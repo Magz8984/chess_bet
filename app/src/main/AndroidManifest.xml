@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="chessbet.app.com">
 
-    <!--adds the INTERNET permission as we need to make network calls.-->
+    <!-- adds the INTERNET permission as we need to make network calls. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -19,7 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
+        <activity android:name=".SignupActivity"></activity>
     </application>
 
 </manifest>
