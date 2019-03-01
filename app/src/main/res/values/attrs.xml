@@ -1,3 +1,7 @@
 <resources>
-
+ <declare-styleable name="ComponentView">
+     <attr name="name" format="string"/>
+     <attr name="row" format="integer"/>
+     <attr name="col" format="integer"/>
+ </declare-styleable>
 </resources>
