@@ -24,7 +24,7 @@
             android:layout_height="@dimen/logo_w_h"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="30dp"
-            android:src="@drawable/news" />
+            android:src="@drawable/chesslogo" />
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
