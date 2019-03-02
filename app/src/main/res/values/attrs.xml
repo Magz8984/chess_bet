@@ -3,5 +3,7 @@
      <attr name="name" format="string"/>
      <attr name="row" format="integer"/>
      <attr name="col" format="integer"/>
+     <attr name="componentColor" format="color"/>
+     <attr name="component" format="string"/>
  </declare-styleable>
 </resources>
