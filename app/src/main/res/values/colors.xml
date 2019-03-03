@@ -11,4 +11,7 @@
     <color name="colorCyanBlue">#0B9BE2</color>
     <color name="colorMidBlue">#032B3F</color>
     <color name="colorCoinBackground">#01242b</color>
+    <color name="chessWhite"></color>
+
+    <!--Add b-->
 </resources>
