@@ -1,5 +1,6 @@
 package chessbet.app.com;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -13,4 +14,6 @@ public class BoardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_board);
         ButterKnife.bind(this);
     }
+
+
 }
