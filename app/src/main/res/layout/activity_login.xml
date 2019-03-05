@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:gravity="center_horizontal"
     android:orientation="vertical"
     tools:context=".LoginActivity">
@@ -10,7 +11,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="@color/colorPrimary"
+        android:background="@drawable/chesslogin"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="@dimen/activity_horizontal_margin">
@@ -24,32 +25,44 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:passwordToggleEnabled="true"
+            android:textColorHint="@color/colorWhite">
 
             <EditText
                 android:id="@+id/email"
-                android:layout_width="match_parent"
+                android:layout_width="401dp"
                 android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"
+                android:padding="1dp"
+                app:fontFamily="@font/poiretoneregular"
                 android:layout_marginBottom="10dp"
                 android:hint="@string/hint_email"
-                android:inputType="textEmailAddress"
-                android:textColor="@color/white"
-                android:textColorHint="@color/white" />
+                android:textColor="@color/colorWhite"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:passwordToggleEnabled="true"
+            android:textColorHint="@color/colorWhite">
 
             <EditText
                 android:id="@+id/password"
-                android:layout_width="fill_parent"
+                android:layout_width="401dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="1dp"
+                android:maxLines="1"
+                android:ems="10"
                 android:hint="@string/hint_password"
                 android:inputType="textPassword"
-                android:textColor="@color/white"
-                android:textColorHint="@color/white" />
+                android:textColor="@color/colorWhite"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:fontFamily="@font/poiretoneregular"/>
         </android.support.design.widget.TextInputLayout>
 
         <!-- Login Button -->
@@ -58,10 +71,10 @@
             android:id="@+id/btn_login"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dip"
-            android:background="@color/colorAccent"
+            android:layout_marginTop="20dp"
+            android:background="@color/colorWhite"
             android:text="@string/btn_login"
-            android:textColor="@android:color/black" />
+            android:textColor="@color/colorTransparentPink" />
 
         <Button
             android:id="@+id/btn_reset_password"
@@ -93,5 +106,5 @@
         android:layout_height="30dp"
         android:layout_gravity="center|bottom"
         android:layout_marginBottom="20dp"
-        android:visibility="gone" />
+        android:visibility="gone"/>
 </LinearLayout>
