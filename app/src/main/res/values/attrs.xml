@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="BoardView">
-        <attr name="format_white" format="color"/>
-        <attr name="format_black" format="color"/>
-    </declare-styleable>
-    <declare-styleable name="Cell">
 
-    </declare-styleable>
 </resources>
