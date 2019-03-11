@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import 	android.graphics.Color;
 
 public class Cell extends View {
+<<<<<<< HEAD
     private int col;
     private int row;
     private boolean isWhite;
@@ -73,5 +74,9 @@ public class Cell extends View {
 
 
         setMeasuredDimension(width, height);
+=======
+    public Cell(Context context) {
+        super(context);
+>>>>>>> parent of 2928cc8... Restructure App
     }
 }
