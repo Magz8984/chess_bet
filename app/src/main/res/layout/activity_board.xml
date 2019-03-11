@@ -8,19 +8,5 @@
     tools:context=".BoardActivity"
     android:padding="5dp">
 
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="400dp">
-        <TableRow>
-               <chessengine.ComponentView
-                   app:componentColor="@color/colorAccent"
-                   >
-                   <!--<ImageView-->
-                       <!--android:src="@drawable/like"/>-->
-               </chessengine.ComponentView>
-        </TableRow>
-    </TableLayout>
-
-
 
 </RelativeLayout>

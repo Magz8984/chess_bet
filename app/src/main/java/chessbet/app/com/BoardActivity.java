@@ -3,8 +3,6 @@ package chessbet.app.com;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import butterknife.ButterKnife;
-
 public class BoardActivity extends AppCompatActivity {
 
     @Override

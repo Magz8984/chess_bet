@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<<<<<<< HEAD
-
-=======
     <declare-styleable name="BoardView">
 
     </declare-styleable>
 
-
->>>>>>> parent of 2928cc8... Restructure App
 </resources>
