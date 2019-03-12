@@ -4,11 +4,20 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -19,6 +28,7 @@ import chessbet.app.com.R;
 
 
 public class BoardView extends View {
+    private final String place[]={"r","n","b","k","q","b","n","r"};
     private static String app_name=BoardView.class.getSimpleName();
     private final int row =8;
     private final int column =8;
@@ -30,6 +40,7 @@ public class BoardView extends View {
 
     public  boolean isFlipped=false;
     private Cell[][] cells;
+    private Component[][] components;
 
     public BoardView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -38,9 +49,11 @@ public class BoardView extends View {
         super(context);
         this.context=context;
         cells=new Cell[row][column]; // Initialize Cell Size
+        components=new Component[row][column];
         setFocusable(true);
 
         buildCells(); // Create an instance of the cell;
+        Log.d(app_name,Integer.toString(place.length));
     }
 
     private  void buildCells(){
@@ -48,6 +61,37 @@ public class BoardView extends View {
         for(int i=0;i<row;i++){
             for(int j=0;j<column;j++){
                 cells[i][j]= new Cell(i,j,this.context);
+                components[i][j]=new Component();
+                if(i==0){
+                    components[i][j].setCol(column);
+                    components[i][j].setRow(row);
+                    components[i][j].setType(place[j].concat("b"));
+                    components[i][j].setResourceId(Component.resID(components[i][j].getType()));
+                }
+                else if(i==1){
+                    components[i][j].setCol(column);
+                    components[i][j].setRow(row);
+                    components[i][j].setType("pb");
+                    components[i][j].setResourceId(Component.resID(components[i][j].getType()));
+                }
+                else if(i==6){
+                    components[i][j].setCol(column);
+                    components[i][j].setRow(row);
+                    components[i][j].setType("pw");
+                    components[i][j].setResourceId(Component.resID(components[i][j].getType()));
+                }
+                else if(i==7){
+                    components[i][j].setCol(column);
+                    components[i][j].setRow(row);
+                    components[i][j].setType(place[j].concat("w"));
+                    components[i][j].setResourceId(Component.resID(components[i][j].getType()));
+                }
+                else{
+                    components[i][j].setCol(column);
+                    components[i][j].setRow(row);
+                    components[i][j].setType("0");
+                }
+                cells[i][j].setComponent(components[i][j]); //Sets component
             }
         }
     }
@@ -89,8 +133,8 @@ public class BoardView extends View {
                         yCoord + square_size   // bottom
                 );
 
-                cells[c][r].setTileRect(tileRect);
-                cells[c][r].draw(canvas);
+                cells[r][c].setTileRect(tileRect);
+                cells[r][c].draw(canvas);
             }
         }
 
@@ -116,11 +160,17 @@ public class BoardView extends View {
     private int getYCoord(final int y) {
         return y0 + square_size * (isFlipped ? y : 7 - y);
     }
+    private void setIsFilpped(boolean value){ // FLips;
+        this.isFlipped=value;
+    }
 }
 
 
 //
-class Cell {
+class Cell extends View{
+    private Matrix matrix;
+    private RectF mSrcRectF;
+    private RectF mDestRectF;
     private static final String TAG = Cell.class.getSimpleName();
 
     private final int col;
@@ -130,23 +180,54 @@ class Cell {
     private Rect tileRect;
     private Context context;
     private Bitmap bitmap;
+    private  Component component;
 
     Cell(int row, int column,Context context) {
+        super(context);
         this.col = column;
         this.row = row;
         this.context=context;
         this.squareColor = new Paint();
-        squareColor.setColor(isDark() ? Color.rgb(240,230,140) : Color.rgb(220,235,235));
+        this.matrix=new Matrix();
+        this.mDestRectF=new RectF();
+        this.mSrcRectF=new RectF();
     }
 
     public void draw(final Canvas canvas) {
-        Drawable drawable=this.context.getResources().getDrawable(R.drawable.pw);
-        drawable.setBounds(tileRect);
-        drawable.draw(canvas);;
-        canvas.drawRect(tileRect, squareColor);
-        bitmap=((BitmapDrawable) drawable).getBitmap();
-//        canvas.drawBitmap(bitmap,10,10,squareColor);
+        super.draw(canvas);
+        Log.d("RESID",component.getType());
+        Log.d("RESID",Integer.toString(component.getResourceId()));
+        Drawable drawable;
+        if(component.getResourceId()!=0){
+//            Log.d("RESID",component.getType());
+//            Log.d("RESID",Integer.toString(component.getResourceId()));
 
+             drawable= this.context.getResources().getDrawable(component.getResourceId());
+        }
+        else{
+            drawable=this.context.getResources().getDrawable(R.drawable.select);
+            drawable.setAlpha(10);
+        }
+
+        drawable.setColorFilter(isDark() ? Color.rgb(240,230,140) : Color.rgb(220,235,235),PorterDuff.Mode.DST_OVER);
+        drawable.setBounds(tileRect);
+        drawable.draw(canvas);
+
+        bitmap = ((BitmapDrawable) drawable).getBitmap();
+
+        mSrcRectF.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+        // Setting size of Destination Rect
+        mDestRectF.set(0, 0, getWidth(),getHeight());
+
+
+        // Scaling the bitmap to fit the PaintView
+        matrix.setRectToRect(mSrcRectF, mDestRectF, Matrix.ScaleToFit.CENTER);
+        // Drawing the bitmap in the canvas
+
+
+        canvas.drawBitmap(bitmap, matrix, squareColor);
+        invalidate();
     }
 
     private String getColumnString() {
@@ -199,5 +280,79 @@ class Cell {
         final String row = getRowString();
         return "<Tile " + column + row + ">";
 
+    }
+
+    public void setComponent(Component component) {
+        this.component = component;
+    }
+}
+
+class Component{ // Holds Component Data;
+    private  String  type;
+    private int row;
+    private  int col;
+    private  int resourceId;
+
+    public void setRow(int row) {
+        this.row = row;
+    }
+
+    public void setCol(int col) {
+        this.col = col;
+    }
+
+    public void setResourceId(int reSourceId) {
+        this.resourceId = reSourceId;
+    }
+
+    public void setType(String  type) {
+        this.type = type;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    public int getResourceId() {
+        return resourceId;
+    }
+
+    public String  getType() {
+        return type;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public  static int resID(String c){
+        switch (c){
+            case "rb":
+                return R.drawable.rb;
+            case "nb":
+                return R.drawable.nb;
+            case "bb":
+                return R.drawable.bb;
+            case "kb":
+                return R.drawable.kb;
+            case "qb":
+                return R.drawable.qb;
+            case "pb":
+                return R.drawable.pb;
+            case "rw":
+                return R.drawable.rw;
+            case "nw":
+                return R.drawable.nw;
+            case "bw":
+                return R.drawable.bw;
+            case "kw":
+                return R.drawable.kw;
+            case "qw":
+                return R.drawable.qw;
+            case "pw":
+                return R.drawable.pw;
+            default:
+                return 0;
+        }
     }
 }
