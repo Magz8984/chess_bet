@@ -17,7 +17,7 @@ public class BoardActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         BoardView boardView=new BoardView(this);
         boardView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));
+//        boardView.setIsFilpped(true);
         chessLayout.addView(boardView);
-
     }
 }

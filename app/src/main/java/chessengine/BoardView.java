@@ -160,8 +160,10 @@ public class BoardView extends View {
     private int getYCoord(final int y) {
         return y0 + square_size * (isFlipped ? y : 7 - y);
     }
-    private void setIsFilpped(boolean value){ // FLips;
+    public void setIsFilpped(boolean value){ // FLips;
         this.isFlipped=value;
+        requestLayout();
+        invalidate();
     }
 }
 
@@ -209,7 +211,7 @@ class Cell extends View{
             drawable.setAlpha(10);
         }
 
-        drawable.setColorFilter(isDark() ? Color.rgb(240,230,140) : Color.rgb(220,235,235),PorterDuff.Mode.DST_OVER);
+        drawable.setColorFilter(isDark() ? Color.rgb(240,230,140) : Color.CYAN,PorterDuff.Mode.DST_OVER);
         drawable.setBounds(tileRect);
         drawable.draw(canvas);
 
