@@ -103,9 +103,9 @@ public class BoardView extends View {
         final int y = (int) event.getY();
 
         Cell cell;
-        for (int c = 0; c < row; c++) {
-            for (int r = 0; r < column; r++) {
-                cell = cells[c][r];
+        for (int r = 0; r < row; r++) {
+            for (int c = 0; c < column; c++) {
+                cell = cells[r][c];
                 if (cell.isTouched(x, y))
                     cell.handleTouch();
             }
@@ -168,7 +168,7 @@ public class BoardView extends View {
 }
 
 
-//
+
 class Cell extends View{
     private Matrix matrix;
     private RectF mSrcRectF;
