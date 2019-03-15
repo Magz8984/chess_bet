@@ -18,20 +18,39 @@
 
 
         <Button
+            android:id="@+id/playcomputer"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:text="Play Game"
+            android:text="Play vs Computer"
             android:layout_marginTop="40dp"
             android:background="@drawable/menubuttons"
             android:textColor="@color/colorWhite" />
         <Button
+            android:id="@+id/playtwoplayer"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:text="two Players"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/menubuttons"
+            android:textColor="@color/colorWhite" />
+        <Button
+            android:id="@+id/playsingleplayer"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:text="Single Player"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/menubuttons"
+            android:textColor="@color/colorWhite"/>
+        <Button
+            android:id="@+id/playonline"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Play Online"
             android:layout_marginTop="40dp"
             android:background="@drawable/menubuttons"
-            android:textColor="@color/colorWhite" />
+            android:textColor="@color/colorWhite"/>
         <Button
+            android:id="@+id/playBetonline"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Bet Online"
@@ -39,6 +58,7 @@
             android:background="@drawable/menubuttons"
             android:textColor="@color/colorWhite"/>
         <Button
+            android:id="@+id/settings"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Settings"
