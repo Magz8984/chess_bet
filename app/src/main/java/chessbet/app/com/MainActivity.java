@@ -12,8 +12,6 @@ public class MainActivity extends AppCompatActivity {
 //    BUTTONS
     //SettingsButton
     private Button mSettingsButton;
-    //Accounts Settings
-    private Button mAccountsSettings;
 
 
 
@@ -34,11 +32,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void openAccountsSettings(){
-        Intent intent = new Intent(this, AccountActivity.class);
-        startActivity(intent);
-    }
-
+    //Settings Button Start Activity
     public void openSettings(){
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
