@@ -4,9 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".AccountActivity">
+    tools:context=".AccountActivity"
+    android:id="@+id/main_layout">
 
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:elevation="0dp">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPink" />
+
+    </android.support.design.widget.AppBarLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,7 +53,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:focusableInTouchMode="true"
-            android:hint="@string/prompt_password"
+            android:hint="@string/hint_password"
             android:imeOptions="actionUnspecified"
             android:inputType="textPassword"
             android:maxLines="1"
@@ -156,5 +168,4 @@
             android:textStyle="bold" />
 
     </LinearLayout>
-
 </android.support.design.widget.CoordinatorLayout>
