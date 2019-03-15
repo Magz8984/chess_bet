@@ -18,10 +18,32 @@
 
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Play Game"
-            android:background="@color/colorTransparentWhite"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/menubuttons"
+            android:textColor="@color/colorWhite" />
+        <Button
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:text="Play Online"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/menubuttons"
+            android:textColor="@color/colorWhite" />
+        <Button
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:text="Bet Online"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/menubuttons"
+            android:textColor="@color/colorWhite"/>
+        <Button
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:text="Settings"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/menubuttons"
             android:textColor="@color/colorWhite" />
 
     </LinearLayout>
