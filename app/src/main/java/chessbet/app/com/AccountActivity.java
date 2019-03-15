@@ -51,7 +51,7 @@ public class AccountActivity extends AppCompatActivity {
             }
         };
         btnChangeEmail = (Button) findViewById(R.id.change_email_button);
-        btnChangePassword = (Button) findViewById(R.id.change_password_button);
+//        btnChangePassword = (Button) findViewById(R.id.change_password_button);
         btnSendResetEmail = (Button) findViewById(R.id.sending_pass_reset_button);
         btnRemoveUser = (Button) findViewById(R.id.remove_user_button);
         changeEmail = (Button) findViewById(R.id.changeEmail);
