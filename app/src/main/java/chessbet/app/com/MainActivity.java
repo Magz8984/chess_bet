@@ -22,17 +22,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //AccountsSettings
-        mAccountsSettings = (Button) findViewById(R.id.BtnAccountSettings);
-        mAccountsSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openAccountsSettings();
-            }
-        });
-
-
-        //Settings
+        //Settings Button
         mSettingsButton = (Button) findViewById(R.id.BtnSettings);
         mSettingsButton.setOnClickListener(new View.OnClickListener() {
 
