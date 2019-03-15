@@ -9,8 +9,12 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity {
 
 
-//    Buttons
-    private Button mSettingButton;
+//    BUTTONS
+    //SettingsButton
+    private Button mSettingsButton;
+    //Accounts Settings
+    private Button mAccountsSettings;
+
 
 
     @Override
@@ -18,16 +22,35 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mSettingButton = (Button) findViewById(R.id.settings);
-        mSettingButton.setOnClickListener(new View.OnClickListener() {
+        //AccountsSettings
+        mAccountsSettings = (Button) findViewById(R.id.BtnAccountSettings);
+        mAccountsSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openAccountsSettings();
+            }
+        });
+
+
+        //Settings
+        mSettingsButton = (Button) findViewById(R.id.BtnSettings);
+        mSettingsButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 openSettings();
             }
         });
+
     }
-    public void openSettings(){
+
+    public void openAccountsSettings(){
         Intent intent = new Intent(this, AccountActivity.class);
+        startActivity(intent);
+    }
+
+    public void openSettings(){
+        Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
     }
 }

@@ -18,7 +18,7 @@
 
 
         <Button
-            android:id="@+id/playcomputer"
+            android:id="@+id/BtnPlaycomputer"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Play vs Computer"
@@ -26,7 +26,7 @@
             android:background="@drawable/menubuttons"
             android:textColor="@color/colorWhite" />
         <Button
-            android:id="@+id/playtwoplayer"
+            android:id="@+id/BtnPlaytwoplayer"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="two Players"
@@ -34,7 +34,7 @@
             android:background="@drawable/menubuttons"
             android:textColor="@color/colorWhite" />
         <Button
-            android:id="@+id/playsingleplayer"
+            android:id="@+id/BtnPlaysingleplayer"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Single Player"
@@ -42,7 +42,7 @@
             android:background="@drawable/menubuttons"
             android:textColor="@color/colorWhite"/>
         <Button
-            android:id="@+id/playonline"
+            android:id="@+id/BtnPlayonline"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Play Online"
@@ -50,7 +50,7 @@
             android:background="@drawable/menubuttons"
             android:textColor="@color/colorWhite"/>
         <Button
-            android:id="@+id/playBetonline"
+            android:id="@+id/BtnPlayBetonline"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Bet Online"
@@ -58,7 +58,7 @@
             android:background="@drawable/menubuttons"
             android:textColor="@color/colorWhite"/>
         <Button
-            android:id="@+id/settings"
+            android:id="@+id/BtnSettings"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="Settings"
