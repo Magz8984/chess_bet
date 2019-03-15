@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -33,16 +32,15 @@ public class LoginActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         if (auth.getCurrentUser() != null) {
-//            LOGS USEr IN ONCE IT FINDS HE HAD LOGGED IN!
-//            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-//            finish();
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
         }
 
         // set the view now
         setContentView(R.layout.activity_login);
-//
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+
+        // Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        // setSupportActionBar(toolbar);
 
         inputEmail = (EditText) findViewById(R.id.email);
         inputPassword = (EditText) findViewById(R.id.password);

@@ -18,53 +18,27 @@
 
 
         <Button
-            android:id="@+id/BtnPlaycomputer"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:text="Play vs Computer"
+            android:text="Profile"
             android:layout_marginTop="40dp"
             android:background="@drawable/menubuttons"
             android:textColor="@color/colorWhite" />
         <Button
-            android:id="@+id/BtnPlaytwoplayer"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:text="two Players"
+            android:text="Sound"
             android:layout_marginTop="40dp"
             android:background="@drawable/menubuttons"
             android:textColor="@color/colorWhite" />
         <Button
-            android:id="@+id/BtnPlaysingleplayer"
+            android:id="@+id/BtnAccountSettings"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:text="Single Player"
+            android:text="Account Settings"
             android:layout_marginTop="40dp"
             android:background="@drawable/menubuttons"
             android:textColor="@color/colorWhite"/>
-        <Button
-            android:id="@+id/BtnPlayonline"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:text="Play Online"
-            android:layout_marginTop="40dp"
-            android:background="@drawable/menubuttons"
-            android:textColor="@color/colorWhite"/>
-        <Button
-            android:id="@+id/BtnPlayBetonline"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:text="Bet Online"
-            android:layout_marginTop="40dp"
-            android:background="@drawable/menubuttons"
-            android:textColor="@color/colorWhite"/>
-        <Button
-            android:id="@+id/BtnSettings"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:text="Settings"
-            android:layout_marginTop="40dp"
-            android:background="@drawable/menubuttons"
-            android:textColor="@color/colorWhite" />
 
     </LinearLayout>
 
