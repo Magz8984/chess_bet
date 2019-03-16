@@ -106,8 +106,11 @@ public class BoardView extends View {
         for (int r = 0; r < row; r++) {
             for (int c = 0; c < column; c++) {
                 cell = cells[r][c];
-                if (cell.isTouched(x, y))
+                if (cell.isTouched(x, y)){
                     cell.handleTouch();
+                    invalidate();
+                }
+
             }
         }
 
@@ -182,7 +185,8 @@ class Cell extends View{
     private Rect tileRect;
     private Context context;
     private Bitmap bitmap;
-    private  Component component;
+    private Component component;
+    private boolean touched;
 
     Cell(int row, int column,Context context) {
         super(context);
@@ -197,8 +201,6 @@ class Cell extends View{
 
     public void draw(final Canvas canvas) {
         super.draw(canvas);
-        Log.d("RESID",component.getType());
-        Log.d("RESID",Integer.toString(component.getResourceId()));
         Drawable drawable;
         if(component.getResourceId()!=0){
 //            Log.d("RESID",component.getType());
@@ -211,7 +213,13 @@ class Cell extends View{
             drawable.setAlpha(10);
         }
 
-        drawable.setColorFilter(isDark() ? Color.rgb(240,230,140) : Color.CYAN,PorterDuff.Mode.DST_OVER);
+        if(this.touched){ // Once invalidate is invoked
+            Log.d("TRUE","Done");
+            drawable.setColorFilter(Color.YELLOW,PorterDuff.Mode.DST_OVER);
+        }
+        else{
+            drawable.setColorFilter(isDark() ? Color.rgb(240,230,140) : Color.CYAN,PorterDuff.Mode.DST_OVER);
+        }
         drawable.setBounds(tileRect);
         drawable.draw(canvas);
 
@@ -261,6 +269,7 @@ class Cell extends View{
     }
 
     public void handleTouch() {
+        this.touched=!this.touched;
         Log.d(TAG, "handleTouch(): col: " + col);
         Log.d(TAG, "handleTouch(): row: " + row);
     }
@@ -281,7 +290,6 @@ class Cell extends View{
         final String column = getColumnString();
         final String row = getRowString();
         return "<Tile " + column + row + ">";
-
     }
 
     public void setComponent(Component component) {
