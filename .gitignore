@@ -194,3 +194,6 @@ sftp-config.json
 *.tmproj
 *.tmproject
 tmtags
+
+# Pencil File
+*.epgz
