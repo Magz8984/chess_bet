@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "105382578129",
+    "firebase_url": "https://chess-bet.firebaseio.com",
+    "project_id": "chess-bet",
+    "storage_bucket": "chess-bet.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:105382578129:android:02b0b11f242b3e3b",
+        "android_client_info": {
+          "package_name": "chessbet.app.com"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "105382578129-sbav9t3j34s1bphu4aa90ggaqgm2ta9s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCU87rZqLULPB6wB9g04bHM9jzOR6yw4nk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
