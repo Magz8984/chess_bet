@@ -196,4 +196,8 @@ sftp-config.json
 tmtags
 
 # Pencil File
+<<<<<<< HEAD
 .epgz
+=======
+*.epgz
+>>>>>>> 215a375ce00f50ace2467c2de375814236d9af80
