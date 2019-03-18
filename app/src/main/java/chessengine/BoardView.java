@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.graphics.Canvas;
+import android.widget.Toast;
 
 import chessbet.app.com.R;
 
@@ -107,6 +108,8 @@ public class BoardView extends View {
             for (int c = 0; c < column; c++) {
                 cell = cells[r][c];
                 if (cell.isTouched(x, y)){
+                    Toast.makeText(context,"row " + Integer.toString(r) + "col " +Integer.toString(c)
+                            ,Toast.LENGTH_LONG).show();
                     cell.handleTouch();
                     invalidate();
                 }
