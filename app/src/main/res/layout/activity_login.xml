@@ -40,7 +40,6 @@
                 android:hint="@string/hint_email"
                 android:inputType="textEmailAddress"
                 android:maxLines="1"
-                android:padding="1dp"
                 android:textColor="@color/colorWhite"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:fontFamily="@font/poiretoneregular" />
@@ -64,10 +63,8 @@
                 android:drawablePadding="12dp"
                 android:hint="@string/hint_password"
                 android:fontFamily="@font/poiretoneregular"
-                android:paddingTop="20dp"
                 android:inputType="textPassword"
                 android:maxLines="1"
-                android:padding="1dp"
                 android:textColor="@color/colorWhite"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:fontFamily="@font/poiretoneregular" />

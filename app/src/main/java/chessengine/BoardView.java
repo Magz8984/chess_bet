@@ -220,10 +220,12 @@ class Cell extends View{
         else{
             drawable.setColorFilter(isDark() ? Color.rgb(240,230,140) : Color.CYAN,PorterDuff.Mode.DST_OVER);
         }
+
         drawable.setBounds(tileRect);
         drawable.draw(canvas);
 
         bitmap = ((BitmapDrawable) drawable).getBitmap();
+
 
         mSrcRectF.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
 
@@ -231,8 +233,10 @@ class Cell extends View{
         mDestRectF.set(0, 0, getWidth(),getHeight());
 
 
+
         // Scaling the bitmap to fit the PaintView
         matrix.setRectToRect(mSrcRectF, mDestRectF, Matrix.ScaleToFit.CENTER);
+        matrix.postRotate(90);
         // Drawing the bitmap in the canvas
 
 

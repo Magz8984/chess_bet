@@ -58,5 +58,13 @@
 
    </LinearLayout>
 
+    <Button
+    android:id="@+id/btnFlip"
+    android:layout_below="@+id/chessLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/colorPrimaryDark"
+    android:textColor="@color/colorWhite"
+    android:text="@string/flip"/>
 
 </RelativeLayout>

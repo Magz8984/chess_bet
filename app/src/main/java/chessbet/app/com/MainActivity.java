@@ -6,35 +6,42 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity {
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-
-//    BUTTONS
-    //SettingsButton
-    private Button mSettingsButton;
-
-
+public class MainActivity extends AppCompatActivity implements  View.OnClickListener {
+    @BindView(R.id.BtnPlaytwoplayer) Button btnTwoPlayer;
+    @BindView(R.id.BtnSettings) Button mSettingsButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
-        //Settings Button
-        mSettingsButton = (Button) findViewById(R.id.BtnSettings);
-        mSettingsButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                openSettings();
-            }
-        });
-
+        mSettingsButton.setOnClickListener(this);
+        btnTwoPlayer.setOnClickListener(this);
     }
 
     //Settings Button Start Activity
-    public void openSettings(){
+    private void openSettings(){
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
+    }
+
+    private void openBoard(){
+        Intent intent=new Intent(this,BoardActivity.class);
+        startActivity(intent);
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        if(v.equals(mSettingsButton)){
+            openSettings();
+        }
+        if(v.equals(btnTwoPlayer)){
+            openBoard();
+        }
     }
 }

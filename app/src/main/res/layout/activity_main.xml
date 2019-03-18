@@ -14,61 +14,59 @@
         android:gravity="center"
         android:orientation="vertical"
         android:padding="@dimen/activity_horizontal_margin"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
+        tools:layout_editor_absoluteX="0sp"
+        tools:layout_editor_absoluteY="0sp">
 
 
         <Button
             android:id="@+id/BtnPlaycomputer"
-            android:layout_width="250dp"
+            android:layout_width="250sp"
             android:layout_height="wrap_content"
             android:text="Play vs Computer"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30sp"
             android:background="@drawable/menubuttons"
-            android:textColor="@color/colorWhite" />
+            android:textColor="@color/colorPrimaryDark" />
         <Button
             android:id="@+id/BtnPlaytwoplayer"
-            android:layout_width="250dp"
+            android:layout_width="250sp"
             android:layout_height="wrap_content"
             android:text="two Players"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30sp"
             android:background="@drawable/menubuttons"
-            android:textColor="@color/colorWhite" />
+            android:textColor="@color/colorPrimaryDark" />
         <Button
             android:id="@+id/BtnPlaysingleplayer"
-            android:layout_width="250dp"
+            android:layout_width="250sp"
             android:layout_height="wrap_content"
             android:text="Single Player"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30sp"
             android:background="@drawable/menubuttons"
-            android:textColor="@color/colorWhite"/>
+            android:textColor="@color/colorPrimaryDark"/>
         <Button
             android:id="@+id/BtnPlayonline"
-            android:layout_width="250dp"
+            android:layout_width="250sp"
             android:layout_height="wrap_content"
             android:text="Play Online"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30sp"
             android:background="@drawable/menubuttons"
-            android:textColor="@color/colorWhite"/>
+            android:textColor="@color/colorPrimaryDark"/>
         <Button
             android:id="@+id/BtnPlayBetonline"
-            android:layout_width="250dp"
+            android:layout_width="250sp"
             android:layout_height="wrap_content"
             android:text="Bet Online"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30sp"
             android:background="@drawable/menubuttons"
-            android:textColor="@color/colorWhite"/>
+            android:textColor="@color/colorPrimaryDark"/>
         <Button
             android:id="@+id/BtnSettings"
-            android:layout_width="250dp"
+            android:layout_width="250sp"
             android:layout_height="wrap_content"
             android:text="Settings"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30sp"
             android:background="@drawable/menubuttons"
-            android:textColor="@color/colorWhite" />
+            android:textColor="@color/colorPrimaryDark" />
 
     </LinearLayout>
-
-
 
 </android.support.constraint.ConstraintLayout>
