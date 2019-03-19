@@ -206,16 +206,12 @@ class Cell extends View{
         super.draw(canvas);
         Drawable drawable;
         if(component.getResourceId()!=0){
-//            Log.d("RESID",component.getType());
-//            Log.d("RESID",Integer.toString(component.getResourceId()));
-
              drawable= this.context.getResources().getDrawable(component.getResourceId());
         }
         else{
             drawable=this.context.getResources().getDrawable(R.drawable.select);
             drawable.setAlpha(10);
         }
-
         if(this.touched){ // Once invalidate is invoked
             Log.d("TRUE","Done");
             drawable.setColorFilter(Color.YELLOW,PorterDuff.Mode.DST_OVER);
@@ -223,26 +219,14 @@ class Cell extends View{
         else{
             drawable.setColorFilter(isDark() ? Color.rgb(240,230,140) : Color.CYAN,PorterDuff.Mode.DST_OVER);
         }
-
         drawable.setBounds(tileRect);
         drawable.draw(canvas);
-
         bitmap = ((BitmapDrawable) drawable).getBitmap();
-
-
         mSrcRectF.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
 
-        // Setting size of Destination Rect
         mDestRectF.set(0, 0, getWidth(),getHeight());
-
-
-
-        // Scaling the bitmap to fit the PaintView
         matrix.setRectToRect(mSrcRectF, mDestRectF, Matrix.ScaleToFit.CENTER);
         matrix.postRotate(90);
-        // Drawing the bitmap in the canvas
-
-
         canvas.drawBitmap(bitmap, matrix, squareColor);
         invalidate();
     }
@@ -279,6 +263,7 @@ class Cell extends View{
         this.touched=!this.touched;
         Log.d(TAG, "handleTouch(): col: " + col);
         Log.d(TAG, "handleTouch(): row: " + row);
+        Log.d("COMPONENT",component.getType());
     }
 
     private boolean isDark() {
