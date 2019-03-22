@@ -35,7 +35,8 @@ public class BoardView extends View {
     private final int column =8;
     private Context context;
 
-    private int x0=0; // X and Y coordinates
+    // X and Y coordinates
+    private int x0=0;
     private int y0=0;
     private int square_size =0;
 
@@ -108,10 +109,12 @@ public class BoardView extends View {
             for (int c = 0; c < column; c++) {
                 cell = cells[r][c];
                 if (cell.isTouched(x, y)){
-                    Toast.makeText(context,"row " + Integer.toString(r) + "col " +Integer.toString(c)
-                            ,Toast.LENGTH_LONG).show();
                     cell.handleTouch();
-                    invalidate();
+                    if(Game.assignGame(cell.getComponent())==0) { //Game Assignment
+                        Game.Move(cells);
+                        Toast.makeText(context, "DONE", Toast.LENGTH_SHORT).show();
+                        invalidate();
+                    }
                 }
 
             }
@@ -219,6 +222,7 @@ class Cell extends View{
         else{
             drawable.setColorFilter(isDark() ? Color.rgb(240,230,140) : Color.CYAN,PorterDuff.Mode.DST_OVER);
         }
+
         drawable.setBounds(tileRect);
         drawable.draw(canvas);
         bitmap = ((BitmapDrawable) drawable).getBitmap();
@@ -261,8 +265,6 @@ class Cell extends View{
 
     public void handleTouch() {
         this.touched=!this.touched;
-        Log.d(TAG, "handleTouch(): col: " + col);
-        Log.d(TAG, "handleTouch(): row: " + row);
         Log.d("COMPONENT",component.getType());
     }
 
@@ -286,6 +288,10 @@ class Cell extends View{
 
     public void setComponent(Component component) {
         this.component = component;
+    }
+
+    public Component getComponent() {
+        return component;
     }
 }
 
