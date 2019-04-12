@@ -1,32 +1,50 @@
 package chessengine;
 
-import android.util.Log;
-
+import java.util.ArrayList;
+import java.util.List;
 
 class Game {
-    private  static Component component_to=null;
-    private  static Component component_from=null;
-    static void Move(Cell[][] cells){ //Moves Cell From To;
-        freeGame();
-    }
-     static int assignGame(Component component){
-        if(component_from==null){
-            component_from=component;
+    private char turn='w';  //Start At White
+    private List<Cell> cells=new ArrayList<>();
+    boolean assignGame(Cell cell){ // By ref
+        if(cells.size()<2) {
+            if (cells.size() == 1) {
+                if (!cell.getComponent().getType().equals(cells.get(0).getComponent().getType())) {
+                    cells.add(cell);
+                }
+            } else if (cell.getComponent().getType().length()>1){
+                if (cell.getComponent().getType().charAt(1) ==  turn){
+                    freeGame();
+                    cells.add(cell);
+                }
+            }
         }
-        else if(component_to==null){
-            component_to=component;
-            return 0;
-        }
-        else{
-            Log.d(Game.class.getSimpleName(),"GAME MOVE INVALID");
-        }
-        return  1;
+           if(cells.size() == 2) {
+                Component t_component=cells.get(0).getComponent();
+                t_component.setRow(cells.get(1).getComponent().getRow());
+                t_component.setCol(cells.get(1).getComponent().getCol());
+                cells.get(1).setComponent(t_component);
+                cells.get(0).setComponent(createEmptyComponent(cells.get(0).getComponent().getRow(),cells.get(0).getComponent().getCol()));
+                    if (turn == 'w') {
+                        turn='b';
+                    }
+                    else {
+                        turn='w';
+                    }
+                freeGame();
+                return true;
+            }
+            return  false;
     }
 
-    private static void freeGame(){
-        component_from=null;
-        component_to=null;
+    private void freeGame(){
+        for (Cell cell:cells){
+            cell.setTouchedFalse();
+        }
+        cells.clear();
+        cells.clear();
     }
+
 
 
     private static Component createEmptyComponent(int row,int col){ //Create Empty Component
