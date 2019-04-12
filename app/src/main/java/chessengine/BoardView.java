@@ -1,25 +1,17 @@
 package chessengine;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.graphics.Canvas;
@@ -29,19 +21,19 @@ import chessbet.app.com.R;
 
 public class BoardView extends View {
     private final String place[]={"r","n","b","k","q","b","n","r"};
-    private static String app_name=BoardView.class.getSimpleName();
     private final int row =8;
     private final int column =8;
     private Context context;
 
-    private int x0=0; // X and Y coordinates
+    // X and Y coordinates
+    private int x0=0;
     private int y0=0;
     private int square_size =0;
 
     public  boolean isFlipped=false;
     private Cell[][] cells;
     private Component[][] components;
-
+    private Game game;
     public BoardView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
@@ -51,44 +43,42 @@ public class BoardView extends View {
         cells=new Cell[row][column]; // Initialize Cell Size
         components=new Component[row][column];
         setFocusable(true);
-
+        game=new Game();
         buildCells(); // Create an instance of the cell;
-        Log.d(app_name,Integer.toString(place.length));
     }
 
     private  void buildCells(){
-        Log.d("INIT","INITIALIZED");
         for(int i=0;i<row;i++){
             for(int j=0;j<column;j++){
                 cells[i][j]= new Cell(i,j,this.context);
                 components[i][j]=new Component();
                 if(i==0){
-                    components[i][j].setCol(column);
-                    components[i][j].setRow(row);
+                    components[i][j].setCol(j);
+                    components[i][j].setRow(i);
                     components[i][j].setType(place[j].concat("b"));
                     components[i][j].setResourceId(Component.resID(components[i][j].getType()));
                 }
                 else if(i==1){
-                    components[i][j].setCol(column);
-                    components[i][j].setRow(row);
+                    components[i][j].setCol(j);
+                    components[i][j].setRow(i);
                     components[i][j].setType("pb");
                     components[i][j].setResourceId(Component.resID(components[i][j].getType()));
                 }
                 else if(i==6){
-                    components[i][j].setCol(column);
-                    components[i][j].setRow(row);
+                    components[i][j].setCol(j);
+                    components[i][j].setRow(i);
                     components[i][j].setType("pw");
                     components[i][j].setResourceId(Component.resID(components[i][j].getType()));
                 }
                 else if(i==7){
-                    components[i][j].setCol(column);
-                    components[i][j].setRow(row);
+                    components[i][j].setCol(i);
+                    components[i][j].setRow(j);
                     components[i][j].setType(place[j].concat("w"));
                     components[i][j].setResourceId(Component.resID(components[i][j].getType()));
                 }
                 else{
-                    components[i][j].setCol(column);
-                    components[i][j].setRow(row);
+                    components[i][j].setCol(j);
+                    components[i][j].setRow(i);
                     components[i][j].setType("0");
                 }
                 cells[i][j].setComponent(components[i][j]); //Sets component
@@ -96,9 +86,9 @@ public class BoardView extends View {
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(final MotionEvent event) {
+        boolean moveMade;
         final int x = (int) event.getX();
         final int y = (int) event.getY();
 
@@ -108,12 +98,11 @@ public class BoardView extends View {
                 cell = cells[r][c];
                 if (cell.isTouched(x, y)){
                     cell.handleTouch();
-                    invalidate();
+                    game.assignGame(cell);
                 }
-
             }
         }
-
+        invalidate();
         return true;
     }
 
@@ -135,7 +124,6 @@ public class BoardView extends View {
                         xCoord + square_size,  // right
                         yCoord + square_size   // bottom
                 );
-
                 cells[r][c].setTileRect(tileRect);
                 cells[r][c].draw(canvas);
             }
@@ -150,15 +138,11 @@ public class BoardView extends View {
     private int getCellHeight(int height){
         return  (height /8);
     }
-    private void compute_orign(int width,int height){
-        this.x0= (width -square_size) / 2;
-        this.y0= (height -square_size) / 2;
-
-    }
 
     private int getXCoord(final int x) {
         return x0 + square_size * (isFlipped ? 7 - x : x);
     }
+
 
     private int getYCoord(final int y) {
         return y0 + square_size * (isFlipped ? y : 7 - y);
@@ -186,7 +170,7 @@ class Cell extends View{
     private Context context;
     private Bitmap bitmap;
     private Component component;
-    private boolean touched;
+    private boolean touched=false;
 
     Cell(int row, int column,Context context) {
         super(context);
@@ -202,20 +186,18 @@ class Cell extends View{
     public void draw(final Canvas canvas) {
         super.draw(canvas);
         Drawable drawable;
-        if(component.getResourceId()!=0){
-//            Log.d("RESID",component.getType());
-//            Log.d("RESID",Integer.toString(component.getResourceId()));
 
+
+        if(component.getResourceId()!=0){
              drawable= this.context.getResources().getDrawable(component.getResourceId());
         }
         else{
             drawable=this.context.getResources().getDrawable(R.drawable.select);
             drawable.setAlpha(10);
         }
-
-        if(this.touched){ // Once invalidate is invoked
-            Log.d("TRUE","Done");
+        if(this.touched){
             drawable.setColorFilter(Color.YELLOW,PorterDuff.Mode.DST_OVER);
+            this.touched=!this.touched;
         }
         else{
             drawable.setColorFilter(isDark() ? Color.rgb(240,230,140) : Color.CYAN,PorterDuff.Mode.DST_OVER);
@@ -223,23 +205,12 @@ class Cell extends View{
 
         drawable.setBounds(tileRect);
         drawable.draw(canvas);
-
         bitmap = ((BitmapDrawable) drawable).getBitmap();
-
-
         mSrcRectF.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
 
-        // Setting size of Destination Rect
         mDestRectF.set(0, 0, getWidth(),getHeight());
-
-
-
-        // Scaling the bitmap to fit the PaintView
         matrix.setRectToRect(mSrcRectF, mDestRectF, Matrix.ScaleToFit.CENTER);
         matrix.postRotate(90);
-        // Drawing the bitmap in the canvas
-
-
         canvas.drawBitmap(bitmap, matrix, squareColor);
         invalidate();
     }
@@ -268,14 +239,11 @@ class Cell extends View{
     }
 
     private String getRowString() {
-        // To get the actual row, add 1 since 'row' is 0 indexed.
         return String.valueOf(row + 1);
     }
 
     public void handleTouch() {
-        this.touched=!this.touched;
-        Log.d(TAG, "handleTouch(): col: " + col);
-        Log.d(TAG, "handleTouch(): row: " + row);
+        this.touched =true;
     }
 
     private boolean isDark() {
@@ -298,6 +266,14 @@ class Cell extends View{
 
     public void setComponent(Component component) {
         this.component = component;
+    }
+
+    public Component getComponent() {
+        return component;
+    }
+
+    public void setTouchedFalse(){
+        this.touched=false;
     }
 }
 
