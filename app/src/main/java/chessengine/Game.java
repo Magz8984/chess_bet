@@ -42,7 +42,6 @@ class Game {
             cell.setTouchedFalse();
         }
         cells.clear();
-        cells.clear();
     }
 
 
