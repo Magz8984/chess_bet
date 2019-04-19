@@ -38,13 +38,11 @@ class Game {
     }
 
     private void freeGame(){
-        for (Cell cell:cells){
+        for (Cell cell : cells){
             cell.setTouchedFalse();
         }
         cells.clear();
     }
-
-
 
     private static Component createEmptyComponent(int row,int col){ //Create Empty Component
         Component component=new Component();
