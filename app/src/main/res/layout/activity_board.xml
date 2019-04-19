@@ -54,10 +54,7 @@
        android:layout_width="400sp"
        android:layout_height="400sp"
        android:layout_centerInParent="true"
-       android:orientation="vertical">
-
-   </LinearLayout>
-
+       android:orientation="vertical"/>
     <Button
     android:id="@+id/btnFlip"
     android:layout_below="@+id/chessLayout"
