@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">chessbet</string>
+    <string name="app_name">Chess Bet</string>
     <string name="action_sign_in_short">Register</string>
     <string name="email">Email</string>
     <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
@@ -29,4 +29,7 @@
     <string name="lbl_forgot_password">Forgot password?</string>
     <string name="forgot_password_msg">We just need your registered Email to sent you password reset instructions.</string>
     <string name="flip">FLIP</string>
+    <string name="color_picker">Board Color</string>
+    <string name="black">Black</string>
+    <string name="white">White</string>
 </resources>

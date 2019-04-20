@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#262626"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.flask.colorpicker.ColorPickerView
+        android:id="@+id/colorPicker"
+        android:layout_width="match_parent"
+        android:layout_height="400sp"
+        app:alphaSlider="true"
+        app:density="12"
+        app:lightnessSlider="true"
+        app:wheelType="FLOWER"
+        app:lightnessSliderView="@id/colorLightness"
+        app:alphaSliderView="@id/colorAlpha"/>
+    <com.flask.colorpicker.slider.LightnessSlider
+        android:layout_below="@+id/colorPicker"
+        android:id="@+id/colorLightness"
+        android:layout_width="match_parent"
+        android:layout_height="48sp" />
+
+    <com.flask.colorpicker.slider.AlphaSlider
+        android:layout_below="@+id/colorLightness"
+        android:id="@+id/colorAlpha"
+        android:layout_width="match_parent"
+        android:layout_height="48sp" />
+    <LinearLayout
+        android:layout_below="@+id/colorAlpha"
+        android:id="@+id/back_ground"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20sp"
+        android:weightSum="2">
+        <Button
+            android:id="@+id/btn_dark"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/white"/>
+        <Button
+            android:id="@+id/btn_white"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/black"/>
+    </LinearLayout>
+</RelativeLayout>

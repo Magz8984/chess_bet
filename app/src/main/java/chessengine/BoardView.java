@@ -18,13 +18,13 @@ import android.graphics.Canvas;
 
 import chessbet.app.com.R;
 
-
 public class BoardView extends View {
     private final String place[]={"r","n","b","k","q","b","n","r"};
     private final int row =8;
     private final int column =8;
     private Context context;
-
+    private  int dark;
+    private  int white;
     // X and Y coordinates
     private int x0=0;
     private int y0=0;
@@ -125,6 +125,22 @@ public class BoardView extends View {
                         yCoord + square_size   // bottom
                 );
                 cells[r][c].setTileRect(tileRect);
+                if((r+c+2) % 2 == 0){
+                    if(dark==0 && white==0){
+                        cells[r][c].setColor(Color.CYAN);
+                    }
+                    else{
+                        cells[r][c].setColor(dark);
+                    }
+                }
+                else {
+                    if(dark==0 && white==0){
+                        cells[r][c].setColor(Color.WHITE);
+                    }
+                    else{
+                        cells[r][c].setColor(white);
+                    }
+                }
                 cells[r][c].draw(canvas);
             }
         }
@@ -152,16 +168,24 @@ public class BoardView extends View {
         requestLayout();
         invalidate();
     }
+
+    public void setWhite(int white) {
+        this.white = white;
+        invalidate();
+    }
+
+    public void setDark(int dark) {
+        this.dark = dark;
+        invalidate();
+    }
 }
-
-
 
 class Cell extends View{
     private Matrix matrix;
     private RectF mSrcRectF;
     private RectF mDestRectF;
     private static final String TAG = Cell.class.getSimpleName();
-
+    private  int color;
     private final int col;
     private final int row;
 
@@ -187,7 +211,6 @@ class Cell extends View{
         super.draw(canvas);
         Drawable drawable;
 
-
         if(component.getResourceId()!=0){
              drawable= this.context.getResources().getDrawable(component.getResourceId());
         }
@@ -200,7 +223,7 @@ class Cell extends View{
             this.touched=!this.touched;
         }
         else{
-            drawable.setColorFilter(isDark() ? Color.rgb(240,230,140) : Color.CYAN,PorterDuff.Mode.DST_OVER);
+            drawable.setColorFilter(color,PorterDuff.Mode.DST_OVER);
         }
 
         drawable.setBounds(tileRect);
@@ -245,11 +268,6 @@ class Cell extends View{
     public void handleTouch() {
         this.touched =true;
     }
-
-    private boolean isDark() {
-        return (col + row) % 2 == 0;
-    }
-
     public boolean isTouched(final int x, final int y) {
         return tileRect.contains(x, y);
     }
@@ -274,6 +292,10 @@ class Cell extends View{
 
     public void setTouchedFalse(){
         this.touched=false;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
     }
 }
 
