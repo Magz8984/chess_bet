@@ -55,13 +55,32 @@
        android:layout_height="400sp"
        android:layout_centerInParent="true"
        android:orientation="vertical"/>
-    <Button
-    android:id="@+id/btnFlip"
-    android:layout_below="@+id/chessLayout"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:background="@color/colorPrimaryDark"
-    android:textColor="@color/colorWhite"
-    android:text="@string/flip"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chessLayout"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/btnFlip"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:textColor="@color/colorWhite"
+            android:text="@string/flip"
+            android:layout_margin="5sp"/>
+
+        <Button
+            android:id="@+id/btnColorPicker"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
+            android:textColor="@color/colorWhite"
+            android:text="@string/color_picker"
+            android:layout_margin="5sp"/>
+    </LinearLayout>
+
 
 </RelativeLayout>
