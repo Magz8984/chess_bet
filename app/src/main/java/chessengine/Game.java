@@ -12,11 +12,9 @@ class Game {
                 if (!cell.getComponent().getType().equals(cells.get(0).getComponent().getType())) {
                     cells.add(cell);
                 }
-            } else if (cell.getComponent().getType().length()>1){
-                if (cell.getComponent().getType().charAt(1) ==  turn){
-                    freeGame();
-                    cells.add(cell);
-                }
+            } else if (!cell.getComponent().getType().equals("0") && cell.getComponent().getType().charAt(1) ==  turn){
+                freeGame();
+                cells.add(cell);
             }
         }
            if(cells.size() == 2) {
@@ -25,7 +23,7 @@ class Game {
                 t_component.setCol(cells.get(1).getComponent().getCol());
                 cells.get(1).setComponent(t_component);
                 cells.get(0).setComponent(createEmptyComponent(cells.get(0).getComponent().getRow(),cells.get(0).getComponent().getCol()));
-                    if (turn == 'w') {
+                if (turn == 'w') {
                         turn='b';
                     }
                     else {
@@ -38,9 +36,6 @@ class Game {
     }
 
     private void freeGame(){
-        for (Cell cell : cells){
-            cell.setTouchedFalse();
-        }
         cells.clear();
     }
 
