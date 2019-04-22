@@ -216,7 +216,7 @@ class Cell extends View{
         }
         else{
             drawable=this.context.getResources().getDrawable(R.drawable.select);
-            drawable.setAlpha(10);
+            drawable.setAlpha(0);
         }
         if(this.touched){
             drawable.setColorFilter(Color.YELLOW,PorterDuff.Mode.DST_OVER);
@@ -290,8 +290,8 @@ class Cell extends View{
         return component;
     }
 
-    public void setTouchedFalse(){
-        this.touched=false;
+    public void setTouched(boolean  touched){
+        this.touched=touched;
     }
 
     public void setColor(int color) {
