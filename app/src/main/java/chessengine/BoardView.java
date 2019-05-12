@@ -1,22 +1,13 @@
 package chessengine;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.graphics.Canvas;
-
-import chessbet.app.com.R;
 
 public class BoardView extends View {
     private final String place[]={"r","n","b","k","q","b","n","r"};
@@ -178,193 +169,13 @@ public class BoardView extends View {
         this.dark = dark;
         invalidate();
     }
-}
 
-class Cell extends View{
-    private Matrix matrix;
-    private RectF mSrcRectF;
-    private RectF mDestRectF;
-    private static final String TAG = Cell.class.getSimpleName();
-    private  int color;
-    private final int col;
-    private final int row;
+    public void moveBack(){
 
-    private final Paint squareColor;
-    private Rect tileRect;
-    private Context context;
-    private Bitmap bitmap;
-    private Component component;
-    private boolean touched=false;
-
-    Cell(int row, int column,Context context) {
-        super(context);
-        this.col = column;
-        this.row = row;
-        this.context=context;
-        this.squareColor = new Paint();
-        this.matrix=new Matrix();
-        this.mDestRectF=new RectF();
-        this.mSrcRectF=new RectF();
     }
+    public void moveForward(){
 
-    public void draw(final Canvas canvas) {
-        super.draw(canvas);
-        Drawable drawable;
-
-        if(component.getResourceId()!=0){
-             drawable= this.context.getResources().getDrawable(component.getResourceId());
-        }
-        else{
-            drawable=this.context.getResources().getDrawable(R.drawable.select);
-            drawable.setAlpha(0);
-        }
-        if(this.touched){
-            drawable.setColorFilter(Color.YELLOW,PorterDuff.Mode.DST_OVER);
-            this.touched=!this.touched;
-        }
-        else{
-            drawable.setColorFilter(color,PorterDuff.Mode.DST_OVER);
-        }
-
-        drawable.setBounds(tileRect);
-        drawable.draw(canvas);
-        bitmap = ((BitmapDrawable) drawable).getBitmap();
-        mSrcRectF.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-        mDestRectF.set(0, 0, getWidth(),getHeight());
-        matrix.setRectToRect(mSrcRectF, mDestRectF, Matrix.ScaleToFit.CENTER);
-        matrix.postRotate(90);
-        canvas.drawBitmap(bitmap, matrix, squareColor);
-        invalidate();
-    }
-
-    private String getColumnString() {
-        switch (col) {
-            case 0:
-                return "A";
-            case 1:
-                return "B";
-            case 2:
-                return "C";
-            case 3:
-                return "D";
-            case 4:
-                return "E";
-            case 5:
-                return "F";
-            case 6:
-                return "G";
-            case 7:
-                return "H";
-            default:
-                return null;
-        }
-    }
-
-    private String getRowString() {
-        return String.valueOf(row + 1);
-    }
-
-    public void handleTouch() {
-        this.touched =true;
-    }
-    public boolean isTouched(final int x, final int y) {
-        return tileRect.contains(x, y);
-    }
-
-    public void setTileRect(final Rect tileRect) {
-        this.tileRect = tileRect;
-    }
-
-    public String toString() {
-        final String column = getColumnString();
-        final String row = getRowString();
-        return "<Tile " + column + row + ">";
-    }
-
-    public void setComponent(Component component) {
-        this.component = component;
-    }
-
-    public Component getComponent() {
-        return component;
-    }
-
-    public void setTouched(boolean  touched){
-        this.touched=touched;
-    }
-
-    public void setColor(int color) {
-        this.color = color;
     }
 }
 
-class Component{ // Holds Component Data;
-    private  String  type;
-    private int row;
-    private  int col;
-    private  int resourceId;
 
-    public void setRow(int row) {
-        this.row = row;
-    }
-
-    public void setCol(int col) {
-        this.col = col;
-    }
-
-    public void setResourceId(int reSourceId) {
-        this.resourceId = reSourceId;
-    }
-
-    public void setType(String  type) {
-        this.type = type;
-    }
-
-    public int getCol() {
-        return col;
-    }
-
-    public int getResourceId() {
-        return resourceId;
-    }
-
-    public String  getType() {
-        return type;
-    }
-
-    public int getRow() {
-        return row;
-    }
-
-    public  static int resID(String c){
-        switch (c){
-            case "rb":
-                return R.drawable.rb;
-            case "nb":
-                return R.drawable.nb;
-            case "bb":
-                return R.drawable.bb;
-            case "kb":
-                return R.drawable.kb;
-            case "qb":
-                return R.drawable.qb;
-            case "pb":
-                return R.drawable.pb;
-            case "rw":
-                return R.drawable.rw;
-            case "nw":
-                return R.drawable.nw;
-            case "bw":
-                return R.drawable.bw;
-            case "kw":
-                return R.drawable.kw;
-            case "qw":
-                return R.drawable.qw;
-            case "pw":
-                return R.drawable.pw;
-            default:
-                return 0;
-        }
-    }
-}
