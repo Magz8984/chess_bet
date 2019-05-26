@@ -30,7 +30,7 @@
         <TextView
             android:id="@+id/from"
             android:layout_weight="1"
-            android:text="From"
+            android:text="Player 1"
             android:textAlignment="center"
             android:textColor="#fff"
             android:layout_width="wrap_content"
@@ -41,7 +41,7 @@
         <TextView
             android:id="@+id/to"
             android:layout_weight="1"
-            android:text="To"
+            android:text="Player 2"
             android:textAlignment="center"
             android:textColor="#fff"
             android:layout_width="wrap_content"
@@ -56,29 +56,37 @@
        android:layout_centerInParent="true"
        android:orientation="vertical"/>
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/chessLayout"
-        android:weightSum="2">
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true">
 
         <Button
             android:id="@+id/btnFlip"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:textColor="@color/colorWhite"
-            android:text="@string/flip"
+            android:layout_width="40sp"
+            android:layout_height="40sp"
+            android:background="@drawable/img_flip"
             android:layout_margin="5sp"/>
 
         <Button
             android:id="@+id/btnColorPicker"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimaryDark"
-            android:textColor="@color/colorWhite"
-            android:text="@string/color_picker"
+            android:layout_width="40sp"
+            android:layout_height="40sp"
+            android:background="@drawable/img_change_board_color"
+            android:layout_margin="5sp"/>
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="40sp"
+            android:layout_height="40sp"
+            android:background="@drawable/img_back"
+            android:layout_margin="5sp"/>
+
+        <Button
+            android:id="@+id/btnForward"
+            android:layout_width="40sp"
+            android:layout_height="40sp"
+            android:background="@drawable/img_forward"
             android:layout_margin="5sp"/>
     </LinearLayout>
 

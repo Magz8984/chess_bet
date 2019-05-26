@@ -33,6 +33,7 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation 'com.google.firebase:firebase-auth:9.0.2'
     implementation 'com.github.QuadFlask:colorpicker:0.0.13'
+    implementation 'com.android.support:cardview-v7:23.3.+'
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -1,6 +1,5 @@
 package chessbet.app.com;
 
-
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import android.widget.LinearLayout;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
 import chessengine.BoardPreference;
 import chessengine.BoardView;
 
@@ -18,6 +16,8 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.chessLayout) LinearLayout chessLayout;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.btnColorPicker) Button btnColorPicker;
+@BindView(R.id.btnBack) Button btnBack;
+@BindView(R.id.btnForward) Button btnForward;
     BoardView boardView;
     boolean flip;
     @Override
@@ -35,6 +35,8 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         chessLayout.addView(boardView);
         btnFlip.setOnClickListener(this);
         btnColorPicker.setOnClickListener(this);
+        btnBack.setOnClickListener(this);
+        btnForward.setOnClickListener(this);
     }
 
     @Override
@@ -48,6 +50,12 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
             colorPicker.setSharedPreferences(getPreferences(Context.MODE_PRIVATE));
             colorPicker.setBoardView(boardView);
             colorPicker.show(BoardActivity.this.getSupportFragmentManager(),"Color Fragment");
+        }
+        else if(v.equals(btnBack)){
+            boardView.moveBack();
+        }
+        else if(v.equals(btnForward)){
+            boardView.moveForward();
         }
     }
 }
