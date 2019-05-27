@@ -26,8 +26,8 @@
             android:id="@+id/menuItems"
             android:columnWidth="100sp"
             android:numColumns="auto_fit"
-            android:verticalSpacing="10dp"
-            android:horizontalSpacing="15dp"
+            android:verticalSpacing="10sp"
+            android:horizontalSpacing="15sp"
             android:stretchMode="columnWidth"
             android:gravity="center">
 
