@@ -36,6 +36,8 @@ private  int trigger =1;
         white.setOnClickListener(this);
         black.setTextColor(Color.WHITE);
         white.setTextColor(Color.BLACK);
+        black.setBackgroundColor(boardPreference.getDark());
+        white.setBackgroundColor(boardPreference.getWhite());
         initColorPicker();
         return  view;
     }
