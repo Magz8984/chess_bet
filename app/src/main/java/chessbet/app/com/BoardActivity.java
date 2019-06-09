@@ -12,16 +12,20 @@ import android.widget.TextView;
 
 import com.chess.engine.Alliance;
 import com.chess.engine.Move;
+import com.chess.engine.player.Player;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessengine.BoardPreference;
 import chessengine.BoardView;
+import chessengine.GameUtil;
 import chessengine.OnMoveDoneListener;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener {
 @BindView(R.id.chessLayout) LinearLayout chessLayout;
 @BindView(R.id.btnFlip)Button btnFlip;
+@BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
+@BindView(R.id.txtBlackStatus) TextView txtBlackStatus;
 @BindView(R.id.btnColorPicker) Button btnColorPicker;
 @BindView(R.id.btnBack) Button btnBack;
 @BindView(R.id.btnForward) Button btnForward;
@@ -29,10 +33,12 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.whiteMoves) LinearLayout whiteMoves;
 @BindView(R.id.blackScrollView) HorizontalScrollView blackScrollView;
 @BindView(R.id.whiteScrollView) HorizontalScrollView whiteScrollView;
-    BoardView boardView;
+private BoardView boardView;
+private StringBuilder gameState;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        gameState = new StringBuilder();
         BoardPreference boardPreference;
         boardPreference=new BoardPreference(getPreferences(Context.MODE_PRIVATE));
         setContentView(R.layout.activity_board);
@@ -78,9 +84,48 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         textView.setTextColor(Color.WHITE);
         if(move.getMovedPiece().getPieceAlliance() == Alliance.BLACK){
             blackMoves.addView(textView);
+            txtBlackStatus.setText("");
+
         }
         else if (move.getMovedPiece().getPieceAlliance() == Alliance.WHITE){
             whiteMoves.addView(textView);
+            txtWhiteStatus.setText("");
+        }
+    }
+
+    @Override
+    public void isCheckMate(Player player) {
+        if(player.getAlliance().isBlack()){
+            txtBlackStatus.setTextColor(Color.RED);
+            txtBlackStatus.setText("CHECK MATE");
+        }
+        else if(player.getAlliance().isWhite()){
+            txtWhiteStatus.setTextColor(Color.RED);
+            txtWhiteStatus.setText("CHECK MATE");
+        }
+    }
+
+    @Override
+    public void isStaleMate(Player player) {
+        if(player.getAlliance().isBlack()){
+            txtBlackStatus.setTextColor(Color.RED);
+            txtBlackStatus.setText("STALE MATE");
+        }
+        else if(player.getAlliance().isWhite()){
+            txtWhiteStatus.setTextColor(Color.RED);
+            txtWhiteStatus.setText("STALE MATE");
+        }
+    }
+
+    @Override
+    public void isCheck(Player player) {
+        if(player.getAlliance().isBlack()){
+            txtBlackStatus.setTextColor(Color.RED);
+            txtBlackStatus.setText("CHECK");
+        }
+        else if(player.getAlliance().isWhite()){
+            txtWhiteStatus.setTextColor(Color.RED);
+            txtWhiteStatus.setText("CHECK");
         }
     }
 
@@ -100,6 +145,17 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
             View lastWhiteMove = whiteMoves.getChildAt(whiteMoveCount-1);
             whiteScrollView.scrollTo(lastWhiteMove.getLeft(), lastWhiteMove.getTop());
         }
+    }
 
+    @Override
+    protected void onPause(){
+        super.onPause();
+        GameUtil.getMediaPlayer().release();
+    }
+
+    @Override
+    protected void onStop(){
+       super.onStop();
+        GameUtil.getMediaPlayer().release();
     }
 }
