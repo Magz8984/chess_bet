@@ -141,10 +141,23 @@ public class Cell extends View {
                 final MoveTransition transition = boardView.chessBoard.currentPlayer().makeMove(move);
 
                 if(transition.getMoveStatus().isDone()){
+                    GameUtil.playSound(R.raw.chess_move,context); // Play sound once move is made
                     boardView.chessBoard= transition.getTransitionBoard();
                     boardView.moveLog.addMove(move);
                     boardView.onMoveDoneListener.getMove(move);
 
+
+                    if(boardView.chessBoard.currentPlayer().isInCheck()){
+                        boardView.onMoveDoneListener.isCheck(boardView.chessBoard.currentPlayer());
+                    }
+
+                    if(boardView.chessBoard.currentPlayer().isInStaleMate()){
+                        boardView.onMoveDoneListener.isStaleMate(boardView.chessBoard.currentPlayer());
+                    }
+
+                    if(boardView.chessBoard.currentPlayer().isInCheckMate()){
+                        boardView.onMoveDoneListener.isCheckMate(boardView.chessBoard.currentPlayer());
+                    }
                 }
 
                 boardView.sourceTile = null;

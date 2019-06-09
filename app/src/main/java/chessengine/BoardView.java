@@ -2,8 +2,6 @@ package chessengine;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.support.annotation.Nullable;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.graphics.Canvas;
@@ -25,24 +23,10 @@ public class BoardView extends View {
     private BoardDirection boardDirection;
     private int squareSize = 0;
     private boolean isFlipped = false;
-    private int x0=0;
-    private int y0=0;
     private int whiteCellsColor;
     private int darkCellsColor;
     protected MoveLog moveLog;
     protected OnMoveDoneListener onMoveDoneListener;
-
-    public BoardView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        chessBoard= Board.createStandardBoard();
-        boardCells=new ArrayList<>();
-        boardDirection = BoardDirection.REVERSE;
-        this.moveLog = new MoveLog();
-        for (int i=0 ; i < BoardUtils.NUMBER_OF_TILES_PER_ROW; i++){
-            final  Cell cell = new Cell(context,this,i);
-            this.boardCells.add(cell);
-        }
-    }
 
     public  BoardView(Context context){
         super(context);
@@ -111,10 +95,12 @@ public class BoardView extends View {
     }
 
     private int getXCoord(final int x) {
+        int x0 = 0;
         return x0 + squareSize * (isFlipped ? x : 7 - x);
     }
 
     private int getYCoord(final int y) {
+        int y0 = 0;
         return y0 + squareSize * (isFlipped ? y : 7 - y);
     }
 
@@ -180,7 +166,6 @@ public class BoardView extends View {
     public void  setOnMoveDoneListener(final OnMoveDoneListener onMoveDoneListener){
         this.onMoveDoneListener = onMoveDoneListener;
     }
-
 }
 
 

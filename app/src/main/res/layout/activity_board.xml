@@ -27,15 +27,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
         <TextView
-            android:id="@+id/from"
-            android:layout_weight="1"
+            android:id="@+id/txtBlack"
             android:text="Black"
             android:textColor="#fff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:fontFamily="@font/chakrapetchbold"/>
+
+        <TextView
+            android:id="@+id/txtBlackStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:fontFamily="@font/chakrapetchbold"
+            android:layout_marginLeft="@dimen/fab_margin"
+            android:layout_marginStart="@dimen/fab_margin" />
+
+    </LinearLayout>
 
         <!--Moves-->
         <HorizontalScrollView
@@ -67,15 +82,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
         <TextView
-            android:id="@+id/to"
-            android:layout_weight="1"
+            android:id="@+id/txtWhite"
             android:text="White"
             android:textColor="#fff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:fontFamily="@font/chakrapetchbold"/>
+
+        <TextView
+            android:id="@+id/txtWhiteStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_marginLeft="@dimen/fab_margin"
+            android:fontFamily="@font/chakrapetchbold"
+            android:layout_marginStart="@dimen/fab_margin" />
+
+    </LinearLayout>
 
         <!--Moves-->
         <HorizontalScrollView
