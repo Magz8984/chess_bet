@@ -34,11 +34,9 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.blackScrollView) HorizontalScrollView blackScrollView;
 @BindView(R.id.whiteScrollView) HorizontalScrollView whiteScrollView;
 private BoardView boardView;
-private StringBuilder gameState;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        gameState = new StringBuilder();
         BoardPreference boardPreference;
         boardPreference=new BoardPreference(getPreferences(Context.MODE_PRIVATE));
         setContentView(R.layout.activity_board);
