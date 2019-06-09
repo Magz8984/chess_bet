@@ -36,6 +36,8 @@ private  int trigger =1;
         white.setOnClickListener(this);
         black.setTextColor(Color.WHITE);
         white.setTextColor(Color.BLACK);
+        black.setBackgroundColor(boardPreference.getDark());
+        white.setBackgroundColor(boardPreference.getWhite());
         initColorPicker();
         return  view;
     }
@@ -47,12 +49,12 @@ private  int trigger =1;
                 if(trigger == 1){
                     black.setBackgroundColor(i);
                     boardPreference.setDark(i);
-                    boardView.setDark(boardPreference.getDark());
+                    boardView.setDarkCellsColor(boardPreference.getDark());
                 }
                 else if (trigger == 0){
                     white.setBackgroundColor(i);
                     boardPreference.setWhite(i);
-                    boardView.setWhite(boardPreference.getWhite());
+                    boardView.setWhiteCellsColor(boardPreference.getWhite());
                 }
             }
         });
