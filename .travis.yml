@@ -5,7 +5,7 @@ jdk:
 
 sudo: required
 
-APP_ABI = armeabi-v7a arm64-v8a x86 x86_64
+APP_ABI: armeabi-v7a arm64-v8a x86 x86_64
 
 before_script:
 - echo no | android create avd --force -n test -t android-26 --abi $APP_ABI
