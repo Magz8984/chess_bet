@@ -6,7 +6,7 @@ jdk:
 sudo: required
 
 before_script:
-- echo no | android create avd --f -n test -t android-25
+- echo no | android create avd -f -n test -t android-25
 - sys-img-arm64-v8a-google_apis-25
 - emulator -avd test -no-skin -no-audio -no-window &
 - android-wait-for-emulator
