@@ -7,7 +7,7 @@ sudo: required
 
 before_script:
 - android list targets
-- echo no | android create avd --force -n test -t android-28
+- echo no | android create avd --force -n test -t android-28 -b  arm64-v8a
 - sys-img-armeabi-v7a-android-28
 - sys-img-x86_64-android-28
 - emulator -avd test -no-skin -no-audio -no-window &
