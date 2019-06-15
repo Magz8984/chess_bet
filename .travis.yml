@@ -6,7 +6,6 @@ jdk:
 sudo: required
 
 before_script:
-- android update sdk -a -u -t sys-img-x86-android-28
 - android list targets
 - echo no | android create avd --force -n test -t android-28
 - sys-img-armeabi-v7a-android-28
