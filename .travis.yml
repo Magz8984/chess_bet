@@ -1,33 +1,39 @@
-language : android
-
-jdk:
-- openjdk8
-
-sudo: required
-
-before_script:
-- android list targets
-- echo no | android create avd --force -n test -t android-28 -b  arm64-v8a
-- sys-img-armeabi-v7a-android-28
-- sys-img-x86_64-android-28
-- emulator -avd test -no-skin -no-audio -no-window &
-- android-wait-for-emulator
-- adb shell input keyevent 82 &
-
+language: android
+notifications:
+  email: false
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y pax
+env:
+  global:
+  - ANDROID_API_LEVEL=26
+  - ANDROID_BUILD_TOOLS_VERSION=26.0.1
+  - ANDROID_EMU_API_LEVEL=22
+  - ANDROID_ABI=armeabi-v7a
+  - ADB_INSTALL_TIMEOUT=15 # minutes (2 minutes by default)
+  - QEMU_AUDIO_DRV=none # Remove audio
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
 android:
   components:
-  # Update Android SDK Tools
   - tools
-
-  - build-tools-27.0.3
-  - android-28
-
-  # Support library
+  - platform-tools
+  - tools
+  - build-tools-$ANDROID_BUILD_TOOLS_VERSION
+  - android-$ANDROID_API_LEVEL
+  - android-$ANDROID_EMU_API_LEVEL
   - extra-android-support
-  - extra-android-m2repository
-
-notifications:
-    email: true
-
-before_install:
-- chmod +x gradlew
+  - sys-img-$ANDROID_ABI-google_apis-$ANDROID_EMU_API_LEVEL
+before_script:
+  - echo no | android create avd --force -n test -t android-$ANDROID_EMU_API_LEVEL --abi google_apis/$ANDROID_ABI
+  - emulator -avd test -no-window &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82 &
+script:
+  - ./gradlew clean installDebug
+  - ./gradlew check
+  - ./gradlew testDebugUnitTest
+  - ./gradlew connectedDebugAndroidTest
