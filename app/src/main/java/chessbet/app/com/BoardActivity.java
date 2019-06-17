@@ -16,6 +16,7 @@ import com.chess.engine.player.Player;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import chessbet.utils.GameTimer;
 import chessengine.BoardPreference;
 import chessengine.BoardView;
 import chessengine.GameUtil;
@@ -33,7 +34,9 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.whiteMoves) LinearLayout whiteMoves;
 @BindView(R.id.blackScrollView) HorizontalScrollView blackScrollView;
 @BindView(R.id.whiteScrollView) HorizontalScrollView whiteScrollView;
+@BindView(R.id.txtCountDown) TextView txtCountDown;
 private BoardView boardView;
+private GameTimer gameTimer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +44,7 @@ private BoardView boardView;
         boardPreference=new BoardPreference(getPreferences(Context.MODE_PRIVATE));
         setContentView(R.layout.activity_board);
         ButterKnife.bind(this);
+        gameTimer= new GameTimer(this);
         boardView=new BoardView(this);
         boardView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));
         boardView.setDarkCellsColor(boardPreference.getDark());
@@ -51,6 +55,12 @@ private BoardView boardView;
         btnColorPicker.setOnClickListener(this);
         btnBack.setOnClickListener(this);
         btnForward.setOnClickListener(this);
+        gameTimer.setMoveCountDownTask(txtCountDown,(1000 * 60) , 1000);
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
     }
 
     @Override
@@ -148,7 +158,7 @@ private BoardView boardView;
     @Override
     protected void onPause(){
         super.onPause();
-        GameUtil.getMediaPlayer().release();
+//        GameUtil.getMediaPlayer().release();
     }
 
     @Override
