@@ -158,7 +158,6 @@ private GameTimer gameTimer;
     @Override
     protected void onPause(){
         super.onPause();
-//        GameUtil.getMediaPlayer().release();
     }
 
     @Override
