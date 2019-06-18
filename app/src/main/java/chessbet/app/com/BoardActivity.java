@@ -16,13 +16,15 @@ import com.chess.engine.player.Player;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import chessbet.domain.TimerEvent;
 import chessbet.utils.GameTimer;
+import chessbet.utils.OnTimerElapsed;
 import chessengine.BoardPreference;
 import chessengine.BoardView;
 import chessengine.GameUtil;
 import chessengine.OnMoveDoneListener;
 
-public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener {
+public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed{
 @BindView(R.id.chessLayout) LinearLayout chessLayout;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -44,7 +46,10 @@ private GameTimer gameTimer;
         boardPreference=new BoardPreference(getPreferences(Context.MODE_PRIVATE));
         setContentView(R.layout.activity_board);
         ButterKnife.bind(this);
-        gameTimer= new GameTimer(this);
+        gameTimer= new GameTimer.Builder()
+                       .setTxtMoveTimer(txtCountDown)
+                       .setOnMoveTimerElapsed(this)
+                       .build();
         boardView=new BoardView(this);
         boardView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));
         boardView.setDarkCellsColor(boardPreference.getDark());
@@ -55,7 +60,7 @@ private GameTimer gameTimer;
         btnColorPicker.setOnClickListener(this);
         btnBack.setOnClickListener(this);
         btnForward.setOnClickListener(this);
-        gameTimer.setMoveCountDownTask(txtCountDown,(1000 * 60) , 1000);
+        gameTimer.setMoveCountDownTask((1000 * 30) , 1000);
     }
 
     @Override
@@ -99,6 +104,13 @@ private GameTimer gameTimer;
             whiteMoves.addView(textView);
             txtWhiteStatus.setText("");
         }
+        gameTimer.invalidateTimer();
+
+        gameTimer= new GameTimer.Builder()
+                .setTxtMoveTimer(txtCountDown)
+                .setOnMoveTimerElapsed(this)
+                .build();
+        gameTimer.setMoveCountDownTask((1000 * 30) , 1000);
     }
 
     @Override
@@ -164,5 +176,22 @@ private GameTimer gameTimer;
     protected void onStop(){
        super.onStop();
         GameUtil.getMediaPlayer().release();
+    }
+
+    @Override
+    public void moveTimerElapsed() {
+        try {
+            TimerElapsedDialog timerElapsedDialog = new TimerElapsedDialog();
+            timerElapsedDialog.setTimerEvent(TimerEvent.MOVE_TIMER_ELAPSED);
+            timerElapsedDialog.setResult(boardView.getCurrentPlayer().getOpponent().getAlliance().toString().concat(" WINS"));
+            timerElapsedDialog.show(this.getSupportFragmentManager(),"Timer Elapsed Dialog");
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void moveGameElapsed() {
+
     }
 }

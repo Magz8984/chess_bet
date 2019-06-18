@@ -10,6 +10,7 @@ import com.chess.engine.board.Board;
 import com.chess.engine.board.BoardUtils;
 import com.chess.engine.board.Tile;
 import com.chess.engine.pieces.Piece;
+import com.chess.engine.player.Player;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
@@ -165,6 +166,10 @@ public class BoardView extends View {
 
     public void  setOnMoveDoneListener(final OnMoveDoneListener onMoveDoneListener){
         this.onMoveDoneListener = onMoveDoneListener;
+    }
+
+    public Player getCurrentPlayer(){
+        return chessBoard.currentPlayer();
     }
 }
 

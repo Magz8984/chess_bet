@@ -1,6 +1,6 @@
 package chessbet.utils;
 
-import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -9,16 +9,20 @@ import io.github.erehmi.countdown.CountDownTask;
 import io.github.erehmi.countdown.CountDownTimers;
 
 public class GameTimer {
-    private Context context;
+    public Builder builder;
+    private String result;
+    private CountDownTask moveCountDownTask;
+    private CountDownTask gameCountDownTask;
 
-    public GameTimer(Context context){
-        this.context=context;
+
+    public GameTimer(final Builder builder){
+        this.builder = builder;
     }
 
-    public void setGameCountDownTask(TextView txtCountDown,int milliseconds,int interval) {
-        CountDownTask gameCountDownTask = CountDownTask.create();
+    public void setGameCountDownTask(int milliseconds,int interval) {
+        gameCountDownTask = CountDownTask.create();
         long targetMilliseconds = CountDownTask.elapsedRealtime() + milliseconds;
-        gameCountDownTask.until(txtCountDown, targetMilliseconds, interval, new CountDownTimers.OnCountDownListener() {
+        gameCountDownTask.until(builder.txtGameTimer, targetMilliseconds, interval, new CountDownTimers.OnCountDownListener() {
             @Override
             public void onTick(View view, long millisUntilFinished) {
                 Log.d("TIMER" ,Long.toString(millisUntilFinished));
@@ -27,23 +31,28 @@ public class GameTimer {
 
             @Override
             public void onFinish(View view) {
-                ((TextView) view).setText("DONE");
-            }
+                builder.onTimerElapsed.moveGameElapsed();
+             }
         });
     }
 
-    public void setMoveCountDownTask(TextView txtCountDown,int milliseconds,int interval) {
-        CountDownTask moveCountDownTask = CountDownTask.create();
+    public void setMoveCountDownTask(int milliseconds,int interval) {
+        moveCountDownTask = CountDownTask.create();
         long targetMilliseconds = CountDownTask.elapsedRealtime() + milliseconds;
-        moveCountDownTask.until(txtCountDown, targetMilliseconds, interval, new CountDownTimers.OnCountDownListener() {
+        Log.d("TIMER",Long.toString(targetMilliseconds));
+        moveCountDownTask.until(builder.txtMoveTimer, targetMilliseconds, interval, new CountDownTimers.OnCountDownListener() {
             @Override
             public void onTick(View view, long millisUntilFinished) {
-                ((TextView) view).setText(timeConverter(millisUntilFinished/interval));
+                TextView txtMoveTimer = (TextView) view;
+                txtMoveTimer.setText(timeConverter(millisUntilFinished/interval));
+                if(millisUntilFinished / 1000 <= 10 ){
+                    txtMoveTimer.setTextColor(Color.RED);
+                }
             }
 
             @Override
             public void onFinish(View view) {
-                ((TextView) view).setText("DONE");
+                builder.onTimerElapsed.moveTimerElapsed();
             }
         });
     }
@@ -62,5 +71,42 @@ public class GameTimer {
         else {
             return "00 : "+ secondsString;
         }
+    }
+
+    public void setResult(String result) {
+        this.result = result;
+    }
+
+    public void invalidateTimer(){
+        moveCountDownTask.cancel(builder.txtMoveTimer);
+        // TODO Implement this at a later stage
+//        gameCountDownTask.cancel(builder.txtGameTimer);
+    }
+
+    public static class Builder{
+        private TextView txtGameTimer;
+        private TextView txtMoveTimer;
+        private OnTimerElapsed onTimerElapsed;
+
+        public Builder setTxtGameTimer(final TextView txtGameTimer){
+            this.txtGameTimer = txtGameTimer;
+            return this;
+        }
+
+        public Builder setTxtMoveTimer(final TextView txtMoveTimer){
+            this.txtMoveTimer = txtMoveTimer;
+            return this;
+        }
+
+        public Builder setOnMoveTimerElapsed(OnTimerElapsed onTimerElapsed) {
+            this.onTimerElapsed = onTimerElapsed;
+            return this;
+
+        }
+
+        public GameTimer build(){
+            return new GameTimer(this);
+        }
+
     }
 }
