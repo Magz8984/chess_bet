@@ -95,6 +95,7 @@ public class GameTimer {
 
         public Builder setTxtMoveTimer(final TextView txtMoveTimer){
             this.txtMoveTimer = txtMoveTimer;
+            this.txtMoveTimer.setTextColor(Color.WHITE);
             return this;
         }
 
