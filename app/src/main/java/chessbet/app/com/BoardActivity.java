@@ -60,7 +60,7 @@ private GameTimer gameTimer;
         btnColorPicker.setOnClickListener(this);
         btnBack.setOnClickListener(this);
         btnForward.setOnClickListener(this);
-        gameTimer.setMoveCountDownTask((1000 * 30) , 1000);
+//        gameTimer.setMoveCountDownTask((1000 * 30) , 1000);
     }
 
     @Override
@@ -104,13 +104,13 @@ private GameTimer gameTimer;
             whiteMoves.addView(textView);
             txtWhiteStatus.setText("");
         }
-        gameTimer.invalidateTimer();
-
-        gameTimer= new GameTimer.Builder()
-                .setTxtMoveTimer(txtCountDown)
-                .setOnMoveTimerElapsed(this)
-                .build();
-        gameTimer.setMoveCountDownTask((1000 * 30) , 1000);
+//        gameTimer.invalidateTimer();
+//
+//        gameTimer= new GameTimer.Builder()
+//                .setTxtMoveTimer(txtCountDown)
+//                .setOnMoveTimerElapsed(this)
+//                .build();
+//        gameTimer.setMoveCountDownTask((1000 * 30) , 1000);
     }
 
     @Override

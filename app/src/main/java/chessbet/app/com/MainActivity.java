@@ -7,7 +7,7 @@ import android.widget.GridView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import chessbet.adapter.com.MenuOptionsAdapter;
+import chessbet.adapter.MenuOptionsAdapter;
 
 public class MainActivity extends AppCompatActivity{
     @BindView(R.id.menuItems) GridView menuItems;

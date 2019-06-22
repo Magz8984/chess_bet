@@ -1,4 +1,4 @@
-package chessbet.adapter.com;
+package chessbet.adapter;
 
 import android.content.Context;
 import android.content.Intent;
