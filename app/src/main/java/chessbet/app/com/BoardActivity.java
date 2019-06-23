@@ -202,6 +202,13 @@ private MatchableAccount  matchableAccount;
             timerElapsedDialog.setTimerEvent(TimerEvent.MOVE_TIMER_ELAPSED);
             timerElapsedDialog.setResult(boardView.getCurrentPlayer().getOpponent().getAlliance().toString().concat(" WINS"));
             timerElapsedDialog.show(this.getSupportFragmentManager(),"Timer Elapsed Dialog");
+            // Board Clearing
+            boardView.restartChessBoard();
+            whiteMoves.removeAllViews();
+            blackMoves.removeAllViews();
+            txtBlackStatus.setText("");
+            txtWhiteStatus.setText("");
+
         }catch (Exception ex){
             ex.printStackTrace();
         }

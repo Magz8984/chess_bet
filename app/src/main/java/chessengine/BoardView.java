@@ -187,6 +187,12 @@ public class BoardView extends View implements RemoteMoveListener {
         abstract List<Cell> traverse(final List<Cell> boardCells);
     }
 
+    public void restartChessBoard(){
+        this.chessBoard = Board.createStandardBoard();
+        invalidate();
+    }
+
+
     public void flipBoardDirection() {
         this.boardDirection = boardDirection.opposite();
         invalidate();
