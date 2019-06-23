@@ -35,4 +35,5 @@
     <string name="playervscomputer">Player Vs Computer</string>
     <string name="message">Message</string>
     <string name="result">Result</string>
+    <string name="match_service">match_service</string>
 </resources>

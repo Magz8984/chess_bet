@@ -6,17 +6,25 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.graphics.Canvas;
 
+import com.chess.engine.Alliance;
+import com.chess.engine.Move;
 import com.chess.engine.board.Board;
 import com.chess.engine.board.BoardUtils;
 import com.chess.engine.board.Tile;
 import com.chess.engine.pieces.Piece;
+import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BoardView extends View {
+import chessbet.api.MatchAPI;
+import chessbet.domain.MatchableAccount;
+import chessbet.domain.RemoteMove;
+import chessbet.services.RemoteMoveListener;
+
+public class BoardView extends View implements RemoteMoveListener {
     protected Board chessBoard;
     protected Tile sourceTile;
     protected Piece movedPiece;
@@ -28,6 +36,9 @@ public class BoardView extends View {
     private int darkCellsColor;
     protected MoveLog moveLog;
     protected OnMoveDoneListener onMoveDoneListener;
+    private MatchableAccount matchableAccount;
+    private MatchAPI matchAPI;
+    private Alliance localAlliance;
 
     public  BoardView(Context context){
         super(context);
@@ -47,10 +58,16 @@ public class BoardView extends View {
         if(event.getAction() == MotionEvent.ACTION_DOWN){
             final int x = (int) event.getX();
             final int y = (int) event.getY();
-
             for (int i = 0; i < BoardUtils.NUMBER_OF_TILES; i++) {
                 if(boardCells.get(i).isTouched(x,y)){
-                        boardCells.get(i).handleTouch();
+                        if(matchableAccount != null  && chessBoard.getTile(i).isOccupied()){
+                            if(chessBoard.getTile(i).getPiece().getPieceAlliance() == localAlliance){
+                                boardCells.get(i).handleTouch();
+                            }
+                        }
+                        else {
+                            boardCells.get(i).handleTouch();
+                        }
                 }
             }
             invalidate();
@@ -131,6 +148,17 @@ public class BoardView extends View {
         return darkCellsColor;
     }
 
+    public void setMoveData(int from, int to) {
+        if(matchAPI != null){
+            matchAPI.sendMoveData(matchableAccount,from,to);
+        }
+    }
+
+    @Override
+    public void onRemoteMoveMade(RemoteMove remoteMove) {
+      this.translateRemoteMoveOnBoard(remoteMove);
+    }
+
     private enum BoardDirection {
         REVERSE{
             @Override
@@ -168,8 +196,46 @@ public class BoardView extends View {
         this.onMoveDoneListener = onMoveDoneListener;
     }
 
+    public void setMatchableAccount(MatchableAccount matchableAccount) {
+        this.matchableAccount = matchableAccount;
+        matchAPI = new MatchAPI();
+        matchAPI.setRemoteMoveListener(this);
+        matchAPI.getRemoteMoveData(matchableAccount);
+        if(matchableAccount.getOpponent().equals("WHITE")){
+            this.localAlliance = Alliance.BLACK;
+        }
+        else if(matchableAccount.getOpponent().equals("BLACK")){
+            this.localAlliance = Alliance.WHITE;
+        }
+    }
+
     public Player getCurrentPlayer(){
         return chessBoard.currentPlayer();
+    }
+    private void translateRemoteMoveOnBoard(RemoteMove remoteMove){
+        if(remoteMove!=null){
+            final Move move = Move.MoveFactory.createMove(chessBoard,remoteMove.from,remoteMove.to);
+            final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
+            if(transition.getMoveStatus().isDone()){
+                chessBoard = transition.getTransitionBoard();
+                moveLog.addMove(move);
+                onMoveDoneListener.getMove(move);
+
+
+                if(chessBoard.currentPlayer().isInCheck()){
+                    onMoveDoneListener.isCheck(chessBoard.currentPlayer());
+                }
+
+                if(chessBoard.currentPlayer().isInStaleMate()){
+                    onMoveDoneListener.isStaleMate(chessBoard.currentPlayer());
+                }
+
+                if(chessBoard.currentPlayer().isInCheckMate()){
+                    onMoveDoneListener.isCheckMate(chessBoard.currentPlayer());
+                }
+                invalidate();
+            }
+        }
     }
 }
 

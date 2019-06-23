@@ -1,14 +1,20 @@
 package chessbet.app.com;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chess.engine.Alliance;
 import com.chess.engine.Move;
@@ -16,7 +22,10 @@ import com.chess.engine.player.Player;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import chessbet.domain.MatchableAccount;
 import chessbet.domain.TimerEvent;
+import chessbet.services.MatchService;
+import chessbet.utils.DatabaseUtil;
 import chessbet.utils.GameTimer;
 import chessbet.utils.OnTimerElapsed;
 import chessengine.BoardPreference;
@@ -39,6 +48,8 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.txtCountDown) TextView txtCountDown;
 private BoardView boardView;
 private GameTimer gameTimer;
+private Intent intent;
+private MatchableAccount  matchableAccount;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,13 +71,19 @@ private GameTimer gameTimer;
         btnColorPicker.setOnClickListener(this);
         btnBack.setOnClickListener(this);
         btnForward.setOnClickListener(this);
-//        gameTimer.setMoveCountDownTask((1000 * 30) , 1000);
     }
 
     @Override
     protected void onStart(){
         super.onStart();
-    }
+        GameUtil.initialize(R.raw.chess_move,this);
+        intent = getIntent();
+        matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
+        if(matchableAccount!=null){
+            Toast.makeText(this,matchableAccount.getMatch_type(),Toast.LENGTH_LONG).show();
+            boardView.setMatchableAccount(matchableAccount);
+        }
+      }
 
     @Override
     public void onClick(View v) {

@@ -15,6 +15,7 @@ import java.util.List;
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.SettingsActivity;
 import chessbet.app.com.R;
+import chessbet.domain.MatchType;
 
 
 public class MenuOptionsAdapter extends BaseAdapter {
@@ -32,6 +33,7 @@ public class MenuOptionsAdapter extends BaseAdapter {
         // Two Player
         listeners.add(v -> {
             Intent intent=new Intent(context, BoardActivity.class);
+            intent.putExtra("match_type", MatchType.TWO_PLAYER.toString());
             context.startActivity(intent);
         });
         drawables.add(R.drawable.two_player);
@@ -40,6 +42,7 @@ public class MenuOptionsAdapter extends BaseAdapter {
         // Single Player
         listeners.add(v -> {
             Intent intent=new Intent(context, BoardActivity.class);
+            intent.putExtra("match_type", MatchType.SINGLE_PLAYER.toString());
             context.startActivity(intent);
         });
         drawables.add(R.drawable.desktop);
@@ -48,6 +51,7 @@ public class MenuOptionsAdapter extends BaseAdapter {
         // Play Online
         listeners.add(v -> {
             Intent intent=new Intent(context, BoardActivity.class);
+            intent.putExtra("match_type", MatchType.PLAY_ONLINE.toString());
             context.startActivity(intent);
         });
         drawables.add(R.drawable.play_online);
@@ -56,6 +60,7 @@ public class MenuOptionsAdapter extends BaseAdapter {
         // Bet Online
         listeners.add(v->{
             Intent intent=new Intent(context, BoardActivity.class);
+            intent.putExtra("match_type", MatchType.BET_ONLINE.toString());
             context.startActivity(intent);
         });
         drawables.add(R.drawable.bet_online);

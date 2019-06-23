@@ -141,7 +141,8 @@ public class Cell extends View {
                 final MoveTransition transition = boardView.chessBoard.currentPlayer().makeMove(move);
 
                 if(transition.getMoveStatus().isDone()){
-                    GameUtil.playSound(R.raw.chess_move,context); // Play sound once move is made
+                    GameUtil.playSound(); // Play sound once move is made
+                    boardView.setMoveData(boardView.movedPiece.getPiecePosition(), tileId); // Online Play
                     boardView.chessBoard= transition.getTransitionBoard();
                     boardView.moveLog.addMove(move);
                     boardView.onMoveDoneListener.getMove(move);

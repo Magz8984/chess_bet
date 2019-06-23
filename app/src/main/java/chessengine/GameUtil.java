@@ -5,8 +5,13 @@ import android.media.MediaPlayer;
 
 public class GameUtil {
     static MediaPlayer mp;
-    static void playSound(int resource, Context context){
-        mp= MediaPlayer.create(context, resource);
+
+    public static void  initialize(int resource, Context context){{
+        mp = MediaPlayer.create(context, resource);
+    }
+
+    }
+    static void playSound(){
         mp.start();
     }
 
