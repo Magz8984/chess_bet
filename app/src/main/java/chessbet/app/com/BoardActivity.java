@@ -32,7 +32,7 @@ import chessengine.GameUtil;
 import chessengine.OnMoveDoneListener;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed{
-@BindView(R.id.chessLayout) LinearLayout chessLayout;
+@BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
 @BindView(R.id.txtBlackStatus) TextView txtBlackStatus;
@@ -44,7 +44,6 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.blackScrollView) HorizontalScrollView blackScrollView;
 @BindView(R.id.whiteScrollView) HorizontalScrollView whiteScrollView;
 @BindView(R.id.txtCountDown) TextView txtCountDown;
-private BoardView boardView;
 private GameTimer gameTimer;
 private Intent intent;
 private MatchableAccount  matchableAccount;
@@ -59,12 +58,9 @@ private MatchableAccount  matchableAccount;
                        .setTxtMoveTimer(txtCountDown)
                        .setOnMoveTimerElapsed(this)
                        .build();
-        boardView=new BoardView(this);
-        boardView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.MATCH_PARENT));
         boardView.setDarkCellsColor(boardPreference.getDark());
         boardView.setWhiteCellsColor(boardPreference.getWhite());
         boardView.setOnMoveDoneListener(this);
-        chessLayout.addView(boardView);
         btnFlip.setOnClickListener(this);
         btnColorPicker.setOnClickListener(this);
         btnBack.setOnClickListener(this);

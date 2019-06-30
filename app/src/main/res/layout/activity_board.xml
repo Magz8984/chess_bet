@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".BoardActivity"
-    android:padding="5dp"
+    android:padding="0dp"
     android:background="#262626">
 
 
@@ -14,7 +14,7 @@
        android:id="@+id/title"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
-       android:text="Chess Bet"
+       android:text="@string/app_name"
        android:textColor="#fff"
        android:textSize="20sp"
        android:layout_centerHorizontal="true"
@@ -33,6 +33,7 @@
         />
 
     <LinearLayout
+        android:id="@+id/blackData"
         android:layout_below="@+id/title"
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -49,14 +50,14 @@
             android:textColor="#fff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:fontFamily="@font/chakrapetchbold"/>
 
         <TextView
             android:id="@+id/txtBlackStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:fontFamily="@font/chakrapetchbold"
             android:layout_marginLeft="@dimen/fab_margin"
             android:layout_marginStart="@dimen/fab_margin" />
@@ -68,7 +69,7 @@
             android:id="@+id/blackScrollView"
             android:fillViewport="true"
             android:layout_width="match_parent"
-            android:layout_height="50sp"
+            android:layout_height="30dp"
             android:scrollbars="none">
             <LinearLayout
                 android:orientation="horizontal"
@@ -80,15 +81,15 @@
         </HorizontalScrollView>
     </LinearLayout>
 
-   <LinearLayout
+   <chessengine.BoardView
        android:id="@+id/chessLayout"
-       android:layout_width="400sp"
-       android:layout_height="400sp"
-       android:layout_centerInParent="true"
-       android:orientation="vertical"/>
+       android:layout_width="match_parent"
+       android:layout_height="400dp"
+       android:layout_centerVertical="true"
+       android:orientation="vertical" />
 
     <LinearLayout
-        android:layout_below="@+id/chessLayout"
+        android:layout_above="@id/icons"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -104,14 +105,14 @@
             android:textColor="#fff"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:fontFamily="@font/chakrapetchbold"/>
 
         <TextView
             android:id="@+id/txtWhiteStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
+            android:textSize="15sp"
             android:layout_marginLeft="@dimen/fab_margin"
             android:fontFamily="@font/chakrapetchbold"
             android:layout_marginStart="@dimen/fab_margin" />
@@ -123,7 +124,7 @@
             android:id="@+id/whiteScrollView"
             android:fillViewport="true"
             android:layout_width="match_parent"
-            android:layout_height="50sp"
+            android:layout_height="30sp"
             android:scrollbars="none">
             <LinearLayout
                 android:orientation="horizontal"
@@ -137,6 +138,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/icons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

@@ -42,8 +42,10 @@ public class MatchAPI {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 matchable[0] = dataSnapshot.getValue(MatchableAccount.class);
                 MatchableAccount matchableAccount = matchable[0];
-                if(matchableAccount.isMatched()){
-                    matchListener.onMatch(matchableAccount);
+                if(matchableAccount != null){
+                    if(matchableAccount.isMatched()){
+                        matchListener.onMatch(matchableAccount);
+                    }
                 }
             }
             @Override

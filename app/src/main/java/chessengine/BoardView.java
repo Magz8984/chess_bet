@@ -2,6 +2,8 @@ package chessengine;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.graphics.Canvas;
@@ -28,7 +30,7 @@ public class BoardView extends View implements RemoteMoveListener {
     protected Board chessBoard;
     protected Tile sourceTile;
     protected Piece movedPiece;
-    private final List<Cell> boardCells;
+    private List<Cell> boardCells=null;
     private BoardDirection boardDirection;
     private int squareSize = 0;
     private boolean isFlipped = false;
@@ -40,8 +42,7 @@ public class BoardView extends View implements RemoteMoveListener {
     private MatchAPI matchAPI;
     private Alliance localAlliance;
 
-    public  BoardView(Context context){
-        super(context);
+    private void initialize(Context context){
         moveLog= new MoveLog();
         chessBoard= Board.createStandardBoard();
         boardCells=new ArrayList<>();
@@ -50,6 +51,16 @@ public class BoardView extends View implements RemoteMoveListener {
             final  Cell cell = new Cell(context,this,i);
             this.boardCells.add(cell);
         }
+    }
+
+    public BoardView(Context context, AttributeSet attributeSet){
+        super(context,attributeSet);
+        initialize(context);
+    }
+
+    public  BoardView(Context context){
+        super(context);
+       initialize(context);
     }
 
     @Override
@@ -74,6 +85,36 @@ public class BoardView extends View implements RemoteMoveListener {
         }
 
         return true;
+    }
+
+
+    private int measureDimension(int desiredSize, int measuredSpec){
+        int result;
+        int specMode = MeasureSpec.getMode(measuredSpec);
+        int specSize = MeasureSpec.getSize(measuredSpec);
+
+        if(specMode  == MeasureSpec.EXACTLY){
+            result = specSize;
+        }
+        else {
+            result = desiredSize;
+            if(specMode == MeasureSpec.AT_MOST){
+                result = Math.min(result,specSize);
+            }
+        }
+
+        if(result < desiredSize){
+            Log.e("Board View","Too Small A Size");
+        }
+
+        return result;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
+        int desiredWidth = getSuggestedMinimumWidth() + getPaddingLeft() + getPaddingRight();
+        int desiredHeight = getSuggestedMinimumHeight() + getPaddingTop() + getPaddingBottom();
+        setMeasuredDimension(measureDimension(desiredWidth,widthMeasureSpec), measureDimension(desiredHeight,heightMeasureSpec));
     }
 
     @Override
