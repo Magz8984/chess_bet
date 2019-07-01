@@ -34,10 +34,11 @@
 
     <LinearLayout
         android:id="@+id/blackData"
-        android:layout_below="@+id/title"
+        android:layout_above="@id/chessLayout"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="15dp">
 
     <LinearLayout
         android:orientation="horizontal"
@@ -57,7 +58,7 @@
             android:id="@+id/txtBlackStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="15sp"
+            android:textSize="20sp"
             android:fontFamily="@font/chakrapetchbold"
             android:layout_marginLeft="@dimen/fab_margin"
             android:layout_marginStart="@dimen/fab_margin" />
@@ -69,7 +70,7 @@
             android:id="@+id/blackScrollView"
             android:fillViewport="true"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:scrollbars="none">
             <LinearLayout
                 android:orientation="horizontal"
@@ -84,12 +85,13 @@
    <chessengine.BoardView
        android:id="@+id/chessLayout"
        android:layout_width="match_parent"
-       android:layout_height="400dp"
+       android:layout_height="0dp"
+       android:background="@color/bg_register"
        android:layout_centerVertical="true"
-       android:orientation="vertical" />
+       android:orientation="vertical"/>
 
     <LinearLayout
-        android:layout_above="@id/icons"
+        android:layout_below="@id/chessLayout"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -124,7 +126,7 @@
             android:id="@+id/whiteScrollView"
             android:fillViewport="true"
             android:layout_width="match_parent"
-            android:layout_height="30sp"
+            android:layout_height="30dp"
             android:scrollbars="none">
             <LinearLayout
                 android:orientation="horizontal"
@@ -147,30 +149,30 @@
 
         <Button
             android:id="@+id/btnFlip"
-            android:layout_width="40sp"
-            android:layout_height="40sp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:background="@drawable/img_flip"
-            android:layout_margin="5sp"/>
+            android:layout_margin="5dp"/>
 
         <Button
             android:id="@+id/btnColorPicker"
-            android:layout_width="40sp"
-            android:layout_height="40sp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:background="@drawable/img_change_board_color"
-            android:layout_margin="5sp"/>
+            android:layout_margin="5dp"/>
         <Button
             android:id="@+id/btnBack"
-            android:layout_width="40sp"
-            android:layout_height="40sp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:background="@drawable/img_back"
-            android:layout_margin="5sp"/>
+            android:layout_margin="5dp"/>
 
         <Button
             android:id="@+id/btnForward"
-            android:layout_width="40sp"
-            android:layout_height="40sp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:background="@drawable/img_forward"
-            android:layout_margin="5sp"/>
+            android:layout_margin="5dp"/>
     </LinearLayout>
 
 
