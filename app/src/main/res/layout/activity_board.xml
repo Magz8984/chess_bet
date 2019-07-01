@@ -32,55 +32,62 @@
         android:padding="5sp"
         />
 
-    <LinearLayout
-        android:id="@+id/blackData"
+    <RelativeLayout
+        android:layout_below="@id/title"
         android:layout_above="@id/chessLayout"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="15dp">
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/txtBlack"
-            android:text="Black"
-            android:textColor="#fff"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:fontFamily="@font/chakrapetchbold"/>
-
-        <TextView
-            android:id="@+id/txtBlackStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:fontFamily="@font/chakrapetchbold"
-            android:layout_marginLeft="@dimen/fab_margin"
-            android:layout_marginStart="@dimen/fab_margin" />
-
-    </LinearLayout>
-
-        <!--Moves-->
-        <HorizontalScrollView
-            android:id="@+id/blackScrollView"
-            android:fillViewport="true"
+        <LinearLayout
+            android:layout_centerVertical="true"
+            android:id="@+id/blackData"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="none">
+            android:paddingBottom="15dp">
+
             <LinearLayout
                 android:orientation="horizontal"
-                android:id="@+id/blackMoves"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
+                <TextView
+                    android:id="@+id/txtBlack"
+                    android:text="Black"
+                    android:textColor="#fff"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/chakrapetchbold"/>
+
+                <TextView
+                    android:id="@+id/txtBlackStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/chakrapetchbold"
+                    android:layout_marginLeft="@dimen/fab_margin"
+                    android:layout_marginStart="@dimen/fab_margin" />
+
             </LinearLayout>
-        </HorizontalScrollView>
-    </LinearLayout>
+
+            <!--Moves-->
+            <HorizontalScrollView
+                android:id="@+id/blackScrollView"
+                android:fillViewport="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none">
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:id="@+id/blackMoves"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                </LinearLayout>
+            </HorizontalScrollView>
+        </LinearLayout>
+
+    </RelativeLayout>
 
    <chessengine.BoardView
        android:id="@+id/chessLayout"
@@ -90,54 +97,60 @@
        android:layout_centerVertical="true"
        android:orientation="vertical"/>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_below="@id/chessLayout"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
+        android:layout_above="@id/icons"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/txtWhite"
-            android:text="White"
-            android:textColor="#fff"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:fontFamily="@font/chakrapetchbold"/>
-
-        <TextView
-            android:id="@+id/txtWhiteStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:layout_marginLeft="@dimen/fab_margin"
-            android:fontFamily="@font/chakrapetchbold"
-            android:layout_marginStart="@dimen/fab_margin" />
-
-    </LinearLayout>
-
-        <!--Moves-->
-        <HorizontalScrollView
-            android:id="@+id/whiteScrollView"
-            android:fillViewport="true"
+        <LinearLayout
+            android:layout_centerVertical="true"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:scrollbars="none">
-            <LinearLayout
-                android:orientation="horizontal"
-                android:id="@+id/whiteMoves"
+            android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/txtWhite"
+                android:text="White"
+                android:textColor="#fff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:fontFamily="@font/chakrapetchbold"/>
+
+            <TextView
+                android:id="@+id/txtWhiteStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:fontFamily="@font/chakrapetchbold"
+                android:layout_marginStart="@dimen/fab_margin" />
+
+        </LinearLayout>
+
+            <!--Moves-->
+            <HorizontalScrollView
+                android:id="@+id/whiteScrollView"
+                android:fillViewport="true"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="30dp"
+                android:scrollbars="none">
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:id="@+id/whiteMoves"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-            </LinearLayout>
-        </HorizontalScrollView>
+                </LinearLayout>
+            </HorizontalScrollView>
 
-    </LinearLayout>
+        </LinearLayout>
+   </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/icons"
