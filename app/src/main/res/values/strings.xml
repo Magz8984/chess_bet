@@ -36,4 +36,8 @@
     <string name="message">Message</string>
     <string name="result">Result</string>
     <string name="match_service">match_service</string>
+    <string name="match_on_rating">Match on rating</string>
+    <string name="rating_range">Rating Range</string>
+    <string name="find_match">Find Match</string>
+    <string name="random_matches">Random Matches</string>
 </resources>

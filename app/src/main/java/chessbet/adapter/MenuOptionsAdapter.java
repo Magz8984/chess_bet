@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import chessbet.app.com.BoardActivity;
+import chessbet.app.com.MatchActivity;
 import chessbet.app.com.SettingsActivity;
 import chessbet.app.com.R;
 import chessbet.domain.MatchType;
@@ -50,8 +51,7 @@ public class MenuOptionsAdapter extends BaseAdapter {
 
         // Play Online
         listeners.add(v -> {
-            Intent intent=new Intent(context, BoardActivity.class);
-            intent.putExtra("match_type", MatchType.PLAY_ONLINE.toString());
+            Intent intent=new Intent(context, MatchActivity.class);
             context.startActivity(intent);
         });
         drawables.add(R.drawable.play_online);

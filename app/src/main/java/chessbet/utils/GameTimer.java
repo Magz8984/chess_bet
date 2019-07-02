@@ -1,6 +1,7 @@
 package chessbet.utils;
 
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -109,5 +110,36 @@ public class GameTimer {
             return new GameTimer(this);
         }
 
+    }
+
+    public enum GameDuration{
+        TEN_MINUTES{
+            @NonNull
+            @Override
+            public String toString() {
+                return "10 min";
+            }
+        },
+        FIFTEEN_MINUTES{
+            @NonNull
+            @Override
+            public String toString() {
+                return "15 min";
+            }
+        },
+        TWENTY_MINUTES{
+            @NonNull
+            @Override
+            public String toString() {
+                return "20 min";
+            }
+        },
+        THIRTY_MINUTES{
+            @NonNull
+            @Override
+            public String toString() {
+                return "30 min";
+            }
+        }
     }
 }
