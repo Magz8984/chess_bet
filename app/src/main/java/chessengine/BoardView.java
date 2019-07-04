@@ -75,6 +75,12 @@ public class BoardView extends View implements RemoteMoveListener {
                             if(chessBoard.getTile(i).getPiece().getPieceAlliance() == localAlliance){
                                 boardCells.get(i).handleTouch();
                             }
+                            else if(chessBoard.getTile(i).getPiece().getPieceAlliance() != localAlliance && movedPiece!=null){
+                                boardCells.get(i).handleTouch();
+                            }
+                        }
+                        else if(matchableAccount !=null && !chessBoard.getTile(i).isOccupied()){
+                            boardCells.get(i).handleTouch();
                         }
                         else {
                             boardCells.get(i).handleTouch();
@@ -110,16 +116,9 @@ public class BoardView extends View implements RemoteMoveListener {
         return result;
     }
 
-    private int measureViewSize(int width, int height){
-        int specWidth = MeasureSpec.getMode(width);
-        int specHeight = MeasureSpec.getMode(height);
-        return  Math.max(specWidth,specHeight);
-    }
-
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
         int desiredWidth = getSuggestedMinimumWidth() + getPaddingLeft() + getPaddingRight();
-        int desiredHeight = getSuggestedMinimumHeight() + getPaddingTop() + getPaddingBottom();
         setMeasuredDimension(measureDimension(desiredWidth,widthMeasureSpec), measureDimension(desiredWidth,widthMeasureSpec));
     }
 

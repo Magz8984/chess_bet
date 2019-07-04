@@ -121,6 +121,6 @@ public class MatchableAccount implements Parcelable {
     }
 
     public String getSelf() {
-        return owner.equals("WHITE") ? "BLACK" : "WHITE";
+        return opponent.equals("WHITE") ? "BLACK" : "WHITE";
     }
 }
