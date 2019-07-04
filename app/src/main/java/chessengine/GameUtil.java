@@ -2,6 +2,7 @@ package chessengine;
 
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.util.Log;
 
 public class GameUtil {
     static MediaPlayer mp;
@@ -12,7 +13,12 @@ public class GameUtil {
 
     }
     static void playSound(){
-        mp.start();
+        try{
+            mp.start();
+        }
+        catch (Exception ex){
+            Log.e("MEDIA_PLAYER",ex.getMessage());
+        }
     }
 
     public static MediaPlayer getMediaPlayer() {

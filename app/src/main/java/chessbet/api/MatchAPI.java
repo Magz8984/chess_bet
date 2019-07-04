@@ -1,5 +1,7 @@
 package chessbet.api;
 
+import android.util.Log;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -80,6 +82,7 @@ public class MatchAPI {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         RemoteMove remoteMove = dataSnapshot.getValue(RemoteMove.class);
                         if(remoteMove.getFrom() !=0 && remoteMove.getTo()!=0){
+                            Log.d("Changed", remoteMove.from +  " "+ remoteMove.to);
                             remoteMoveListener.onRemoteMoveMade(remoteMove);
                         }
                     }
