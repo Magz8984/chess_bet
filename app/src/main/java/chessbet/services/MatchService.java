@@ -21,7 +21,6 @@ import chessbet.domain.MatchableAccount;
 import chessbet.utils.DatabaseUtil;
 
 public class MatchService extends Service implements MatchListener {
-    private MatchAPI matchAPI;
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -31,7 +30,7 @@ public class MatchService extends Service implements MatchListener {
     @Override
     public void onCreate(){
         super.onCreate();
-        matchAPI =new MatchAPI();
+        MatchAPI matchAPI = new MatchAPI();
         matchAPI.setMatchListener(this);
         matchAPI.getAccount();
     }

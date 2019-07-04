@@ -10,10 +10,8 @@ import io.github.erehmi.countdown.CountDownTask;
 import io.github.erehmi.countdown.CountDownTimers;
 
 public class GameTimer {
-    public Builder builder;
-    private String result;
+    private Builder builder;
     private CountDownTask moveCountDownTask;
-    private CountDownTask gameCountDownTask;
 
 
     public GameTimer(final Builder builder){
@@ -21,7 +19,7 @@ public class GameTimer {
     }
 
     public void setGameCountDownTask(int milliseconds,int interval) {
-        gameCountDownTask = CountDownTask.create();
+        CountDownTask gameCountDownTask = CountDownTask.create();
         long targetMilliseconds = CountDownTask.elapsedRealtime() + milliseconds;
         gameCountDownTask.until(builder.txtGameTimer, targetMilliseconds, interval, new CountDownTimers.OnCountDownListener() {
             @Override
@@ -75,7 +73,7 @@ public class GameTimer {
     }
 
     public void setResult(String result) {
-        this.result = result;
+        String result1 = result;
     }
 
     public void invalidateTimer(){

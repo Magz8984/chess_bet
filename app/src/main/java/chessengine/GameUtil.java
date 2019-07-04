@@ -5,7 +5,7 @@ import android.media.MediaPlayer;
 import android.util.Log;
 
 public class GameUtil {
-    static MediaPlayer mp;
+    private static MediaPlayer mp;
 
     public static void  initialize(int resource, Context context){{
         mp = MediaPlayer.create(context, resource);

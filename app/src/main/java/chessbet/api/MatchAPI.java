@@ -1,8 +1,5 @@
 package chessbet.api;
 
-import android.util.Log;
-
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -18,13 +15,12 @@ import chessbet.services.RemoteMoveListener;
 import chessbet.utils.DatabaseUtil;
 
 public class MatchAPI {
-    private FirebaseAuth firebaseAuth = null;
-    private FirebaseUser firebaseUser = null;
-    private DatabaseReference  databaseReference = null;
+    private FirebaseUser firebaseUser;
+    private DatabaseReference  databaseReference;
     private MatchListener matchListener;
     private RemoteMoveListener remoteMoveListener;
     public MatchAPI(){
-        firebaseAuth= FirebaseAuth.getInstance();
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
         databaseReference = FirebaseDatabase.getInstance().getReference();
     }
@@ -37,7 +33,7 @@ public class MatchAPI {
         this.remoteMoveListener = remoteMoveListener;
     }
 
-    public MatchableAccount getAccount(){
+    public void getAccount(){
         final MatchableAccount[] matchable = {null};
         databaseReference.child(DatabaseUtil.matchables).child(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
@@ -55,7 +51,6 @@ public class MatchAPI {
 
             }
         });
-        return matchable[0];
     }
     public void sendMoveData(MatchableAccount matchableAccount,int source, int destination){
         RemoteMove remoteMove = new RemoteMove();
@@ -65,12 +60,9 @@ public class MatchAPI {
         databaseReference.child(DatabaseUtil.matches).child(matchableAccount.getMatchId())
                 .child("players")
                 .child(matchableAccount.getSelf())
-                .setValue(remoteMove).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
+                .setValue(remoteMove).addOnSuccessListener(aVoid -> {
 
-            }
-        });
+                });
     }
 
     public void getRemoteMoveData(MatchableAccount matchableAccount){

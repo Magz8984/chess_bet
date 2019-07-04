@@ -28,8 +28,8 @@ public class SplashScreen extends AppCompatActivity {
 //      descimage = (R.id.titleimage)
 //      desctxt = (R.id.titletxt)
 
-        descimage = (LinearLayout) findViewById(R.id.titleimage);
-        desctxt = (LinearLayout) findViewById(R.id.titletxt);
+        descimage = findViewById(R.id.titleimage);
+        desctxt = findViewById(R.id.titletxt);
         uptodown = AnimationUtils.loadAnimation(this,R.anim.uptodown);
         downtoup = AnimationUtils.loadAnimation(this,R.anim.downtoup);
 //      THIS ANIMATIONS ARE SET INSIDE THE (ANIM) FOLDER.

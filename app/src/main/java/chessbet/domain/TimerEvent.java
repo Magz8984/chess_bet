@@ -1,5 +1,7 @@
 package chessbet.domain;
 
+import android.support.annotation.NonNull;
+
 public enum TimerEvent {
     MOVE_TIMER_ELAPSED{
         @Override
@@ -7,6 +9,7 @@ public enum TimerEvent {
             return "Move time has elapsed";
         }
 
+        @NonNull
         @Override
         public String toString(){
             return "MOVE TIMEOUT";
@@ -18,6 +21,7 @@ public enum TimerEvent {
             return null;
         }
 
+        @NonNull
         @Override
         public String toString(){
             return "GAME TIMEOUT";

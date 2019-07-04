@@ -46,9 +46,7 @@ public class GameDurationAdapter extends BaseAdapter {
         timeDuration.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         timeDuration.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         timeDuration.setText(gameDurations.get(position).toString());
-        timeDuration.setOnClickListener(v->{
-            Log.d("CLICKED",gameDurations.get(position).toString());
-        });
+        timeDuration.setOnClickListener(v-> Log.d("CLICKED",gameDurations.get(position).toString()));
         return timeDuration;
     }
 }

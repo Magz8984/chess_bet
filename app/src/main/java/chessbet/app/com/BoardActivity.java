@@ -21,7 +21,6 @@ import butterknife.ButterKnife;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.TimerEvent;
 import chessbet.utils.DatabaseUtil;
-import chessbet.utils.GameTimer;
 import chessbet.utils.OnTimerElapsed;
 import chessengine.BoardPreference;
 import chessengine.BoardView;
@@ -41,9 +40,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.blackScrollView) HorizontalScrollView blackScrollView;
 @BindView(R.id.whiteScrollView) HorizontalScrollView whiteScrollView;
 @BindView(R.id.txtCountDown) TextView txtCountDown;
-private GameTimer gameTimer;
-private Intent intent;
-private MatchableAccount  matchableAccount;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,10 +48,10 @@ private MatchableAccount  matchableAccount;
         boardPreference=new BoardPreference(getPreferences(Context.MODE_PRIVATE));
         setContentView(R.layout.activity_board);
         ButterKnife.bind(this);
-        gameTimer= new GameTimer.Builder()
-                       .setTxtMoveTimer(txtCountDown)
-                       .setOnMoveTimerElapsed(this)
-                       .build();
+//        GameTimer gameTimer = new GameTimer.Builder()
+//                .setTxtMoveTimer(txtCountDown)
+//                .setOnMoveTimerElapsed(this)
+//                .build();
         boardView.setDarkCellsColor(boardPreference.getDark());
         boardView.setWhiteCellsColor(boardPreference.getWhite());
         boardView.setOnMoveDoneListener(this);
@@ -68,10 +65,10 @@ private MatchableAccount  matchableAccount;
     protected void onStart(){
         super.onStart();
         GameUtil.initialize(R.raw.chess_move,this);
-        intent = getIntent();
-        matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
-        if(matchableAccount!=null){
-            Toast.makeText(this,matchableAccount.getMatch_type(),Toast.LENGTH_LONG).show();
+        Intent intent = getIntent();
+        MatchableAccount matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
+        if(matchableAccount !=null){
+            Toast.makeText(this, matchableAccount.getMatch_type(),Toast.LENGTH_LONG).show();
             boardView.setMatchableAccount(matchableAccount);
         }
       }
@@ -125,11 +122,11 @@ private MatchableAccount  matchableAccount;
     public void isCheckMate(Player player) {
         if(player.getAlliance().isBlack()){
             txtBlackStatus.setTextColor(Color.RED);
-            txtBlackStatus.setText("CHECK MATE");
+            txtBlackStatus.setText(getString(R.string.checkmate));
         }
         else if(player.getAlliance().isWhite()){
             txtWhiteStatus.setTextColor(Color.RED);
-            txtWhiteStatus.setText("CHECK MATE");
+            txtWhiteStatus.setText(getString(R.string.checkmate));
         }
     }
 
@@ -137,11 +134,11 @@ private MatchableAccount  matchableAccount;
     public void isStaleMate(Player player) {
         if(player.getAlliance().isBlack()){
             txtBlackStatus.setTextColor(Color.RED);
-            txtBlackStatus.setText("STALE MATE");
+            txtBlackStatus.setText(getString(R.string.stalemate));
         }
         else if(player.getAlliance().isWhite()){
             txtWhiteStatus.setTextColor(Color.RED);
-            txtWhiteStatus.setText("STALE MATE");
+            txtWhiteStatus.setText(getString(R.string.stalemate));
         }
     }
 
@@ -149,11 +146,11 @@ private MatchableAccount  matchableAccount;
     public void isCheck(Player player) {
         if(player.getAlliance().isBlack()){
             txtBlackStatus.setTextColor(Color.RED);
-            txtBlackStatus.setText("CHECK");
+            txtBlackStatus.setText(getString(R.string.check));
         }
         else if(player.getAlliance().isWhite()){
             txtWhiteStatus.setTextColor(Color.RED);
-            txtWhiteStatus.setText("CHECK");
+            txtWhiteStatus.setText(getString(R.string.check));
         }
     }
 

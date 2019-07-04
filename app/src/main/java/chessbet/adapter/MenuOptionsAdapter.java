@@ -94,12 +94,12 @@ public class MenuOptionsAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         LayoutInflater menuInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View gridMenu=null;
+        View gridMenu;
 
         if(convertView == null){
             gridMenu = menuInflater.inflate(R.layout.menu_view,null);
-            ImageView imgMenu =  (ImageView) gridMenu.findViewById(R.id.imgMenu);
-            TextView txtMenu = (TextView) gridMenu.findViewById(R.id.txtMenu);
+            ImageView imgMenu = gridMenu.findViewById(R.id.imgMenu);
+            TextView txtMenu = gridMenu.findViewById(R.id.txtMenu);
             imgMenu.setImageResource(drawables.get(position));
             txtMenu.setText(strings.get(position));
             gridMenu.setOnClickListener(listeners.get(position));

@@ -1,10 +1,10 @@
 package chessbet.app.com;
 
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.GridView;
 
 import butterknife.BindView;
@@ -13,7 +13,8 @@ import chessbet.adapter.GameDurationAdapter;
 import chessbet.domain.MatchType;
 
 public class MatchActivity extends AppCompatActivity implements View.OnClickListener{
-    @BindView(R.id.btnFindMatch) Button findMatch;
+    @BindView(R.id.btnFindMatch)
+    FloatingActionButton findMatch;
     @BindView(R.id.gameDurations) GridView gameDurations;
     @Override
     protected void onCreate(Bundle savedInstanceState) {

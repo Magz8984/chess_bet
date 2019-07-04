@@ -77,7 +77,7 @@ public class Cell extends View {
             drawable.setColorFilter(color,PorterDuff.Mode.DST_OVER);
         }
 
-        highlightMoves(boardView.chessBoard, canvas ,color);
+        highlightMoves(canvas);
 
         drawable.setBounds(tileRect);
         drawable.draw(canvas);
@@ -202,7 +202,7 @@ public class Cell extends View {
         this.column = column;
     }
 
-    public void highlightMoves(final Board board,final Canvas canvas,final int tileColor){
+    public void highlightMoves(final Canvas canvas){
         for(final Move move : pieceLegalMoves(boardView.chessBoard)){
             if(move.getDestinationCoordinate() == this.tileId){
                 if(!boardView.chessBoard.getTile(this.tileId).isOccupied()){

@@ -1,5 +1,6 @@
 package chessbet.app.com;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,11 +15,11 @@ public class TimerElapsedDialog extends DialogFragment {
     private String result;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup viewGroup, Bundle bundle){
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup viewGroup, Bundle bundle){
         View view = inflater.inflate(R.layout.board_timer_elapsed,viewGroup,false);
-        TextView txtTitle = (TextView) view.findViewById(R.id.txtTitle);
-        TextView txtMessage = (TextView) view.findViewById(R.id.txtMessage);
-        TextView txtResult = (TextView) view.findViewById(R.id.txtResult);
+        TextView txtTitle = view.findViewById(R.id.txtTitle);
+        TextView txtMessage = view.findViewById(R.id.txtMessage);
+        TextView txtResult = view.findViewById(R.id.txtResult);
 
         txtTitle.setText(timerEvent.toString());
         txtMessage.setText(timerEvent.getMessage());

@@ -2,7 +2,7 @@ package chessbet.domain;
 
 public class RemoteMove {
     public int to;
-    public String owner;
+    private String owner;
     public int from;
 
     public void setOwner(String owner) {
