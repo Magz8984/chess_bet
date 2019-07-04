@@ -82,7 +82,6 @@ public class MatchAPI {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         RemoteMove remoteMove = dataSnapshot.getValue(RemoteMove.class);
                         if(remoteMove.getFrom() !=0 && remoteMove.getTo()!=0){
-                            Log.d("Changed", remoteMove.from +  " "+ remoteMove.to);
                             remoteMoveListener.onRemoteMoveMade(remoteMove);
                         }
                     }
