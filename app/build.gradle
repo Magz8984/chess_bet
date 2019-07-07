@@ -38,7 +38,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:3.14.2"
     testImplementation "com.squareup.okhttp3:mockwebserver:3.14.2"
     implementation 'com.github.QuadFlask:colorpicker:0.0.13' // Color picker
-    implementation 'com.github.Magz8984:chess-engine-dev:f54a166197'
+    implementation 'com.github.Magz8984:chess-engine-dev:b63087e897'
     implementation 'com.android.support:cardview-v7:28.0.0'
     implementation 'com.google.guava:guava:27.1-jre'
     implementation 'com.github.erehmi:countdowntask:1.0.1' // Count Down Timer

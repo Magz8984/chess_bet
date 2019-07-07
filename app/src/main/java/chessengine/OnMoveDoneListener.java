@@ -8,4 +8,5 @@ public interface OnMoveDoneListener{
     void isCheckMate(Player player);
     void isStaleMate(Player player);
     void isCheck(Player player);
+    void isDraw();
 }

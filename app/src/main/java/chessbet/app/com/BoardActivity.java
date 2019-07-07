@@ -59,6 +59,9 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         btnColorPicker.setOnClickListener(this);
         btnBack.setOnClickListener(this);
         btnForward.setOnClickListener(this);
+        txtWhiteStatus.setTextColor(Color.RED);
+        txtBlackStatus.setTextColor(Color.RED);
+
     }
 
     @Override
@@ -121,11 +124,9 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void isCheckMate(Player player) {
         if(player.getAlliance().isBlack()){
-            txtBlackStatus.setTextColor(Color.RED);
             txtBlackStatus.setText(getString(R.string.checkmate));
         }
         else if(player.getAlliance().isWhite()){
-            txtWhiteStatus.setTextColor(Color.RED);
             txtWhiteStatus.setText(getString(R.string.checkmate));
         }
     }
@@ -133,11 +134,9 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void isStaleMate(Player player) {
         if(player.getAlliance().isBlack()){
-            txtBlackStatus.setTextColor(Color.RED);
             txtBlackStatus.setText(getString(R.string.stalemate));
         }
         else if(player.getAlliance().isWhite()){
-            txtWhiteStatus.setTextColor(Color.RED);
             txtWhiteStatus.setText(getString(R.string.stalemate));
         }
     }
@@ -145,13 +144,17 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void isCheck(Player player) {
         if(player.getAlliance().isBlack()){
-            txtBlackStatus.setTextColor(Color.RED);
             txtBlackStatus.setText(getString(R.string.check));
         }
         else if(player.getAlliance().isWhite()){
-            txtWhiteStatus.setTextColor(Color.RED);
             txtWhiteStatus.setText(getString(R.string.check));
         }
+    }
+
+    @Override
+    public void isDraw() {
+        txtWhiteStatus.setText(getString(R.string.draw));
+        txtBlackStatus.setText(getString(R.string.draw));
     }
 
     @Override

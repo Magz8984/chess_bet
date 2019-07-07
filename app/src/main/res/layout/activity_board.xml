@@ -63,7 +63,7 @@
                     android:id="@+id/txtBlackStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
+                    android:textSize="15sp"
                     android:fontFamily="@font/chakrapetchbold"
                     android:layout_marginLeft="@dimen/fab_margin"
                     android:layout_marginStart="@dimen/fab_margin" />

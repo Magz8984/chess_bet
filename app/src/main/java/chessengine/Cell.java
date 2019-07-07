@@ -11,10 +11,12 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RotateDrawable;
 import android.view.View;
 
 import com.chess.engine.Move;
 import com.chess.engine.board.Board;
+import com.chess.engine.board.Tile;
 import com.chess.engine.player.MoveTransition;
 
 import java.util.Collection;
@@ -53,13 +55,12 @@ public class Cell extends View {
 
     public void draw(final Canvas canvas) {
         super.draw(canvas);
-
+        Tile tile = boardView.chessBoard.getTile(this.tileId);
         assignCellColor();
-
-        if(boardView.chessBoard.getTile(this.tileId).isOccupied()){
-            String name = boardView.chessBoard.getTile(tileId).getPiece() +
-                    boardView.chessBoard.getTile(tileId).getPiece().getPieceAlliance().toString();
-            drawable= this.context.getResources().getDrawable(context.getResources()
+        if(tile.isOccupied()){
+            String name = tile.getPiece() +
+                    tile.getPiece().getPieceAlliance().toString();
+            drawable = this.context.getResources().getDrawable(context.getResources()
                     .getIdentifier( name.toLowerCase(),"drawable", context.getPackageName()));
         }
 
@@ -82,11 +83,13 @@ public class Cell extends View {
         drawable.setBounds(tileRect);
         drawable.draw(canvas);
         bitmap = ((BitmapDrawable) drawable).getBitmap();
+
         mSrcRectF.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
 
         mDestRectF.set(0, 0, getWidth(),getHeight());
         matrix.setRectToRect(mSrcRectF, mDestRectF, Matrix.ScaleToFit.CENTER);
-        matrix.postRotate(90);
+        matrix.preScale(-1.0f,-1.0f);
+
         canvas.drawBitmap(bitmap, matrix, squareColor);
         invalidate();
     }
@@ -158,6 +161,10 @@ public class Cell extends View {
 
                     if(boardView.chessBoard.currentPlayer().isInCheckMate()){
                         boardView.onMoveDoneListener.isCheckMate(boardView.chessBoard.currentPlayer());
+                    }
+
+                    if(boardView.chessBoard.isDraw()){
+                        boardView.onMoveDoneListener.isDraw();
                     }
                 }
 

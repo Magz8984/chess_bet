@@ -32,6 +32,7 @@ public class BoardView extends View implements RemoteMoveListener {
     protected Piece movedPiece;
     private List<Cell> boardCells=null;
     private BoardDirection boardDirection;
+    protected Alliance topAlliance = Alliance.BLACK;
     private int squareSize = 0;
     private boolean isFlipped = false;
     private int whiteCellsColor;
@@ -241,6 +242,7 @@ public class BoardView extends View implements RemoteMoveListener {
 
     public void flipBoardDirection() {
         this.boardDirection = boardDirection.opposite();
+        topAlliance = topAlliance.equals(Alliance.BLACK) ? Alliance.WHITE : Alliance.BLACK;
         invalidate();
     }
 
@@ -264,6 +266,7 @@ public class BoardView extends View implements RemoteMoveListener {
     public Player getCurrentPlayer(){
         return chessBoard.currentPlayer();
     }
+
     private void translateRemoteMoveOnBoard(RemoteMove remoteMove){
         if(remoteMove!=null){
             final Move move = Move.MoveFactory.createMove(chessBoard,remoteMove.from,remoteMove.to);
@@ -284,6 +287,10 @@ public class BoardView extends View implements RemoteMoveListener {
 
                 if(chessBoard.currentPlayer().isInCheckMate()){
                     onMoveDoneListener.isCheckMate(chessBoard.currentPlayer());
+                }
+
+                if(chessBoard.isDraw()){
+                    onMoveDoneListener.isDraw();
                 }
                 invalidate();
             }

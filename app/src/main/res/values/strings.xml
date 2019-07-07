@@ -43,4 +43,5 @@
     <string name="check">CHECK</string>
     <string name="stalemate">STALEMATE</string>
     <string name="checkmate">CHECKMATE</string>
+    <string name="draw">DRAW</string>
 </resources>
