@@ -20,6 +20,10 @@ android {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
     }
+
+    buildTypes.each{
+        it.buildConfigField("String", "CLOUD_FUNCTIONS_URL", cloudFunctionsURL)
+    }
 }
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

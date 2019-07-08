@@ -8,11 +8,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
+
+import chessbet.domain.Constants;
+import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.RemoteMove;
 import chessbet.services.MatchListener;
 import chessbet.services.RemoteMoveListener;
 import chessbet.utils.DatabaseUtil;
+
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MatchAPI {
     private FirebaseUser firebaseUser;
@@ -84,4 +93,21 @@ public class MatchAPI {
                     }
                 });
     }
+
+    public Response getMatchableAccountOnEloRating(String uid, MatchType matchType) throws IOException {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .cache(null)
+                .build();
+
+        HttpUrl.Builder builder = HttpUrl.parse(Constants.CLOUD_FUNCTIONS_URL.concat(Constants.GET_MATCH_PATH_ON_ELO_RATING)).newBuilder();
+        String url = builder.addQueryParameter("match_type", matchType.toString())
+                            .addQueryParameter("uid", uid)
+                            .build().toString();
+
+        Request request = new Request.Builder()
+                              .url(url)
+                              .build();
+        return okHttpClient.newCall(request).execute();
+    }
+
 }
