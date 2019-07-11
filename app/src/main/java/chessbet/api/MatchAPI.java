@@ -1,5 +1,8 @@
 package chessbet.api;
 
+import android.support.annotation.NonNull;
+import android.util.Log;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -7,6 +10,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -18,9 +24,13 @@ import chessbet.services.MatchListener;
 import chessbet.services.RemoteMoveListener;
 import chessbet.utils.DatabaseUtil;
 
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.HttpUrl;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MatchAPI {
@@ -94,7 +104,7 @@ public class MatchAPI {
                 });
     }
 
-    public Response getMatchableAccountOnEloRating(String uid, MatchType matchType) throws IOException {
+    private void getMatchableAccountOnEloRating(String uid, MatchType matchType, Callback  callback){
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .cache(null)
                 .build();
@@ -104,10 +114,52 @@ public class MatchAPI {
                             .addQueryParameter("uid", uid)
                             .build().toString();
 
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("match_type", matchType.toString())
+                .addFormDataPart("uid",uid)
+                .build();
+
         Request request = new Request.Builder()
                               .url(url)
+                              .method("POST",requestBody)
                               .build();
-        return okHttpClient.newCall(request).execute();
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(callback);
     }
 
+    public void getOnMatchNotificationOnEloRating(String uid, MatchType matchType){
+        getMatchableAccountOnEloRating(uid, matchType, new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                matchListener.onMatchError();
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                assert response.body() != null;
+                Log.d("Data",response.body().toString());
+
+                try {
+                    switch (response.code()) {
+                        case 200 :
+                            matchListener.onMatch(null);
+                            JSONObject jsonObject = new JSONObject(response.body().string());
+                            MatchableAccount  matchableAccount = new MatchableAccount();
+                            matchableAccount.setElo_rating(jsonObject.getInt("elo_rating"));
+                            matchableAccount.setMatch_type(jsonObject.getString("match_type"));
+                            matchableAccount.setMatchable(jsonObject.getBoolean("matchable"));
+                            matchableAccount.setMatchable(jsonObject.getBoolean("matched"));
+                            Log.d("Data",matchableAccount.getMatch_type());
+                            break;
+                        case 404 :
+                            matchListener.onMatchError();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 }
