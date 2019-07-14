@@ -103,7 +103,7 @@ public class MatchAPI {
                     }
                 });
     }
-
+    // TODO Remove redundant code blocks
     private void getMatchableAccountOnEloRating(String uid, MatchType matchType, Callback  callback){
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .cache(null)
@@ -128,7 +128,31 @@ public class MatchAPI {
         call.enqueue(callback);
     }
 
-    public void getOnMatchNotificationOnEloRating(String uid, MatchType matchType){
+    private void createUserMatchableAccount(String uid, MatchType matchType, Callback callback){
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                                        .cache(null)
+                                        .build();
+
+        HttpUrl.Builder builder = HttpUrl.parse(Constants.CLOUD_FUNCTIONS_URL.concat(Constants.CREATE_USER_MATCHABLE_ACCOUNT)).newBuilder();
+        String url = builder.addQueryParameter("match_type", matchType.toString())
+                .addQueryParameter("uid", uid)
+                .build().toString();
+
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("match_type", matchType.toString())
+                .addFormDataPart("uid",uid)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .method("POST",requestBody)
+                .build();
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(callback);
+    }
+
+    private void getOnMatchableAccountImplementation(String uid, MatchType matchType){
         getMatchableAccountOnEloRating(uid, matchType, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
@@ -139,7 +163,8 @@ public class MatchAPI {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 assert response.body() != null;
-                Log.d("Data",response.body().toString());
+                Log.d("DATAZ" +
+                        "",response.body().string());
 
                 try {
                     switch (response.code()) {
@@ -151,9 +176,12 @@ public class MatchAPI {
                             matchableAccount.setMatch_type(jsonObject.getString("match_type"));
                             matchableAccount.setMatchable(jsonObject.getBoolean("matchable"));
                             matchableAccount.setMatchable(jsonObject.getBoolean("matched"));
-                            Log.d("Data",matchableAccount.getMatch_type());
+                            Log.d("Datas",matchableAccount.getMatch_type());
                             break;
                         case 404 :
+                            matchListener.onMatchError();
+                            break;
+                        case 403:
                             matchListener.onMatchError();
                     }
                 } catch (JSONException e) {
@@ -162,4 +190,23 @@ public class MatchAPI {
             }
         });
     }
+
+    public void createUseAccountImplementation(String uid, MatchType matchType){
+        createUserMatchableAccount(uid, matchType, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                matchListener.onMatchError();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                /*
+                Match User after creating a matchable
+                 */
+                getOnMatchableAccountImplementation(uid,matchType);
+            }
+        });
+    }
+
+
 }

@@ -22,6 +22,7 @@ import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.services.MatchListener;
 import chessbet.services.MatchService;
+import chessbet.utils.GameManager;
 
 public class MatchActivity extends AppCompatActivity implements MatchListener, View.OnClickListener, FABProgressListener {
     @BindView(R.id.btnFindMatch)
@@ -48,8 +49,8 @@ public class MatchActivity extends AppCompatActivity implements MatchListener, V
     public void onClick(View v) {
         if(v.equals(findMatch)){
             progressCircle.show();
-            if(user !=null){
-                matchAPI.getOnMatchNotificationOnEloRating(user.getUid(), MatchType.PLAY_ONLINE);
+            if(user !=null && GameManager.isConnected(this)){
+                matchAPI.createUseAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE);
             }
             else{
                 progressCircle.hide();
