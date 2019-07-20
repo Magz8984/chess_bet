@@ -11,9 +11,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 
 import chessbet.domain.Constants;
@@ -162,30 +159,26 @@ public class MatchAPI {
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                assert response.body() != null;
-                Log.d("DATAZ" +
-                        "",response.body().string());
+                String data;
+                if(response.body() != null) {
+                    data = response.body().string();
 
-                try {
-                    switch (response.code()) {
-                        case 200 :
-                            matchListener.onMatch(null);
-                            JSONObject jsonObject = new JSONObject(response.body().string());
-                            MatchableAccount  matchableAccount = new MatchableAccount();
-                            matchableAccount.setElo_rating(jsonObject.getInt("elo_rating"));
-                            matchableAccount.setMatch_type(jsonObject.getString("match_type"));
-                            matchableAccount.setMatchable(jsonObject.getBoolean("matchable"));
-                            matchableAccount.setMatchable(jsonObject.getBoolean("matched"));
-                            Log.d("Datas",matchableAccount.getMatch_type());
-                            break;
-                        case 404 :
-                            matchListener.onMatchError();
-                            break;
-                        case 403:
-                            matchListener.onMatchError();
+                    try {
+                        switch (response.code()) {
+                            case 200 :
+                                Log.d("RDATA", data);
+                                matchListener.onMatch(MatchableAccount.CREATE_MATCHABLE_ACCOUNT_ON_RESPONSE(data));
+                                break;
+                            case 404 :
+                                matchListener.onMatchError();
+                                break;
+                            case 403:
+                                matchListener.onMatchError();
+                        }
+                    } catch (Exception e) {
+                        matchListener.onMatchError();
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
             }
         });

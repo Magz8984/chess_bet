@@ -21,8 +21,8 @@ import chessbet.api.MatchAPI;
 import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.services.MatchListener;
-import chessbet.services.MatchService;
-import chessbet.utils.GameManager;
+import chessbet.utils.DatabaseUtil;
+
 
 public class MatchActivity extends AppCompatActivity implements MatchListener, View.OnClickListener, FABProgressListener {
     @BindView(R.id.btnFindMatch)
@@ -49,7 +49,7 @@ public class MatchActivity extends AppCompatActivity implements MatchListener, V
     public void onClick(View v) {
         if(v.equals(findMatch)){
             progressCircle.show();
-            if(user !=null && GameManager.isConnected(this)){
+            if(user != null){
                 matchAPI.createUseAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE);
             }
             else{
@@ -68,16 +68,18 @@ public class MatchActivity extends AppCompatActivity implements MatchListener, V
     @Override
     public void onMatch(MatchableAccount matchableAccount) {
         progressCircle.beginFinalAnimation();
-        Intent intent = new Intent(this, MatchService.class);
-        startService(intent);
-        Log.d("oKAY","dONE");
+        Intent target= new Intent(this, BoardActivity.class);
+        target.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(DatabaseUtil.matchables,matchableAccount);
+        target.putExtras(bundle);
+        startActivity(target);
     }
 
     @Override
     public void onMatchError() {
         runOnUiThread(() -> {
             progressCircle.hide();
-            Log.d("oKAY","NdONE");
         });
 
     }
