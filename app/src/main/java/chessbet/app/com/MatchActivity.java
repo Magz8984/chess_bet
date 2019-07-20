@@ -37,6 +37,7 @@ public class MatchActivity extends AppCompatActivity implements MatchListener, V
         super.onCreate(savedInstanceState);
         matchAPI = new MatchAPI();
         matchAPI.setMatchListener(this);
+        matchAPI.getAccount();
         setContentView(R.layout.activity_match);
         ButterKnife.bind(this);
         findMatch.setOnClickListener(this);
