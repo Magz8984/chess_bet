@@ -97,7 +97,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void getMove(Move move) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
         params.setMargins(10, 0, 10,0);
         TextView textView = new TextView(this);
         textView.setLayoutParams(params);
