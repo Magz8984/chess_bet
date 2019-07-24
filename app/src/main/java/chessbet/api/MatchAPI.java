@@ -166,7 +166,6 @@ public class MatchAPI {
                     try {
                         switch (response.code()) {
                             case 200 :
-                                Log.d("RDATA", data);
                                 matchListener.onMatch(MatchableAccount.CREATE_MATCHABLE_ACCOUNT_ON_RESPONSE(data));
                                 break;
                             case 404 :
@@ -193,13 +192,9 @@ public class MatchAPI {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                /*
-                Match User after creating a matchable
-                 */
+                // Match User after creating a matchable
                 getOnMatchableAccountImplementation(uid,matchType);
             }
         });
     }
-
-
 }

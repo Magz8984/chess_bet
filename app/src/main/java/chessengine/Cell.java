@@ -144,12 +144,17 @@ public class Cell extends View {
                 final MoveTransition transition = boardView.chessBoard.currentPlayer().makeMove(move);
 
                 if(transition.getMoveStatus().isDone()){
+                    // Undone a move
+                    if(boardView.moveCursor < boardView.moveLog.size()){
+                        boardView.moveLog.removeMoves(boardView.moveCursor -1);
+                        boardView.onMoveDoneListener.getMove(boardView.moveLog);
+                    }
                     GameUtil.playSound(); // Play sound once move is made
                     boardView.setMoveData(boardView.movedPiece.getPiecePosition(), tileId); // Online Play
                     boardView.chessBoard= transition.getTransitionBoard();
                     boardView.moveLog.addMove(move);
-                    boardView.onMoveDoneListener.getMove(move);
-
+                    boardView.moveCursor = boardView.moveLog.size();
+                    boardView.onMoveDoneListener.getMove(boardView.moveLog);
 
                     if(boardView.chessBoard.currentPlayer().isInCheck()){
                         boardView.onMoveDoneListener.isCheck(boardView.chessBoard.currentPlayer());
