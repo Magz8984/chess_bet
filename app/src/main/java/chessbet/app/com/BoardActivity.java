@@ -27,6 +27,7 @@ import chessbet.utils.OnTimerElapsed;
 import chessengine.BoardPreference;
 import chessengine.BoardView;
 import chessengine.GameUtil;
+import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed{
@@ -90,34 +91,38 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
             colorPicker.show(BoardActivity.this.getSupportFragmentManager(),"Color Fragment");
         }
         else if(v.equals(btnBack)){
-            boardView.moveBack();
+            boardView.undoMove();
         }
         else if(v.equals(btnForward)){
-            boardView.moveForward();
+            boardView.redoMove();
         }
     }
 
     @Override
-    public void getMove(Move move) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMargins(10, 0, 10,0);
-        TextView textView = new TextView(this);
-        textView.setLayoutParams(params);
-        textView.setText(move.toString());
-        textView.setTextColor(Color.WHITE);
+    public void getMove(MoveLog moveLog) {
+        runOnUiThread(() -> {
+            blackMoves.removeAllViews();
+            whiteMoves.removeAllViews();
+            for (Move move : moveLog.getMoves()){
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.setMargins(10, 0, 10,0);
+                TextView textView = new TextView(this);
+                textView.setLayoutParams(params);
+                textView.setText(move.toString());
+                textView.setTextColor(Color.WHITE);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,15);
         textView.setOnClickListener(v -> {
             Log.d("MOVE", move.toString());
         });
-        if(move.getMovedPiece().getPieceAlliance() == Alliance.BLACK){
-            blackMoves.addView(textView);
-            txtBlackStatus.setText("");
+                if(move.getMovedPiece().getPieceAlliance() == Alliance.BLACK){
+                    blackMoves.addView(textView);
 
-        }
-        else if (move.getMovedPiece().getPieceAlliance() == Alliance.WHITE){
-            whiteMoves.addView(textView);
-            txtWhiteStatus.setText("");
-        }
+                }
+                else if (move.getMovedPiece().getPieceAlliance() == Alliance.WHITE){
+                    whiteMoves.addView(textView);
+                }
+            }
+        });
 //        gameTimer.invalidateTimer();
 //
 //        gameTimer= new GameTimer.Builder()
@@ -161,6 +166,12 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     public void isDraw() {
         txtWhiteStatus.setText(getString(R.string.draw));
         txtBlackStatus.setText(getString(R.string.draw));
+    }
+
+    @Override
+    public void onGameResume() {
+        txtWhiteStatus.setText("");
+        txtBlackStatus.setText("");
     }
 
     @Override
