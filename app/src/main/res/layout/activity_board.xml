@@ -79,7 +79,7 @@
                     android:orientation="horizontal"
                     android:id="@+id/blackMoves"
                     android:layout_width="wrap_content"
-                    android:layout_height="15sp">
+                    android:layout_height="wrap_content">
 
                 </LinearLayout>
             </HorizontalScrollView>
@@ -142,7 +142,7 @@
                     android:orientation="horizontal"
                     android:id="@+id/whiteMoves"
                     android:layout_width="wrap_content"
-                    android:layout_height="15sp">
+                    android:layout_height="wrap_content">
 
                 </LinearLayout>
             </HorizontalScrollView>

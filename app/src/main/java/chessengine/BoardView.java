@@ -296,6 +296,13 @@ public class BoardView extends View implements RemoteMoveListener {
             }
         }
     }
+
+    public void undoMove(int moveIndex){
+
+    }
+    public void redoMove(){
+        MoveTransition moveTransition = new MoveTransition()
+    }
 }
 
 

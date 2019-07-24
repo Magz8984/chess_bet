@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
@@ -97,12 +99,16 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void getMove(Move move) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(10, 0, 10,0);
         TextView textView = new TextView(this);
         textView.setLayoutParams(params);
         textView.setText(move.toString());
         textView.setTextColor(Color.WHITE);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,15);
+        textView.setOnClickListener(v -> {
+            Log.d("MOVE", move.toString());
+        });
         if(move.getMovedPiece().getPieceAlliance() == Alliance.BLACK){
             blackMoves.addView(textView);
             txtBlackStatus.setText("");
