@@ -156,15 +156,14 @@ public class Cell extends View {
                     boardView.moveCursor = boardView.moveLog.size();
                     boardView.onMoveDoneListener.getMove(boardView.moveLog);
 
-                    if(boardView.chessBoard.currentPlayer().isInCheck()){
+                    if(boardView.chessBoard.currentPlayer().isInCheckMate()){
+                        boardView.onMoveDoneListener.isCheckMate(boardView.chessBoard.currentPlayer());
+                    }
+                    else if(boardView.chessBoard.currentPlayer().isInCheck()){
                         boardView.onMoveDoneListener.isCheck(boardView.chessBoard.currentPlayer());
                     }
                     else if(boardView.chessBoard.currentPlayer().isInStaleMate()){
                         boardView.onMoveDoneListener.isStaleMate(boardView.chessBoard.currentPlayer());
-                    }
-
-                    else if(boardView.chessBoard.currentPlayer().isInCheckMate()){
-                        boardView.onMoveDoneListener.isCheckMate(boardView.chessBoard.currentPlayer());
                     }
                     else if(boardView.chessBoard.isDraw()){
                         boardView.onMoveDoneListener.isDraw();
