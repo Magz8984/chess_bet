@@ -144,27 +144,32 @@ public class Cell extends View {
                 final MoveTransition transition = boardView.chessBoard.currentPlayer().makeMove(move);
 
                 if(transition.getMoveStatus().isDone()){
+                    // Undone a move
+                    if(boardView.moveCursor < boardView.moveLog.size()){
+                        boardView.moveLog.removeMoves(boardView.moveCursor -1);
+                        boardView.onMoveDoneListener.getMove(boardView.moveLog);
+                    }
                     GameUtil.playSound(); // Play sound once move is made
                     boardView.setMoveData(boardView.movedPiece.getPiecePosition(), tileId); // Online Play
                     boardView.chessBoard= transition.getTransitionBoard();
                     boardView.moveLog.addMove(move);
-                    boardView.onMoveDoneListener.getMove(move);
-
-
-                    if(boardView.chessBoard.currentPlayer().isInCheck()){
-                        boardView.onMoveDoneListener.isCheck(boardView.chessBoard.currentPlayer());
-                    }
-
-                    if(boardView.chessBoard.currentPlayer().isInStaleMate()){
-                        boardView.onMoveDoneListener.isStaleMate(boardView.chessBoard.currentPlayer());
-                    }
+                    boardView.moveCursor = boardView.moveLog.size();
+                    boardView.onMoveDoneListener.getMove(boardView.moveLog);
 
                     if(boardView.chessBoard.currentPlayer().isInCheckMate()){
                         boardView.onMoveDoneListener.isCheckMate(boardView.chessBoard.currentPlayer());
                     }
-
-                    if(boardView.chessBoard.isDraw()){
+                    else if(boardView.chessBoard.currentPlayer().isInCheck()){
+                        boardView.onMoveDoneListener.isCheck(boardView.chessBoard.currentPlayer());
+                    }
+                    else if(boardView.chessBoard.currentPlayer().isInStaleMate()){
+                        boardView.onMoveDoneListener.isStaleMate(boardView.chessBoard.currentPlayer());
+                    }
+                    else if(boardView.chessBoard.isDraw()){
                         boardView.onMoveDoneListener.isDraw();
+                    }
+                    else{
+                        boardView.onMoveDoneListener.onGameResume();
                     }
                 }
 

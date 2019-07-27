@@ -4,4 +4,5 @@ import chessbet.domain.MatchableAccount;
 
 public interface MatchListener {
     void onMatch(MatchableAccount matchableAccount);
+    void onMatchError();
 }

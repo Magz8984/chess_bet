@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:custom="http://schemas.android.com/apk/chessengine"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".BoardActivity"
@@ -80,7 +78,7 @@
                 <LinearLayout
                     android:orientation="horizontal"
                     android:id="@+id/blackMoves"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
                 </LinearLayout>
@@ -143,7 +141,7 @@
                 <LinearLayout
                     android:orientation="horizontal"
                     android:id="@+id/whiteMoves"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
 
                 </LinearLayout>

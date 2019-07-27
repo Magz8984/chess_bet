@@ -42,6 +42,7 @@ public class BoardView extends View implements RemoteMoveListener {
     private MatchableAccount matchableAccount;
     private MatchAPI matchAPI;
     private Alliance localAlliance;
+    protected int moveCursor = 0;
 
     private void initialize(Context context){
         moveLog= new MoveLog();
@@ -169,14 +170,6 @@ public class BoardView extends View implements RemoteMoveListener {
         return y0 + squareSize * (isFlipped ? y : 7 - y);
     }
 
-    public void moveBack(){
-
-    }
-
-    public void moveForward(){
-
-    }
-
     public void setDarkCellsColor(int dark) {
         this.darkCellsColor= dark;
         invalidate();
@@ -272,29 +265,61 @@ public class BoardView extends View implements RemoteMoveListener {
             final Move move = Move.MoveFactory.createMove(chessBoard,remoteMove.from,remoteMove.to);
             final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
             if(transition.getMoveStatus().isDone()){
-                chessBoard = transition.getTransitionBoard();
+                // Undone a move
+                if(moveCursor < moveLog.size()){
+                    moveLog.removeMoves(moveCursor);
+                    onMoveDoneListener.getMove(moveLog);
+                }
                 moveLog.addMove(move);
-                onMoveDoneListener.getMove(move);
-
-
-                if(chessBoard.currentPlayer().isInCheck()){
-                    onMoveDoneListener.isCheck(chessBoard.currentPlayer());
-                }
-
-                if(chessBoard.currentPlayer().isInStaleMate()){
-                    onMoveDoneListener.isStaleMate(chessBoard.currentPlayer());
-                }
-
-                if(chessBoard.currentPlayer().isInCheckMate()){
-                    onMoveDoneListener.isCheckMate(chessBoard.currentPlayer());
-                }
-
-                if(chessBoard.isDraw()){
-                    onMoveDoneListener.isDraw();
-                }
+                moveCursor = moveLog.size();
+                chessBoard = transition.getTransitionBoard();
+                onMoveDoneListener.getMove(moveLog);
+                displayGameStates();
                 invalidate();
             }
         }
+    }
+    public void undoMove(){
+        if(this.moveCursor > 0){
+            this.moveCursor -= 1;
+            Log.d("BTN", "undoMove: " + moveCursor);
+            this.chessBoard = this.moveLog.getMove(moveCursor).undo();
+            displayGameStates();
+            invalidate();
+        }
+    }
+    public void redoMove(){
+        if (this.moveCursor < moveLog.size()){
+            MoveTransition transition = chessBoard.currentPlayer().makeMove(moveLog.getMove(moveCursor));
+            if(transition.getMoveStatus().isDone()){
+                chessBoard = transition.getTransitionBoard();
+                displayGameStates();
+                this.moveCursor += 1;
+                Log.d("BTN", "redoMove: " + moveCursor);
+                invalidate();
+            }
+        }
+    }
+    protected void displayGameStates(){
+        if(chessBoard.currentPlayer().isInCheck()){
+            onMoveDoneListener.isCheck(chessBoard.currentPlayer());
+        }
+        else if(chessBoard.currentPlayer().isInStaleMate()){
+            onMoveDoneListener.isStaleMate(chessBoard.currentPlayer());
+        }
+        else if(chessBoard.currentPlayer().isInCheckMate()){
+            onMoveDoneListener.isCheckMate(chessBoard.currentPlayer());
+        }
+        else if(chessBoard.isDraw()){
+            onMoveDoneListener.isDraw();
+        }
+        else {
+            onMoveDoneListener.onGameResume();
+        }
+    }
+
+    public void undoMove(int moveIndex){
+
     }
 }
 

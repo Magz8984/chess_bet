@@ -86,4 +86,9 @@ public class MatchService extends Service implements MatchListener {
             ex.printStackTrace();
         }
     }
+
+    @Override
+    public void onMatchError() {
+
+    }
 }

@@ -3,6 +3,9 @@ package chessbet.domain;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MatchableAccount implements Parcelable {
     private int elo_rating;
     private String matchId;
@@ -122,5 +125,19 @@ public class MatchableAccount implements Parcelable {
 
     public String getSelf() {
         return opponent.equals("WHITE") ? "BLACK" : "WHITE";
+    }
+
+    public static MatchableAccount CREATE_MATCHABLE_ACCOUNT_ON_RESPONSE(String response) throws JSONException {
+        JSONObject jsonObject = new JSONObject(response);
+        MatchableAccount matchableAccount = new MatchableAccount();
+        matchableAccount.setMatchId(jsonObject.getString("matchId"));
+        matchableAccount.setMatch_type(jsonObject.getString("match_type"));
+        matchableAccount.setOnline(jsonObject.getBoolean("online"));
+        matchableAccount.setOwner(jsonObject.getString("owner"));
+        matchableAccount.setOpponent(jsonObject.getString("opponent"));
+        matchableAccount.setElo_rating(jsonObject.getInt("elo_rating"));
+        matchableAccount.setMatchable(jsonObject.getBoolean("matchable"));
+        matchableAccount.setMatched(jsonObject.getBoolean("matched"));
+        return matchableAccount;
     }
 }
