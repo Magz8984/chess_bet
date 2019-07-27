@@ -159,17 +159,18 @@ public class Cell extends View {
                     if(boardView.chessBoard.currentPlayer().isInCheck()){
                         boardView.onMoveDoneListener.isCheck(boardView.chessBoard.currentPlayer());
                     }
-
-                    if(boardView.chessBoard.currentPlayer().isInStaleMate()){
+                    else if(boardView.chessBoard.currentPlayer().isInStaleMate()){
                         boardView.onMoveDoneListener.isStaleMate(boardView.chessBoard.currentPlayer());
                     }
 
-                    if(boardView.chessBoard.currentPlayer().isInCheckMate()){
+                    else if(boardView.chessBoard.currentPlayer().isInCheckMate()){
                         boardView.onMoveDoneListener.isCheckMate(boardView.chessBoard.currentPlayer());
                     }
-
-                    if(boardView.chessBoard.isDraw()){
+                    else if(boardView.chessBoard.isDraw()){
                         boardView.onMoveDoneListener.isDraw();
+                    }
+                    else{
+                        boardView.onMoveDoneListener.onGameResume();
                     }
                 }
 
