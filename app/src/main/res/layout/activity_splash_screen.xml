@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/colorPrimaryDark">
+    android:background="@color/colorPrimary">
     <LinearLayout
         android:id="@+id/titleimage"
         android:layout_width="match_parent"
@@ -37,16 +37,16 @@
             android:layout_gravity="center"
             android:textAlignment="center"
             android:textSize="25sp"
-            android:textColor="@color/colorAccent"/>
+            android:textColor="@color/colorPrimaryYellow"/>
 
         <TextView
             android:id="@+id/splashDesc"
             android:layout_width="500sp"
             android:layout_height="37sp"
             android:layout_gravity="center"
-            android:text="Reinventing the chess game for you to Play and Bet."
+            android:text="@string/motto"
             android:textAlignment="center"
-            android:textColor="@color/colorAccent"
+            android:textColor="@color/colorPrimaryYellow"
             android:textSize="16sp"
             app:fontFamily="@font/reeniebeanie"/>
 
