@@ -300,15 +300,15 @@ public class BoardView extends View implements RemoteMoveListener {
             }
         }
     }
-    protected void displayGameStates(){
-        if(chessBoard.currentPlayer().isInCheck()){
-            onMoveDoneListener.isCheck(chessBoard.currentPlayer());
-        }
-        else if(chessBoard.currentPlayer().isInStaleMate()){
+    private void displayGameStates(){
+        if(chessBoard.currentPlayer().isInStaleMate()){
             onMoveDoneListener.isStaleMate(chessBoard.currentPlayer());
         }
         else if(chessBoard.currentPlayer().isInCheckMate()){
             onMoveDoneListener.isCheckMate(chessBoard.currentPlayer());
+        }
+        else if(chessBoard.currentPlayer().isInCheck()){
+            onMoveDoneListener.isCheck(chessBoard.currentPlayer());
         }
         else if(chessBoard.isDraw()){
             onMoveDoneListener.isDraw();
@@ -316,10 +316,6 @@ public class BoardView extends View implements RemoteMoveListener {
         else {
             onMoveDoneListener.onGameResume();
         }
-    }
-
-    public void undoMove(int moveIndex){
-
     }
 }
 
