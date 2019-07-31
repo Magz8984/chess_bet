@@ -64,7 +64,6 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         btnForward.setOnClickListener(this);
         txtWhiteStatus.setTextColor(Color.RED);
         txtBlackStatus.setTextColor(Color.RED);
-
     }
 
     @Override

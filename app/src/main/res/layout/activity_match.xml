@@ -37,20 +37,134 @@
         android:stretchMode="columnWidth"
         android:layout_height="wrap_content"/>
 
-    <Button
-        android:layout_marginTop="10sp"
-        android:id="@+id/btnRatingRange"
-        android:text="@string/rating_range"
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/ratingRange"
         android:layout_below="@id/matchCheck"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/default_preview_height"
-        android:textColor="@color/white"
-        android:background="@color/bg_register"
-        android:padding="5sp"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:layout_marginTop="10sp"
+            android:id="@+id/btnRatingRange"
+            android:text="@string/rating_range"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/default_preview_height"
+            android:textColor="@color/white"
+            android:background="@color/bg_register"
+            android:padding="5sp"
+            />
+        <LinearLayout
+            android:id="@+id/rangeViews"
+            android:weightSum="3"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"/>
+
+                <com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker
+                    android:layout_gravity="center"
+                    android:background="@drawable/number_picker"
+                    android:id="@+id/from"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    app:snp_scrollEnabled="true"
+                    app:snp_updateInterval="10"
+                    app:snp_maxValue="500"
+                    app:snp_minValue="50"
+                    app:snp_value="100"
+                    app:snp_stepSize="25"
+                    app:snp_buttonIconLeft="@drawable/chevron_left_black"
+                    app:snp_buttonIconRight="@drawable/chevron_right_black"
+                    app:snp_buttonBackgroundTintSelector="@color/white"
+                    app:snp_buttonTouchScaleFactor="0.8"
+                    app:snp_orientation="horizontal"
+                    app:snp_valueMarginEnd="5dp"
+                    app:snp_valueMarginStart="5dp"
+                    app:snp_value_text_color="#262626"
+                    app:snp_value_text_size="16sp"
+                    app:snp_value_text_appearance="?android:attr/textAppearanceMedium"
+                    app:snp_buttonPaddingBottom="8dp"
+                    app:snp_buttonPaddingLeft="8dp"
+                    app:snp_buttonPaddingRight="8dp"
+                    app:snp_buttonPaddingTop="8dp"
+                    />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+                <TextView
+                    android:layout_gravity="center"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1000"
+                    android:textColor="@color/white"
+                    android:textSize="15sp"/>
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:textSize="15sp"/>
+
+                <com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker
+                    android:layout_gravity="center"
+                    android:background="@drawable/number_picker"
+                    android:id="@+id/to"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    app:snp_scrollEnabled="true"
+                    app:snp_updateInterval="10"
+                    app:snp_maxValue="500"
+                    app:snp_minValue="50"
+                    app:snp_value="100"
+                    app:snp_stepSize="25"
+                    app:snp_buttonIconLeft="@drawable/chevron_left_black"
+                    app:snp_buttonIconRight="@drawable/chevron_right_black"
+                    app:snp_buttonBackgroundTintSelector="@color/white"
+                    app:snp_buttonTouchScaleFactor="0.8"
+                    app:snp_orientation="horizontal"
+                    app:snp_valueMarginEnd="5dp"
+                    app:snp_valueMarginStart="5dp"
+                    app:snp_value_text_color="#262626"
+                    app:snp_value_text_size="16sp"
+                    app:snp_value_text_appearance="?android:attr/textAppearanceMedium"
+                    app:snp_buttonPaddingBottom="8dp"
+                    app:snp_buttonPaddingLeft="8dp"
+                    app:snp_buttonPaddingRight="8dp"
+                    app:snp_buttonPaddingTop="8dp"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+        </LinearLayout>
     <TextView
         android:id="@+id/txtRandomMatches"
-        android:layout_below="@id/btnRatingRange"
+        android:layout_below="@id/ratingRange"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/random_matches"
@@ -78,7 +192,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        app:arcColor="@color/btn_login"
+        app:arcColor="@color/colorPrimary"
         app:arcWidth="5dp">
 
         <android.support.design.widget.FloatingActionButton
@@ -86,7 +200,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/play_button"
-            app:rippleColor="@color/btn_login"
+            app:rippleColor="@color/colorPrimary"
             app:elevation="20dp"
             app:borderWidth="0dp"
             android:layout_margin="16dp"

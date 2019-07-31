@@ -7,12 +7,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.transitionseverywhere.TransitionManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,11 +28,15 @@ import chessbet.utils.DatabaseUtil;
 
 
 public class MatchActivity extends AppCompatActivity implements MatchListener, View.OnClickListener, FABProgressListener {
-    @BindView(R.id.btnFindMatch)
-    FloatingActionButton findMatch;
+    @BindView(R.id.btnFindMatch) FloatingActionButton findMatch;
     @BindView(R.id.gameDurations) GridView gameDurations;
-    @BindView(R.id.fabProgressCircle)
-    FABProgressCircle progressCircle;
+    @BindView(R.id.fabProgressCircle) FABProgressCircle progressCircle;
+    @BindView(R.id.ratingRange) LinearLayout ratingRangeView;
+    @BindView(R.id.rangeViews) LinearLayout rangeViewHolder;
+    @BindView(R.id.btnRatingRange) Button btnViewRangeViewHolder;
+
+    private boolean showRatingView = false;
+
     private MatchAPI matchAPI;
     private FirebaseUser user;
     @Override
@@ -43,7 +50,9 @@ public class MatchActivity extends AppCompatActivity implements MatchListener, V
         findMatch.setOnClickListener(this);
         gameDurations.setAdapter(new GameDurationAdapter(this));
         progressCircle.attachListener(this);
+        btnViewRangeViewHolder.setOnClickListener(this);
         user = FirebaseAuth.getInstance().getCurrentUser();
+        rangeViewHolder.setVisibility(showRatingView ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -56,6 +65,11 @@ public class MatchActivity extends AppCompatActivity implements MatchListener, V
             else{
                 progressCircle.hide();
             }
+        }
+        else if(v.equals(btnViewRangeViewHolder)){
+            showRatingView =! showRatingView;
+            TransitionManager.beginDelayedTransition(ratingRangeView);
+            rangeViewHolder.setVisibility(showRatingView ? View.VISIBLE : View.GONE);
         }
     }
 

@@ -47,6 +47,8 @@ dependencies {
     implementation 'com.google.guava:guava:27.1-jre'
     implementation 'com.github.erehmi:countdowntask:1.0.1' // Count Down Timer
     implementation 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar' // Fab Progress Bar
+    implementation'com.michaelmuenzer.android:ScrollableNumberPicker:0.2.2' // Range Picker
+    implementation "com.andkulikov:transitionseverywhere:1.8.1" // Transition everywhere
 }
 
 apply plugin: 'com.google.gms.google-services'
