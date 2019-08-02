@@ -11,7 +11,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.RotateDrawable;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.chess.engine.Move;
@@ -29,7 +29,6 @@ public class Cell extends View {
     private Matrix matrix;
     private RectF mSrcRectF;
     private RectF mDestRectF;
-    private static final String TAG = Cell.class.getSimpleName();
     private  int color;
     private int column =0;
     private int row=0;
@@ -92,33 +91,6 @@ public class Cell extends View {
 
         canvas.drawBitmap(bitmap, matrix, squareColor);
         invalidate();
-    }
-
-    private String getColumnString() {
-        switch (column) {
-            case 0:
-                return "A";
-            case 1:
-                return "B";
-            case 2:
-                return "C";
-            case 3:
-                return "D";
-            case 4:
-                return "E";
-            case 5:
-                return "F";
-            case 6:
-                return "G";
-            case 7:
-                return "H";
-            default:
-                return null;
-        }
-    }
-
-    private String getRowString() {
-        return String.valueOf(row + 1);
     }
 
     public void handleTouch() {
@@ -184,9 +156,8 @@ public class Cell extends View {
         this.tileRect = tileRect;
     }
 
+    @NonNull
     public String toString() {
-        final String column = getColumnString();
-     final String row = getRowString();
         return "<Tile " + tileId + ">";
     }
 
@@ -198,10 +169,6 @@ public class Cell extends View {
         else{
             this.color=boardView.getWhiteCellsColor();
         }
-    }
-
-    public int getTileId() {
-        return tileId;
     }
 
     public void setRow(int row) {

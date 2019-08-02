@@ -59,6 +59,8 @@ public class MatchAPI {
                 if(matchableAccount != null){
                     if(matchableAccount.isMatched()){
                         matchListener.onMatch(matchableAccount);
+                        // Remove listener once the match is made
+                        databaseReference.child(DatabaseUtil.matchables).child(firebaseUser.getUid()).removeEventListener(this);
                     }
                 }
             }
@@ -101,15 +103,26 @@ public class MatchAPI {
                 });
     }
     // TODO Remove redundant code blocks
-    private void getMatchableAccountOnEloRating(String uid, MatchType matchType, Callback  callback){
+    private void getMatchableAccountOnEloRating(String uid, MatchType matchType, MatchRange matchRange, Callback  callback){
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .cache(null)
                 .build();
 
         HttpUrl.Builder builder = HttpUrl.parse(Constants.CLOUD_FUNCTIONS_URL.concat(Constants.GET_MATCH_PATH_ON_ELO_RATING)).newBuilder();
-        String url = builder.addQueryParameter("match_type", matchType.toString())
-                            .addQueryParameter("uid", uid)
-                            .build().toString();
+        String url;
+        if(matchRange != null){
+             url = builder.addQueryParameter("match_type", matchType.toString())
+                    .addQueryParameter("uid", uid)
+                    .addQueryParameter("start_at", Integer.toString(matchRange.getStartAt()))
+                    .addQueryParameter("end_at", Integer.toString(matchRange.getEndAt()))
+                    .build().toString();
+        }
+        else{
+             url = builder.addQueryParameter("match_type", matchType.toString())
+                    .addQueryParameter("uid", uid)
+                    .build().toString();
+        }
+
 
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -149,8 +162,8 @@ public class MatchAPI {
         call.enqueue(callback);
     }
 
-    private void getOnMatchableAccountImplementation(String uid, MatchType matchType){
-        getMatchableAccountOnEloRating(uid, matchType, new Callback() {
+    private void getOnMatchableAccountImplementation(String uid, MatchType matchType, MatchRange matchRange){
+        getMatchableAccountOnEloRating(uid, matchType, matchRange, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 matchListener.onMatchError();
@@ -183,17 +196,17 @@ public class MatchAPI {
         });
     }
 
-    public void createUseAccountImplementation(String uid, MatchType matchType){
+    public void createUseAccountImplementation(String uid, MatchType matchType, MatchRange matchRange){
         createUserMatchableAccount(uid, matchType, new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 matchListener.onMatchError();
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response){
                 // Match User after creating a matchable
-                getOnMatchableAccountImplementation(uid,matchType);
+                getOnMatchableAccountImplementation(uid,matchType,matchRange);
             }
         });
     }

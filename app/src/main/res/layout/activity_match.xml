@@ -14,7 +14,7 @@
 
     <Switch
         android:layout_below="@+id/gameDurations"
-        android:id="@+id/matchCheck"
+        android:id="@+id/matchOnRating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:checked="false"
@@ -40,7 +40,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:id="@+id/ratingRange"
-        android:layout_below="@id/matchCheck"
+        android:layout_below="@id/matchOnRating"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button
@@ -76,7 +76,7 @@
                 <com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker
                     android:layout_gravity="center"
                     android:background="@drawable/number_picker"
-                    android:id="@+id/from"
+                    android:id="@+id/startValue"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     app:snp_scrollEnabled="true"
@@ -135,7 +135,7 @@
                 <com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker
                     android:layout_gravity="center"
                     android:background="@drawable/number_picker"
-                    android:id="@+id/to"
+                    android:id="@+id/endValue"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
                     app:snp_scrollEnabled="true"

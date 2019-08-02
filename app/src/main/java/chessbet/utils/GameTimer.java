@@ -13,7 +13,6 @@ public class GameTimer {
     private Builder builder;
     private CountDownTask moveCountDownTask;
 
-
     public GameTimer(final Builder builder){
         this.builder = builder;
     }
@@ -65,7 +64,7 @@ public class GameTimer {
         if(milliseconds > 1000){
             long seconds = milliseconds / 60 ;
             long minutes = seconds / 60 ;
-            return Long.toString(minutes) + ":" + secondsString;
+            return minutes + ":" + secondsString;
         }
         else {
             return "00 : "+ secondsString;
