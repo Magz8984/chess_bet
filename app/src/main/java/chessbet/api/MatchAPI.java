@@ -33,14 +33,11 @@ import okhttp3.Response;
 
 public class MatchAPI {
     private FirebaseUser firebaseUser;
-    private RemoteMove remoteMove = new RemoteMove();
-    private DatabaseReference  databaseReference;
     private MatchListener matchListener;
     private RemoteMoveListener remoteMoveListener;
     public MatchAPI(){
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
     }
 
     public void setMatchListener(MatchListener matchListener) {
