@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import chessbet.utils.DatabaseUtil;
+import chessbet.utils.GameManager;
 
 public class MatchableAccount implements Parcelable {
     private int elo_rating;
@@ -145,6 +146,9 @@ public class MatchableAccount implements Parcelable {
 
     public void endMatch(){
         DatabaseUtil.getAccount(this.owner).removeValue();
-        DatabaseUtil.getMatch(this.matchId).removeValue();
+        GameManager.delayedTask(() -> {
+            DatabaseUtil.getMatch(this.matchId).removeValue();
+        }, 3000);
+
     }
 }

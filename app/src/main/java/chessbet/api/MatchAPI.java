@@ -102,12 +102,12 @@ public class MatchAPI {
                 });
     }
 
-    private static boolean isMatchInterrupted(RemoteMove remoteMove){
-        return remoteMove.getEvents().contains(MatchEvent.INTERRUPTED.toString());
+    private boolean isMatchInterrupted(RemoteMove remoteMove){
+        return remoteMove.getEvents() != null && remoteMove.getEvents().contains(MatchEvent.INTERRUPTED.toString());
     }
 
-    private static boolean isMatchStarted(RemoteMove remoteMove){
-        return remoteMove.getEvents().contains(MatchEvent.IN_PROGRESS.toString());
+    private boolean isMatchStarted(RemoteMove remoteMove){
+        return remoteMove.getEvents() != null && remoteMove.getEvents().contains(MatchEvent.IN_PROGRESS.toString());
     }
 
     // TODO Remove redundant code blocks

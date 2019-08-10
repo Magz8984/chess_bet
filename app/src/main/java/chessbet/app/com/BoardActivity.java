@@ -23,6 +23,7 @@ import butterknife.ButterKnife;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.TimerEvent;
 import chessbet.utils.DatabaseUtil;
+import chessbet.utils.GameManager;
 import chessbet.utils.OnTimerElapsed;
 import chessengine.BoardPreference;
 import chessengine.BoardView;
