@@ -231,7 +231,8 @@ private  MatchableAccount matchableAccount;
     }
 
     private void endGame(){
-        if(this.matchableAccount != null)
-            this.matchableAccount.endMatch();
+        if(this.matchableAccount != null){
+            this.matchableAccount.endMatch(this);
+        }
     }
 }
