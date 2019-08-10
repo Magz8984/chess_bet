@@ -103,11 +103,11 @@ public class MatchAPI {
     }
 
     private static boolean isMatchInterrupted(RemoteMove remoteMove){
-        return remoteMove.getEvents().contains(MatchEvent.INTERRUPTED);
+        return remoteMove.getEvents().contains(MatchEvent.INTERRUPTED.toString());
     }
 
     private static boolean isMatchStarted(RemoteMove remoteMove){
-        return remoteMove.getEvents().contains(MatchEvent.IN_PROGRESS);
+        return remoteMove.getEvents().contains(MatchEvent.IN_PROGRESS.toString());
     }
 
     // TODO Remove redundant code blocks

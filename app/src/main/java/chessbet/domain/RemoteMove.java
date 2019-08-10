@@ -33,7 +33,9 @@ public class RemoteMove {
     }
 
     public void addEvent(MatchEvent matchEvent){
-        this.events.add(matchEvent.toString());
+        if(!this.getEvents().contains(matchEvent.toString())){
+            this.events.add(matchEvent.toString());
+        }
     }
 
     public String getOwner() {

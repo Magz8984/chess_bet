@@ -43,7 +43,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.blackScrollView) HorizontalScrollView blackScrollView;
 @BindView(R.id.whiteScrollView) HorizontalScrollView whiteScrollView;
 @BindView(R.id.txtCountDown) TextView txtCountDown;
-
+private  MatchableAccount matchableAccount;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,7 +71,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         super.onStart();
         GameUtil.initialize(R.raw.chess_move,this);
         Intent intent = getIntent();
-        MatchableAccount matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
+        matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
         if(matchableAccount !=null){
             Toast.makeText(this, matchableAccount.getMatch_type(),Toast.LENGTH_LONG).show();
             boardView.setMatchableAccount(matchableAccount);
@@ -139,6 +139,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         else if(player.getAlliance().isWhite()){
             txtWhiteStatus.setText(getString(R.string.checkmate));
         }
+        endGame();
     }
 
     @Override
@@ -149,6 +150,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         else if(player.getAlliance().isWhite()){
             txtWhiteStatus.setText(getString(R.string.stalemate));
         }
+        endGame();
     }
 
     @Override
@@ -165,6 +167,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     public void isDraw() {
         txtWhiteStatus.setText(getString(R.string.draw));
         txtBlackStatus.setText(getString(R.string.draw));
+        endGame();
     }
 
     @Override
@@ -224,5 +227,10 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void moveGameElapsed() {
 
+    }
+
+    private void endGame(){
+        if(this.matchableAccount != null)
+            this.matchableAccount.endMatch();
     }
 }

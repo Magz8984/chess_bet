@@ -6,6 +6,8 @@ import android.os.Parcelable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import chessbet.utils.DatabaseUtil;
+
 public class MatchableAccount implements Parcelable {
     private int elo_rating;
     private String matchId;
@@ -139,5 +141,9 @@ public class MatchableAccount implements Parcelable {
         matchableAccount.setMatchable(jsonObject.getBoolean("matchable"));
         matchableAccount.setMatched(jsonObject.getBoolean("matched"));
         return matchableAccount;
+    }
+
+    public void endMatch(){
+        DatabaseUtil.getAccount(this.owner).removeValue();
     }
 }
