@@ -10,7 +10,7 @@ public class RemoteMove {
     private int to;
     private String owner;
     private int from;
-    private List<MatchEvent> events = new ArrayList<>();
+    private List<String> events = new ArrayList<>();
 
     public void setOwner(String owner) {
         this.owner = owner;
@@ -24,16 +24,16 @@ public class RemoteMove {
         this.to = to;
     }
 
-    public void setEvents(ArrayList<MatchEvent> events) {
+    public void setEvents(ArrayList<String> events) {
         this.events = events;
     }
 
-    public List<MatchEvent> getEvents() {
+    public List<String> getEvents() {
         return events;
     }
 
     public void addEvent(MatchEvent matchEvent){
-        this.events.add(matchEvent);
+        this.events.add(matchEvent.toString());
     }
 
     public String getOwner() {

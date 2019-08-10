@@ -103,7 +103,7 @@ public class MatchAPI {
     }
 
     private static boolean isMatchInterrupted(RemoteMove remoteMove){
-        return remoteMove.getEvents().contains(MatchEvent.INTERUPPTED);
+        return remoteMove.getEvents().contains(MatchEvent.INTERRUPTED);
     }
 
     private static boolean isMatchStarted(RemoteMove remoteMove){
