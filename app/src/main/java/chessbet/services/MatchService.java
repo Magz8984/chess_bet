@@ -57,7 +57,7 @@ public class MatchService extends Service implements MatchListener {
     }
 
     @Override
-    public void onMatch(MatchableAccount matchableAccount) {
+    public void onMatchMade(MatchableAccount matchableAccount) {
         try{
             String channel_id="default";
 
@@ -85,6 +85,11 @@ public class MatchService extends Service implements MatchListener {
         catch (Exception ex){
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public void onMatchCreatedNotification() {
+
     }
 
     @Override

@@ -1,6 +1,7 @@
 package chessbet.app.com;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -101,7 +102,7 @@ public class MatchActivity extends AppCompatActivity implements MatchListener, V
     }
 
     @Override
-    public void onMatch(MatchableAccount matchableAccount) {
+    public void onMatchMade(MatchableAccount matchableAccount) {
         progressCircle.beginFinalAnimation();
         Intent target= new Intent(this, BoardActivity.class);
         target.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -112,11 +113,13 @@ public class MatchActivity extends AppCompatActivity implements MatchListener, V
     }
 
     @Override
-    public void onMatchError() {
-        runOnUiThread(() -> {
-            progressCircle.hide();
-        });
+    public void onMatchCreatedNotification() {
+        progressCircle.beginFinalAnimation();
+    }
 
+    @Override
+    public void onMatchError() {
+        runOnUiThread(() -> new Handler().postDelayed(() -> progressCircle.hide(),40000)); // Waits for 40 seconds before hiding the progress bar
     }
 
     @Override

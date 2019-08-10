@@ -262,14 +262,9 @@ public class BoardView extends View implements RemoteMoveListener {
 
     private void translateRemoteMoveOnBoard(RemoteMove remoteMove){
         if(remoteMove!=null){
-            final Move move = Move.MoveFactory.createMove(chessBoard,remoteMove.from,remoteMove.to);
+            final Move move = Move.MoveFactory.createMove(chessBoard,remoteMove.getFrom(),remoteMove.getTo());
             final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
             if(transition.getMoveStatus().isDone()){
-                // Undone a move
-                if(moveCursor < moveLog.size()){
-                    moveLog.removeMoves(moveCursor);
-                    onMoveDoneListener.getMove(moveLog);
-                }
                 moveLog.addMove(move);
                 moveCursor = moveLog.size();
                 chessBoard = transition.getTransitionBoard();
