@@ -10,7 +10,7 @@ public class RemoteMove {
     private int to;
     private String owner;
     private int from;
-    private List<MatchEvent> events;
+    private List<MatchEvent> events = new ArrayList<>();
 
     public void setOwner(String owner) {
         this.owner = owner;
