@@ -28,4 +28,8 @@ public class DatabaseUtil {
                 .child("players")
                 .child(opponent);
     }
+
+    public static DatabaseReference getMatch (String matchId){
+        return  databaseReference.child(DatabaseUtil.matches).child(matchId);
+    }
 }

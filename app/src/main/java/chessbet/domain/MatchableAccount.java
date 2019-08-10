@@ -145,5 +145,6 @@ public class MatchableAccount implements Parcelable {
 
     public void endMatch(){
         DatabaseUtil.getAccount(this.owner).removeValue();
+        DatabaseUtil.getMatch(this.matchId).removeValue();
     }
 }
