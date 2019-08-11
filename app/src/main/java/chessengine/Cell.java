@@ -37,7 +37,6 @@ public class Cell extends View {
     private Rect tileRect;
     private Context context;
     private Bitmap bitmap;
-    private boolean touched=false;
     private Drawable drawable;
 
     Cell(Context context,final BoardView boardView, final int tileId) {
@@ -68,11 +67,12 @@ public class Cell extends View {
             drawable.setAlpha(0);
         }
 
-        if(this.touched){
-            drawable.setColorFilter(Color.YELLOW, PorterDuff.Mode.DST_OVER);
-            this.touched=!this.touched;
+        if(boardView.destinationTile != null && boardView.destinationTile.getTileCoordinate() == tile.getTileCoordinate()){
+            drawable.setColorFilter(Color.HSVToColor(new float[] {60, 100, 100}), PorterDuff.Mode.DST_OVER);
         }
-
+        else if(boardView.sourceTile != null && boardView.sourceTile.getTileCoordinate() == tile.getTileCoordinate()){
+            drawable.setColorFilter(Color.HSVToColor(new float[] {50, 100, 100}), PorterDuff.Mode.DST_OVER);
+        }
         else{
             drawable.setColorFilter(color,PorterDuff.Mode.DST_OVER);
         }
@@ -94,8 +94,13 @@ public class Cell extends View {
     }
 
     public void handleTouch() {
+            if(boardView.sourceTile != null && boardView.destinationTile != null){
+                boardView.sourceTile = null;
+                boardView.movedPiece = null;
+                boardView.destinationTile = null;
+            }
+
             if(boardView.sourceTile == null){
-                this.touched = true;
                 boardView.sourceTile = boardView.chessBoard.getTile(tileId);
                 boardView.movedPiece = boardView.sourceTile.getPiece();
 
@@ -107,7 +112,6 @@ public class Cell extends View {
                     boardView.sourceTile.getTileCoordinate()){
                 boardView.sourceTile = null;
                 boardView.movedPiece = null;
-                this.touched =false;
             }
             else{
                 // Second Click
@@ -116,12 +120,13 @@ public class Cell extends View {
                 final MoveTransition transition = boardView.chessBoard.currentPlayer().makeMove(move);
 
                 if(transition.getMoveStatus().isDone()){
-                    // Undone a move
+                    // Undo a move
                     if(boardView.moveCursor < boardView.moveLog.size()){
                         boardView.moveLog.removeMoves(boardView.moveCursor -1);
                         boardView.onMoveDoneListener.getMove(boardView.moveLog);
                     }
                     GameUtil.playSound(); // Play sound once move is made
+                    boardView.destinationTile = boardView.chessBoard.getTile(tileId);
                     boardView.setMoveData(boardView.movedPiece.getPiecePosition(), tileId); // Online Play
                     boardView.chessBoard= transition.getTransitionBoard();
                     boardView.moveLog.addMove(move);
@@ -142,9 +147,12 @@ public class Cell extends View {
                         boardView.onMoveDoneListener.isDraw();
                     }
                 }
+                else{
+                    boardView.sourceTile = null;
+                    boardView.movedPiece = null;
+                    boardView.destinationTile = null;
+                }
 
-                boardView.sourceTile = null;
-                boardView.movedPiece = null;
                 boardView.invalidate();
             }
     }

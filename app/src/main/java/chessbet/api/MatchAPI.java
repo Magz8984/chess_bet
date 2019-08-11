@@ -47,6 +47,7 @@ public class MatchAPI {
     }
 
     public void getAccount(){
+        RemoteMove.get().clear();
         final MatchableAccount[] matchable = {null};
         DatabaseUtil.getAccount(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override

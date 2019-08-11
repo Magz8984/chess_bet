@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -151,7 +149,7 @@ public class MatchableAccount implements Parcelable {
 
     public void endMatch(Context context){
         DatabaseUtil.getAccount(this.owner).removeValue();
-        // Remove match
+        // Remove match from rdb
         GameManager.delayedTask(() -> DatabaseUtil.getMatch(this.matchId).removeValue().addOnSuccessListener(aVoid -> {
             Intent intent=new Intent(context, MainActivity.class);
             context.startActivity(intent);

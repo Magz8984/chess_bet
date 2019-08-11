@@ -64,4 +64,10 @@ public class RemoteMove {
     public static RemoteMove get(){
         return INSTANCE;
     }
+
+    public void clear() {
+        this.events.clear();
+        this.to = 0;
+        this.from = 0;
+    }
 }

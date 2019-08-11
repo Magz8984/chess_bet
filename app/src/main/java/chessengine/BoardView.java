@@ -29,6 +29,7 @@ import chessbet.services.RemoteMoveListener;
 public class BoardView extends View implements RemoteMoveListener {
     protected Board chessBoard;
     protected Tile sourceTile;
+    protected Tile destinationTile;
     protected Piece movedPiece;
     private List<Cell> boardCells=null;
     private BoardDirection boardDirection;
@@ -267,6 +268,8 @@ public class BoardView extends View implements RemoteMoveListener {
             if(transition.getMoveStatus().isDone()){
                 moveLog.addMove(move);
                 moveCursor = moveLog.size();
+                destinationTile = chessBoard.getTile(remoteMove.getTo());
+                sourceTile = chessBoard.getTile(remoteMove.getFrom());
                 chessBoard = transition.getTransitionBoard();
                 onMoveDoneListener.getMove(moveLog);
                 displayGameStates();
@@ -275,6 +278,10 @@ public class BoardView extends View implements RemoteMoveListener {
         }
     }
     public void undoMove(){
+        this.sourceTile = null;
+        this.destinationTile = null;
+        this.movedPiece = null;
+
         if(this.moveCursor > 0){
             this.moveCursor -= 1;
             Log.d("BTN", "undoMove: " + moveCursor);

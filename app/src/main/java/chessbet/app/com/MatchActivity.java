@@ -53,7 +53,6 @@ public class MatchActivity extends AppCompatActivity implements MatchListener, V
         matchAPI = new MatchAPI();
         matchRange = new MatchRange();
         matchAPI.setMatchListener(this);
-        matchAPI.getAccount();
         setContentView(R.layout.activity_match);
         ButterKnife.bind(this);
         findMatch.setOnClickListener(this);
@@ -64,6 +63,12 @@ public class MatchActivity extends AppCompatActivity implements MatchListener, V
         user = FirebaseAuth.getInstance().getCurrentUser();
         rangeViewHolder.setVisibility(showRatingView ? View.VISIBLE : View.GONE);
         matchOnRatingSwitch.setOnCheckedChangeListener(this);
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        matchAPI.getAccount();
     }
 
     private void initializeMatchRangeListeners(){
