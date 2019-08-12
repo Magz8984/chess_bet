@@ -3,6 +3,9 @@ package chessbet.app.com;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,12 +13,14 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chess.engine.Alliance;
 import com.chess.engine.Move;
+import com.chess.engine.pieces.Piece;
 import com.chess.engine.player.Player;
 
 import butterknife.BindView;
@@ -23,7 +28,6 @@ import butterknife.ButterKnife;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.TimerEvent;
 import chessbet.utils.DatabaseUtil;
-import chessbet.utils.GameManager;
 import chessbet.utils.OnTimerElapsed;
 import chessengine.BoardPreference;
 import chessengine.BoardView;
@@ -44,6 +48,9 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.blackScrollView) HorizontalScrollView blackScrollView;
 @BindView(R.id.whiteScrollView) HorizontalScrollView whiteScrollView;
 @BindView(R.id.txtCountDown) TextView txtCountDown;
+@BindView(R.id.whitePieces) LinearLayout whitePieces;
+@BindView(R.id.blackPieces) LinearLayout blackPieces;
+
 private  MatchableAccount matchableAccount;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,10 +106,12 @@ private  MatchableAccount matchableAccount;
     }
 
     @Override
-    public void getMove(MoveLog moveLog) {
+    public void getMove(MoveLog moveLog){
         runOnUiThread(() -> {
             blackMoves.removeAllViews();
             whiteMoves.removeAllViews();
+            blackPieces.removeAllViews();
+            whitePieces.removeAllViews();
             for (Move move : moveLog.getMoves()){
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 params.setMargins(10, 0, 10,0);
@@ -114,14 +123,16 @@ private  MatchableAccount matchableAccount;
         textView.setOnClickListener(v -> {
             Log.d("MOVE", move.toString());
         });
-                if(move.getMovedPiece().getPieceAlliance() == Alliance.BLACK){
-                    blackMoves.addView(textView);
+            if(move.getMovedPiece().getPieceAlliance() == Alliance.BLACK){
+                blackMoves.addView(textView);
 
-                }
-                else if (move.getMovedPiece().getPieceAlliance() == Alliance.WHITE){
-                    whiteMoves.addView(textView);
-                }
             }
+            else if (move.getMovedPiece().getPieceAlliance() == Alliance.WHITE){
+                whiteMoves.addView(textView);
+            }
+            // Get taken pieces
+            this.getTakenPieces(move);
+        }
         });
 //        gameTimer.invalidateTimer();
 //
@@ -236,6 +247,26 @@ private  MatchableAccount matchableAccount;
     private void endGame(){
         if(this.matchableAccount != null){
             this.matchableAccount.endMatch(this);
+        }
+    }
+
+    private void getTakenPieces(Move move){
+        if(move.getAttackedPiece() != null){
+            Piece piece = move.getAttackedPiece();
+            ImageView imageView = new ImageView(this);
+            Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), getApplicationContext().getResources()
+                    .getIdentifier(piece.toString().concat(piece.getPieceAlliance().toString()).toLowerCase(),"drawable", getPackageName()));
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(40, 40);
+            imageView.setLayoutParams(params);
+            imageView.setBackground(drawable);
+
+            if(piece.getPieceAlliance().equals(Alliance.BLACK)){
+                blackPieces.addView(imageView);
+            }
+            else if(piece.getPieceAlliance().equals(Alliance.WHITE)){
+                whitePieces.addView(imageView);
+            }
         }
     }
 }
