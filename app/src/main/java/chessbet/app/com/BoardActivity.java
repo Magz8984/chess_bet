@@ -134,6 +134,7 @@ private  MatchableAccount matchableAccount;
 
     @Override
     public void isCheckMate(Player player) {
+        onGameResume();
         if(player.getAlliance().isBlack()){
             txtBlackStatus.setText(getString(R.string.checkmate));
         }
@@ -145,6 +146,7 @@ private  MatchableAccount matchableAccount;
 
     @Override
     public void isStaleMate(Player player) {
+        onGameResume();
         if(player.getAlliance().isBlack()){
             txtBlackStatus.setText(getString(R.string.stalemate));
         }
@@ -156,6 +158,7 @@ private  MatchableAccount matchableAccount;
 
     @Override
     public void isCheck(Player player) {
+        onGameResume();
         if(player.getAlliance().isBlack()){
             txtBlackStatus.setText(getString(R.string.check));
         }
