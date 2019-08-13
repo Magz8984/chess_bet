@@ -3,7 +3,6 @@ package chessbet.app.com;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -257,9 +256,14 @@ private  MatchableAccount matchableAccount;
             Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), getApplicationContext().getResources()
                     .getIdentifier(piece.toString().concat(piece.getPieceAlliance().toString()).toLowerCase(),"drawable", getPackageName()));
 
+            assert drawable != null;
+            drawable.clearColorFilter();
+
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(40, 40);
+
             imageView.setLayoutParams(params);
             imageView.setBackground(drawable);
+            imageView.invalidate();
 
             if(piece.getPieceAlliance().equals(Alliance.BLACK)){
                 blackPieces.addView(imageView);

@@ -269,7 +269,7 @@ public class BoardView extends View implements RemoteMoveListener {
                 moveLog.addMove(move);
                 moveCursor = moveLog.size();
                 destinationTile = chessBoard.getTile(remoteMove.getTo());
-                sourceTile = chessBoard.getTile(remoteMove.getFrom());
+//                sourceTile = chessBoard.getTile(remoteMove.getFrom());
                 chessBoard = transition.getTransitionBoard();
                 onMoveDoneListener.getMove(moveLog);
                 displayGameStates();
