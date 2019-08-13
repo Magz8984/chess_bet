@@ -89,9 +89,7 @@ public class MatchAPI {
                         RemoteMove remoteMove = dataSnapshot.getValue(RemoteMove.class);
                         if(isMatchStarted(remoteMove)){
                             if(!isMatchInterrupted(remoteMove)) {
-                                if (remoteMove.getFrom() != 0 && remoteMove.getTo() != 0) {
                                     remoteMoveListener.onRemoteMoveMade(remoteMove);
-                                }
                             }
                         }
                     }

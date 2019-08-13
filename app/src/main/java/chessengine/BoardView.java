@@ -25,6 +25,7 @@ import chessbet.api.MatchAPI;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.RemoteMove;
 import chessbet.services.RemoteMoveListener;
+import chessbet.services.RemoteViewUpdateListener;
 
 public class BoardView extends View implements RemoteMoveListener {
     protected Board chessBoard;
@@ -43,6 +44,7 @@ public class BoardView extends View implements RemoteMoveListener {
     private MatchableAccount matchableAccount;
     private MatchAPI matchAPI;
     private Alliance localAlliance;
+    private RemoteViewUpdateListener remoteViewUpdateListener;
     protected int moveCursor = 0;
 
     private void initialize(Context context){
@@ -195,9 +197,13 @@ public class BoardView extends View implements RemoteMoveListener {
         }
     }
 
+    public void setRemoteViewUpdateListener(RemoteViewUpdateListener remoteViewUpdateListener) {
+        this.remoteViewUpdateListener = remoteViewUpdateListener;
+    }
+
     @Override
     public void onRemoteMoveMade(RemoteMove remoteMove) {
-      this.translateRemoteMoveOnBoard(remoteMove);
+        this.remoteViewUpdateListener.onRemoteMoveMade(remoteMove);
     }
 
     private enum BoardDirection {
@@ -261,7 +267,7 @@ public class BoardView extends View implements RemoteMoveListener {
         return chessBoard.currentPlayer();
     }
 
-    private void translateRemoteMoveOnBoard(RemoteMove remoteMove){
+    public void translateRemoteMoveOnBoard(RemoteMove remoteMove){
         if(remoteMove!=null){
             final Move move = Move.MoveFactory.createMove(chessBoard,remoteMove.getFrom(),remoteMove.getTo());
             final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
@@ -269,7 +275,7 @@ public class BoardView extends View implements RemoteMoveListener {
                 moveLog.addMove(move);
                 moveCursor = moveLog.size();
                 destinationTile = chessBoard.getTile(remoteMove.getTo());
-                sourceTile = chessBoard.getTile(remoteMove.getFrom());
+                GameUtil.playSound();
                 chessBoard = transition.getTransitionBoard();
                 onMoveDoneListener.getMove(moveLog);
                 displayGameStates();
@@ -277,6 +283,7 @@ public class BoardView extends View implements RemoteMoveListener {
             }
         }
     }
+
     public void undoMove(){
         this.sourceTile = null;
         this.destinationTile = null;

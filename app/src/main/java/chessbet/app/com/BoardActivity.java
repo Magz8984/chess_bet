@@ -3,7 +3,6 @@ package chessbet.app.com;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +25,9 @@ import com.chess.engine.player.Player;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.domain.MatchableAccount;
+import chessbet.domain.RemoteMove;
 import chessbet.domain.TimerEvent;
+import chessbet.services.RemoteViewUpdateListener;
 import chessbet.utils.DatabaseUtil;
 import chessbet.utils.OnTimerElapsed;
 import chessengine.BoardPreference;
@@ -35,7 +36,7 @@ import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
 
-public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed{
+public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed, RemoteViewUpdateListener {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -66,6 +67,7 @@ private  MatchableAccount matchableAccount;
         boardView.setDarkCellsColor(boardPreference.getDark());
         boardView.setWhiteCellsColor(boardPreference.getWhite());
         boardView.setOnMoveDoneListener(this);
+        boardView.setRemoteViewUpdateListener(this);
         btnFlip.setOnClickListener(this);
         btnColorPicker.setOnClickListener(this);
         btnBack.setOnClickListener(this);
@@ -257,9 +259,14 @@ private  MatchableAccount matchableAccount;
             Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), getApplicationContext().getResources()
                     .getIdentifier(piece.toString().concat(piece.getPieceAlliance().toString()).toLowerCase(),"drawable", getPackageName()));
 
+            assert drawable != null;
+            drawable.clearColorFilter();
+
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(40, 40);
+
             imageView.setLayoutParams(params);
             imageView.setBackground(drawable);
+            imageView.invalidate();
 
             if(piece.getPieceAlliance().equals(Alliance.BLACK)){
                 blackPieces.addView(imageView);
@@ -268,5 +275,10 @@ private  MatchableAccount matchableAccount;
                 whitePieces.addView(imageView);
             }
         }
+    }
+
+    @Override
+    public void onRemoteMoveMade(RemoteMove remoteMove) {
+        runOnUiThread(() -> boardView.translateRemoteMoveOnBoard(remoteMove));
     }
 }

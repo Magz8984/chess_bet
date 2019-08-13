@@ -17,10 +17,13 @@ import android.view.View;
 import com.chess.engine.Move;
 import com.chess.engine.board.Board;
 import com.chess.engine.board.Tile;
+import com.chess.engine.player.MoveStatus;
 import com.chess.engine.player.MoveTransition;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import chessbet.app.com.R;
 public class Cell extends View {
@@ -94,9 +97,7 @@ public class Cell extends View {
     }
 
     public void handleTouch() {
-            if(boardView.sourceTile != null && boardView.destinationTile != null){
-                boardView.sourceTile = null;
-                boardView.movedPiece = null;
+            if(boardView.destinationTile != null){
                 boardView.destinationTile = null;
             }
 
@@ -147,12 +148,8 @@ public class Cell extends View {
                         boardView.onMoveDoneListener.isDraw();
                     }
                 }
-                else{
-                    boardView.sourceTile = null;
-                    boardView.movedPiece = null;
-                    boardView.destinationTile = null;
-                }
-
+                boardView.sourceTile = null;
+                boardView.movedPiece = null;
                 boardView.invalidate();
             }
     }
@@ -200,6 +197,15 @@ public class Cell extends View {
                     matrix.setRectToRect(mSrcRectF, mDestRectF, Matrix.ScaleToFit.CENTER);
                     canvas.drawBitmap(bitmap, matrix, squareColor);
                     break;
+                }
+                else{
+                    drawable.setColorFilter(Color.RED,PorterDuff.Mode.DST_OVER);
+                    drawable.draw(canvas);
+                    bitmap = ((BitmapDrawable) drawable).getBitmap();
+                    mSrcRectF.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
+                    mDestRectF.set(0, 0, getWidth(),getHeight());
+                    matrix.setRectToRect(mSrcRectF, mDestRectF, Matrix.ScaleToFit.CENTER);
+                    canvas.drawBitmap(bitmap, matrix, squareColor);
                 }
             }
         }
