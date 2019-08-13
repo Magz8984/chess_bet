@@ -25,7 +25,9 @@ import com.chess.engine.player.Player;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.domain.MatchableAccount;
+import chessbet.domain.RemoteMove;
 import chessbet.domain.TimerEvent;
+import chessbet.services.RemoteViewUpdateListener;
 import chessbet.utils.DatabaseUtil;
 import chessbet.utils.OnTimerElapsed;
 import chessengine.BoardPreference;
@@ -34,7 +36,7 @@ import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
 
-public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed{
+public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed, RemoteViewUpdateListener {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -65,6 +67,7 @@ private  MatchableAccount matchableAccount;
         boardView.setDarkCellsColor(boardPreference.getDark());
         boardView.setWhiteCellsColor(boardPreference.getWhite());
         boardView.setOnMoveDoneListener(this);
+        boardView.setRemoteViewUpdateListener(this);
         btnFlip.setOnClickListener(this);
         btnColorPicker.setOnClickListener(this);
         btnBack.setOnClickListener(this);
@@ -272,5 +275,10 @@ private  MatchableAccount matchableAccount;
                 whitePieces.addView(imageView);
             }
         }
+    }
+
+    @Override
+    public void onRemoteMoveMade(RemoteMove remoteMove) {
+        runOnUiThread(() -> boardView.translateRemoteMoveOnBoard(remoteMove));
     }
 }
