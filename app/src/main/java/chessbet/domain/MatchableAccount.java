@@ -1,10 +1,16 @@
 package chessbet.domain;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import chessbet.app.com.MainActivity;
+import chessbet.utils.DatabaseUtil;
+import chessbet.utils.GameManager;
 
 public class MatchableAccount implements Parcelable {
     private int elo_rating;
@@ -139,5 +145,15 @@ public class MatchableAccount implements Parcelable {
         matchableAccount.setMatchable(jsonObject.getBoolean("matchable"));
         matchableAccount.setMatched(jsonObject.getBoolean("matched"));
         return matchableAccount;
+    }
+
+    public void endMatch(Context context){
+        DatabaseUtil.getAccount(this.owner).removeValue();
+        // Remove match from rdb
+        GameManager.delayedTask(() -> DatabaseUtil.getMatch(this.matchId).removeValue().addOnSuccessListener(aVoid -> {
+            Intent intent=new Intent(context, MainActivity.class);
+            context.startActivity(intent);
+        }), 3000);
+
     }
 }

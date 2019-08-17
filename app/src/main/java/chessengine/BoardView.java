@@ -25,10 +25,12 @@ import chessbet.api.MatchAPI;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.RemoteMove;
 import chessbet.services.RemoteMoveListener;
+import chessbet.services.RemoteViewUpdateListener;
 
 public class BoardView extends View implements RemoteMoveListener {
     protected Board chessBoard;
     protected Tile sourceTile;
+    protected Tile destinationTile;
     protected Piece movedPiece;
     private List<Cell> boardCells=null;
     private BoardDirection boardDirection;
@@ -42,6 +44,7 @@ public class BoardView extends View implements RemoteMoveListener {
     private MatchableAccount matchableAccount;
     private MatchAPI matchAPI;
     private Alliance localAlliance;
+    private RemoteViewUpdateListener remoteViewUpdateListener;
     protected int moveCursor = 0;
 
     private void initialize(Context context){
@@ -194,9 +197,13 @@ public class BoardView extends View implements RemoteMoveListener {
         }
     }
 
+    public void setRemoteViewUpdateListener(RemoteViewUpdateListener remoteViewUpdateListener) {
+        this.remoteViewUpdateListener = remoteViewUpdateListener;
+    }
+
     @Override
     public void onRemoteMoveMade(RemoteMove remoteMove) {
-      this.translateRemoteMoveOnBoard(remoteMove);
+        this.remoteViewUpdateListener.onRemoteMoveMade(remoteMove);
     }
 
     private enum BoardDirection {
@@ -260,18 +267,15 @@ public class BoardView extends View implements RemoteMoveListener {
         return chessBoard.currentPlayer();
     }
 
-    private void translateRemoteMoveOnBoard(RemoteMove remoteMove){
+    public void translateRemoteMoveOnBoard(RemoteMove remoteMove){
         if(remoteMove!=null){
-            final Move move = Move.MoveFactory.createMove(chessBoard,remoteMove.from,remoteMove.to);
+            final Move move = Move.MoveFactory.createMove(chessBoard,remoteMove.getFrom(),remoteMove.getTo());
             final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
             if(transition.getMoveStatus().isDone()){
-                // Undone a move
-                if(moveCursor < moveLog.size()){
-                    moveLog.removeMoves(moveCursor);
-                    onMoveDoneListener.getMove(moveLog);
-                }
                 moveLog.addMove(move);
                 moveCursor = moveLog.size();
+                destinationTile = chessBoard.getTile(remoteMove.getTo());
+                GameUtil.playSound();
                 chessBoard = transition.getTransitionBoard();
                 onMoveDoneListener.getMove(moveLog);
                 displayGameStates();
@@ -279,7 +283,12 @@ public class BoardView extends View implements RemoteMoveListener {
             }
         }
     }
+
     public void undoMove(){
+        this.sourceTile = null;
+        this.destinationTile = null;
+        this.movedPiece = null;
+
         if(this.moveCursor > 0){
             this.moveCursor -= 1;
             Log.d("BTN", "undoMove: " + moveCursor);
@@ -300,15 +309,15 @@ public class BoardView extends View implements RemoteMoveListener {
             }
         }
     }
-    protected void displayGameStates(){
-        if(chessBoard.currentPlayer().isInCheck()){
-            onMoveDoneListener.isCheck(chessBoard.currentPlayer());
-        }
-        else if(chessBoard.currentPlayer().isInStaleMate()){
+    private void displayGameStates(){
+        if(chessBoard.currentPlayer().isInStaleMate()){
             onMoveDoneListener.isStaleMate(chessBoard.currentPlayer());
         }
         else if(chessBoard.currentPlayer().isInCheckMate()){
             onMoveDoneListener.isCheckMate(chessBoard.currentPlayer());
+        }
+        else if(chessBoard.currentPlayer().isInCheck()){
+            onMoveDoneListener.isCheck(chessBoard.currentPlayer());
         }
         else if(chessBoard.isDraw()){
             onMoveDoneListener.isDraw();
@@ -316,10 +325,6 @@ public class BoardView extends View implements RemoteMoveListener {
         else {
             onMoveDoneListener.onGameResume();
         }
-    }
-
-    public void undoMove(int moveIndex){
-
     }
 }
 

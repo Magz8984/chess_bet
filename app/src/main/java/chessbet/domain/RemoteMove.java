@@ -1,9 +1,20 @@
 package chessbet.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import chessbet.utils.DatabaseUtil;
+
 public class RemoteMove {
-    public int to;
+    private static  RemoteMove INSTANCE = new RemoteMove();
+    private int to;
     private String owner;
-    public int from;
+    private int from;
+    private List<String> events;
+
+    private RemoteMove(){
+        events = new ArrayList<>();
+    }
 
     public void setOwner(String owner) {
         this.owner = owner;
@@ -17,6 +28,20 @@ public class RemoteMove {
         this.to = to;
     }
 
+    public void setEvents(ArrayList<String> events) {
+        this.events = events;
+    }
+
+    public List<String> getEvents() {
+        return events;
+    }
+
+    public void addEvent(MatchEvent matchEvent){
+        if(!this.getEvents().contains(matchEvent.toString())){
+            this.events.add(matchEvent.toString());
+        }
+    }
+
     public String getOwner() {
         return owner;
     }
@@ -27,5 +52,22 @@ public class RemoteMove {
 
     public int getTo() {
         return to;
+    }
+    // TODO Change self to enum BLACK || WHITE
+    public void send(String matchId, String self){
+        DatabaseUtil.sendRemoteMove(matchId,self)
+                .setValue(this).addOnSuccessListener(aVoid -> {
+
+        });
+    }
+
+    public static RemoteMove get(){
+        return INSTANCE;
+    }
+
+    public void clear() {
+        this.events.clear();
+        this.to = 0;
+        this.from = 0;
     }
 }

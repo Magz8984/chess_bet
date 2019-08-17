@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".BoardActivity"
     android:padding="0dp"
-    android:background="@color/colorPrimary">
+    android:background="#262626">
 
 
    <TextView
@@ -83,6 +83,11 @@
 
                 </LinearLayout>
             </HorizontalScrollView>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:id="@+id/whitePieces"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"/>
         </LinearLayout>
 
     </RelativeLayout>
@@ -146,7 +151,11 @@
 
                 </LinearLayout>
             </HorizontalScrollView>
-
+            <LinearLayout
+                android:orientation="horizontal"
+                android:id="@+id/blackPieces"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"/>
         </LinearLayout>
    </RelativeLayout>
 

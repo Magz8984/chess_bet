@@ -11,16 +11,19 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.RotateDrawable;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.chess.engine.Move;
 import com.chess.engine.board.Board;
 import com.chess.engine.board.Tile;
+import com.chess.engine.player.MoveStatus;
 import com.chess.engine.player.MoveTransition;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import chessbet.app.com.R;
 public class Cell extends View {
@@ -29,7 +32,6 @@ public class Cell extends View {
     private Matrix matrix;
     private RectF mSrcRectF;
     private RectF mDestRectF;
-    private static final String TAG = Cell.class.getSimpleName();
     private  int color;
     private int column =0;
     private int row=0;
@@ -38,7 +40,6 @@ public class Cell extends View {
     private Rect tileRect;
     private Context context;
     private Bitmap bitmap;
-    private boolean touched=false;
     private Drawable drawable;
 
     Cell(Context context,final BoardView boardView, final int tileId) {
@@ -69,11 +70,12 @@ public class Cell extends View {
             drawable.setAlpha(0);
         }
 
-        if(this.touched){
-            drawable.setColorFilter(Color.YELLOW, PorterDuff.Mode.DST_OVER);
-            this.touched=!this.touched;
+        if(boardView.destinationTile != null && boardView.destinationTile.getTileCoordinate() == tile.getTileCoordinate()){
+            drawable.setColorFilter(Color.HSVToColor(new float[] {60, 100, 100}), PorterDuff.Mode.DST_OVER);
         }
-
+        else if(boardView.sourceTile != null && boardView.sourceTile.getTileCoordinate() == tile.getTileCoordinate()){
+            drawable.setColorFilter(Color.HSVToColor(new float[] {50, 100, 100}), PorterDuff.Mode.DST_OVER);
+        }
         else{
             drawable.setColorFilter(color,PorterDuff.Mode.DST_OVER);
         }
@@ -94,36 +96,12 @@ public class Cell extends View {
         invalidate();
     }
 
-    private String getColumnString() {
-        switch (column) {
-            case 0:
-                return "A";
-            case 1:
-                return "B";
-            case 2:
-                return "C";
-            case 3:
-                return "D";
-            case 4:
-                return "E";
-            case 5:
-                return "F";
-            case 6:
-                return "G";
-            case 7:
-                return "H";
-            default:
-                return null;
-        }
-    }
-
-    private String getRowString() {
-        return String.valueOf(row + 1);
-    }
-
     public void handleTouch() {
+            if(boardView.destinationTile != null){
+                boardView.destinationTile = null;
+            }
+
             if(boardView.sourceTile == null){
-                this.touched = true;
                 boardView.sourceTile = boardView.chessBoard.getTile(tileId);
                 boardView.movedPiece = boardView.sourceTile.getPiece();
 
@@ -135,7 +113,6 @@ public class Cell extends View {
                     boardView.sourceTile.getTileCoordinate()){
                 boardView.sourceTile = null;
                 boardView.movedPiece = null;
-                this.touched =false;
             }
             else{
                 // Second Click
@@ -144,17 +121,19 @@ public class Cell extends View {
                 final MoveTransition transition = boardView.chessBoard.currentPlayer().makeMove(move);
 
                 if(transition.getMoveStatus().isDone()){
-                    // Undone a move
+                    // Undo a move
                     if(boardView.moveCursor < boardView.moveLog.size()){
                         boardView.moveLog.removeMoves(boardView.moveCursor -1);
                         boardView.onMoveDoneListener.getMove(boardView.moveLog);
                     }
                     GameUtil.playSound(); // Play sound once move is made
+                    boardView.destinationTile = boardView.chessBoard.getTile(tileId);
                     boardView.setMoveData(boardView.movedPiece.getPiecePosition(), tileId); // Online Play
                     boardView.chessBoard= transition.getTransitionBoard();
                     boardView.moveLog.addMove(move);
                     boardView.moveCursor = boardView.moveLog.size();
                     boardView.onMoveDoneListener.getMove(boardView.moveLog);
+                    boardView.onMoveDoneListener.onGameResume();
 
                     if(boardView.chessBoard.currentPlayer().isInCheckMate()){
                         boardView.onMoveDoneListener.isCheckMate(boardView.chessBoard.currentPlayer());
@@ -168,11 +147,7 @@ public class Cell extends View {
                     else if(boardView.chessBoard.isDraw()){
                         boardView.onMoveDoneListener.isDraw();
                     }
-                    else{
-                        boardView.onMoveDoneListener.onGameResume();
-                    }
                 }
-
                 boardView.sourceTile = null;
                 boardView.movedPiece = null;
                 boardView.invalidate();
@@ -186,9 +161,8 @@ public class Cell extends View {
         this.tileRect = tileRect;
     }
 
+    @NonNull
     public String toString() {
-        final String column = getColumnString();
-     final String row = getRowString();
         return "<Tile " + tileId + ">";
     }
 
@@ -200,10 +174,6 @@ public class Cell extends View {
         else{
             this.color=boardView.getWhiteCellsColor();
         }
-    }
-
-    public int getTileId() {
-        return tileId;
     }
 
     public void setRow(int row) {
@@ -227,6 +197,15 @@ public class Cell extends View {
                     matrix.setRectToRect(mSrcRectF, mDestRectF, Matrix.ScaleToFit.CENTER);
                     canvas.drawBitmap(bitmap, matrix, squareColor);
                     break;
+                }
+                else{
+                    drawable.setColorFilter(Color.RED,PorterDuff.Mode.DST_OVER);
+                    drawable.draw(canvas);
+                    bitmap = ((BitmapDrawable) drawable).getBitmap();
+                    mSrcRectF.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
+                    mDestRectF.set(0, 0, getWidth(),getHeight());
+                    matrix.setRectToRect(mSrcRectF, mDestRectF, Matrix.ScaleToFit.CENTER);
+                    canvas.drawBitmap(bitmap, matrix, squareColor);
                 }
             }
         }

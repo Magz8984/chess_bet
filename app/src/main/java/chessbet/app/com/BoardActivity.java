@@ -3,6 +3,8 @@ package chessbet.app.com;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,18 +12,22 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chess.engine.Alliance;
 import com.chess.engine.Move;
+import com.chess.engine.pieces.Piece;
 import com.chess.engine.player.Player;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.domain.MatchableAccount;
+import chessbet.domain.RemoteMove;
 import chessbet.domain.TimerEvent;
+import chessbet.services.RemoteViewUpdateListener;
 import chessbet.utils.DatabaseUtil;
 import chessbet.utils.OnTimerElapsed;
 import chessengine.BoardPreference;
@@ -30,7 +36,7 @@ import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
 
-public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed{
+public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed, RemoteViewUpdateListener {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -43,7 +49,10 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.blackScrollView) HorizontalScrollView blackScrollView;
 @BindView(R.id.whiteScrollView) HorizontalScrollView whiteScrollView;
 @BindView(R.id.txtCountDown) TextView txtCountDown;
+@BindView(R.id.whitePieces) LinearLayout whitePieces;
+@BindView(R.id.blackPieces) LinearLayout blackPieces;
 
+private  MatchableAccount matchableAccount;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,13 +67,13 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         boardView.setDarkCellsColor(boardPreference.getDark());
         boardView.setWhiteCellsColor(boardPreference.getWhite());
         boardView.setOnMoveDoneListener(this);
+        boardView.setRemoteViewUpdateListener(this);
         btnFlip.setOnClickListener(this);
         btnColorPicker.setOnClickListener(this);
         btnBack.setOnClickListener(this);
         btnForward.setOnClickListener(this);
         txtWhiteStatus.setTextColor(Color.RED);
         txtBlackStatus.setTextColor(Color.RED);
-
     }
 
     @Override
@@ -72,7 +81,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         super.onStart();
         GameUtil.initialize(R.raw.chess_move,this);
         Intent intent = getIntent();
-        MatchableAccount matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
+        matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
         if(matchableAccount !=null){
             Toast.makeText(this, matchableAccount.getMatch_type(),Toast.LENGTH_LONG).show();
             boardView.setMatchableAccount(matchableAccount);
@@ -99,10 +108,12 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    public void getMove(MoveLog moveLog) {
+    public void getMove(MoveLog moveLog){
         runOnUiThread(() -> {
             blackMoves.removeAllViews();
             whiteMoves.removeAllViews();
+            blackPieces.removeAllViews();
+            whitePieces.removeAllViews();
             for (Move move : moveLog.getMoves()){
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 params.setMargins(10, 0, 10,0);
@@ -114,14 +125,16 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         textView.setOnClickListener(v -> {
             Log.d("MOVE", move.toString());
         });
-                if(move.getMovedPiece().getPieceAlliance() == Alliance.BLACK){
-                    blackMoves.addView(textView);
+            if(move.getMovedPiece().getPieceAlliance() == Alliance.BLACK){
+                blackMoves.addView(textView);
 
-                }
-                else if (move.getMovedPiece().getPieceAlliance() == Alliance.WHITE){
-                    whiteMoves.addView(textView);
-                }
             }
+            else if (move.getMovedPiece().getPieceAlliance() == Alliance.WHITE){
+                whiteMoves.addView(textView);
+            }
+            // Get taken pieces
+            this.getTakenPieces(move);
+        }
         });
 //        gameTimer.invalidateTimer();
 //
@@ -134,26 +147,31 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void isCheckMate(Player player) {
+        onGameResume();
         if(player.getAlliance().isBlack()){
             txtBlackStatus.setText(getString(R.string.checkmate));
         }
         else if(player.getAlliance().isWhite()){
             txtWhiteStatus.setText(getString(R.string.checkmate));
         }
+        endGame();
     }
 
     @Override
     public void isStaleMate(Player player) {
+        onGameResume();
         if(player.getAlliance().isBlack()){
             txtBlackStatus.setText(getString(R.string.stalemate));
         }
         else if(player.getAlliance().isWhite()){
             txtWhiteStatus.setText(getString(R.string.stalemate));
         }
+        endGame();
     }
 
     @Override
     public void isCheck(Player player) {
+        onGameResume();
         if(player.getAlliance().isBlack()){
             txtBlackStatus.setText(getString(R.string.check));
         }
@@ -166,6 +184,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     public void isDraw() {
         txtWhiteStatus.setText(getString(R.string.draw));
         txtBlackStatus.setText(getString(R.string.draw));
+        endGame();
     }
 
     @Override
@@ -225,5 +244,41 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void moveGameElapsed() {
 
+    }
+
+    private void endGame(){
+        if(this.matchableAccount != null){
+            this.matchableAccount.endMatch(this);
+        }
+    }
+
+    private void getTakenPieces(Move move){
+        if(move.getAttackedPiece() != null){
+            Piece piece = move.getAttackedPiece();
+            ImageView imageView = new ImageView(this);
+            Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), getApplicationContext().getResources()
+                    .getIdentifier(piece.toString().concat(piece.getPieceAlliance().toString()).toLowerCase(),"drawable", getPackageName()));
+
+            assert drawable != null;
+            drawable.clearColorFilter();
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(40, 40);
+
+            imageView.setLayoutParams(params);
+            imageView.setBackground(drawable);
+            imageView.invalidate();
+
+            if(piece.getPieceAlliance().equals(Alliance.BLACK)){
+                blackPieces.addView(imageView);
+            }
+            else if(piece.getPieceAlliance().equals(Alliance.WHITE)){
+                whitePieces.addView(imageView);
+            }
+        }
+    }
+
+    @Override
+    public void onRemoteMoveMade(RemoteMove remoteMove) {
+        runOnUiThread(() -> boardView.translateRemoteMoveOnBoard(remoteMove));
     }
 }

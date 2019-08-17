@@ -1,19 +1,18 @@
 package chessbet.api;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import chessbet.domain.Constants;
+import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.RemoteMove;
@@ -32,13 +31,11 @@ import okhttp3.Response;
 
 public class MatchAPI {
     private FirebaseUser firebaseUser;
-    private DatabaseReference  databaseReference;
     private MatchListener matchListener;
     private RemoteMoveListener remoteMoveListener;
     public MatchAPI(){
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
     }
 
     public void setMatchListener(MatchListener matchListener) {
@@ -50,15 +47,23 @@ public class MatchAPI {
     }
 
     public void getAccount(){
+        RemoteMove.get().clear();
         final MatchableAccount[] matchable = {null};
-        databaseReference.child(DatabaseUtil.matchables).child(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
+        DatabaseUtil.getAccount(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 matchable[0] = dataSnapshot.getValue(MatchableAccount.class);
                 MatchableAccount matchableAccount = matchable[0];
                 if(matchableAccount != null){
                     if(matchableAccount.isMatched()){
-                        matchListener.onMatch(matchableAccount);
+                        // Remove listener once the match is made
+                        DatabaseUtil.getAccount(firebaseUser.getUid()).removeEventListener(this);
+                        // Add Started Event
+                        RemoteMove.get().addEvent(MatchEvent.IN_PROGRESS);
+                        RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
+                        // Confirms a match has been made
+                        matchListener.onMatchMade(matchableAccount);
+
                     }
                 }
             }
@@ -68,29 +73,24 @@ public class MatchAPI {
             }
         });
     }
+
     public void sendMoveData(MatchableAccount matchableAccount,int source, int destination){
-        RemoteMove remoteMove = new RemoteMove();
-        remoteMove.setOwner(matchableAccount.getOwner());
-        remoteMove.setFrom(source);
-        remoteMove.setTo(destination);
-        databaseReference.child(DatabaseUtil.matches).child(matchableAccount.getMatchId())
-                .child("players")
-                .child(matchableAccount.getSelf())
-                .setValue(remoteMove).addOnSuccessListener(aVoid -> {
-
-                });
+        RemoteMove.get().setOwner(matchableAccount.getOwner());
+        RemoteMove.get().setFrom(source);
+        RemoteMove.get().setTo(destination);
+        RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
     }
-
+    // TODO Implement remote move events
     public void getRemoteMoveData(MatchableAccount matchableAccount){
-        databaseReference.child(DatabaseUtil.matches).child(matchableAccount.getMatchId())
-                .child("players")
-                .child(matchableAccount.getOpponent())
+        DatabaseUtil.getOpponentRemoteMove(matchableAccount.getMatchId(), matchableAccount.getOpponent())
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         RemoteMove remoteMove = dataSnapshot.getValue(RemoteMove.class);
-                        if(remoteMove.getFrom() !=0 && remoteMove.getTo()!=0){
-                            remoteMoveListener.onRemoteMoveMade(remoteMove);
+                        if(isMatchStarted(remoteMove)){
+                            if(!isMatchInterrupted(remoteMove)) {
+                                    remoteMoveListener.onRemoteMoveMade(remoteMove);
+                            }
                         }
                     }
 
@@ -100,16 +100,36 @@ public class MatchAPI {
                     }
                 });
     }
+
+    private boolean isMatchInterrupted(RemoteMove remoteMove){
+        return remoteMove != null && remoteMove.getEvents().contains(MatchEvent.INTERRUPTED.toString());
+    }
+
+    private boolean isMatchStarted(RemoteMove remoteMove){
+        return remoteMove != null && remoteMove.getEvents().contains(MatchEvent.IN_PROGRESS.toString());
+    }
+
     // TODO Remove redundant code blocks
-    private void getMatchableAccountOnEloRating(String uid, MatchType matchType, Callback  callback){
+    private void getMatchableAccountOnEloRating(String uid, MatchType matchType, MatchRange matchRange, Callback  callback){
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .cache(null)
                 .build();
 
-        HttpUrl.Builder builder = HttpUrl.parse(Constants.CLOUD_FUNCTIONS_URL.concat(Constants.GET_MATCH_PATH_ON_ELO_RATING)).newBuilder();
-        String url = builder.addQueryParameter("match_type", matchType.toString())
-                            .addQueryParameter("uid", uid)
-                            .build().toString();
+        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(Constants.CLOUD_FUNCTIONS_URL.concat(Constants.GET_MATCH_PATH_ON_ELO_RATING))).newBuilder();
+        String url;
+        if(matchRange != null){
+             url = builder.addQueryParameter("match_type", matchType.toString())
+                    .addQueryParameter("uid", uid)
+                    .addQueryParameter("start_at", Integer.toString(matchRange.getStartAt()))
+                    .addQueryParameter("end_at", Integer.toString(matchRange.getEndAt()))
+                    .build().toString();
+        }
+        else{
+             url = builder.addQueryParameter("match_type", matchType.toString())
+                    .addQueryParameter("uid", uid)
+                    .build().toString();
+        }
+
 
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -130,7 +150,7 @@ public class MatchAPI {
                                         .cache(null)
                                         .build();
 
-        HttpUrl.Builder builder = HttpUrl.parse(Constants.CLOUD_FUNCTIONS_URL.concat(Constants.CREATE_USER_MATCHABLE_ACCOUNT)).newBuilder();
+        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(Constants.CLOUD_FUNCTIONS_URL.concat(Constants.CREATE_USER_MATCHABLE_ACCOUNT))).newBuilder();
         String url = builder.addQueryParameter("match_type", matchType.toString())
                 .addQueryParameter("uid", uid)
                 .build().toString();
@@ -149,8 +169,8 @@ public class MatchAPI {
         call.enqueue(callback);
     }
 
-    private void getOnMatchableAccountImplementation(String uid, MatchType matchType){
-        getMatchableAccountOnEloRating(uid, matchType, new Callback() {
+    private void getOnMatchableAccountImplementation(String uid, MatchType matchType, MatchRange matchRange){
+        getMatchableAccountOnEloRating(uid, matchType, matchRange, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 matchListener.onMatchError();
@@ -159,41 +179,38 @@ public class MatchAPI {
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                String data;
-                if(response.body() != null) {
-                    data = response.body().string();
-
                     try {
                         switch (response.code()) {
                             case 200 :
-                                matchListener.onMatch(MatchableAccount.CREATE_MATCHABLE_ACCOUNT_ON_RESPONSE(data));
+                                matchListener.onMatchCreatedNotification();
                                 break;
                             case 404 :
                                 matchListener.onMatchError();
                                 break;
                             case 403:
                                 matchListener.onMatchError();
+                                break;
+                            default:
+                                matchListener.onMatchError();
                         }
                     } catch (Exception e) {
                         matchListener.onMatchError();
-                        e.printStackTrace();
                     }
-                }
             }
         });
     }
 
-    public void createUseAccountImplementation(String uid, MatchType matchType){
+    public void createUseAccountImplementation(String uid, MatchType matchType, MatchRange matchRange){
         createUserMatchableAccount(uid, matchType, new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 matchListener.onMatchError();
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response){
                 // Match User after creating a matchable
-                getOnMatchableAccountImplementation(uid,matchType);
+                getOnMatchableAccountImplementation(uid,matchType,matchRange);
             }
         });
     }

@@ -12,10 +12,10 @@ public class BoardPreference{
         editor.apply();
     }
     public int getDark() {
-        return  sharedPreferences.getInt("Dark", Color.MAGENTA);
+        return  sharedPreferences.getInt("Dark", Color.GRAY);
     }
     public int getWhite() {
-        return  sharedPreferences.getInt("White", Color.CYAN);
+        return  sharedPreferences.getInt("White", Color.WHITE);
     }
     public void setDark(int dark) {
         editor.putInt("Dark",dark);
