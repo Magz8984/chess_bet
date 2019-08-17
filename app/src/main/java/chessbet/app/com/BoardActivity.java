@@ -84,7 +84,6 @@ private  MatchableAccount matchableAccount;
         Intent intent = getIntent();
         matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
         if(matchableAccount !=null){
-            Toast.makeText(this, matchableAccount.getMatch_type(),Toast.LENGTH_LONG).show();
             boardView.setMatchableAccount(matchableAccount);
         }
       }
