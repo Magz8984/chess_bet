@@ -8,22 +8,43 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:layout_height="180dp">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_marginTop="20dp"
-        android:id="@+id/profile_photo"
+    <LinearLayout
+        android:weightSum="2"
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher_round"/>
+        android:layout_height="wrap_content">
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_weight="1"
+            android:layout_marginTop="20dp"
+            android:id="@+id/profile_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_launcher_round"/>
+
+        <TextView
+            android:textSize="20sp"
+            android:fontFamily="@font/chakrapetchbold"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/white"
+            android:textAlignment="center"
+            android:text="@string/rating"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
 
     <TextView
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="8dp"
-        android:textColor="@color/colorWhite"
+        android:textColor="@color/colorPrimaryYellow"
         android:fontFamily="@font/chakrapetchbold"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:text="Chess Bet Url"/>
+        android:text="Edit Profile Photo"/>
 
     <TextView
         android:layout_width="wrap_content"

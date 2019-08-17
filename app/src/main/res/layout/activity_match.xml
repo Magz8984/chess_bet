@@ -194,7 +194,7 @@
         app:arcColor="@color/colorPrimary"
         app:arcWidth="5dp">
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnFindMatch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

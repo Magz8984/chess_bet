@@ -1,6 +1,7 @@
 package chessbet.api;
 
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -13,6 +14,7 @@ import java.util.Objects;
 
 import chessbet.domain.Constants;
 import chessbet.domain.MatchEvent;
+import chessbet.domain.MatchRange;
 import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.RemoteMove;

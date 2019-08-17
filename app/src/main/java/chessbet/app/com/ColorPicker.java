@@ -3,12 +3,13 @@ package chessbet.app.com;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 
 import com.flask.colorpicker.ColorPickerView;
 
@@ -23,7 +24,7 @@ private BoardView boardView;
 private  int trigger = 1;
 
     @Override
-    public View onCreateView(@NonNull  LayoutInflater inflater, ViewGroup viewGroup, Bundle bundle){
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup viewGroup, Bundle bundle){
         View view=inflater.inflate(R.layout.board_color_picker,viewGroup,false);
         black = view.findViewById(R.id.btn_dark);
         white= view.findViewById(R.id.btn_white);

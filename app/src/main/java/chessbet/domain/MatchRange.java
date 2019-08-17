@@ -1,4 +1,4 @@
-package chessbet.api;
+package chessbet.domain;
 
 public class MatchRange {
     private int startAt = 100;

@@ -2,9 +2,6 @@ package chessbet.app.com;
 
 import android.content.Intent;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -13,8 +10,12 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker;
@@ -24,7 +25,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.adapter.GameDurationAdapter;
 import chessbet.api.MatchAPI;
-import chessbet.api.MatchRange;
+import chessbet.domain.MatchRange;
 import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.services.MatchListener;
@@ -32,7 +33,8 @@ import chessbet.utils.DatabaseUtil;
 
 
 public class MatchActivity extends AppCompatActivity implements MatchListener, View.OnClickListener, FABProgressListener, CompoundButton.OnCheckedChangeListener {
-    @BindView(R.id.btnFindMatch) FloatingActionButton findMatch;
+    @BindView(R.id.btnFindMatch)
+    FloatingActionButton findMatch;
     @BindView(R.id.gameDurations) GridView gameDurations;
     @BindView(R.id.matchOnRating) Switch matchOnRatingSwitch;
     @BindView(R.id.fabProgressCircle) FABProgressCircle progressCircle;
