@@ -46,7 +46,7 @@
             android:layout_gravity="center"
             android:text="@string/motto"
             android:textAlignment="center"
-            android:textColor="@color/colorPrimaryYellow"
+            android:textColor="@color/colorWhite"
             android:textSize="16sp"
             app:fontFamily="@font/reeniebeanie"/>
 

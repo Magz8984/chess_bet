@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import chessbet.app.com.R;
 import chessbet.utils.GameTimer;
 
 public class GameDurationAdapter extends BaseAdapter {
@@ -46,6 +47,8 @@ public class GameDurationAdapter extends BaseAdapter {
         timeDuration.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         timeDuration.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         timeDuration.setText(gameDurations.get(position).toString());
+        timeDuration.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryDark));
+        timeDuration.setTextColor(context.getResources().getColor(R.color.white));
         timeDuration.setOnClickListener(v-> Log.d("CLICKED",gameDurations.get(position).toString()));
         return timeDuration;
     }
