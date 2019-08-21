@@ -131,6 +131,14 @@ public class Cell extends View {
                     boardView.destinationTile = boardView.chessBoard.getTile(tileId);
                     boardView.setMoveData(boardView.movedPiece.getPiecePosition(), tileId); // Online Play
                     boardView.chessBoard= transition.getTransitionBoard();
+
+                    if(boardView.chessBoard.currentPlayer().isInCheckMate()){
+                        move.setCheckMateMove(true);
+                    }
+                    else if(boardView.chessBoard.currentPlayer().isInCheck()){
+                        move.setCheckMove(true);
+                    }
+
                     boardView.moveLog.addMove(move);
                     boardView.moveCursor = boardView.moveLog.size();
                     boardView.onMoveDoneListener.getMove(boardView.moveLog);
