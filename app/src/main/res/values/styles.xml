@@ -8,6 +8,7 @@
         <item name="colorAccent">@color/colorPrimaryYellow</item>
         <item name="android:colorBackground">@color/colorWhite</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="preferenceTheme">@style/PreferenceTheme</item>
 
     </style>
     <style name="AppTheme.NoActionBar" >
@@ -15,6 +16,7 @@
         <item name="android:textColor">@color/colorCyanBlue</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
+        <item name="preferenceTheme">@style/PreferenceTheme</item>
     </style>
     <style name="TextAppearance.App.TextInputLayout" parent="@android:style/TextAppearance">
     <item name="android:textColor">@color/colorTransparentWhite</item>
@@ -29,6 +31,12 @@
     <style name="DrawerArrowStyle" parent="@style/Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>
         <item name="color">@color/white</item>
+    </style>
+
+    <style name="PreferenceTheme" parent="@style/PreferenceThemeOverlay">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:textColorSecondary">@color/colorWhite</item>
     </style>
 
 </resources>

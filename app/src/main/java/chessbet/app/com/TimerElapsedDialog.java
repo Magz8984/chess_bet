@@ -29,11 +29,11 @@ public class TimerElapsedDialog extends DialogFragment {
         return view;
     }
 
-    public void setTimerEvent(TimerEvent timerEvent) {
+    void setTimerEvent(TimerEvent timerEvent) {
         this.timerEvent = timerEvent;
     }
 
-    public void setResult(String result){
+    void setResult(String result){
         this.result=result;
     }
 }

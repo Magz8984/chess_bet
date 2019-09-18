@@ -22,6 +22,12 @@ import com.chess.engine.Alliance;
 import com.chess.engine.Move;
 import com.chess.engine.pieces.Piece;
 import com.chess.engine.player.Player;
+import com.chess.pgn.PGNMainUtils;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,6 +36,7 @@ import chessbet.domain.RemoteMove;
 import chessbet.domain.TimerEvent;
 import chessbet.services.RemoteViewUpdateListener;
 import chessbet.utils.DatabaseUtil;
+import chessbet.utils.GameManager;
 import chessbet.utils.OnTimerElapsed;
 import chessengine.BoardPreference;
 import chessengine.BoardView;
@@ -153,6 +160,7 @@ private  MatchableAccount matchableAccount;
         }
         else if(player.getAlliance().isWhite()){
             txtWhiteStatus.setText(getString(R.string.checkmate));
+            storeGameAsPGN("1-0");
         }
         endGame();
     }
@@ -280,5 +288,35 @@ private  MatchableAccount matchableAccount;
     @Override
     public void onRemoteMoveMade(RemoteMove remoteMove) {
         runOnUiThread(() -> boardView.translateRemoteMoveOnBoard(remoteMove));
+    }
+
+    protected void storeGameAsPGN(String result){
+        MoveLog moveLog = boardView.getMoveLog();
+        String gameText = PGNMainUtils.writeGameAsPGN(moveLog.convertToEngineMoveLog(),"N/A","N/A",result);
+        FileOutputStream fileOutputStream = null;
+
+        try{
+            String file_name = String.format(GameManager.GAME_FILE, new Date().getTime());
+            fileOutputStream = openFileOutput(file_name,MODE_PRIVATE);
+            fileOutputStream.write(gameText.getBytes());
+            Toast.makeText(this, "Saved to : " + getFilesDir() + "/" + file_name , Toast.LENGTH_LONG).show();
+        }catch (FileNotFoundException ex){
+            ex.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if(fileOutputStream != null){
+                try {
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    protected void loadGameFromPGN() {
+
     }
 }

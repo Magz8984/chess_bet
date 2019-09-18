@@ -18,7 +18,7 @@
         <item
             android:id="@+id/itm_account_settings"
             android:icon="@drawable/settings"
-            android:title="Settings"
+            android:title="@string/settings"
             />
     </group>
 

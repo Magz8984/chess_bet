@@ -44,4 +44,10 @@ public class MoveLog {
         this.moves.clear();
         this.moves.addAll(validMoves);
     }
+
+    public com.chess.gui.MoveLog convertToEngineMoveLog(){
+        com.chess.gui.MoveLog moveLog = new com.chess.gui.MoveLog();
+        moveLog.setMoves((ArrayList<Move>) this.moves);
+        return moveLog;
+    }
 }

@@ -16,6 +16,7 @@ import com.chess.engine.board.Tile;
 import com.chess.engine.pieces.Piece;
 import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
+import com.chess.pgn.PGNMainUtils;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
@@ -325,6 +326,10 @@ public class BoardView extends View implements RemoteMoveListener {
         else {
             onMoveDoneListener.onGameResume();
         }
+    }
+
+    public MoveLog getMoveLog() {
+        return moveLog;
     }
 }
 

@@ -15,7 +15,6 @@ import java.util.List;
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.MatchActivity;
 import chessbet.app.com.R;
-import chessbet.app.com.SettingsActivity;
 import chessbet.domain.MatchType;
 
 
@@ -65,15 +64,6 @@ public class MenuOptionsAdapter extends BaseAdapter {
         });
         drawables.add(R.drawable.bet_online);
         strings.add("Bet Online");
-
-
-        // Settings
-        listeners.add(v->{
-            Intent intent=new Intent(context, SettingsActivity.class);
-            context.startActivity(intent);
-        });
-        drawables.add(R.drawable.settings2);
-        strings.add("Settings");
 
     }
     @Override
