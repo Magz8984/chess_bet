@@ -43,13 +43,14 @@ public class GameDurationAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Button timeDuration = new Button(context);
-        timeDuration.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        timeDuration.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        timeDuration.setText(gameDurations.get(position).toString());
-        timeDuration.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryDark));
-        timeDuration.setTextColor(context.getResources().getColor(R.color.white));
-        timeDuration.setOnClickListener(v-> Log.d("CLICKED",gameDurations.get(position).toString()));
-        return timeDuration;
+        Button btnTimeDuration = new Button(context);
+        btnTimeDuration.setBackground(context.getResources().getDrawable(R.drawable.rounded_button));
+        btnTimeDuration.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        btnTimeDuration.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        btnTimeDuration.setText(gameDurations.get(position).toString());
+//        btnTimeDuration.setBackgroundColor(context.getResources().getColor(R.color.white));
+        btnTimeDuration.setTextColor(context.getResources().getColor(R.color.colorPrimary));
+        btnTimeDuration.setOnClickListener(v-> Log.d("CLICKED",gameDurations.get(position).toString()));
+        return btnTimeDuration;
     }
 }

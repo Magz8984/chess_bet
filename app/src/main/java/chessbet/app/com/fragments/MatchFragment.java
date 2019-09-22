@@ -1,16 +1,20 @@
-package chessbet.app.com;
+package chessbet.app.com.fragments;
 
 import android.content.Intent;
-import android.os.Handler;
 import android.os.Bundle;
+import android.os.Handler;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
@@ -21,59 +25,68 @@ import com.google.firebase.auth.FirebaseUser;
 import com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker;
 import com.transitionseverywhere.TransitionManager;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import java.util.Objects;
+
 import chessbet.adapter.GameDurationAdapter;
 import chessbet.api.MatchAPI;
+import chessbet.app.com.BoardActivity;
+import chessbet.app.com.R;
 import chessbet.domain.MatchRange;
 import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.services.MatchListener;
 import chessbet.utils.DatabaseUtil;
 
-
-public class MatchActivity extends AppCompatActivity implements MatchListener, View.OnClickListener, FABProgressListener, CompoundButton.OnCheckedChangeListener {
-    @BindView(R.id.btnFindMatch)
-    FloatingActionButton findMatch;
-    @BindView(R.id.gameDurations) GridView gameDurations;
-    @BindView(R.id.matchOnRating) Switch matchOnRatingSwitch;
-    @BindView(R.id.fabProgressCircle) FABProgressCircle progressCircle;
-    @BindView(R.id.ratingRange) LinearLayout ratingRangeView;
-    @BindView(R.id.rangeViews) LinearLayout rangeViewHolder;
-    @BindView(R.id.btnRatingRange) Button btnViewRangeViewHolder;
-    @BindView(R.id.startValue) ScrollableNumberPicker startValue;
-    @BindView(R.id.endValue) ScrollableNumberPicker endValue;
+public class MatchFragment extends Fragment implements MatchListener, View.OnClickListener, FABProgressListener, CompoundButton.OnCheckedChangeListener {
+    private FloatingActionButton findMatch;
+    private GridView gameDurations;
+    private Switch matchOnRatingSwitch;
+    private FABProgressCircle progressCircle;
+    private LinearLayout ratingRangeView;
+    private LinearLayout rangeViewHolder;
+    private Button btnViewRangeViewHolder;
+    private ScrollableNumberPicker startValue;
+    private ScrollableNumberPicker endValue;
 
     private boolean showRatingView = false;
 
     private MatchAPI matchAPI;
     private FirebaseUser user;
     private MatchRange matchRange;
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_match,container,false);
+        findMatch = view.findViewById(R.id.btnFindMatch);
+        gameDurations = view.findViewById(R.id.gameDurations);
+        matchOnRatingSwitch = view.findViewById(R.id.matchOnRating);
+        progressCircle = view.findViewById(R.id.fabProgressCircle);
+        ratingRangeView = view.findViewById(R.id.ratingRange);
+        btnViewRangeViewHolder = view.findViewById(R.id.btnRatingRange);
+        rangeViewHolder = view.findViewById(R.id.rangeViews);
+        startValue = view.findViewById(R.id.startValue);
+        endValue = view.findViewById(R.id.endValue);
         matchAPI = new MatchAPI();
         matchRange = new MatchRange();
         matchAPI.setMatchListener(this);
-        setContentView(R.layout.activity_match);
-        ButterKnife.bind(this);
         findMatch.setOnClickListener(this);
         initializeMatchRangeListeners();
-        gameDurations.setAdapter(new GameDurationAdapter(this));
+        gameDurations.setAdapter(new GameDurationAdapter(getContext()));
         progressCircle.attachListener(this);
         btnViewRangeViewHolder.setOnClickListener(this);
         user = FirebaseAuth.getInstance().getCurrentUser();
         rangeViewHolder.setVisibility(showRatingView ? View.VISIBLE : View.GONE);
         matchOnRatingSwitch.setOnCheckedChangeListener(this);
+        return view;
     }
 
     @Override
-    protected void onStart(){
+    public void onStart() {
         super.onStart();
         matchAPI.getAccount();
     }
 
-    private void initializeMatchRangeListeners(){
+    private void initializeMatchRangeListeners() {
         startValue.setListener(value -> matchRange.setStartAt(value));
         endValue.setListener(value -> matchRange.setEndAt(value));
     }
@@ -102,16 +115,23 @@ public class MatchActivity extends AppCompatActivity implements MatchListener, V
     }
 
     @Override
-    public void onFABProgressAnimationEnd() {
-        Snackbar.make(progressCircle, "Match Created", Snackbar.LENGTH_LONG)
-                .setAction("Action",null)
-                .show();
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if(isChecked){
+            btnViewRangeViewHolder.setEnabled(false);
+            rangeViewHolder.setVisibility(View.GONE);
+            Snackbar.make(progressCircle, "Match Is Set On Exact Rating", Snackbar.LENGTH_LONG)
+                    .setAction("Action",null)
+                    .show();
+        }else {
+
+            btnViewRangeViewHolder.setEnabled(true);
+        }
     }
 
     @Override
     public void onMatchMade(MatchableAccount matchableAccount) {
         progressCircle.beginFinalAnimation();
-        Intent target= new Intent(this, BoardActivity.class);
+        Intent target= new Intent(getContext(), BoardActivity.class);
         target.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         Bundle bundle = new Bundle();
         bundle.putParcelable(DatabaseUtil.matchables,matchableAccount);
@@ -126,20 +146,14 @@ public class MatchActivity extends AppCompatActivity implements MatchListener, V
 
     @Override
     public void onMatchError() {
-        runOnUiThread(() -> new Handler().postDelayed(() -> progressCircle.hide(),40000)); // Waits for 40 seconds before hiding the progress bar
+        Objects.requireNonNull(getActivity()).runOnUiThread(() -> new Handler().postDelayed(() -> progressCircle.hide(),40000)); // Waits for 40 seconds before hiding the progress bar
+
     }
 
     @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if(isChecked){
-            btnViewRangeViewHolder.setEnabled(false);
-            rangeViewHolder.setVisibility(View.GONE);
-            Snackbar.make(progressCircle, "Match Is Set On Exact Rating", Snackbar.LENGTH_LONG)
-                    .setAction("Action",null)
-                    .show();
-        }else {
-
-            btnViewRangeViewHolder.setEnabled(true);
-        }
+    public void onFABProgressAnimationEnd() {
+        Snackbar.make(progressCircle, "Match Created", Snackbar.LENGTH_LONG)
+                .setAction("Action",null)
+                .show();
     }
 }

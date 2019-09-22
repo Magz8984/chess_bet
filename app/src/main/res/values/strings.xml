@@ -49,4 +49,7 @@
     <string name="close">CLOSE</string>
     <string name="settings">Settings</string>
     <string name="rating">Rating : %1$d </string>
+    <string name="play_online">Play Online</string>
+    <string name="select_profile_photo">Select Profile Photo</string>
+    <string name="upload_profile_photo">Upload Profile Photo</string>
 </resources>

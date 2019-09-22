@@ -18,7 +18,6 @@ public class Account {
         this.elo_rating = elo_rating;
     }
 
-
     public void setOwner(String owner) {
         this.owner = owner;
     }
@@ -42,7 +41,6 @@ public class Account {
     public void setLast_date_modified(String last_date_modified) {
         this.last_date_modified = last_date_modified;
     }
-
     public void setMatches(ArrayList<MatchDetails> matches) {
         this.matches = matches;
     }

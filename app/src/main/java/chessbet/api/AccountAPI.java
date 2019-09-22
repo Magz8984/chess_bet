@@ -3,6 +3,7 @@ package chessbet.api;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -47,7 +48,7 @@ public class AccountAPI {
         });
     }
 
-    public void getUser() {
+    public void getUser(){
         db.collection(AccountAPI.USER_COLLECTION).document(user.getUid()).get().addOnCompleteListener(task -> {
            if(task.isSuccessful()){
                    accountListener.onUserReceived(Objects.requireNonNull(task.getResult()).toObject(User.class));
@@ -64,5 +65,9 @@ public class AccountAPI {
 
     public void setAccountListener(AccountListener accountListener) {
         this.accountListener = accountListener;
+    }
+
+    public DocumentReference getUserPath(){
+        return  db.collection(AccountAPI.USER_COLLECTION).document(user.getUid());
     }
 }

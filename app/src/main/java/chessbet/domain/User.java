@@ -6,6 +6,7 @@ public class User {
     private boolean disabled;
     private String email;
     private String ui;
+    private String profile_photo_url;
 
     public String getDate_created() {
         return date_created;
@@ -45,6 +46,14 @@ public class User {
 
     public void setUi(String ui) {
         this.ui = ui;
+    }
+
+    public void setProfile_photo_url(String profile_photo_url) {
+        this.profile_photo_url = profile_photo_url;
+    }
+
+    public String getProfile_photo_url() {
+        return profile_photo_url;
     }
 }
 

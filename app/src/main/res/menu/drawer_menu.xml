@@ -6,10 +6,17 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/itm_play"
+            android:id="@+id/itm_play_chess"
             android:icon="@drawable/play_button"
-            android:title="Play"
+            android:title="Play Chess"
             />
+
+        <item
+            android:id="@+id/itm_play_online"
+            android:icon="@drawable/online"
+            android:title="Play Online"
+            />
+
         <item
             android:id="@+id/itm_profile"
             android:icon="@drawable/profile"
