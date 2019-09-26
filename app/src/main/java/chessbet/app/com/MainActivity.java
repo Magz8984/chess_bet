@@ -1,21 +1,15 @@
 package chessbet.app.com;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,25 +29,15 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.google.android.gms.tasks.OnCanceledListener;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import org.checkerframework.checker.index.qual.PolyUpperBound;
-
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.security.Permission;
-import java.security.Permissions;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -70,6 +54,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountListener, View.OnClickListener {
     private ProgressDialog uploadProfileDialog;
     private StorageReference storageReference;
+    private FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.drawerLayout)
@@ -86,9 +71,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         uploadProfileDialog = new ProgressDialog(this);
         uploadProfileDialog.setMessage(getResources().getString(R.string.upload_profile_photo));
         uploadProfileDialog.setCancelable(false);
-        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
-        storageReference = firebaseStorage.getReference(FirebaseAuth.getInstance().getUid() + "/" + "profile_photo");
+
         ButterKnife.bind(this);
+        setSupportActionBar(toolbar);
         txtEmail = navigationView.getHeaderView(0).findViewById(R.id.email);
         txtRating = navigationView.getHeaderView(0).findViewById(R.id.rating);
         profileImage = navigationView.getHeaderView(0).findViewById(R.id.profile_photo);
@@ -97,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         AccountAPI.get().getAccount();
         AccountAPI.get().getUser();
         AccountAPI.get().setAccountListener(this);
-        setSupportActionBar(toolbar);
         navigationView.setNavigationItemSelectedListener(this);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.open,R.string.close);
@@ -135,19 +119,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (menuItem.getItemId()) {
             case R.id.itm_play_chess :
                 toolbar.setTitle(getString(R.string.app_name));
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MainFragment())
-                        .commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MainFragment()).commit();
                 break;
             case R.id.itm_play_online:
-                toolbar.setTitle(getString(R.string.play_online));
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment())
-                        .commit();
+                if(AccountAPI.get().getCurrentAccount() != null){
+                    toolbar.setTitle(getString(R.string.play_online));
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment()).commit();
+                }
             case R.id.itm_profile:
                 break;
             case R.id.itm_account_settings:
                 toolbar.setTitle(getString(R.string.settings));
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment())
-                        .commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment()).commit();
 
                 break;
             case R.id.itm_terms:
@@ -221,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CODE) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -235,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     private UploadTask uploadProfilePhotoTask(Bitmap bitmap){
-        byte[] bytes = null;
+        byte[] bytes = {};
         try {
             uploadProfileDialog.show(); // Shows Dialog
             profileImage.setDrawingCacheEnabled(true);
@@ -253,28 +236,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void uploadProfilePhoto(Bitmap bitmap){
+        storageReference = firebaseStorage.getReference(FirebaseAuth.getInstance().getUid() + "/" + "profile_photo");
         uploadProfilePhotoTask(bitmap).addOnFailureListener(e -> {
             uploadProfileDialog.dismiss();
             Log.d("Upload",e.getMessage());
         });
 
-        uploadProfilePhotoTask(bitmap).addOnSuccessListener(taskSnapshot -> {
-            storageReference.getDownloadUrl().addOnCompleteListener(task -> {
-                final Uri uri = task.getResult();
-                Map<String,Object> map = new HashMap<>();
-                assert uri != null;
-                map.put("profile_photo_url", uri.toString());
-                AccountAPI.get().getUserPath().update(map).addOnCompleteListener(task2 -> {
-                    Toast.makeText(MainActivity.this,R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
-                    Log.d("Done","Is Done");
-                    uploadProfileDialog.dismiss();
-                    AccountAPI.get().getUser();
-                    AccountAPI.get().setAccountListener(this);
-                }).addOnCanceledListener(() -> {
-                    uploadProfileDialog.dismiss();
-                });
-            });
-        });
+        uploadProfilePhotoTask(bitmap).addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnCompleteListener(task -> {
+            final Uri uri = task.getResult();
+            Map<String,Object> map = new HashMap<>();
+            assert uri != null;
+            map.put("profile_photo_url", uri.toString());
+            AccountAPI.get().getUserPath().update(map).addOnCompleteListener(task2 -> {
+                Toast.makeText(MainActivity.this,R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
+                Log.d("Done","Is Done");
+                uploadProfileDialog.dismiss();
+                AccountAPI.get().getUser();
+            }).addOnCanceledListener(() -> uploadProfileDialog.dismiss());
+        }));
     }
 }
 

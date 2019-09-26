@@ -202,7 +202,7 @@ public class MatchAPI {
         });
     }
 
-    public void createUseAccountImplementation(String uid, MatchType matchType, MatchRange matchRange){
+    public void createUserMatchableAccountImplementation(String uid, MatchType matchType, MatchRange matchRange){
         createUserMatchableAccount(uid, matchType, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {

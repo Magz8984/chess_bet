@@ -12,7 +12,7 @@
     <string name="title_activity_login">Sign in</string>
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
-    <string name="hint_name">Fullname</string>
+    <string name="hint_name">Full Name</string>
     <string name="btn_login">LOGIN</string>
     <string name="btn_link_to_register">Not a member? Get registered in Firebase now!</string>
     <string name="btn_link_to_login">Already registered. Login Me!</string>
@@ -52,4 +52,5 @@
     <string name="play_online">Play Online</string>
     <string name="select_profile_photo">Select Profile Photo</string>
     <string name="upload_profile_photo">Upload Profile Photo</string>
+    <string name="match_exact_rating">Match is set on exact rating</string>
 </resources>

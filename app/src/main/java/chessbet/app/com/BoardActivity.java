@@ -227,7 +227,7 @@ private  MatchableAccount matchableAccount;
     @Override
     protected void onStop(){
        super.onStop();
-        GameUtil.getMediaPlayer().release();
+       GameUtil.getMediaPlayer().release();
     }
 
     @Override

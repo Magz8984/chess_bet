@@ -1,42 +1,48 @@
 <PreferenceScreen
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
     <PreferenceCategory
         app:key="notifications_category"
-        app:title="Notifications">
+        app:title="Notifications"
+        app:iconSpaceReserved="false">
 
         <SwitchPreferenceCompat
             app:key="notifications"
-            app:title="Enable message notifications"/>
+            app:title="Enable message notifications"
+            app:iconSpaceReserved="false"/>
 
     </PreferenceCategory>
 
     <PreferenceCategory
         app:key="help_category"
-        app:title="Help">
+        app:title="Help"
+        app:iconSpaceReserved="false">
 
         <Preference
             app:key="feedback"
             app:summary="Report technical issues or suggest new features"
-            app:title="Send feedback"/>
+            app:title="Send feedback"
+            app:iconSpaceReserved="false"/>
 
     </PreferenceCategory>
 
     <PreferenceCategory
         app:key="account"
-        app:title="Account">
+        app:title="Account"
+        app:iconSpaceReserved="false">
 
         <Preference
             app:key="reset_pin"
             app:summary="Pin reset prompt will be sent to your email address"
-            app:title="Reset Pin"/>
+            app:title="Reset Pin"
+            app:iconSpaceReserved="false"/>
 
         <Preference
             app:key="sign_out"
             app:summary="Takes you back to login section"
-            app:title="Sign Out"/>
+            app:title="Sign Out"
+            app:iconSpaceReserved="false"/>
 
 
     </PreferenceCategory>
-
-
 </PreferenceScreen>

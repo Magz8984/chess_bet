@@ -34,9 +34,8 @@
     </style>
 
     <style name="PreferenceTheme" parent="@style/PreferenceThemeOverlay">
-        <item name="android:background">@color/colorPrimary</item>
-        <item name="android:textColor">@color/colorWhite</item>
-        <item name="android:textColorSecondary">@color/colorWhite</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textColorSecondary">@color/colorPrimary</item>
     </style>
 
 </resources>

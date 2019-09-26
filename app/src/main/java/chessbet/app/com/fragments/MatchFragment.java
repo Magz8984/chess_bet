@@ -11,6 +11,7 @@ import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,9 +26,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker;
 import com.transitionseverywhere.TransitionManager;
 
+import java.util.Locale;
 import java.util.Objects;
 
 import chessbet.adapter.GameDurationAdapter;
+import chessbet.api.AccountAPI;
 import chessbet.api.MatchAPI;
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.R;
@@ -47,6 +50,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     private Button btnViewRangeViewHolder;
     private ScrollableNumberPicker startValue;
     private ScrollableNumberPicker endValue;
+    private TextView txtAccountRating;
 
     private boolean showRatingView = false;
 
@@ -64,6 +68,8 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         ratingRangeView = view.findViewById(R.id.ratingRange);
         btnViewRangeViewHolder = view.findViewById(R.id.btnRatingRange);
         rangeViewHolder = view.findViewById(R.id.rangeViews);
+        txtAccountRating = view.findViewById(R.id.txtAccountRating);
+        txtAccountRating.setText(String.format(Locale.US,"%d", AccountAPI.get().getCurrentAccount().getElo_rating()));
         startValue = view.findViewById(R.id.startValue);
         endValue = view.findViewById(R.id.endValue);
         matchAPI = new MatchAPI();
@@ -97,10 +103,10 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
             progressCircle.show();
             if(user != null){
                 if(matchOnRatingSwitch.isChecked()){
-                    matchAPI.createUseAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE, null);
+                    matchAPI.createUserMatchableAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE, null);
                 }
                 else{
-                    matchAPI.createUseAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE, matchRange);
+                    matchAPI.createUserMatchableAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE, matchRange);
                 }
             }
             else{
@@ -119,7 +125,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         if(isChecked){
             btnViewRangeViewHolder.setEnabled(false);
             rangeViewHolder.setVisibility(View.GONE);
-            Snackbar.make(progressCircle, "Match Is Set On Exact Rating", Snackbar.LENGTH_LONG)
+            Snackbar.make(progressCircle, getResources().getString(R.string.match_exact_rating), Snackbar.LENGTH_LONG)
                     .setAction("Action",null)
                     .show();
         }else {

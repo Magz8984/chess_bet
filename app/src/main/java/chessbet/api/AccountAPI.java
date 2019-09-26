@@ -25,6 +25,7 @@ public class AccountAPI {
     private static AccountAPI INSTANCE = new AccountAPI();
     private FirebaseFirestore db;
     private FirebaseUser user;
+    private Account currentAccount;
 
     private AccountAPI() {
          db = FirebaseFirestore.getInstance();
@@ -39,7 +40,8 @@ public class AccountAPI {
         query.get().addOnCompleteListener(task -> {
             if(task.isSuccessful()){
                 for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())){
-                     accountListener.onAccountReceived(document.toObject(Account.class));
+                    currentAccount = document.toObject(Account.class);
+                     accountListener.onAccountReceived(currentAccount);
                 }
             }
             else {
@@ -61,6 +63,10 @@ public class AccountAPI {
 
     public void setUser(FirebaseUser user){
         this.user = user;
+    }
+
+    public Account getCurrentAccount() {
+        return currentAccount;
     }
 
     public void setAccountListener(AccountListener accountListener) {
