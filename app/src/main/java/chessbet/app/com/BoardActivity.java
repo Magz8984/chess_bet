@@ -23,7 +23,9 @@ import com.chess.engine.Move;
 import com.chess.engine.pieces.Piece;
 import com.chess.engine.player.Player;
 import com.chess.pgn.PGNMainUtils;
+import com.google.android.material.snackbar.Snackbar;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -59,8 +61,10 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.txtCountDown) TextView txtCountDown;
 @BindView(R.id.whitePieces) LinearLayout whitePieces;
 @BindView(R.id.blackPieces) LinearLayout blackPieces;
+@BindView(R.id.btnSave) Button btnSave;
 
 private  MatchableAccount matchableAccount;
+private boolean isGameFinished = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +81,7 @@ private  MatchableAccount matchableAccount;
         boardView.setOnMoveDoneListener(this);
         boardView.setRemoteViewUpdateListener(this);
         btnFlip.setOnClickListener(this);
+        btnSave.setOnClickListener(this);
         btnColorPicker.setOnClickListener(this);
         btnBack.setOnClickListener(this);
         btnForward.setOnClickListener(this);
@@ -111,6 +116,16 @@ private  MatchableAccount matchableAccount;
         }
         else if(v.equals(btnForward)){
             boardView.redoMove();
+        }
+        else if(v.equals(btnSave)){
+            if(!isGameFinished && matchableAccount == null){ // Enable this for none online games
+                Snackbar snackbar = Snackbar.make(btnSave, R.string.save_end_match,Snackbar.LENGTH_LONG)
+                        .setAction(R.string.save, v1 -> {
+                            storeGameAsPGN("*");
+                            isGameFinished = true;
+                        });
+                snackbar.show();
+            }
         }
     }
 
@@ -157,6 +172,7 @@ private  MatchableAccount matchableAccount;
         onGameResume();
         if(player.getAlliance().isBlack()){
             txtBlackStatus.setText(getString(R.string.checkmate));
+            storeGameAsPGN("0-1");
         }
         else if(player.getAlliance().isWhite()){
             txtWhiteStatus.setText(getString(R.string.checkmate));
@@ -174,6 +190,7 @@ private  MatchableAccount matchableAccount;
         else if(player.getAlliance().isWhite()){
             txtWhiteStatus.setText(getString(R.string.stalemate));
         }
+        storeGameAsPGN("1/2-1/2");
         endGame();
     }
 
@@ -291,12 +308,13 @@ private  MatchableAccount matchableAccount;
     }
 
     protected void storeGameAsPGN(String result){
+        isGameFinished = true; // Is game on going is false
         MoveLog moveLog = boardView.getMoveLog();
         String gameText = PGNMainUtils.writeGameAsPGN(moveLog.convertToEngineMoveLog(),"N/A","N/A",result);
         FileOutputStream fileOutputStream = null;
 
         try{
-            String file_name = String.format(GameManager.GAME_FILE, new Date().getTime());
+            String file_name = String.format(GameManager.FULL_GAME_FILE, new Date().getTime());
             fileOutputStream = openFileOutput(file_name,MODE_PRIVATE);
             fileOutputStream.write(gameText.getBytes());
             Toast.makeText(this, "Saved to : " + getFilesDir() + "/" + file_name , Toast.LENGTH_LONG).show();
@@ -314,9 +332,5 @@ private  MatchableAccount matchableAccount;
                 }
             }
         }
-    }
-
-    protected void loadGameFromPGN() {
-
     }
 }

@@ -37,12 +37,14 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.api.AccountAPI;
+import chessbet.app.com.fragments.GamesFragment;
 import chessbet.app.com.fragments.MainFragment;
 import chessbet.app.com.fragments.MatchFragment;
 import chessbet.app.com.fragments.SettingsFragment;
@@ -135,6 +137,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.itm_terms:
                 Toast.makeText(this, "Accept Terms", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.games:
+                toolbar.setTitle(getString(R.string.games));
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new GamesFragment()).commit();
                 break;
         }
         return true;

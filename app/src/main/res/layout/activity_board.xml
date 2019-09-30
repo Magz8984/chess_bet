@@ -168,6 +168,14 @@
         android:layout_alignParentBottom="true">
 
         <Button
+            android:id="@+id/btnSave"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:background="@drawable/save"
+            android:layout_margin="5dp"/>
+
+
+        <Button
             android:id="@+id/btnFlip"
             android:layout_width="35dp"
             android:layout_height="35dp"

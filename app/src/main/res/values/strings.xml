@@ -53,4 +53,7 @@
     <string name="select_profile_photo">Select Profile Photo</string>
     <string name="upload_profile_photo">Upload Profile Photo</string>
     <string name="match_exact_rating">Match is set on exact rating</string>
+    <string name="save_end_match">Save and end match</string>
+    <string name="save">Save</string>
+    <string name="games">Games</string>
 </resources>
