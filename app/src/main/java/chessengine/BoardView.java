@@ -1,6 +1,7 @@
 package chessengine;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -16,7 +17,6 @@ import com.chess.engine.board.Tile;
 import com.chess.engine.pieces.Piece;
 import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
-import com.chess.pgn.PGNMainUtils;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
@@ -49,6 +49,7 @@ public class BoardView extends View implements RemoteMoveListener {
     protected int moveCursor = 0;
 
     private void initialize(Context context){
+        setSaveEnabled(true);
         moveLog= new MoveLog();
         chessBoard= Board.createStandardBoard();
         boardCells=new ArrayList<>();
@@ -124,8 +125,15 @@ public class BoardView extends View implements RemoteMoveListener {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
-        int desiredWidth = getSuggestedMinimumWidth() + getPaddingLeft() + getPaddingRight();
-        setMeasuredDimension(measureDimension(desiredWidth,widthMeasureSpec), measureDimension(desiredWidth,widthMeasureSpec));
+        if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            int desiredWidth = getSuggestedMinimumWidth() + getPaddingLeft() + getPaddingRight();
+            setMeasuredDimension(measureDimension(desiredWidth,widthMeasureSpec), measureDimension(desiredWidth,widthMeasureSpec));
+        }
+        else{
+            int desiredHeight = getSuggestedMinimumHeight() + getPaddingTop() + getPaddingBottom();
+            setMeasuredDimension(measureDimension(desiredHeight,heightMeasureSpec), measureDimension(desiredHeight,heightMeasureSpec));
+        }
+
     }
 
     @Override

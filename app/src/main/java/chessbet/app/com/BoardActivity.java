@@ -2,6 +2,7 @@ package chessbet.app.com;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.chess.engine.Alliance;
 import com.chess.engine.Move;
@@ -25,7 +27,6 @@ import com.chess.engine.player.Player;
 import com.chess.pgn.PGNMainUtils;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -46,7 +47,7 @@ import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
 
-public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed, RemoteViewUpdateListener {
+public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed, RemoteViewUpdateListener, LifecycleOwner {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -106,10 +107,15 @@ private boolean isGameFinished = false;
            boardView.flipBoardDirection();
         }
         else if(v.equals(btnColorPicker)){
-            ColorPicker colorPicker=new ColorPicker();
-            colorPicker.setSharedPreferences(getPreferences(Context.MODE_PRIVATE));
-            colorPicker.setBoardView(boardView);
-            colorPicker.show(BoardActivity.this.getSupportFragmentManager(),"Color Fragment");
+            if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+                ColorPicker colorPicker=new ColorPicker();
+                colorPicker.setSharedPreferences(getPreferences(Context.MODE_PRIVATE));
+                colorPicker.setBoardView(boardView);
+                colorPicker.show(BoardActivity.this.getSupportFragmentManager(),"Color Fragment");
+            }
+            else {
+                Toast.makeText(this,"Feature only available in portrait mode",Toast.LENGTH_LONG).show();
+            }
         }
         else if(v.equals(btnBack)){
             boardView.undoMove();

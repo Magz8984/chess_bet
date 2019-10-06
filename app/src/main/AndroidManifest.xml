@@ -36,8 +36,7 @@
         <activity android:name=".SignupActivity" />
         <activity android:name=".ResetPasswordActivity" />
         <activity
-            android:name=".BoardActivity"
-            android:screenOrientation="portrait" />
+            android:name=".BoardActivity"/>
 
         <service
             android:name="chessbet.services.MatchService"

@@ -38,7 +38,7 @@ public class GamesAdapter extends RecyclerView.Adapter<ViewHolder> {
         holder.getTxtName().setText(GameManager.GAME_FILE_NAME);
         long mills = Long.parseLong(time);
         Date date = new Date(mills);
-        DateFormat df = new SimpleDateFormat("dd:MM:yy:HH:mm:ss", Locale.US);
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy/HH.mm.ss", Locale.US);
         holder.getTxtTime().setText(df.format(date));
     }
 

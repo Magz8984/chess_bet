@@ -154,6 +154,5 @@ public class MatchableAccount implements Parcelable {
             Intent intent=new Intent(context, MainActivity.class);
             context.startActivity(intent);
         }), 3000);
-
     }
 }
