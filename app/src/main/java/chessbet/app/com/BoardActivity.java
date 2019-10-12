@@ -177,7 +177,7 @@ private boolean isStoredGame = false;
 
     @Override
     public void onBackPressed() {
-            if(!,isStoredGame){
+            if(!isStoredGame){
                 Snackbar snackbar = Snackbar.make(btnSave, R.string.save_end_match,Snackbar.LENGTH_LONG)
                         .setAction(R.string.forfeit, v1 -> {
                             // Handle game forfeit
