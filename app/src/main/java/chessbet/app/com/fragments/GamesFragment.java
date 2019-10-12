@@ -29,7 +29,7 @@ public class GamesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_games, container,false);
         RecyclerView recyclerView = view.findViewById(R.id.recGames);
-        GamesAdapter gamesAdapter = new GamesAdapter(loadGamesFromPGN());
+        GamesAdapter gamesAdapter = new GamesAdapter(loadGamesFromPGN(),getContext());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(gamesAdapter);
         return view;
@@ -48,6 +48,7 @@ public class GamesFragment extends Fragment {
                 iterator.remove();
             }
         }
+        // Recent games to oldest game
         Collections.reverse(mutatedList);
         return mutatedList;
     }

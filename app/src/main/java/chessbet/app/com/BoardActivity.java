@@ -16,24 +16,32 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.LifecycleOwner;
 
 import com.chess.engine.Alliance;
 import com.chess.engine.Move;
+import com.chess.engine.board.Board;
 import com.chess.engine.pieces.Piece;
+import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
 import com.chess.pgn.PGNMainUtils;
+import com.chess.pgn.PGNUtilities;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import chessbet.api.MatchAPI;
+import chessbet.app.com.fragments.ColorPicker;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.RemoteMove;
 import chessbet.domain.TimerEvent;
@@ -47,7 +55,7 @@ import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
 
-public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed, RemoteViewUpdateListener, LifecycleOwner {
+public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed, RemoteViewUpdateListener {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -66,6 +74,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 
 private  MatchableAccount matchableAccount;
 private boolean isGameFinished = false;
+private boolean isStoredGame = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,6 +108,23 @@ private boolean isGameFinished = false;
         if(matchableAccount !=null){
             boardView.setMatchableAccount(matchableAccount);
         }
+        // Try To Reconstruct
+        String pgn = intent.getStringExtra("pgn");
+        if(pgn != null){
+            isStoredGame = true;
+            Board board = Board.createStandardBoard();
+                List<String> strMoves = PGNMainUtils.processMoveText(pgn);
+                List<Move> moves = new ArrayList<>();
+                for (String string : strMoves) {
+                    Move move = PGNMainUtils.createMove(board, string);
+                    MoveTransition moveTransition = board.currentPlayer().makeMove(move);
+                    if (moveTransition.getMoveStatus().isDone()) {
+                        board = moveTransition.getTransitionBoard();
+                        moves.add(move);
+                    }
+                }
+                boardView.reconstructBoard(moves, board);
+        }
       }
 
     @Override
@@ -114,7 +140,7 @@ private boolean isGameFinished = false;
                 colorPicker.show(BoardActivity.this.getSupportFragmentManager(),"Color Fragment");
             }
             else {
-                Toast.makeText(this,"Feature only available in portrait mode",Toast.LENGTH_LONG).show();
+                Toast.makeText(this,"Feature only available in portrait mode", Toast.LENGTH_LONG).show();
             }
         }
         else if(v.equals(btnBack)){
@@ -124,7 +150,7 @@ private boolean isGameFinished = false;
             boardView.redoMove();
         }
         else if(v.equals(btnSave)){
-            if(!isGameFinished && matchableAccount == null){ // Enable this for none online games
+            if(!isGameFinished && matchableAccount == null && !isStoredGame){ // Enable this for none online games
                 Snackbar snackbar = Snackbar.make(btnSave, R.string.save_end_match,Snackbar.LENGTH_LONG)
                         .setAction(R.string.save, v1 -> {
                             storeGameAsPGN("*");
@@ -136,7 +162,71 @@ private boolean isGameFinished = false;
     }
 
     @Override
-    public void getMove(MoveLog moveLog){
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        try{
+            runOnUiThread(() -> {
+                outState.putSerializable("matchApi", boardView.getMatchAPI());
+                outState.putString("matchString", PGNUtilities.get().acceptMoveLog(boardView.getMoveLog().convertToEngineMoveLog()));
+                outState.putParcelable("matchableAccount",matchableAccount);
+            });
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+            if(!,isStoredGame){
+                Snackbar snackbar = Snackbar.make(btnSave, R.string.save_end_match,Snackbar.LENGTH_LONG)
+                        .setAction(R.string.forfeit, v1 -> {
+                            // Handle game forfeit
+                            if(!isGameFinished){
+                                storeGameAsPGN("*");
+                                isGameFinished = true;
+                            }
+                            Intent intent = new Intent(this, MainActivity.class);
+                            startActivity(intent);
+                        });
+                snackbar.show();
+            }
+            else {
+                super.onBackPressed();
+            }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        runOnUiThread(() -> {
+            try{
+                MatchableAccount matchableAccount = savedInstanceState.getParcelable("matchableAccount");
+                boardView.setMatchableAccount(matchableAccount);
+                Board board = Board.createStandardBoard();
+                String gameState = savedInstanceState.getString("matchString");
+                if(gameState !=null){
+                    List<String> strMoves = PGNMainUtils.processMoveText(Objects.requireNonNull(savedInstanceState.getString("matchString")));
+                    List<Move> moves = new ArrayList<>();
+                    for (String string : strMoves){
+                        Move move = PGNMainUtils.createMove(board, string);
+                        MoveTransition moveTransition = board.currentPlayer().makeMove(move);
+                        if(moveTransition.getMoveStatus().isDone()){
+                            board = moveTransition.getTransitionBoard();
+                            moves.add(move);
+                        }
+                    }
+                    boardView.reconstructBoard(moves, board);
+                }
+                MatchAPI matchAPI = (MatchAPI) savedInstanceState.getSerializable("matchApi");
+                boardView.setMatchAPI(matchAPI);
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+        });
+    }
+
+    @Override
+    public void getMoves(MoveLog moveLog){
         runOnUiThread(() -> {
             blackMoves.removeAllViews();
             whiteMoves.removeAllViews();
@@ -150,9 +240,7 @@ private boolean isGameFinished = false;
                 textView.setText(move.toString());
                 textView.setTextColor(Color.WHITE);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,15);
-        textView.setOnClickListener(v -> {
-            Log.d("MOVE", move.toString());
-        });
+        textView.setOnClickListener(v -> Log.d("MOVE", move.toString()));
             if(move.getMovedPiece().getPieceAlliance() == Alliance.BLACK){
                 blackMoves.addView(textView);
 
@@ -250,7 +338,7 @@ private boolean isGameFinished = false;
     @Override
     protected void onStop(){
        super.onStop();
-       GameUtil.getMediaPlayer().release();
+        GameUtil.getMediaPlayer().release();
     }
 
     @Override
@@ -320,10 +408,13 @@ private boolean isGameFinished = false;
         FileOutputStream fileOutputStream = null;
 
         try{
-            String file_name = String.format(GameManager.FULL_GAME_FILE, new Date().getTime());
-            fileOutputStream = openFileOutput(file_name,MODE_PRIVATE);
-            fileOutputStream.write(gameText.getBytes());
-            Toast.makeText(this, "Saved to : " + getFilesDir() + "/" + file_name , Toast.LENGTH_LONG).show();
+            // Ensures its not a stored game and there are moves made
+            if(!isStoredGame && boardView.getMoveLog().getMoves().size() != 0){
+                String file_name = String.format(GameManager.FULL_GAME_FILE, new Date().getTime());
+                fileOutputStream = openFileOutput(file_name,MODE_PRIVATE);
+                fileOutputStream.write(gameText.getBytes());
+                Toast.makeText(this, "Saved to : " + getFilesDir() + "/" + file_name , Toast.LENGTH_LONG).show();
+            }
         }catch (FileNotFoundException ex){
             ex.printStackTrace();
         } catch (IOException e) {

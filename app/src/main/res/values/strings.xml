@@ -56,4 +56,5 @@
     <string name="save_end_match">Save and end match</string>
     <string name="save">Save</string>
     <string name="games">Games</string>
+    <string name="forfeit">Forfeit</string>
 </resources>

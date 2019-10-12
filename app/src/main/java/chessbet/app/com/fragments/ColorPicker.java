@@ -1,4 +1,4 @@
-package chessbet.app.com;
+package chessbet.app.com.fragments;
 
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -13,6 +13,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.flask.colorpicker.ColorPickerView;
 
+import chessbet.app.com.R;
 import chessengine.BoardPreference;
 import chessengine.BoardView;
 

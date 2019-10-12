@@ -125,7 +125,7 @@ public class Cell extends View {
                     // Undo a move
                     if(boardView.moveCursor < boardView.moveLog.size()){
                         boardView.moveLog.removeMoves(boardView.moveCursor -1);
-                        boardView.onMoveDoneListener.getMove(boardView.moveLog);
+                        boardView.onMoveDoneListener.getMoves(boardView.moveLog);
                     }
                     GameUtil.playSound(); // Play sound once move is made
                     boardView.destinationTile = boardView.chessBoard.getTile(tileId);
@@ -141,7 +141,7 @@ public class Cell extends View {
 
                     boardView.moveLog.addMove(move);
                     boardView.moveCursor = boardView.moveLog.size();
-                    boardView.onMoveDoneListener.getMove(boardView.moveLog);
+                    boardView.onMoveDoneListener.getMoves(boardView.moveLog);
                     boardView.onMoveDoneListener.onGameResume();
 
                     if(boardView.chessBoard.currentPlayer().isInCheckMate()){

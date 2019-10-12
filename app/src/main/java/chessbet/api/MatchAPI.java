@@ -10,6 +10,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Objects;
 
 import chessbet.domain.Constants;
@@ -31,7 +32,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MatchAPI {
+public class MatchAPI implements Serializable {
     private FirebaseUser firebaseUser;
     private MatchListener matchListener;
     private RemoteMoveListener remoteMoveListener;

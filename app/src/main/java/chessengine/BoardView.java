@@ -19,6 +19,7 @@ import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
 import com.google.common.collect.Lists;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,7 @@ import chessbet.domain.RemoteMove;
 import chessbet.services.RemoteMoveListener;
 import chessbet.services.RemoteViewUpdateListener;
 
-public class BoardView extends View implements RemoteMoveListener {
+public class BoardView extends View implements RemoteMoveListener, Serializable {
     protected Board chessBoard;
     protected Tile sourceTile;
     protected Tile destinationTile;
@@ -71,8 +72,14 @@ public class BoardView extends View implements RemoteMoveListener {
     }
 
     @Override
-    public boolean onTouchEvent(final MotionEvent event) {
+    public boolean performClick(){
+        super.performClick();
+        return true;
+    }
 
+    @Override
+    public boolean onTouchEvent(final MotionEvent event) {
+        performClick();
         if(event.getAction() == MotionEvent.ACTION_DOWN){
             final int x = (int) event.getX();
             final int y = (int) event.getY();
@@ -260,15 +267,17 @@ public class BoardView extends View implements RemoteMoveListener {
     }
 
     public void setMatchableAccount(MatchableAccount matchableAccount) {
-        this.matchableAccount = matchableAccount;
-        matchAPI = new MatchAPI();
-        matchAPI.setRemoteMoveListener(this);
-        matchAPI.getRemoteMoveData(matchableAccount);
-        if(matchableAccount.getOpponent().equals("WHITE")){
-            this.localAlliance = Alliance.BLACK;
-        }
-        else if(matchableAccount.getOpponent().equals("BLACK")){
-            this.localAlliance = Alliance.WHITE;
+        if(matchableAccount != null){
+            this.matchableAccount = matchableAccount;
+            matchAPI = new MatchAPI();
+            matchAPI.setRemoteMoveListener(this);
+            matchAPI.getRemoteMoveData(matchableAccount);
+            if(matchableAccount.getOpponent().equals("WHITE")){
+                this.localAlliance = Alliance.BLACK;
+            }
+            else if(matchableAccount.getOpponent().equals("BLACK")){
+                this.localAlliance = Alliance.WHITE;
+            }
         }
     }
 
@@ -286,11 +295,23 @@ public class BoardView extends View implements RemoteMoveListener {
                 destinationTile = chessBoard.getTile(remoteMove.getTo());
                 GameUtil.playSound();
                 chessBoard = transition.getTransitionBoard();
-                onMoveDoneListener.getMove(moveLog);
+                onMoveDoneListener.getMoves(moveLog);
                 displayGameStates();
                 invalidate();
             }
         }
+    }
+
+    public void reconstructBoard(List<Move> moves, Board board){
+        this.chessBoard = board;
+        for (Move move : moves){
+            moveLog.addMove(move);
+        }
+        onMoveDoneListener.getMoves(moveLog);
+        GameUtil.playSound();
+        moveCursor = moveLog.size();
+        displayGameStates();
+        invalidate();
     }
 
     public void undoMove(){
@@ -338,6 +359,18 @@ public class BoardView extends View implements RemoteMoveListener {
 
     public MoveLog getMoveLog() {
         return moveLog;
+    }
+
+    public MatchableAccount getMatchableAccount() {
+        return matchableAccount;
+    }
+
+    public MatchAPI getMatchAPI() {
+        return matchAPI;
+    }
+
+    public void setMatchAPI(MatchAPI matchAPI) {
+        this.matchAPI = matchAPI;
     }
 }
 

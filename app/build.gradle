@@ -54,7 +54,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:3.14.2"
     testImplementation "com.squareup.okhttp3:mockwebserver:3.14.2"
     implementation 'com.github.QuadFlask:colorpicker:0.0.13' // Color picker
-    implementation 'com.github.Magz8984:chess-engine-dev:d29e8636a3'
+    implementation 'com.github.Magz8984:chess-engine-dev:0db04356b6'
     implementation 'de.hdodenhof:circleimageview:3.0.0'
     implementation 'com.github.bumptech.glide:glide:4.9.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'

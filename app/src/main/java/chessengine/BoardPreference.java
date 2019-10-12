@@ -1,7 +1,14 @@
 package chessengine;
 
+/**
+ * @author Collins Magondu
+ *
+ * Class allows one to set any sharedPreference required for Board Activity
+ */
+
 import android.content.SharedPreferences;
 import android.graphics.Color;
+
 
 public class BoardPreference{
     private SharedPreferences.Editor editor;
@@ -24,5 +31,15 @@ public class BoardPreference{
     public void setWhite(int white) {
         editor.putInt("White",white);
         editor.commit();
+    }
+    public void setBoardState(String state){
+
+    }
+    public void setPGNState(String state){
+        editor.putString("state",state);
+    }
+
+    public String getGameState(){
+        return sharedPreferences.getString("state", null);
     }
 }
