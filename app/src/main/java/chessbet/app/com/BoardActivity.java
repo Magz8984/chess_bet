@@ -28,6 +28,7 @@ import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
 import com.chess.pgn.PGNMainUtils;
 import com.chess.pgn.PGNUtilities;
+import com.crashlytics.android.Crashlytics;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.FileNotFoundException;
@@ -158,6 +159,9 @@ private boolean isStoredGame = false;
                         });
                 snackbar.show();
             }
+            else if(matchableAccount != null){
+                storeGameAsPGN("*");
+            }
         }
     }
 
@@ -166,6 +170,8 @@ private boolean isStoredGame = false;
         super.onSaveInstanceState(outState);
         try{
             runOnUiThread(() -> {
+                outState.putBoolean("gameFinished",isGameFinished);
+                outState.putBoolean("isStoredGame",isStoredGame);
                 outState.putSerializable("matchApi", boardView.getMatchAPI());
                 outState.putString("matchString", PGNUtilities.get().acceptMoveLog(boardView.getMoveLog().convertToEngineMoveLog()));
                 outState.putParcelable("matchableAccount",matchableAccount);
@@ -200,6 +206,8 @@ private boolean isStoredGame = false;
         super.onRestoreInstanceState(savedInstanceState);
         runOnUiThread(() -> {
             try{
+                isGameFinished = savedInstanceState.getBoolean("gameFinished");
+                isStoredGame = savedInstanceState.getBoolean("isStoredGame");
                 MatchableAccount matchableAccount = savedInstanceState.getParcelable("matchableAccount");
                 boardView.setMatchableAccount(matchableAccount);
                 Board board = Board.createStandardBoard();
@@ -212,6 +220,12 @@ private boolean isStoredGame = false;
                         MoveTransition moveTransition = board.currentPlayer().makeMove(move);
                         if(moveTransition.getMoveStatus().isDone()){
                             board = moveTransition.getTransitionBoard();
+                            if(board.currentPlayer().isInCheckMate()){
+                                move.setCheckMateMove(true);
+                            }
+                            else if (board.currentPlayer().isInCheck()){
+                                move.setCheckMove(true);
+                            }
                             moves.add(move);
                         }
                     }
