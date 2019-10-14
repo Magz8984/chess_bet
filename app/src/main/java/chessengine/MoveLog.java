@@ -1,7 +1,5 @@
 package chessengine;
 
-import android.util.Log;
-
 import com.chess.engine.Move;
 
 import java.util.ArrayList;
@@ -38,7 +36,6 @@ public class MoveLog {
         for (int i = 0; i < moves.size(); i++){
             if(i <= index){
                 validMoves.add(moves.get(i));
-                Log.d("BTN", moves.get(i).toString());
             }
         }
         this.moves.clear();

@@ -13,6 +13,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.DateFormat;
@@ -51,21 +53,31 @@ public class GamesAdapter extends RecyclerView.Adapter<ViewHolder>{
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy/HH.mm.ss", Locale.US);
         holder.getTxtTime().setText(df.format(date));
         holder.getBtnDelete().setOnClickListener(v -> {
-            File file = files.get(position);
-            boolean delete =  file.delete();
-            if(delete){
-                files.remove(file);
-                notifyItemChanged(position);
-                Toast.makeText(context, file.getName(), Toast.LENGTH_LONG).show();
+            try{
+                File file = files.get(position);
+                boolean delete =  file.delete();
+                if(delete){
+                    files.remove(file);
+                    notifyItemChanged(position);
+                    Toast.makeText(context, file.getName(), Toast.LENGTH_LONG).show();
+                }
+            }catch (Exception ex){
+                // Log any crash error when deleting
+                Crashlytics.logException(ex);
             }
+
         });
         holder.getBtnView().setOnClickListener(v -> {
-            File file = files.get(position);
-            String pgn = getPGNFromFile(file);
-            if(pgn != null){
-                Intent intent = new Intent(context, BoardActivity.class);
-                intent.putExtra("pgn", pgn);
-                context.startActivity(intent);
+            try{
+                File file = files.get(position);
+                String pgn = getPGNFromFile(file);
+                if(pgn != null){
+                    Intent intent = new Intent(context, BoardActivity.class);
+                    intent.putExtra("pgn", pgn);
+                    context.startActivity(intent);
+                }
+            }catch (Exception ex){
+                Crashlytics.logException(ex);
             }
         });
     }

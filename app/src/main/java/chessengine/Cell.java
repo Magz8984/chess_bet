@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -18,13 +19,12 @@ import androidx.annotation.NonNull;
 import com.chess.engine.Move;
 import com.chess.engine.board.Board;
 import com.chess.engine.board.Tile;
-import com.chess.engine.player.MoveStatus;
 import com.chess.engine.player.MoveTransition;
 
-import java.util.ArrayList;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.Date;
 
 import chessbet.app.com.R;
 public class Cell extends View {
@@ -109,11 +109,12 @@ public class Cell extends View {
                 if(boardView.movedPiece == null){
                     boardView.sourceTile = null;
                 }
+                boardView.invalidate(); // Highlights the source tile
             }
-            else if(boardView.chessBoard.getTile(tileId).getTileCoordinate() ==
-                    boardView.sourceTile.getTileCoordinate()){
+            else if(boardView.chessBoard.getTile(tileId).getTileCoordinate() == boardView.sourceTile.getTileCoordinate()){
                 boardView.sourceTile = null;
                 boardView.movedPiece = null;
+                boardView.invalidate(); // Removes the highlight
             }
             else{
                 // Second Click
@@ -127,7 +128,6 @@ public class Cell extends View {
                         boardView.moveLog.removeMoves(boardView.moveCursor -1);
                         boardView.onMoveDoneListener.getMoves(boardView.moveLog);
                     }
-                    GameUtil.playSound(); // Play sound once move is made
                     boardView.destinationTile = boardView.chessBoard.getTile(tileId);
                     boardView.setMoveData(boardView.movedPiece.getPiecePosition(), tileId); // Online Play
                     boardView.chessBoard= transition.getTransitionBoard();
@@ -156,6 +156,7 @@ public class Cell extends View {
                     else if(boardView.chessBoard.isDraw()){
                         boardView.onMoveDoneListener.isDraw();
                     }
+                    GameUtil.playSound(); // Play sound once move is made
                 }
                 boardView.sourceTile = null;
                 boardView.movedPiece = null;

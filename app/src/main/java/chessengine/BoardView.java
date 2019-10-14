@@ -90,6 +90,7 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
                                 boardCells.get(i).handleTouch();
                             }
                             else if(chessBoard.getTile(i).getPiece().getPieceAlliance() != localAlliance && movedPiece!=null){
+                                // Allows user to take a piece in an online game
                                 boardCells.get(i).handleTouch();
                             }
                         }
@@ -101,9 +102,7 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
                         }
                 }
             }
-            invalidate();
         }
-
         return true;
     }
 
@@ -267,6 +266,7 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
     }
 
     public void setMatchableAccount(MatchableAccount matchableAccount) {
+        // Makes sure to set match api to send and receive moves
         if(matchableAccount != null){
             this.matchableAccount = matchableAccount;
             matchAPI = new MatchAPI();
@@ -286,7 +286,7 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
     }
 
     public void translateRemoteMoveOnBoard(RemoteMove remoteMove){
-        if(remoteMove!=null){
+        if(remoteMove != null){
             final Move move = Move.MoveFactory.createMove(chessBoard,remoteMove.getFrom(),remoteMove.getTo());
             final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
             if(transition.getMoveStatus().isDone()){
@@ -321,7 +321,6 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
 
         if(this.moveCursor > 0){
             this.moveCursor -= 1;
-            Log.d("BTN", "undoMove: " + moveCursor);
             this.chessBoard = this.moveLog.getMove(moveCursor).undo();
             displayGameStates();
             invalidate();
@@ -334,7 +333,6 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
                 chessBoard = transition.getTransitionBoard();
                 displayGameStates();
                 this.moveCursor += 1;
-                Log.d("BTN", "redoMove: " + moveCursor);
                 invalidate();
             }
         }
