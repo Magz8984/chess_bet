@@ -56,7 +56,7 @@ public class GamesAdapter extends RecyclerView.Adapter<ViewHolder>{
                 boolean delete =  file.delete();
                 if(delete){
                     files.remove(file);
-                    notifyItemChanged(position);
+                    notifyItemRemoved(position);
                     Toast.makeText(context, file.getName(), Toast.LENGTH_LONG).show();
                 }
             }catch (Exception ex){
