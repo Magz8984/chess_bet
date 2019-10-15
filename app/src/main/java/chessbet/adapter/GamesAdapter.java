@@ -2,7 +2,6 @@ package chessbet.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.crashlytics.android.Crashlytics;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -125,11 +123,11 @@ class ViewHolder extends RecyclerView.ViewHolder{
         return txtTime;
     }
 
-    public Button getBtnDelete() {
+    Button getBtnDelete() {
         return btnDelete;
     }
 
-    public Button getBtnView() {
+    Button getBtnView() {
         return btnView;
     }
 }

@@ -11,7 +11,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -21,10 +20,8 @@ import com.chess.engine.board.Board;
 import com.chess.engine.board.Tile;
 import com.chess.engine.player.MoveTransition;
 
-import java.time.LocalTime;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 
 import chessbet.app.com.R;
 public class Cell extends View {

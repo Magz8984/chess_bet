@@ -28,7 +28,6 @@ import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
 import com.chess.pgn.PGNMainUtils;
 import com.chess.pgn.PGNUtilities;
-import com.crashlytics.android.Crashlytics;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.FileNotFoundException;

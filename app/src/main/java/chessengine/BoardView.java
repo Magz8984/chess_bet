@@ -303,12 +303,13 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
     }
 
     public void reconstructBoard(List<Move> moves, Board board){
+        this.moveLog.clear();
         this.chessBoard = board;
         for (Move move : moves){
             moveLog.addMove(move);
         }
         onMoveDoneListener.getMoves(moveLog);
-        GameUtil.playSound();
+//        GameUtil.playSound();
         moveCursor = moveLog.size();
         displayGameStates();
         invalidate();
