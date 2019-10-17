@@ -82,9 +82,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         profileImage = navigationView.getHeaderView(0).findViewById(R.id.profile_photo);
         profileImage.setOnClickListener(this);
         AccountAPI.get().setUser(FirebaseAuth.getInstance().getCurrentUser());
+        AccountAPI.get().setAccountListener(this);
         AccountAPI.get().getAccount();
         AccountAPI.get().getUser();
-        AccountAPI.get().setAccountListener(this);
+
         navigationView.setNavigationItemSelectedListener(this);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.open,R.string.close);
@@ -164,10 +165,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onUserReceived(User user) {
-        if(user.getProfile_photo_url() != null){
-            Glide.with(this).asBitmap().load(user.getProfile_photo_url()).into(profileImage);
+        if( user != null){
+            if(user.getProfile_photo_url() != null){
+                Glide.with(this).asBitmap().load(user.getProfile_photo_url()).into(profileImage);
+            }
+            txtEmail.setText(user.getEmail());
+
         }
-        txtEmail.setText(user.getEmail());
     }
 
     @Override

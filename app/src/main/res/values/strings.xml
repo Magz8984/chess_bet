@@ -57,4 +57,5 @@
     <string name="save">Save</string>
     <string name="games">Games</string>
     <string name="forfeit">Forfeit</string>
+    <string name="userVerification">Kindly verify email</string>
 </resources>
