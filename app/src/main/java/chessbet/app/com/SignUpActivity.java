@@ -12,8 +12,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-public class SignupActivity extends AppCompatActivity {
+
+public class SignUpActivity extends AppCompatActivity {
 
     private EditText inputEmail, inputPassword;
     private ProgressBar progressBar;
@@ -34,12 +36,12 @@ public class SignupActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         Button btnResetPassword = findViewById(R.id.btn_reset_password);
 
-        btnResetPassword.setOnClickListener(v -> startActivity(new Intent(SignupActivity.this, ResetPasswordActivity.class)));
+        btnResetPassword.setOnClickListener(v -> startActivity(new Intent(SignUpActivity.this, ResetPasswordActivity.class)));
 
         btnSignIn.setOnClickListener(v -> finish());
 
         btnSignUp.setOnClickListener(v -> {
-
+            btnSignUp.setEnabled(false); // Make sure one registration is made
             String email = inputEmail.getText().toString().trim();
             String password = inputPassword.getText().toString().trim();
 
@@ -61,22 +63,34 @@ public class SignupActivity extends AppCompatActivity {
             progressBar.setVisibility(View.VISIBLE);
             //create user
             auth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(SignupActivity.this, task -> {
-                        Toast.makeText(SignupActivity.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
+                    .addOnCompleteListener(SignUpActivity.this, task -> {
+                        Toast.makeText(SignUpActivity.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.GONE);
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Toast.makeText(SignupActivity.this, "Authentication failed." + task.getException(),
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SignUpActivity.this, "Authentication failed." + task.getException(), Toast.LENGTH_SHORT).show();
                         } else {
-                            startActivity(new Intent(SignupActivity.this, MainActivity.class));
-                            finish();
+                            btnSignUp.setEnabled(true);
+                            sendUserVerificationEmail(auth.getCurrentUser());
                         }
                     });
 
         });
+    }
+
+    private void sendUserVerificationEmail(FirebaseUser user){
+        if(user != null){
+            user.sendEmailVerification().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    Toast.makeText(SignUpActivity.this, "Verification email sent", Toast.LENGTH_LONG).show();
+                }
+                else{
+                    Toast.makeText(SignUpActivity.this, "Failed sending verification email" + task.getException(), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
     }
 
     @Override

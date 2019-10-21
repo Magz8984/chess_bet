@@ -1,13 +1,11 @@
 package chessbet.domain;
 
-import java.time.LocalDateTime;
-
 public class AccountEvent {
     private String name;
-    private LocalDateTime date_created;
+    private String date_created;
     private boolean done;
 
-    public void setDate_created(LocalDateTime date_created) {
+    public void setDate_created(String date_created) {
         this.date_created = date_created;
     }
 
@@ -23,7 +21,7 @@ public class AccountEvent {
         return done;
     }
 
-    public LocalDateTime getDate_created() {
+    public String getDate_created() {
         return date_created;
     }
 

@@ -36,24 +36,30 @@ public class AccountAPI {
     }
 
     public void getAccount() {
-        Query query = db.collection(AccountAPI.ACCOUNT_COLLECTION).whereEqualTo("owner", user.getUid());
-        query.get().addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())){
-                    currentAccount = document.toObject(Account.class);
-                     accountListener.onAccountReceived(currentAccount);
+        try {
+            Query query = db.collection(AccountAPI.ACCOUNT_COLLECTION).whereEqualTo("owner", user.getUid());
+            query.get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    Log.d("Actdf", "Data " + Objects.requireNonNull(task.getResult()).size());
+                    for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())){
+                        currentAccount = document.toObject(Account.class);
+                        accountListener.onAccountReceived(currentAccount);
+                    }
                 }
-            }
-            else {
-                Log.d(TAG, Objects.requireNonNull(task.getException()).getMessage());
-            }
-        });
+                else {
+                    Log.d(TAG, Objects.requireNonNull(task.getException()).getMessage());
+                }
+            });
+        }catch (Exception ex){
+            Log.d(TAG, ex.getMessage());
+        }
+
     }
 
     public void getUser(){
         db.collection(AccountAPI.USER_COLLECTION).document(user.getUid()).get().addOnCompleteListener(task -> {
            if(task.isSuccessful()){
-                   accountListener.onUserReceived(Objects.requireNonNull(task.getResult()).toObject(User.class));
+               accountListener.onUserReceived(Objects.requireNonNull(task.getResult()).toObject(User.class));
            }
            else {
                Log.d(TAG, Objects.requireNonNull(task.getException()).getMessage());

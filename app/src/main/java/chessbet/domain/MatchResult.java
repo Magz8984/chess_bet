@@ -5,6 +5,7 @@ public class MatchResult {
     private MatchStatus matchStatus;
     private String gain;
     private String loss;
+    private String pgnText;
 
     public void setGain(String gain) {
         this.gain = gain;
@@ -36,5 +37,13 @@ public class MatchResult {
 
     public String getLoss() {
         return loss;
+    }
+
+    public void setPgnText(String pgnText) {
+        this.pgnText = pgnText;
+    }
+
+    public String getPgnText() {
+        return pgnText;
     }
 }
