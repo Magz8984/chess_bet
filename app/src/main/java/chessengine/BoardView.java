@@ -323,13 +323,19 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
         if(this.moveCursor > 0){
             this.moveCursor -= 1;
             this.chessBoard = this.moveLog.getMove(moveCursor).undo();
+            if(this.moveLog.getMove(moveCursor) instanceof Move.PawnEnPassantAttackMove){
+                this.moveCursor -= 1;
+                this.chessBoard = this.moveLog.getMove(moveCursor).undo();
+            }
             displayGameStates();
             invalidate();
         }
     }
     public void redoMove(){
         if (this.moveCursor < moveLog.size()){
-            MoveTransition transition = chessBoard.currentPlayer().makeMove(moveLog.getMove(moveCursor));
+            // TODO Over kill (Fix from engine)
+            Move move = Move.MoveFactory.createMove(chessBoard, moveLog.getMove(moveCursor).getCurrentCoordinate(), moveLog.getMove(moveCursor).getDestinationCoordinate());
+            MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
             if(transition.getMoveStatus().isDone()){
                 chessBoard = transition.getTransitionBoard();
                 displayGameStates();
