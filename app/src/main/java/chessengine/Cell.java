@@ -128,6 +128,7 @@ public class Cell extends View {
                     boardView.destinationTile = boardView.chessBoard.getTile(tileId);
                     boardView.setMoveData(boardView.movedPiece.getPiecePosition(), tileId); // Online Play
                     boardView.chessBoard= transition.getTransitionBoard();
+                    GameUtil.playSound();  // Play sound once move is made
 
                     if(boardView.chessBoard.currentPlayer().isInCheckMate()){
                         move.setCheckMateMove(true);
@@ -153,7 +154,6 @@ public class Cell extends View {
                     else if(boardView.chessBoard.isDraw()){
                         boardView.onMoveDoneListener.isDraw();
                     }
-                    GameUtil.playSound(); // Play sound once move is made
                 }
                 boardView.sourceTile = null;
                 boardView.movedPiece = null;

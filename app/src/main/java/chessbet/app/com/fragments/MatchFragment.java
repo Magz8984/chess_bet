@@ -72,7 +72,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         txtAccountRating.setText(String.format(Locale.US,"%d", AccountAPI.get().getCurrentAccount().getElo_rating()));
         startValue = view.findViewById(R.id.startValue);
         endValue = view.findViewById(R.id.endValue);
-        matchAPI = new MatchAPI();
+        matchAPI = MatchAPI.get();
         matchRange = new MatchRange();
         matchAPI.setMatchListener(this);
         findMatch.setOnClickListener(this);

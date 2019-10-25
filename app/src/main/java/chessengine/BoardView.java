@@ -48,6 +48,7 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
     private Alliance localAlliance;
     private RemoteViewUpdateListener remoteViewUpdateListener;
     protected int moveCursor = 0;
+    private List<Rect> tiles = new ArrayList<>();
 
     private void initialize(Context context){
         setSaveEnabled(true);
@@ -75,6 +76,28 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
     public boolean performClick(){
         super.performClick();
         return true;
+    }
+
+    private void createTileRectangles(){
+        final int width=getWidth();
+        final int height=getHeight();
+
+        squareSize=Math.min(getCellWidth(width),getCellHeight(height));
+
+        for (int c = 0; c < BoardUtils.NUMBER_OF_TILES_PER_ROW; c++) {
+            for (int r = 0; r < BoardUtils.NUMBER_OF_TILES_PER_ROW; r++) {
+                final int xCoord = getXCoord(r);
+                final int yCoord = getYCoord(c);
+
+                final Rect tileRect = new Rect(
+                        xCoord,
+                        yCoord,
+                        xCoord + squareSize,
+                        yCoord + squareSize
+                );
+                tiles.add(tileRect);
+            }
+        }
     }
 
     @Override
@@ -145,23 +168,14 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
     @Override
     protected  void onDraw(Canvas canvas){
         int i = 0;
-        final int width=getWidth();
-        final int height=getHeight();
 
-        squareSize=Math.min(getCellWidth(width),getCellHeight(height));
+        if(tiles.size() == 0){
+            createTileRectangles();
+        }
 
         for (int c = 0; c < BoardUtils.NUMBER_OF_TILES_PER_ROW; c++) {
             for (int r = 0; r < BoardUtils.NUMBER_OF_TILES_PER_ROW; r++) {
-                final int xCoord = getXCoord(r);
-                final int yCoord = getYCoord(c);
-
-                final Rect tileRect = new Rect(
-                        xCoord,
-                        yCoord,
-                        xCoord + squareSize,
-                        yCoord + squareSize
-                );
-                boardDirection.traverse(boardCells).get(i).setTileRect(tileRect);
+                boardDirection.traverse(boardCells).get(i).setTileRect(tiles.get(i));
                 boardDirection.traverse(boardCells).get(i).setColumn(c);
                 boardDirection.traverse(boardCells).get(i).setRow(r);
                 boardDirection.traverse(boardCells).get(i).draw(canvas);
@@ -169,6 +183,7 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
             }
         }
     }
+
 
     private int getCellWidth(int width){
         return  (width /8);
@@ -269,7 +284,7 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
         // Makes sure to set match api to send and receive moves
         if(matchableAccount != null){
             this.matchableAccount = matchableAccount;
-            matchAPI = new MatchAPI();
+            matchAPI = MatchAPI.get();
             matchAPI.setRemoteMoveListener(this);
             matchAPI.getRemoteMoveData(matchableAccount);
             if(matchableAccount.getOpponent().equals("WHITE")){

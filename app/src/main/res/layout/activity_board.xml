@@ -20,6 +20,15 @@
        />
 
     <TextView
+        android:layout_below="@id/title"
+        android:id="@+id/txtConnectionStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:textColor="#fff"
+        />
+
+    <TextView
         android:id="@+id/txtCountDown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,7 +40,7 @@
         />
 
     <RelativeLayout
-        android:layout_below="@id/title"
+        android:layout_below="@id/txtConnectionStatus"
         android:layout_above="@id/chessLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">

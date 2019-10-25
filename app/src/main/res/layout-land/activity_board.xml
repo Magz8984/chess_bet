@@ -40,6 +40,13 @@
             android:textSize="20sp" />
 
         <TextView
+            android:id="@+id/txtConnectionStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#fff"
+            />
+
+        <TextView
             android:id="@+id/txtCountDown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

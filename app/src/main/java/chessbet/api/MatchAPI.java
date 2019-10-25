@@ -36,9 +36,15 @@ public class MatchAPI implements Serializable {
     private FirebaseUser firebaseUser;
     private MatchListener matchListener;
     private RemoteMoveListener remoteMoveListener;
-    public MatchAPI(){
+    private static MatchAPI INSTANCE = new MatchAPI();
+
+    private MatchAPI(){
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
+    }
+
+    public static MatchAPI get(){
+        return INSTANCE;
     }
 
     public void setMatchListener(MatchListener matchListener) {

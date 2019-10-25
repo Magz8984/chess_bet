@@ -31,7 +31,7 @@ public class MatchService extends Service implements MatchListener {
     @Override
     public void onCreate(){
         super.onCreate();
-        MatchAPI matchAPI = new MatchAPI();
+        MatchAPI matchAPI = MatchAPI.get();
         matchAPI.setMatchListener(this);
         matchAPI.getAccount();
     }

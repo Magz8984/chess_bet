@@ -40,11 +40,13 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import chessbet.Application;
 import chessbet.api.MatchAPI;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.RemoteMove;
 import chessbet.domain.TimerEvent;
+import chessbet.recievers.ConnectivityReceiver;
 import chessbet.services.RemoteViewUpdateListener;
 import chessbet.utils.DatabaseUtil;
 import chessbet.utils.GameManager;
@@ -55,7 +57,7 @@ import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
 
-public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed, RemoteViewUpdateListener {
+public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -71,15 +73,17 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.whitePieces) LinearLayout whitePieces;
 @BindView(R.id.blackPieces) LinearLayout blackPieces;
 @BindView(R.id.btnSave) Button btnSave;
+@BindView(R.id.txtConnectionStatus) TextView txtConnectionStatus;
 
-private  MatchableAccount matchableAccount;
-private boolean isGameFinished = false;
-private boolean isStoredGame = false;
+    private MatchableAccount matchableAccount;
+    private boolean isGameFinished = false;
+    private boolean isStoredGame = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         BoardPreference boardPreference;
-        boardPreference=new BoardPreference(getPreferences(Context.MODE_PRIVATE));
+        boardPreference = new BoardPreference(getPreferences(Context.MODE_PRIVATE));
         setContentView(R.layout.activity_board);
         ButterKnife.bind(this);
 //        GameTimer gameTimer = new GameTimer.Builder()
@@ -97,35 +101,42 @@ private boolean isStoredGame = false;
         btnForward.setOnClickListener(this);
         txtWhiteStatus.setTextColor(Color.RED);
         txtBlackStatus.setTextColor(Color.RED);
+
+        this.onConnectionChanged(ConnectivityReceiver.isConnected());
     }
 
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
-        GameUtil.initialize(R.raw.chess_move,this);
+        GameUtil.initialize(R.raw.chess_move, this);
         Intent intent = getIntent();
         matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
-        if(matchableAccount !=null){
+        if (matchableAccount != null) {
             boardView.setMatchableAccount(matchableAccount);
         }
         // Try To Reconstruct
         String pgn = intent.getStringExtra("pgn");
-        if(pgn != null){
+        if (pgn != null) {
             isStoredGame = true;
             Board board = Board.createStandardBoard();
-                List<String> strMoves = PGNMainUtils.processMoveText(pgn);
-                List<Move> moves = new ArrayList<>();
-                for (String string : strMoves) {
-                    Move move = PGNMainUtils.createMove(board, string);
-                    MoveTransition moveTransition = board.currentPlayer().makeMove(move);
-                    if (moveTransition.getMoveStatus().isDone()) {
-                        board = moveTransition.getTransitionBoard();
-                        moves.add(move);
+            List<String> strMoves = PGNMainUtils.processMoveText(pgn);
+            List<Move> moves = new ArrayList<>();
+            for (String string : strMoves) {
+                Move move = PGNMainUtils.createMove(board, string);
+                MoveTransition moveTransition = board.currentPlayer().makeMove(move);
+                if (moveTransition.getMoveStatus().isDone()) {
+                    board = moveTransition.getTransitionBoard();
+                    if (board.currentPlayer().isInCheckMate()) {
+                        move.setCheckMateMove(true);
+                    } else if (board.currentPlayer().isInCheck()) {
+                        move.setCheckMove(true);
                     }
+                    moves.add(move);
                 }
-                boardView.reconstructBoard(moves, board);
+            }
+            boardView.reconstructBoard(moves, board);
         }
-      }
+    }
 
     @Override
     public void onClick(View v) {
@@ -137,28 +148,23 @@ private boolean isStoredGame = false;
                 ColorPicker colorPicker=new ColorPicker();
                 colorPicker.setSharedPreferences(getPreferences(Context.MODE_PRIVATE));
                 colorPicker.setBoardView(boardView);
-                colorPicker.show(BoardActivity.this.getSupportFragmentManager(),"Color Fragment");
+                colorPicker.show(BoardActivity.this.getSupportFragmentManager(), "Color Fragment");
+            } else {
+                Toast.makeText(this, "Feature only available in portrait mode", Toast.LENGTH_LONG).show();
             }
-            else {
-                Toast.makeText(this,"Feature only available in portrait mode", Toast.LENGTH_LONG).show();
-            }
-        }
-        else if(v.equals(btnBack)){
+        } else if (v.equals(btnBack)) {
             boardView.undoMove();
-        }
-        else if(v.equals(btnForward)){
+        } else if (v.equals(btnForward)) {
             boardView.redoMove();
-        }
-        else if(v.equals(btnSave)){
-            if(!isGameFinished && matchableAccount == null && !isStoredGame){ // Enable this for none online games
-                Snackbar snackbar = Snackbar.make(btnSave, R.string.save_end_match,Snackbar.LENGTH_LONG)
+        } else if (v.equals(btnSave)) {
+            if (!isGameFinished && matchableAccount == null && !isStoredGame) { // Enable this for none online games
+                Snackbar snackbar = Snackbar.make(btnSave, R.string.save_end_match, Snackbar.LENGTH_LONG)
                         .setAction(R.string.save, v1 -> {
                             storeGameAsPGN("*");
                             isGameFinished = true;
                         });
                 snackbar.show();
-            }
-            else if(matchableAccount != null){
+            } else if (matchableAccount != null) {
                 storeGameAsPGN("*");
             }
         }
@@ -167,62 +173,59 @@ private boolean isStoredGame = false;
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        try{
+        try {
             runOnUiThread(() -> {
-                outState.putBoolean("gameFinished",isGameFinished);
-                outState.putBoolean("isStoredGame",isStoredGame);
+                outState.putBoolean("gameFinished", isGameFinished);
+                outState.putBoolean("isStoredGame", isStoredGame);
                 outState.putSerializable("matchApi", boardView.getMatchAPI());
                 outState.putString("matchString", PGNUtilities.get().acceptMoveLog(boardView.getMoveLog().convertToEngineMoveLog()));
-                outState.putParcelable("matchableAccount",matchableAccount);
+                outState.putParcelable("matchableAccount", matchableAccount);
             });
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     @Override
     public void onBackPressed() {
-            if(!isStoredGame){
-                Snackbar snackbar = Snackbar.make(btnSave, R.string.save_end_match,Snackbar.LENGTH_LONG)
-                        .setAction(R.string.forfeit, v1 -> {
-                            // Handle game forfeit
-                            if(!isGameFinished){
-                                storeGameAsPGN("*");
-                                isGameFinished = true;
-                            }
-                            Intent intent = new Intent(this, MainActivity.class);
-                            startActivity(intent);
-                        });
-                snackbar.show();
-            }
-            else {
-                super.onBackPressed();
-            }
+        if (!isStoredGame) {
+            Snackbar snackbar = Snackbar.make(btnSave, R.string.save_end_match, Snackbar.LENGTH_LONG)
+                    .setAction(R.string.forfeit, v1 -> {
+                        // Handle game forfeit
+                        if (isGameFinished) {
+                            storeGameAsPGN("*");
+                        }
+                        Intent intent = new Intent(this, MainActivity.class);
+                        startActivity(intent);
+                    });
+            snackbar.show();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         runOnUiThread(() -> {
-            try{
+            try {
                 isGameFinished = savedInstanceState.getBoolean("gameFinished");
                 isStoredGame = savedInstanceState.getBoolean("isStoredGame");
                 MatchableAccount matchableAccount = savedInstanceState.getParcelable("matchableAccount");
                 boardView.setMatchableAccount(matchableAccount);
                 Board board = Board.createStandardBoard();
                 String gameState = savedInstanceState.getString("matchString");
-                if(gameState !=null){
+                if (gameState != null) {
                     List<String> strMoves = PGNMainUtils.processMoveText(Objects.requireNonNull(savedInstanceState.getString("matchString")));
                     List<Move> moves = new ArrayList<>();
-                    for (String string : strMoves){
+                    for (String string : strMoves) {
                         Move move = PGNMainUtils.createMove(board, string);
                         MoveTransition moveTransition = board.currentPlayer().makeMove(move);
-                        if(moveTransition.getMoveStatus().isDone()){
+                        if (moveTransition.getMoveStatus().isDone()) {
                             board = moveTransition.getTransitionBoard();
-                            if(board.currentPlayer().isInCheckMate()){
+                            if (board.currentPlayer().isInCheckMate()) {
                                 move.setCheckMateMove(true);
-                            }
-                            else if (board.currentPlayer().isInCheck()){
+                            } else if (board.currentPlayer().isInCheck()) {
                                 move.setCheckMove(true);
                             }
                             moves.add(move);
@@ -232,38 +235,37 @@ private boolean isStoredGame = false;
                 }
                 MatchAPI matchAPI = (MatchAPI) savedInstanceState.getSerializable("matchApi");
                 boardView.setMatchAPI(matchAPI);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
         });
     }
 
     @Override
-    public void getMoves(MoveLog moveLog){
+    public void getMoves(MoveLog moveLog) {
         runOnUiThread(() -> {
             blackMoves.removeAllViews();
             whiteMoves.removeAllViews();
             blackPieces.removeAllViews();
             whitePieces.removeAllViews();
-            for (Move move : moveLog.getMoves()){
+            for (Move move : moveLog.getMoves()) {
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.setMargins(10, 0, 10,0);
+                params.setMargins(10, 0, 10, 0);
                 TextView textView = new TextView(this);
                 textView.setLayoutParams(params);
                 textView.setText(move.toString());
                 textView.setTextColor(Color.WHITE);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP,15);
-        textView.setOnClickListener(v -> Log.d("MOVE", move.toString()));
-            if(move.getMovedPiece().getPieceAlliance() == Alliance.BLACK){
-                blackMoves.addView(textView);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                textView.setOnClickListener(v -> Log.d("MOVE", move.toString()));
+                if (move.getMovedPiece().getPieceAlliance() == Alliance.BLACK) {
+                    blackMoves.addView(textView);
 
+                } else if (move.getMovedPiece().getPieceAlliance() == Alliance.WHITE) {
+                    whiteMoves.addView(textView);
+                }
+                // Get taken pieces
+                this.getTakenPieces(move);
             }
-            else if (move.getMovedPiece().getPieceAlliance() == Alliance.WHITE){
-                whiteMoves.addView(textView);
-            }
-            // Get taken pieces
-            this.getTakenPieces(move);
-        }
         });
 //        gameTimer.invalidateTimer();
 //
@@ -277,11 +279,10 @@ private boolean isStoredGame = false;
     @Override
     public void isCheckMate(Player player) {
         onGameResume();
-        if(player.getAlliance().isBlack()){
+        if (player.getAlliance().isBlack()) {
             txtBlackStatus.setText(getString(R.string.checkmate));
             storeGameAsPGN("0-1");
-        }
-        else if(player.getAlliance().isWhite()){
+        } else if (player.getAlliance().isWhite()) {
             txtWhiteStatus.setText(getString(R.string.checkmate));
             storeGameAsPGN("1-0");
         }
@@ -291,10 +292,9 @@ private boolean isStoredGame = false;
     @Override
     public void isStaleMate(Player player) {
         onGameResume();
-        if(player.getAlliance().isBlack()){
+        if (player.getAlliance().isBlack()) {
             txtBlackStatus.setText(getString(R.string.stalemate));
-        }
-        else if(player.getAlliance().isWhite()){
+        } else if (player.getAlliance().isWhite()) {
             txtWhiteStatus.setText(getString(R.string.stalemate));
         }
         storeGameAsPGN("1/2-1/2");
@@ -304,10 +304,9 @@ private boolean isStoredGame = false;
     @Override
     public void isCheck(Player player) {
         onGameResume();
-        if(player.getAlliance().isBlack()){
+        if (player.getAlliance().isBlack()) {
             txtBlackStatus.setText(getString(R.string.check));
-        }
-        else if(player.getAlliance().isWhite()){
+        } else if (player.getAlliance().isWhite()) {
             txtWhiteStatus.setText(getString(R.string.check));
         }
     }
@@ -326,31 +325,37 @@ private boolean isStoredGame = false;
     }
 
     @Override
-    public void onWindowFocusChanged(boolean hasFocus){
+    public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
 
         final int blackMoveCount = blackMoves.getChildCount();
         final int whiteMoveCount = whiteMoves.getChildCount();
 
-        if(blackMoveCount >= 1){
-            View lastBlackMove = blackMoves.getChildAt(blackMoveCount-1);
+        if (blackMoveCount >= 1) {
+            View lastBlackMove = blackMoves.getChildAt(blackMoveCount - 1);
             blackScrollView.scrollTo(lastBlackMove.getLeft(), lastBlackMove.getTop());
         }
 
-        if(whiteMoveCount >= 1){
-            View lastWhiteMove = whiteMoves.getChildAt(whiteMoveCount-1);
+        if (whiteMoveCount >= 1) {
+            View lastWhiteMove = whiteMoves.getChildAt(whiteMoveCount - 1);
             whiteScrollView.scrollTo(lastWhiteMove.getLeft(), lastWhiteMove.getTop());
         }
     }
 
     @Override
-    protected void onPause(){
+    protected void onResume() {
+        super.onResume();
+        Application.getInstance().setConnectivityListener(this);
+    }
+
+    @Override
+    protected void onPause() {
         super.onPause();
     }
 
     @Override
-    protected void onStop(){
-       super.onStop();
+    protected void onStop() {
+        super.onStop();
         GameUtil.getMediaPlayer().release();
     }
 
@@ -360,7 +365,7 @@ private boolean isStoredGame = false;
             TimerElapsedDialog timerElapsedDialog = new TimerElapsedDialog();
             timerElapsedDialog.setTimerEvent(TimerEvent.MOVE_TIMER_ELAPSED);
             timerElapsedDialog.setResult(boardView.getCurrentPlayer().getOpponent().getAlliance().toString().concat(" WINS"));
-            timerElapsedDialog.show(this.getSupportFragmentManager(),"Timer Elapsed Dialog");
+            timerElapsedDialog.show(this.getSupportFragmentManager(), "Timer Elapsed Dialog");
             // Board Clearing
             boardView.restartChessBoard();
             whiteMoves.removeAllViews();
@@ -368,7 +373,7 @@ private boolean isStoredGame = false;
             txtBlackStatus.setText("");
             txtWhiteStatus.setText("");
 
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -378,18 +383,18 @@ private boolean isStoredGame = false;
 
     }
 
-    private void endGame(){
-        if(this.matchableAccount != null){
+    private void endGame() {
+        if (this.matchableAccount != null) {
             this.matchableAccount.endMatch(this);
         }
     }
 
-    private void getTakenPieces(Move move){
-        if(move.getAttackedPiece() != null){
+    private void getTakenPieces(Move move) {
+        if (move.getAttackedPiece() != null) {
             Piece piece = move.getAttackedPiece();
             ImageView imageView = new ImageView(this);
             Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), getApplicationContext().getResources()
-                    .getIdentifier(piece.toString().concat(piece.getPieceAlliance().toString()).toLowerCase(),"drawable", getPackageName()));
+                    .getIdentifier(piece.toString().concat(piece.getPieceAlliance().toString()).toLowerCase(), "drawable", getPackageName()));
 
             assert drawable != null;
             drawable.clearColorFilter();
@@ -400,10 +405,9 @@ private boolean isStoredGame = false;
             imageView.setBackground(drawable);
             imageView.invalidate();
 
-            if(piece.getPieceAlliance().equals(Alliance.BLACK)){
+            if (piece.getPieceAlliance().equals(Alliance.BLACK)) {
                 blackPieces.addView(imageView);
-            }
-            else if(piece.getPieceAlliance().equals(Alliance.WHITE)){
+            } else if (piece.getPieceAlliance().equals(Alliance.WHITE)) {
                 whitePieces.addView(imageView);
             }
         }
@@ -414,33 +418,43 @@ private boolean isStoredGame = false;
         runOnUiThread(() -> boardView.translateRemoteMoveOnBoard(remoteMove));
     }
 
-    protected void storeGameAsPGN(String result){
+    protected void storeGameAsPGN(String result) {
         isGameFinished = true; // Is game on going is false
         MoveLog moveLog = boardView.getMoveLog();
-        String gameText = PGNMainUtils.writeGameAsPGN(moveLog.convertToEngineMoveLog(),"N/A","N/A",result);
+        String gameText = PGNMainUtils.writeGameAsPGN(moveLog.convertToEngineMoveLog(), "N/A", "N/A", result);
         FileOutputStream fileOutputStream = null;
 
-        try{
+        try {
             // Ensures its not a stored game and there are moves made
-            if(!isStoredGame && boardView.getMoveLog().getMoves().size() != 0){
+            if (!isStoredGame && boardView.getMoveLog().getMoves().size() != 0) {
                 String file_name = String.format(GameManager.FULL_GAME_FILE, new Date().getTime());
-                fileOutputStream = openFileOutput(file_name,MODE_PRIVATE);
+                fileOutputStream = openFileOutput(file_name, MODE_PRIVATE);
                 fileOutputStream.write(gameText.getBytes());
-                Toast.makeText(this, "Saved to : " + getFilesDir() + "/" + file_name , Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Saved to : " + getFilesDir() + "/" + file_name, Toast.LENGTH_LONG).show();
             }
-        }catch (FileNotFoundException ex){
+        } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        finally {
-            if(fileOutputStream != null){
+        } finally {
+            if (fileOutputStream != null) {
                 try {
                     fileOutputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    @Override
+    public void onConnectionChanged(boolean isConnected) {
+        if(isConnected){
+            txtConnectionStatus.setTextColor(Color.GREEN);
+            txtConnectionStatus.setText(getResources().getString(R.string.online));
+        }else{
+            txtConnectionStatus.setTextColor(Color.RED);
+            txtConnectionStatus.setText(getResources().getString(R.string.offline));
         }
     }
 }
