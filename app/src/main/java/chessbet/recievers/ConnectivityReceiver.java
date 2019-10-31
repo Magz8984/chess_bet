@@ -19,7 +19,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = Objects.requireNonNull(connectivityManager).getActiveNetworkInfo();
-        boolean isConnected = networkInfo != null && networkInfo.isConnected();
+        boolean isConnected = networkInfo != null && networkInfo.isConnectedOrConnecting();
         if(connectivityReceiverListener != null){
             connectivityReceiverListener.onConnectionChanged(isConnected);
         }
@@ -30,7 +30,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
                 .getApplicationContext()
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = Objects.requireNonNull(connectivityManager).getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnected();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
     public interface ConnectivityReceiverListener{

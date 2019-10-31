@@ -58,7 +58,7 @@
         android:textColor="@color/colorPrimaryYellow"
         android:fontFamily="@font/chakrapetchbold"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:text="Collins"/>
+        android:text="Username"/>
 
     <TextView
         android:id="@+id/email"
@@ -67,6 +67,7 @@
         android:textColor="@color/colorWhite"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:fontFamily="@font/chakrapetchbold"
-        android:text="collinsmuthinja@gmail.com"/>
+        android:text="Email"/>
+
 
 </LinearLayout>

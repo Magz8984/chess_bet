@@ -3,6 +3,7 @@ package chessbet.api;
 
 import androidx.annotation.NonNull;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -96,16 +97,17 @@ public class MatchAPI implements Serializable {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         RemoteMove remoteMove = dataSnapshot.getValue(RemoteMove.class);
-                        if(isMatchStarted(remoteMove)){
-                            if(!isMatchInterrupted(remoteMove)) {
+                        if(remoteMove != null) {
+                            if(isMatchStarted(remoteMove)){
+                                if(!isMatchInterrupted(remoteMove)) {
                                     remoteMoveListener.onRemoteMoveMade(remoteMove);
+                                }
                             }
                         }
                     }
-
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Crashlytics.log(databaseError.getMessage());
                     }
                 });
     }

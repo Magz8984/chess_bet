@@ -25,6 +25,10 @@
     <string name="btn_send">Send</string>
     <string name="btn_remove">Remove</string>
     <string name="prompt_password">Password</string>
+    <string name="new_username">New Username</string>
+    <string name="new_password">New Password</string>
+    <string name="old_password">Old Password</string>
+    <string name="new_email">New Email</string>
     <string name="btn_sign_out">Sign Out</string>
     <string name="lbl_forgot_password">Forgot password?</string>
     <string name="forgot_password_msg">We just need your registered Email to sent you password reset instructions.</string>
@@ -60,4 +64,5 @@
     <string name="userVerification">Kindly verify email</string>
     <string name="offline">Offline</string>
     <string name="online">Online</string>
+    <string name="profile">Profile</string>
 </resources>

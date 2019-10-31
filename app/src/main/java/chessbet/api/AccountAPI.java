@@ -26,6 +26,7 @@ public class AccountAPI {
     private FirebaseFirestore db;
     private FirebaseUser user;
     private Account currentAccount;
+    private User currentUser = null;
 
     private AccountAPI() {
          db = FirebaseFirestore.getInstance();
@@ -59,7 +60,8 @@ public class AccountAPI {
     public void getUser(){
         db.collection(AccountAPI.USER_COLLECTION).document(user.getUid()).get().addOnCompleteListener(task -> {
            if(task.isSuccessful()){
-               accountListener.onUserReceived(Objects.requireNonNull(task.getResult()).toObject(User.class));
+               currentUser = Objects.requireNonNull(task.getResult()).toObject(User.class);
+               accountListener.onUserReceived(currentUser);
            }
            else {
                Log.d(TAG, Objects.requireNonNull(task.getException()).getMessage());
@@ -74,6 +76,8 @@ public class AccountAPI {
     public Account getCurrentAccount() {
         return currentAccount;
     }
+
+    public User getCurrentUser() { return currentUser; }
 
     public void setAccountListener(AccountListener accountListener) {
         this.accountListener = accountListener;

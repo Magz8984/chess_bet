@@ -41,7 +41,6 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.Application;
-import chessbet.api.MatchAPI;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.RemoteMove;
@@ -177,7 +176,6 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
             runOnUiThread(() -> {
                 outState.putBoolean("gameFinished", isGameFinished);
                 outState.putBoolean("isStoredGame", isStoredGame);
-                outState.putSerializable("matchApi", boardView.getMatchAPI());
                 outState.putString("matchString", PGNUtilities.get().acceptMoveLog(boardView.getMoveLog().convertToEngineMoveLog()));
                 outState.putParcelable("matchableAccount", matchableAccount);
             });
@@ -233,8 +231,6 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
                     }
                     boardView.reconstructBoard(moves, board);
                 }
-                MatchAPI matchAPI = (MatchAPI) savedInstanceState.getSerializable("matchApi");
-                boardView.setMatchAPI(matchAPI);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
