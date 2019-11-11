@@ -91,7 +91,6 @@ public class Cell extends View {
         matrix.preScale(-1.0f,-1.0f);
 
         canvas.drawBitmap(bitmap, matrix, squareColor);
-        invalidate();
     }
 
     public void handleTouch() {
