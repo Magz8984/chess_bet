@@ -9,9 +9,14 @@ public class Account {
     private String date_created;
     private ArrayList<AccountEvent> events;
     private String last_date_modified;
+    private long last_matchable_time;
+    private MatchType last_match_type;
+    private long last_match_duration;
+    private Amount last_match_amount;
     private AccountStatus status;
     private String owner;
     private int elo_rating;
+    private boolean matched;
     private ArrayList<MatchDetails> matches;
 
     public void setElo_rating(int elo_rating) {
@@ -55,6 +60,46 @@ public class Account {
 
     public void setTerms_and_condition_accepted(boolean terms_and_condition_accepted) {
         this.terms_and_condition_accepted = terms_and_condition_accepted;
+    }
+
+    public void setLast_match_amount(Amount last_match_amount) {
+        this.last_match_amount = last_match_amount;
+    }
+
+    public void setLast_match_duration(long last_match_duration) {
+        this.last_match_duration = last_match_duration;
+    }
+
+    public void setMatched(boolean matched) {
+        this.matched = matched;
+    }
+
+    public boolean isMatched() {
+        return matched;
+    }
+
+    public void setLast_match_type(MatchType last_match_type) {
+        this.last_match_type = last_match_type;
+    }
+
+    public void setLast_matchable_time(long last_matchable_time) {
+        this.last_matchable_time = last_matchable_time;
+    }
+
+    public Amount getLast_match_amount() {
+        return last_match_amount;
+    }
+
+    public long getLast_match_duration() {
+        return last_match_duration;
+    }
+
+    public long getLast_matchable_time() {
+        return last_matchable_time;
+    }
+
+    public MatchType getLast_match_type() {
+        return last_match_type;
     }
 
     public int getElo_rating() {

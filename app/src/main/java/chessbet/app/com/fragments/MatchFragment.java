@@ -37,10 +37,12 @@ import chessbet.app.com.R;
 import chessbet.domain.MatchRange;
 import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
+import chessbet.domain.User;
 import chessbet.services.MatchListener;
+import chessbet.services.MatchMetricsUpdateListener;
 import chessbet.utils.DatabaseUtil;
 
-public class MatchFragment extends Fragment implements MatchListener, View.OnClickListener, FABProgressListener, CompoundButton.OnCheckedChangeListener {
+public class MatchFragment extends Fragment implements MatchListener, View.OnClickListener, FABProgressListener, CompoundButton.OnCheckedChangeListener, MatchMetricsUpdateListener {
     private FloatingActionButton findMatch;
     private GridView gameDurations;
     private Switch matchOnRatingSwitch;
@@ -72,7 +74,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         txtAccountRating.setText(String.format(Locale.US,"%d", AccountAPI.get().getCurrentAccount().getElo_rating()));
         startValue = view.findViewById(R.id.startValue);
         endValue = view.findViewById(R.id.endValue);
-        matchAPI = new MatchAPI();
+        matchAPI = MatchAPI.get();
         matchRange = new MatchRange();
         matchAPI.setMatchListener(this);
         findMatch.setOnClickListener(this);
@@ -101,17 +103,11 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     public void onClick(View v) {
         if(v.equals(findMatch)){
             progressCircle.show();
-            if(user != null){
-                if(matchOnRatingSwitch.isChecked()){
-                    matchAPI.createUserMatchableAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE, null);
-                }
-                else{
-                    matchAPI.createUserMatchableAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE, matchRange);
-                }
-            }
-            else{
-                progressCircle.hide();
-            }
+            AccountAPI.get().getCurrentAccount().setLast_match_type(MatchType.PLAY_ONLINE);
+            AccountAPI.get().getCurrentAccount().setMatched(false);
+            // Shift Account API focus to this class onUpdate()
+            AccountAPI.get().setMatchMetricsUpdateListener(this);
+            AccountAPI.get().updateAccountMatchDetails();
         }
         else if(v.equals(btnViewRangeViewHolder)){
             showRatingView =! showRatingView;
@@ -146,14 +142,17 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     }
 
     @Override
-    public void onMatchCreatedNotification() {
+    public void onMatchCreatedNotification(User user) {
         progressCircle.beginFinalAnimation();
     }
 
     @Override
     public void onMatchError() {
-        Objects.requireNonNull(getActivity()).runOnUiThread(() -> new Handler().postDelayed(() -> progressCircle.hide(),40000)); // Waits for 40 seconds before hiding the progress bar
-
+        try {
+            Objects.requireNonNull(getActivity()).runOnUiThread(() -> new Handler().postDelayed(() -> progressCircle.hide(),40000)); // Waits for 40 seconds before hiding the progress bar
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -161,5 +160,21 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         Snackbar.make(progressCircle, "Match Created", Snackbar.LENGTH_LONG)
                 .setAction("Action",null)
                 .show();
+    }
+
+    @Override
+    public void onUpdate() {
+        user = FirebaseAuth.getInstance().getCurrentUser(); // Revalidate user
+        if(user != null){
+            if(matchOnRatingSwitch.isChecked()){
+                matchAPI.createUserMatchableAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE, null);
+            }
+            else{
+                matchAPI.createUserMatchableAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE, matchRange);
+            }
+        }
+        else{
+            progressCircle.hide();
+        }
     }
 }

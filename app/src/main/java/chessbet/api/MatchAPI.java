@@ -1,13 +1,17 @@
 package chessbet.api;
 
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -19,6 +23,7 @@ import chessbet.domain.MatchRange;
 import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.RemoteMove;
+import chessbet.domain.User;
 import chessbet.services.MatchListener;
 import chessbet.services.RemoteMoveListener;
 import chessbet.utils.DatabaseUtil;
@@ -36,9 +41,15 @@ public class MatchAPI implements Serializable {
     private FirebaseUser firebaseUser;
     private MatchListener matchListener;
     private RemoteMoveListener remoteMoveListener;
-    public MatchAPI(){
+    private static MatchAPI INSTANCE = new MatchAPI();
+
+    private MatchAPI(){
         FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
+    }
+
+    public static MatchAPI get(){
+        return INSTANCE;
     }
 
     public void setMatchListener(MatchListener matchListener) {
@@ -52,6 +63,7 @@ public class MatchAPI implements Serializable {
     public void getAccount(){
         RemoteMove.get().clear();
         final MatchableAccount[] matchable = {null};
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseUtil.getAccount(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -63,6 +75,7 @@ public class MatchAPI implements Serializable {
                         DatabaseUtil.getAccount(firebaseUser.getUid()).removeEventListener(this);
                         // Add Started Event
                         RemoteMove.get().addEvent(MatchEvent.IN_PROGRESS);
+                        RemoteMove.get().setOwner(matchableAccount.getOwner());
                         RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
                         // Confirms a match has been made
                         matchListener.onMatchMade(matchableAccount);
@@ -90,16 +103,17 @@ public class MatchAPI implements Serializable {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         RemoteMove remoteMove = dataSnapshot.getValue(RemoteMove.class);
-                        if(isMatchStarted(remoteMove)){
-                            if(!isMatchInterrupted(remoteMove)) {
+                        if(remoteMove != null) {
+                            if(isMatchStarted(remoteMove)){
+                                if(!isMatchInterrupted(remoteMove)) {
                                     remoteMoveListener.onRemoteMoveMade(remoteMove);
+                                }
                             }
                         }
                     }
-
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Crashlytics.log(databaseError.getMessage());
                     }
                 });
     }
@@ -183,9 +197,12 @@ public class MatchAPI implements Serializable {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     try {
+
                         switch (response.code()) {
                             case 200 :
-                                matchListener.onMatchCreatedNotification();
+                                User user = new Gson().fromJson(Objects.requireNonNull(response.body()).string(), User.class);
+                                Log.d("User : ", user.getEmail());
+                                matchListener.onMatchCreatedNotification(user);
                                 break;
                             case 404 :
                                 matchListener.onMatchError();

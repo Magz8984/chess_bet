@@ -48,13 +48,15 @@ import chessbet.api.AccountAPI;
 import chessbet.app.com.fragments.GamesFragment;
 import chessbet.app.com.fragments.MainFragment;
 import chessbet.app.com.fragments.MatchFragment;
+import chessbet.app.com.fragments.ProfileFragment;
 import chessbet.app.com.fragments.SettingsFragment;
 import chessbet.domain.Account;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
+import chessbet.utils.EventBroadcast;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountListener, View.OnClickListener, EventBroadcast.UserUpdate {
     private ProgressDialog uploadProfileDialog;
     private StorageReference storageReference;
     private FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
@@ -65,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.nav_viewer) NavigationView navigationView;
     private TextView txtEmail;
     private TextView txtRating;
+    private TextView txtUserName;
     private CircleImageView profileImage;
     private static final int REQUEST_CODE = 1001;
     @Override
@@ -73,11 +76,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         uploadProfileDialog = new ProgressDialog(this);
         uploadProfileDialog.setMessage(getResources().getString(R.string.upload_profile_photo));
-        uploadProfileDialog.setCancelable(false);
+        uploadProfileDialog.setCancelable(true);
 
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         txtEmail = navigationView.getHeaderView(0).findViewById(R.id.email);
+        txtUserName = navigationView.getHeaderView(0).findViewById(R.id.username);
         txtRating = navigationView.getHeaderView(0).findViewById(R.id.rating);
         profileImage = navigationView.getHeaderView(0).findViewById(R.id.profile_photo);
         profileImage.setOnClickListener(this);
@@ -91,12 +95,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.open,R.string.close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MainFragment())
-                .addToBackStack(null)
-                .commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MainFragment()).commit();
         navigationView.setCheckedItem(R.id.itm_play_chess);
+        // TODO Create private variable
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+            txtUserName.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+        }
+        EventBroadcast.get().addUserUpdateObserver(this);
         initializeCrashReporter();
-
     }
 
     private void initializeCrashReporter(){
@@ -132,18 +138,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch (menuItem.getItemId()) {
             case R.id.itm_play_chess :
                 toolbar.setTitle(getString(R.string.app_name));
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MainFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MainFragment())
+                        .addToBackStack(getString(R.string.app_name))
+                        .commit();
                 break;
             case R.id.itm_play_online:
+                // TODO Remove peice of logic from UI.
                 if(AccountAPI.get().getCurrentAccount() != null){
                     toolbar.setTitle(getString(R.string.play_online));
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment()).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment())
+                            .addToBackStack(getString(R.string.play_online))
+                            .commit();
                 }
+                break;
             case R.id.itm_profile:
+                toolbar.setTitle(getString(R.string.profile));
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment())
+                        .addToBackStack(getString(R.string.profile))
+                        .commit();
                 break;
             case R.id.itm_account_settings:
                 toolbar.setTitle(getString(R.string.settings));
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment())
+                        .addToBackStack(getString(R.string.settings))
+                        .commit();
 
                 break;
             case R.id.itm_terms:
@@ -151,7 +169,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.games:
                 toolbar.setTitle(getString(R.string.games));
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new GamesFragment()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new GamesFragment())
+                        .addToBackStack(getString(R.string.games))
+                        .commit();
                 break;
         }
         return true;
@@ -159,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onAccountReceived(Account account) {
-
         txtRating.setText(getResources().getString(R.string.rating, account.getElo_rating()));
     }
 
@@ -167,10 +186,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onUserReceived(User user) {
         if( user != null){
             if(user.getProfile_photo_url() != null){
-                Glide.with(this).asBitmap().load(user.getProfile_photo_url()).into(profileImage);
+                try {
+                    Glide.with(this).asBitmap().load(user.getProfile_photo_url()).into(profileImage);
+                }catch (Exception ex) {
+                    Log.d(this.getClass().getSimpleName(), ex.getMessage());
+                }
             }
             txtEmail.setText(user.getEmail());
-
+            EventBroadcast.get().broadcastUserLoaded();
         }
     }
 
@@ -274,6 +297,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 AccountAPI.get().getUser();
             }).addOnCanceledListener(() -> uploadProfileDialog.dismiss());
         }));
+    }
+
+    @Override
+    public void onFirebaseUserUpdate(FirebaseUser user) {
+        txtUserName.setText(user.getDisplayName());
     }
 }
 

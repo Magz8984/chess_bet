@@ -1,7 +1,6 @@
 package chessbet.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +11,13 @@ import android.widget.LinearLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import chessbet.api.AccountAPI;
 import chessbet.app.com.R;
 import chessbet.utils.GameTimer;
 
 public class GameDurationAdapter extends BaseAdapter {
     private List<GameTimer.GameDuration> gameDurations;
+    private int duration;
     private Context context;
     public GameDurationAdapter(Context context){
         this.context = context;
@@ -50,7 +51,16 @@ public class GameDurationAdapter extends BaseAdapter {
         btnTimeDuration.setText(gameDurations.get(position).toString());
 //        btnTimeDuration.setBackgroundColor(context.getResources().getColor(R.color.white));
         btnTimeDuration.setTextColor(context.getResources().getColor(R.color.colorPrimary));
-        btnTimeDuration.setOnClickListener(v-> Log.d("CLICKED",gameDurations.get(position).toString()));
+        // Make sure time of match is recognized
+        btnTimeDuration.setOnClickListener(v-> {
+            duration = gameDurations.get(position).getDuration();
+            AccountAPI.get().getCurrentAccount().setLast_match_duration(gameDurations.get(position).getDuration());
+            notifyDataSetChanged();
+        });
+
+        if(duration == gameDurations.get(position).getDuration()){
+            btnTimeDuration.setBackground(context.getResources().getDrawable(R.drawable.rounded_selected_button));
+        }
         return btnTimeDuration;
     }
 }
