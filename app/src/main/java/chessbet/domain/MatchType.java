@@ -30,5 +30,12 @@ public enum MatchType {
         public String toString(){
             return "SINGLE_PLAYER";
         }
+    },
+    NO_TYPE{
+        @NonNull
+        @Override
+        public String toString() {
+            return "NO_TYPE";
+        }
     }
 }

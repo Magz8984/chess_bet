@@ -113,6 +113,11 @@ public class GameTimer {
 
     public enum GameDuration{
         TEN_MINUTES{
+            @Override
+            public int getDuration() {
+                return 10;
+            }
+
             @NonNull
             @Override
             public String toString() {
@@ -120,6 +125,11 @@ public class GameTimer {
             }
         },
         FIFTEEN_MINUTES{
+            @Override
+            public int getDuration() {
+                return 15;
+            }
+
             @NonNull
             @Override
             public String toString() {
@@ -127,6 +137,11 @@ public class GameTimer {
             }
         },
         TWENTY_MINUTES{
+            @Override
+            public int getDuration() {
+                return 20;
+            }
+
             @NonNull
             @Override
             public String toString() {
@@ -134,11 +149,18 @@ public class GameTimer {
             }
         },
         THIRTY_MINUTES{
+            @Override
+            public int getDuration() {
+                return 30;
+            }
+
             @NonNull
             @Override
             public String toString() {
                 return "30 min";
             }
-        }
+        };
+
+        public abstract int getDuration();
     }
 }

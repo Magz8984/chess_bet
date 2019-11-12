@@ -19,6 +19,7 @@ import chessbet.api.MatchAPI;
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.R;
 import chessbet.domain.MatchableAccount;
+import chessbet.domain.User;
 import chessbet.utils.DatabaseUtil;
 
 public class MatchService extends Service implements MatchListener {
@@ -89,7 +90,7 @@ public class MatchService extends Service implements MatchListener {
     }
 
     @Override
-    public void onMatchCreatedNotification() {
+    public void onMatchCreatedNotification(User user) {
 
     }
 
