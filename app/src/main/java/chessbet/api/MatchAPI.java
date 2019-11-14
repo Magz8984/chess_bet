@@ -1,8 +1,5 @@
 package chessbet.api;
 
-
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.crashlytics.android.Crashlytics;
@@ -201,7 +198,6 @@ public class MatchAPI implements Serializable {
                         switch (response.code()) {
                             case 200 :
                                 User user = new Gson().fromJson(Objects.requireNonNull(response.body()).string(), User.class);
-                                Log.d("User : ", user.getEmail());
                                 matchListener.onMatchCreatedNotification(user);
                                 break;
                             case 404 :
