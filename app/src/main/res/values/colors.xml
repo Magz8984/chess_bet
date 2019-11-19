@@ -30,7 +30,7 @@
     <color name="colorCyanBlue">#0B9BE2</color>
     <color name="colorMidBlue">#032B3F</color>
     <color name="colorCoinBackground">#01242b</color>
-    <color name="chessWhite"></color>
-
+    <color name="bootstrap_red">#dc3545</color>
+    <color name="bootstrap_green">#28a745</color>
     <!--Add b-->
 </resources>

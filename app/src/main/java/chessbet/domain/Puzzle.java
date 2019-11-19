@@ -12,6 +12,7 @@ public class Puzzle implements Serializable {
     private long timestamp;
     private String playerType;
     private String owner;
+    private String ownerPhotoUrl;
     public static class Move implements Serializable {
         private int fromCoordinate;
         private int toCoordinate;
@@ -40,6 +41,14 @@ public class Puzzle implements Serializable {
         public String getMoveCoordinates() {
             return moveCoordinates;
         }
+    }
+
+    public void setOwnerPhotoUrl(String ownerPhotoUrl) {
+        this.ownerPhotoUrl = ownerPhotoUrl;
+    }
+
+    public String getOwnerPhotoUrl() {
+        return ownerPhotoUrl;
     }
 
     public void setOwner(String owner) {

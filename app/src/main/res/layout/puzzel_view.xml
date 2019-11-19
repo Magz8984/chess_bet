@@ -12,20 +12,28 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
-                android:layout_marginRight="10dp"
-                android:id="@+id/imgChessPlay"
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_margin="15dp"
+                android:id="@+id/ownerPic"
                 android:src="@drawable/chessplay"
                 android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_marginEnd="10dp" />
+                android:layout_height="100dp"/>
 
             <LinearLayout
                 android:orientation="vertical"
-                android:layout_toRightOf="@+id/imgChessPlay"
+                android:layout_toRightOf="@+id/ownerPic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@+id/imgChessPlay">
+                android:layout_toEndOf="@+id/ownerPic">
+
+
+                <TextView
+                    android:id="@+id/txtOwner"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/chakrapetchbold"
+                    android:text="owner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
                 <TextView
                     android:id="@+id/txtPuzzleTitle"
@@ -44,6 +52,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>
+
+
+            <!--50 Character description of the puzzle-->
+            <TextView
+                android:layout_marginRight="10dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:id="@+id/txtView"
+                android:text="View"
+                android:textColor="@color/colorPrimaryYellow"
+                android:fontFamily="@font/chakrapetchbold"
+                android:textSize="20sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="10dp" />
 
         </RelativeLayout>
 

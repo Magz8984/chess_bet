@@ -66,4 +66,6 @@
     <string name="online">Online</string>
     <string name="profile">Profile</string>
     <string name="puzzles">Puzzles</string>
+    <string name="create_puzzle_from_recording">Create puzzle from recording</string>
+    <string name="create_puzzle">Create Puzzle</string>
 </resources>

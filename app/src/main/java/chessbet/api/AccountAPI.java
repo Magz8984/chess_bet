@@ -2,7 +2,11 @@ package chessbet.api;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -14,18 +18,22 @@ import java.util.Date;
 import java.util.Objects;
 
 import chessbet.domain.Account;
+import chessbet.domain.Puzzle;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
 import chessbet.services.MatchMetricsUpdateListener;
+import chessbet.services.PuzzleListener;
 
 /**
  * @author Collins Magondu
  */
 public class AccountAPI {
-    private static  String USER_COLLECTION = "users";
+    private static String USER_COLLECTION = "users";
     private AccountListener accountListener;
     private MatchMetricsUpdateListener matchMetricsUpdateListener;
-    private static  String ACCOUNT_COLLECTION = "accounts";
+    private PuzzleListener puzzleListener;
+    private static String ACCOUNT_COLLECTION = "accounts";
+    private static String PUZZEL_COLLECTION = "puzzles";
     private static String TAG = AccountAPI.class.getSimpleName();
     private static AccountAPI INSTANCE = new AccountAPI();
     private FirebaseFirestore db;
@@ -99,6 +107,10 @@ public class AccountAPI {
         this.matchMetricsUpdateListener = matchMetricsUpdateListener;
     }
 
+    public void setPuzzleListener(PuzzleListener puzzleListener) {
+        this.puzzleListener = puzzleListener;
+    }
+
     public void updateAccountMatchDetails(){
         currentAccount.setLast_date_modified(new Date().toString());
         currentAccount.setLast_matchable_time(new Date().getTime());
@@ -112,5 +124,17 @@ public class AccountAPI {
                }
             });
         }
+    }
+
+    public void sendPuzzle(Puzzle puzzle){
+       db.collection(PUZZEL_COLLECTION).add(puzzle).addOnCompleteListener(task -> {
+           if(task.isSuccessful()){
+               puzzleListener.onPuzzleSent(true);
+           }
+           else{
+               puzzleListener.onPuzzleSent(false);
+               Log.d("ERROR MESSAGE : ", Objects.requireNonNull(task.getException()).getMessage());
+           }
+       });
     }
 }

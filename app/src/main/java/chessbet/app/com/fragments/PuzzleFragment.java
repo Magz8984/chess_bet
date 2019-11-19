@@ -32,10 +32,11 @@ public class PuzzleFragment extends Fragment {
                 .setQuery(query, Puzzle.class)
                 .build();
 
-        this.puzzlesAdapter = new PuzzlesAdapter(options);
+        this.puzzlesAdapter = new PuzzlesAdapter(options, getContext());
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(this.puzzlesAdapter);
         return view;
     }
 

@@ -22,27 +22,26 @@ import androidx.core.content.ContextCompat;
 
 import com.chess.engine.Alliance;
 import com.chess.engine.Move;
-import com.chess.engine.board.Board;
 import com.chess.engine.pieces.Piece;
-import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
 import com.chess.pgn.PGNMainUtils;
-import com.chess.pgn.PGNUtilities;
+import com.crashlytics.android.Crashlytics;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.Application;
+import chessbet.api.AccountAPI;
 import chessbet.app.com.fragments.ColorPicker;
+import chessbet.app.com.fragments.CreatePuzzle;
 import chessbet.domain.MatchableAccount;
+import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
 import chessbet.domain.TimerEvent;
 import chessbet.recievers.ConnectivityReceiver;
@@ -57,7 +56,7 @@ import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
-        OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener {
+        OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener, BoardView.PuzzleMove {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -114,29 +113,25 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         Intent intent = getIntent();
         matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
         if (matchableAccount != null) {
+            boardView.setMode(BoardView.Modes.PLAY_ONLINE);
             boardView.setMatchableAccount(matchableAccount);
         }
         // Try To Reconstruct
         String pgn = intent.getStringExtra("pgn");
         if (pgn != null) {
+            boardView.setMode(BoardView.Modes.GAME_REVIEW);
             isStoredGame = true;
-            Board board = Board.createStandardBoard();
-            List<String> strMoves = PGNMainUtils.processMoveText(pgn);
-            List<Move> moves = new ArrayList<>();
-            for (String string : strMoves) {
-                Move move = PGNMainUtils.createMove(board, string);
-                MoveTransition moveTransition = board.currentPlayer().makeMove(move);
-                if (moveTransition.getMoveStatus().isDone()) {
-                    board = moveTransition.getTransitionBoard();
-                    if (board.currentPlayer().isInCheckMate()) {
-                        move.setCheckMateMove(true);
-                    } else if (board.currentPlayer().isInCheck()) {
-                        move.setCheckMove(true);
-                    }
-                    moves.add(move);
-                }
-            }
-            boardView.reconstructBoard(moves, board);
+            boardView.reconstructBoardFromPGN(pgn);
+        }
+
+        Puzzle puzzle = (Puzzle) getIntent().getSerializableExtra("Puzzle");
+        if(puzzle != null){
+            boardView.setPuzzleMove(this);
+            btnRecord.setVisibility(View.INVISIBLE);
+            btnSave.setVisibility(View.INVISIBLE);
+            btnBack.setVisibility(View.INVISIBLE);
+            btnForward.setVisibility(View.INVISIBLE);
+            boardView.setPuzzle(puzzle);
         }
     }
 
@@ -171,14 +166,29 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
             }
         }
         else if(v.equals(btnRecord)){
-            boardView.setRecording();
-            if(boardView.isRecording()){
+            if(!boardView.isRecording()){
+                boardView.setRecording();
                 Toast.makeText(this, "Recording Game From Next Move", Toast.LENGTH_LONG).show();
                 btnRecord.setBackground(getResources().getDrawable(R.drawable.stop));
             }
             else {
                 // Show snack bar to send puzzle
                 btnRecord.setBackground(getResources().getDrawable(R.drawable.record_game));
+                Snackbar snackbar = Snackbar.make(btnRecord, R.string.create_puzzle_from_recording, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.create_puzzle, v1 -> {
+                            // Open Up Create Puzzle Dialog
+                            Puzzle puzzle = boardView.getPuzzle();
+                            if(puzzle.getMoves().size() != 0){
+                                puzzle.setOwner(AccountAPI.get().getCurrentUser().getEmail());
+                                puzzle.setOwnerPhotoUrl(AccountAPI.get().getCurrentUser().getProfile_photo_url());
+                                CreatePuzzle createPuzzle = new CreatePuzzle(puzzle, () -> boardView.setRecording());
+                                createPuzzle.show(getSupportFragmentManager(), "Create Puzzle");
+                            }
+                            else {
+                                Toast.makeText(this, "Start Game First", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                snackbar.show();
             }
         }
     }
@@ -190,11 +200,11 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
             runOnUiThread(() -> {
                 outState.putBoolean("gameFinished", isGameFinished);
                 outState.putBoolean("isStoredGame", isStoredGame);
-                outState.putString("matchString", PGNUtilities.get().acceptMoveLog(boardView.getMoveLog().convertToEngineMoveLog()));
+                outState.putString("matchString", boardView.getPortableGameNotation());
                 outState.putParcelable("matchableAccount", matchableAccount);
             });
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Crashlytics.logException(ex);
         }
     }
 
@@ -225,28 +235,12 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
                 isStoredGame = savedInstanceState.getBoolean("isStoredGame");
                 MatchableAccount matchableAccount = savedInstanceState.getParcelable("matchableAccount");
                 boardView.setMatchableAccount(matchableAccount);
-                Board board = Board.createStandardBoard();
                 String gameState = savedInstanceState.getString("matchString");
                 if (gameState != null) {
-                    List<String> strMoves = PGNMainUtils.processMoveText(Objects.requireNonNull(savedInstanceState.getString("matchString")));
-                    List<Move> moves = new ArrayList<>();
-                    for (String string : strMoves) {
-                        Move move = PGNMainUtils.createMove(board, string);
-                        MoveTransition moveTransition = board.currentPlayer().makeMove(move);
-                        if (moveTransition.getMoveStatus().isDone()) {
-                            board = moveTransition.getTransitionBoard();
-                            if (board.currentPlayer().isInCheckMate()) {
-                                move.setCheckMateMove(true);
-                            } else if (board.currentPlayer().isInCheck()) {
-                                move.setCheckMove(true);
-                            }
-                            moves.add(move);
-                        }
-                    }
-                    boardView.reconstructBoard(moves, board);
+                    boardView.reconstructBoardFromPGN(Objects.requireNonNull(savedInstanceState.getString("matchString")));
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                Crashlytics.logException(ex);
             }
         });
     }
@@ -429,6 +423,9 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     }
 
     protected void storeGameAsPGN(String result) {
+        if(boardView.getMode().equals(BoardView.Modes.PUZZLE_MODE)){
+            return;
+        }
         isGameFinished = true; // Is game on going is false
         MoveLog moveLog = boardView.getMoveLog();
         String gameText = PGNMainUtils.writeGameAsPGN(moveLog.convertToEngineMoveLog(), "N/A", "N/A", result);
@@ -466,5 +463,20 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
             txtConnectionStatus.setTextColor(Color.RED);
             txtConnectionStatus.setText(getResources().getString(R.string.offline));
         }
+    }
+
+    @Override
+    public void onCorrectMoveMade(boolean isCorrect) {
+        if(isCorrect){
+            Toast.makeText(this, "Correct Move", Toast.LENGTH_LONG).show();
+        }
+        else{
+            Toast.makeText(this, "Try Again", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onPuzzleFinished() {
+        Toast.makeText(this, "Finished Puzzle", Toast.LENGTH_LONG).show();
     }
 }
