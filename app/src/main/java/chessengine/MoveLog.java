@@ -15,7 +15,7 @@ public class MoveLog {
 
     public List<Move> getMoves() {return  this.moves;};
 
-    public  void addMove(final Move move){
+    void addMove(final Move move){
         this.moves.add(move);
     }
 
@@ -25,5 +25,26 @@ public class MoveLog {
 
     public boolean removeMove(Move move) { return  this.moves.remove(move);}
 
-    public Move removeMove (int index) { return  this.moves.remove(index);}
+    private void removeMove (int index) { this.moves.remove(index);}
+
+    Move getMove(int index){
+        return this.moves.get(index);
+    }
+
+    public void removeMoves(int index){
+        ArrayList<Move> validMoves = new ArrayList<>();
+        for (int i = 0; i < moves.size(); i++){
+            if(i <= index){
+                validMoves.add(moves.get(i));
+            }
+        }
+        this.moves.clear();
+        this.moves.addAll(validMoves);
+    }
+
+    public com.chess.gui.MoveLog convertToEngineMoveLog(){
+        com.chess.gui.MoveLog moveLog = new com.chess.gui.MoveLog();
+        moveLog.setMoves((ArrayList<Move>) this.moves);
+        return moveLog;
+    }
 }

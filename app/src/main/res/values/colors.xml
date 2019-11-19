@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="colorPrimary">#00bcd4</color>
-    <color name="colorPrimaryDark">#181A24</color>
-    <color name="colorAccent">#FFF</color>
-    <color name="colorPrimaryYellow">#f2fe71</color>
+    <color name="colorPrimary">#262626</color>
+    <color name="colorPrimaryDark">#262626</color>
+    <color name="colorAccent">#00bfff</color>
+    <color name="colorPrimaryYellow">#ffcc33</color>
 
     <color name="bg_login">#26ae90</color>
     <color name="bg_register">#2e3237</color>
     <color name="bg_main">#428bca</color>
     <color name="white">#ffffff</color>
     <color name="input_login">#222222</color>
+    <color name="board_view">#262626</color>
     <color name="input_login_hint">#999999</color>
     <color name="input_register">#888888</color>
     <color name="input_register_bg">#3b4148</color>

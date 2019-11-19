@@ -7,6 +7,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorPrimaryYellow</item>
         <item name="android:colorBackground">@color/colorWhite</item>
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="preferenceTheme">@style/PreferenceTheme</item>
 
     </style>
     <style name="AppTheme.NoActionBar" >
@@ -14,9 +16,26 @@
         <item name="android:textColor">@color/colorCyanBlue</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
+        <item name="preferenceTheme">@style/PreferenceTheme</item>
     </style>
     <style name="TextAppearance.App.TextInputLayout" parent="@android:style/TextAppearance">
     <item name="android:textColor">@color/colorTransparentWhite</item>
+    </style>
+
+    <style name="switchCustom" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">@color/colorPrimaryYellow</item>
+        <item name="colorSwitchThumbNormal">@android:color/darker_gray</item>
+        <item name="android:colorForeground">#f1f1f1</item>
+    </style>
+
+    <style name="DrawerArrowStyle" parent="@style/Widget.AppCompat.DrawerArrowToggle">
+        <item name="spinBars">true</item>
+        <item name="color">@color/white</item>
+    </style>
+
+    <style name="PreferenceTheme" parent="@style/PreferenceThemeOverlay">
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textColorSecondary">@color/colorPrimary</item>
     </style>
 
 </resources>

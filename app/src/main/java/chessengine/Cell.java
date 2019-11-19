@@ -13,8 +13,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+
 import com.chess.engine.Move;
 import com.chess.engine.board.Board;
+import com.chess.engine.board.Tile;
 import com.chess.engine.player.MoveTransition;
 
 import java.util.Collection;
@@ -27,7 +30,6 @@ public class Cell extends View {
     private Matrix matrix;
     private RectF mSrcRectF;
     private RectF mDestRectF;
-    private static final String TAG = Cell.class.getSimpleName();
     private  int color;
     private int column =0;
     private int row=0;
@@ -36,7 +38,6 @@ public class Cell extends View {
     private Rect tileRect;
     private Context context;
     private Bitmap bitmap;
-    private boolean touched=false;
     private Drawable drawable;
 
     Cell(Context context,final BoardView boardView, final int tileId) {
@@ -53,13 +54,12 @@ public class Cell extends View {
 
     public void draw(final Canvas canvas) {
         super.draw(canvas);
-
+        Tile tile = boardView.chessBoard.getTile(this.tileId);
         assignCellColor();
-
-        if(boardView.chessBoard.getTile(this.tileId).isOccupied()){
-            String name = boardView.chessBoard.getTile(tileId).getPiece() +
-                    boardView.chessBoard.getTile(tileId).getPiece().getPieceAlliance().toString();
-            drawable= this.context.getResources().getDrawable(context.getResources()
+        if(tile.isOccupied()){
+            String name = tile.getPiece() +
+                    tile.getPiece().getPieceAlliance().toString();
+            drawable = this.context.getResources().getDrawable(context.getResources()
                     .getIdentifier( name.toLowerCase(),"drawable", context.getPackageName()));
         }
 
@@ -68,71 +68,49 @@ public class Cell extends View {
             drawable.setAlpha(0);
         }
 
-        if(this.touched){
-            drawable.setColorFilter(Color.YELLOW, PorterDuff.Mode.DST_OVER);
-            this.touched=!this.touched;
+        if(boardView.destinationTile != null && boardView.destinationTile.getTileCoordinate() == tile.getTileCoordinate()){
+            drawable.setColorFilter(Color.HSVToColor(new float[] {60, 100, 100}), PorterDuff.Mode.DST_OVER);
         }
-
+        else if(boardView.sourceTile != null && boardView.sourceTile.getTileCoordinate() == tile.getTileCoordinate()){
+            drawable.setColorFilter(Color.HSVToColor(new float[] {50, 100, 100}), PorterDuff.Mode.DST_OVER);
+        }
         else{
             drawable.setColorFilter(color,PorterDuff.Mode.DST_OVER);
         }
 
-        highlightMoves(boardView.chessBoard, canvas ,color);
+        highlightMoves(canvas);
 
         drawable.setBounds(tileRect);
         drawable.draw(canvas);
         bitmap = ((BitmapDrawable) drawable).getBitmap();
+
         mSrcRectF.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
 
         mDestRectF.set(0, 0, getWidth(),getHeight());
         matrix.setRectToRect(mSrcRectF, mDestRectF, Matrix.ScaleToFit.CENTER);
-        matrix.postRotate(90);
+        matrix.preScale(-1.0f,-1.0f);
+
         canvas.drawBitmap(bitmap, matrix, squareColor);
-        invalidate();
-    }
-
-    private String getColumnString() {
-        switch (column) {
-            case 0:
-                return "A";
-            case 1:
-                return "B";
-            case 2:
-                return "C";
-            case 3:
-                return "D";
-            case 4:
-                return "E";
-            case 5:
-                return "F";
-            case 6:
-                return "G";
-            case 7:
-                return "H";
-            default:
-                return null;
-        }
-    }
-
-    private String getRowString() {
-        return String.valueOf(row + 1);
     }
 
     public void handleTouch() {
+            if(boardView.destinationTile != null){
+                boardView.destinationTile = null;
+            }
+
             if(boardView.sourceTile == null){
-                this.touched = true;
                 boardView.sourceTile = boardView.chessBoard.getTile(tileId);
                 boardView.movedPiece = boardView.sourceTile.getPiece();
 
                 if(boardView.movedPiece == null){
                     boardView.sourceTile = null;
                 }
+                boardView.invalidate(); // Highlights the source tile
             }
-            else if(boardView.chessBoard.getTile(tileId).getTileCoordinate() ==
-                    boardView.sourceTile.getTileCoordinate()){
+            else if(boardView.chessBoard.getTile(tileId).getTileCoordinate() == boardView.sourceTile.getTileCoordinate()){
                 boardView.sourceTile = null;
                 boardView.movedPiece = null;
-                this.touched =false;
+                boardView.invalidate(); // Removes the highlight
             }
             else{
                 // Second Click
@@ -141,25 +119,41 @@ public class Cell extends View {
                 final MoveTransition transition = boardView.chessBoard.currentPlayer().makeMove(move);
 
                 if(transition.getMoveStatus().isDone()){
-                    GameUtil.playSound(R.raw.chess_move,context); // Play sound once move is made
+                    // Undo a move
+                    if(boardView.moveCursor < boardView.moveLog.size()){
+                        boardView.moveLog.removeMoves(boardView.moveCursor -1);
+                        boardView.onMoveDoneListener.getMoves(boardView.moveLog);
+                    }
+                    boardView.destinationTile = boardView.chessBoard.getTile(tileId);
+                    boardView.setMoveData(boardView.movedPiece.getPiecePosition(), tileId); // Online Play
                     boardView.chessBoard= transition.getTransitionBoard();
+                    GameUtil.playSound();  // Play sound once move is made
+
+                    if(boardView.chessBoard.currentPlayer().isInCheckMate()){
+                        move.setCheckMateMove(true);
+                    }
+                    else if(boardView.chessBoard.currentPlayer().isInCheck()){
+                        move.setCheckMove(true);
+                    }
+
                     boardView.moveLog.addMove(move);
-                    boardView.onMoveDoneListener.getMove(move);
-
-
-                    if(boardView.chessBoard.currentPlayer().isInCheck()){
-                        boardView.onMoveDoneListener.isCheck(boardView.chessBoard.currentPlayer());
-                    }
-
-                    if(boardView.chessBoard.currentPlayer().isInStaleMate()){
-                        boardView.onMoveDoneListener.isStaleMate(boardView.chessBoard.currentPlayer());
-                    }
+                    boardView.moveCursor = boardView.moveLog.size();
+                    boardView.onMoveDoneListener.getMoves(boardView.moveLog);
+                    boardView.onMoveDoneListener.onGameResume();
 
                     if(boardView.chessBoard.currentPlayer().isInCheckMate()){
                         boardView.onMoveDoneListener.isCheckMate(boardView.chessBoard.currentPlayer());
                     }
+                    else if(boardView.chessBoard.currentPlayer().isInCheck()){
+                        boardView.onMoveDoneListener.isCheck(boardView.chessBoard.currentPlayer());
+                    }
+                    else if(boardView.chessBoard.currentPlayer().isInStaleMate()){
+                        boardView.onMoveDoneListener.isStaleMate(boardView.chessBoard.currentPlayer());
+                    }
+                    else if(boardView.chessBoard.isDraw()){
+                        boardView.onMoveDoneListener.isDraw();
+                    }
                 }
-
                 boardView.sourceTile = null;
                 boardView.movedPiece = null;
                 boardView.invalidate();
@@ -173,9 +167,8 @@ public class Cell extends View {
         this.tileRect = tileRect;
     }
 
+    @NonNull
     public String toString() {
-        final String column = getColumnString();
-     final String row = getRowString();
         return "<Tile " + tileId + ">";
     }
 
@@ -189,10 +182,6 @@ public class Cell extends View {
         }
     }
 
-    public int getTileId() {
-        return tileId;
-    }
-
     public void setRow(int row) {
         this.row = row;
     }
@@ -201,7 +190,7 @@ public class Cell extends View {
         this.column = column;
     }
 
-    public void highlightMoves(final Board board,final Canvas canvas,final int tileColor){
+    public void highlightMoves(final Canvas canvas){
         for(final Move move : pieceLegalMoves(boardView.chessBoard)){
             if(move.getDestinationCoordinate() == this.tileId){
                 if(!boardView.chessBoard.getTile(this.tileId).isOccupied()){
@@ -214,6 +203,15 @@ public class Cell extends View {
                     matrix.setRectToRect(mSrcRectF, mDestRectF, Matrix.ScaleToFit.CENTER);
                     canvas.drawBitmap(bitmap, matrix, squareColor);
                     break;
+                }
+                else{
+                    drawable.setColorFilter(Color.RED,PorterDuff.Mode.DST_OVER);
+                    drawable.draw(canvas);
+                    bitmap = ((BitmapDrawable) drawable).getBitmap();
+                    mSrcRectF.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
+                    mDestRectF.set(0, 0, getWidth(),getHeight());
+                    matrix.setRectToRect(mSrcRectF, mDestRectF, Matrix.ScaleToFit.CENTER);
+                    canvas.drawBitmap(bitmap, matrix, squareColor);
                 }
             }
         }

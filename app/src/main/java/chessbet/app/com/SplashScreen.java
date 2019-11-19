@@ -1,7 +1,6 @@
 package chessbet.app.com;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -9,6 +8,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -28,8 +30,8 @@ public class SplashScreen extends AppCompatActivity {
 //      descimage = (R.id.titleimage)
 //      desctxt = (R.id.titletxt)
 
-        descimage = (LinearLayout) findViewById(R.id.titleimage);
-        desctxt = (LinearLayout) findViewById(R.id.titletxt);
+        descimage = findViewById(R.id.titleimage);
+        desctxt = findViewById(R.id.titletxt);
         uptodown = AnimationUtils.loadAnimation(this,R.anim.uptodown);
         downtoup = AnimationUtils.loadAnimation(this,R.anim.downtoup);
 //      THIS ANIMATIONS ARE SET INSIDE THE (ANIM) FOLDER.
