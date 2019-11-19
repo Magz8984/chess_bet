@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <androidx.cardview.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        app:cardMaxElevation="4sp"
+        app:cardCornerRadius="5sp"
+        app:cardElevation="4sp">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_marginRight="10dp"
+                android:id="@+id/imgChessPlay"
+                android:src="@drawable/chessplay"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginEnd="10dp" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_toRightOf="@+id/imgChessPlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/imgChessPlay">
+
+                <TextView
+                    android:id="@+id/txtPuzzleTitle"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/chakrapetchbold"
+                    android:text="Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <!--50 Character description of the puzzle-->
+                <TextView
+                    android:id="@+id/txtPuzzleDescription"
+                    android:text="Description"
+                    android:fontFamily="@font/cabinsketchregular"
+                    android:textSize="15sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+        </RelativeLayout>
+
+
+    </androidx.cardview.widget.CardView>

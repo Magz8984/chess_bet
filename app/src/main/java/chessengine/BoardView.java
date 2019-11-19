@@ -1,5 +1,9 @@
 package chessengine;
 
+/*
+  @author Collins Magondu 3/3/19
+ */
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Rect;
@@ -25,6 +29,7 @@ import java.util.List;
 
 import chessbet.api.MatchAPI;
 import chessbet.domain.MatchableAccount;
+import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
 import chessbet.services.RemoteMoveListener;
 import chessbet.services.RemoteViewUpdateListener;
@@ -36,12 +41,14 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
     protected Piece movedPiece;
     private List<Cell> boardCells=null;
     private BoardDirection boardDirection;
+    private Puzzle puzzle;
     protected Alliance topAlliance = Alliance.BLACK;
     private int squareSize = 0;
     private boolean isFlipped = false;
     private int whiteCellsColor;
     private int darkCellsColor;
     protected MoveLog moveLog;
+    private boolean isRecording = false;
     protected OnMoveDoneListener onMoveDoneListener;
     private MatchableAccount matchableAccount;
     private MatchAPI matchAPI;
@@ -391,6 +398,35 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
 
     public void setMatchAPI(MatchAPI matchAPI) {
         this.matchAPI = matchAPI;
+    }
+
+    public boolean isRecording() {
+        return isRecording;
+    }
+
+    public void setRecording() {
+        isRecording = !isRecording;
+        // Lazy load puzzle only when recording
+        this.puzzle = new Puzzle();
+        // Sets the owner of the move will help in puzzle mode for the view
+        // TODO Set board modes eg LOCAL_PLAY,PLAY_ONLINE, PUZZLE_MODE
+        this.puzzle.setPlayerType((chessBoard.currentPlayer().getAlliance() == Alliance.WHITE) ? "WHITE" : "BLACK");
+    }
+
+    /**
+     * Adds a move to the puzzle moves array list by initializing a new puzzle move from the moves
+     * needed params. See {@link Puzzle.Move}
+     * In use by {@link Cell#handleTouch()}
+     * @param move
+     */
+    protected void addMoveToPuzzle(Move move){
+        if(this.isRecording){
+            Puzzle.Move puzzleMove = new Puzzle.Move();
+            puzzleMove.setFromCoordinate(move.getCurrentCoordinate());
+            puzzleMove.setToCoordinate(move.getDestinationCoordinate());
+            puzzleMove.setMoveCoordinates(move.toString());
+            this.puzzle.addMove(puzzleMove);
+        }
     }
 }
 

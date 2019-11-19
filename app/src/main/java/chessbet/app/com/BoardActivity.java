@@ -56,7 +56,8 @@ import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
 
-public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener , OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener {
+public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
+        OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -72,6 +73,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.whitePieces) LinearLayout whitePieces;
 @BindView(R.id.blackPieces) LinearLayout blackPieces;
 @BindView(R.id.btnSave) Button btnSave;
+@BindView(R.id.btnRecord) Button btnRecord;
 @BindView(R.id.txtConnectionStatus) TextView txtConnectionStatus;
 
     private MatchableAccount matchableAccount;
@@ -98,6 +100,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         btnColorPicker.setOnClickListener(this);
         btnBack.setOnClickListener(this);
         btnForward.setOnClickListener(this);
+        btnRecord.setOnClickListener(this);
         txtWhiteStatus.setTextColor(Color.RED);
         txtBlackStatus.setTextColor(Color.RED);
 
@@ -165,6 +168,17 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
                 snackbar.show();
             } else if (matchableAccount != null) {
                 storeGameAsPGN("*");
+            }
+        }
+        else if(v.equals(btnRecord)){
+            boardView.setRecording();
+            if(boardView.isRecording()){
+                Toast.makeText(this, "Recording Game From Next Move", Toast.LENGTH_LONG).show();
+                btnRecord.setBackground(getResources().getDrawable(R.drawable.stop));
+            }
+            else {
+                // Show snack bar to send puzzle
+                btnRecord.setBackground(getResources().getDrawable(R.drawable.record_game));
             }
         }
     }
