@@ -5,7 +5,7 @@ public class User {
     private String date_modified;
     private boolean disabled;
     private String email;
-    private String ui;
+    private String uid;
     private String profile_photo_url;
 
     public String getDate_created() {
@@ -20,8 +20,8 @@ public class User {
         return email;
     }
 
-    public String getUi() {
-        return ui;
+    public String getUid() {
+        return uid;
     }
 
     public boolean isDisabled() {
@@ -44,8 +44,8 @@ public class User {
         this.email = email;
     }
 
-    public void setUi(String ui) {
-        this.ui = ui;
+    public void setUid(String ui) {
+        this.uid = ui;
     }
 
     public void setProfile_photo_url(String profile_photo_url) {

@@ -436,9 +436,11 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
     }
 
     public void setPuzzle(Puzzle puzzle) {
-        this.mode = Modes.PUZZLE_MODE;
-        this.puzzle = puzzle;
-        this.reconstructBoardFromPGN(puzzle.getPgn());
+        if(mode != Modes.PUZZLE_MODE){
+            this.mode = Modes.PUZZLE_MODE;
+            this.puzzle = puzzle;
+            this.reconstructBoardFromPGN(puzzle.getPgn());
+        }
     }
 
     /**

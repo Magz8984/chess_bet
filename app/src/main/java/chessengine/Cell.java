@@ -11,7 +11,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -169,18 +168,20 @@ public class Cell extends View {
     }
 
     private void puzzleModeAction(Move move){
-        if(isCorrectPuzzleMove(move)){
+        if(boardView.puzzleMoveCounter < boardView.getPuzzle().getMoves().size() && isCorrectPuzzleMove(move)){
             boardView.puzzleMove.onCorrectMoveMade(true);
             boardView.puzzleMoveCounter++;
 
             if(boardView.puzzleMoveCounter < boardView.getPuzzle().getMoves().size()){
-                Move nextMove = Move.MoveFactory.createMove(boardView.chessBoard ,boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getFromCoordinate(),
-                        boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getToCoordinate());
-                boardView.moveLog.addMove(nextMove);
-                boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(nextMove).getTransitionBoard();
-                boardView.puzzleMoveCounter++;
+                    Move nextMove = Move.MoveFactory.createMove(boardView.chessBoard ,boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getFromCoordinate(),
+                            boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getToCoordinate());
+                    boardView.moveLog.addMove(nextMove);
+                    boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(nextMove).getTransitionBoard();
+                    boardView.puzzleMoveCounter++;
+                    invalidate();
             }
             else{
+                boardView.setMode(BoardView.Modes.LOCAL_PLAY);
                 boardView.puzzleMove.onPuzzleFinished();
             }
 
@@ -190,8 +191,7 @@ public class Cell extends View {
             boardView.onMoveDoneListener.onGameResume();
 
             invalidate();
-        }
-        else {
+        } else {
             boardView.puzzleMove.onCorrectMoveMade(false);
         }
     }

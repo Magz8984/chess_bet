@@ -7,10 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.LinearLayout;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -42,17 +40,14 @@ import chessbet.services.MatchListener;
 import chessbet.services.MatchMetricsUpdateListener;
 import chessbet.utils.DatabaseUtil;
 
-public class MatchFragment extends Fragment implements MatchListener, View.OnClickListener, FABProgressListener, CompoundButton.OnCheckedChangeListener, MatchMetricsUpdateListener {
+public class MatchFragment extends Fragment implements MatchListener, View.OnClickListener, FABProgressListener, MatchMetricsUpdateListener {
     private FloatingActionButton findMatch;
-    private GridView gameDurations;
-    private Switch matchOnRatingSwitch;
     private FABProgressCircle progressCircle;
     private LinearLayout ratingRangeView;
     private LinearLayout rangeViewHolder;
     private Button btnViewRangeViewHolder;
     private ScrollableNumberPicker startValue;
     private ScrollableNumberPicker endValue;
-    private TextView txtAccountRating;
 
     private boolean showRatingView = false;
 
@@ -64,13 +59,12 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_match,container,false);
         findMatch = view.findViewById(R.id.btnFindMatch);
-        gameDurations = view.findViewById(R.id.gameDurations);
-        matchOnRatingSwitch = view.findViewById(R.id.matchOnRating);
+        GridView gameDurations = view.findViewById(R.id.gameDurations);
         progressCircle = view.findViewById(R.id.fabProgressCircle);
         ratingRangeView = view.findViewById(R.id.ratingRange);
         btnViewRangeViewHolder = view.findViewById(R.id.btnRatingRange);
         rangeViewHolder = view.findViewById(R.id.rangeViews);
-        txtAccountRating = view.findViewById(R.id.txtAccountRating);
+        TextView txtAccountRating = view.findViewById(R.id.txtAccountRating);
         txtAccountRating.setText(String.format(Locale.US,"%d", AccountAPI.get().getCurrentAccount().getElo_rating()));
         startValue = view.findViewById(R.id.startValue);
         endValue = view.findViewById(R.id.endValue);
@@ -84,7 +78,6 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         btnViewRangeViewHolder.setOnClickListener(this);
         user = FirebaseAuth.getInstance().getCurrentUser();
         rangeViewHolder.setVisibility(showRatingView ? View.VISIBLE : View.GONE);
-        matchOnRatingSwitch.setOnCheckedChangeListener(this);
         return view;
     }
 
@@ -109,6 +102,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
             AccountAPI.get().setMatchMetricsUpdateListener(this);
             AccountAPI.get().updateAccountMatchDetails();
         }
+
         else if(v.equals(btnViewRangeViewHolder)){
             showRatingView =! showRatingView;
             TransitionManager.beginDelayedTransition(ratingRangeView);
@@ -117,33 +111,24 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     }
 
     @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if(isChecked){
-            btnViewRangeViewHolder.setEnabled(false);
-            rangeViewHolder.setVisibility(View.GONE);
-            Snackbar.make(progressCircle, getResources().getString(R.string.match_exact_rating), Snackbar.LENGTH_LONG)
-                    .setAction("Action",null)
-                    .show();
-        }else {
-
-            btnViewRangeViewHolder.setEnabled(true);
-        }
-    }
-
-    @Override
     public void onMatchMade(MatchableAccount matchableAccount) {
         progressCircle.beginFinalAnimation();
-        Intent target= new Intent(getContext(), BoardActivity.class);
-        target.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(DatabaseUtil.matchables,matchableAccount);
-        target.putExtras(bundle);
-        startActivity(target);
+        new Handler().postDelayed(() -> {
+            Intent target= new Intent(getContext(), BoardActivity.class);
+            target.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(DatabaseUtil.matchables,matchableAccount);
+            target.putExtras(bundle);
+            startActivity(target);
+        },3000);
     }
 
     @Override
     public void onMatchCreatedNotification(User user) {
-        progressCircle.beginFinalAnimation();
+        if(user.getEmail() != null){
+            // Begin final animation only when user is received
+            progressCircle.beginFinalAnimation();
+        }
     }
 
     @Override
@@ -166,12 +151,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     public void onUpdate() {
         user = FirebaseAuth.getInstance().getCurrentUser(); // Revalidate user
         if(user != null){
-            if(matchOnRatingSwitch.isChecked()){
-                matchAPI.createUserMatchableAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE, null);
-            }
-            else{
-                matchAPI.createUserMatchableAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE, matchRange);
-            }
+            matchAPI.createUserMatchableAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE, matchRange);
         }
         else{
             progressCircle.hide();
