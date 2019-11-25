@@ -24,6 +24,11 @@
             />
 
         <item
+            android:id="@+id/puzzles"
+            android:icon="@drawable/casino"
+            android:title="@string/puzzles"/>
+
+        <item
             android:id="@+id/itm_profile"
             android:icon="@drawable/profile"
             android:title="Profile"

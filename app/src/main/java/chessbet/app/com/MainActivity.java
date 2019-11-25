@@ -49,6 +49,7 @@ import chessbet.app.com.fragments.GamesFragment;
 import chessbet.app.com.fragments.MainFragment;
 import chessbet.app.com.fragments.MatchFragment;
 import chessbet.app.com.fragments.ProfileFragment;
+import chessbet.app.com.fragments.PuzzleFragment;
 import chessbet.app.com.fragments.SettingsFragment;
 import chessbet.domain.Account;
 import chessbet.domain.User;
@@ -170,8 +171,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.games:
                 toolbar.setTitle(getString(R.string.games));
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new GamesFragment())
-                        .addToBackStack(getString(R.string.games))
-                        .commit();
+                        .addToBackStack(getString(R.string.games)).commit();
+                break;
+            case R.id.puzzles:
+                toolbar.setTitle("Puzzles");
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PuzzleFragment())
+                        .addToBackStack(getString(R.string.puzzles)).commit();
                 break;
         }
         return true;

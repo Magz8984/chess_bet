@@ -1,5 +1,9 @@
 package chessengine;
 
+/*
+  @author Collins Magondu 3/3/19
+ */
+
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Rect;
@@ -17,6 +21,8 @@ import com.chess.engine.board.Tile;
 import com.chess.engine.pieces.Piece;
 import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
+import com.chess.pgn.PGNMainUtils;
+import com.chess.pgn.PGNUtilities;
 import com.google.common.collect.Lists;
 
 import java.io.Serializable;
@@ -25,6 +31,7 @@ import java.util.List;
 
 import chessbet.api.MatchAPI;
 import chessbet.domain.MatchableAccount;
+import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
 import chessbet.services.RemoteMoveListener;
 import chessbet.services.RemoteViewUpdateListener;
@@ -36,18 +43,23 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
     protected Piece movedPiece;
     private List<Cell> boardCells=null;
     private BoardDirection boardDirection;
+    private Puzzle puzzle;
+    protected int puzzleMoveCounter = 0;
     protected Alliance topAlliance = Alliance.BLACK;
+    protected Modes mode = Modes.LOCAL_PLAY;
     private int squareSize = 0;
     private boolean isFlipped = false;
     private int whiteCellsColor;
     private int darkCellsColor;
     protected MoveLog moveLog;
+    private boolean isRecording = false;
     protected OnMoveDoneListener onMoveDoneListener;
     private MatchableAccount matchableAccount;
     private MatchAPI matchAPI;
     private Alliance localAlliance;
     private RemoteViewUpdateListener remoteViewUpdateListener;
     protected int moveCursor = 0;
+    protected PuzzleMove puzzleMove;
     private List<Rect> tiles = new ArrayList<>();
 
     private void initialize(Context context){
@@ -76,6 +88,10 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
     public boolean performClick(){
         super.performClick();
         return true;
+    }
+
+    public void setPuzzleMove(PuzzleMove puzzleMove) {
+        this.puzzleMove = puzzleMove;
     }
 
     private void createTileRectangles(){
@@ -317,14 +333,22 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
         }
     }
 
-    public void reconstructBoard(List<Move> moves, Board board){
-        this.moveLog.clear();
-        this.chessBoard = board;
-        for (Move move : moves){
-            moveLog.addMove(move);
+    public void reconstructBoardFromPGN(String pgn){
+        List<String> strMoves = PGNMainUtils.processMoveText(pgn);
+        for (String string : strMoves) {
+            Move move = PGNMainUtils.createMove(chessBoard, string);
+            MoveTransition moveTransition = chessBoard.currentPlayer().makeMove(move);
+            if (moveTransition.getMoveStatus().isDone()) {
+                chessBoard = moveTransition.getTransitionBoard();
+                if (chessBoard.currentPlayer().isInCheckMate()) {
+                    move.setCheckMateMove(true);
+                } else if (chessBoard.currentPlayer().isInCheck()) {
+                    move.setCheckMove(true);
+                }
+                moveLog.addMove(move);
+            }
         }
         onMoveDoneListener.getMoves(moveLog);
-//        GameUtil.playSound();
         moveCursor = moveLog.size();
         displayGameStates();
         invalidate();
@@ -391,6 +415,73 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
 
     public void setMatchAPI(MatchAPI matchAPI) {
         this.matchAPI = matchAPI;
+    }
+
+    public boolean isRecording() {
+        return isRecording;
+    }
+
+    public void setRecording() {
+        isRecording = !isRecording;
+        // Lazy load puzzle only when recording
+        this.puzzle = new Puzzle();
+        // Sets the owner of the move will help in puzzle mode for the view
+        // TODO Set board modes eg LOCAL_PLAY,PLAY_ONLINE, PUZZLE_MODE
+        this.puzzle.setPlayerType((chessBoard.currentPlayer().getAlliance() == Alliance.WHITE) ? "WHITE" : "BLACK");
+        this.puzzle.setPgn(getPortableGameNotation());
+    }
+
+    public Puzzle getPuzzle() {
+        return puzzle;
+    }
+
+    public void setPuzzle(Puzzle puzzle) {
+        if(mode != Modes.PUZZLE_MODE){
+            this.mode = Modes.PUZZLE_MODE;
+            this.puzzle = puzzle;
+            this.reconstructBoardFromPGN(puzzle.getPgn());
+        }
+    }
+
+    /**
+     * Adds a move to the puzzle moves array list by initializing a new puzzle move from the moves
+     * needed params. See {@link Puzzle.Move}
+     * In use by {@link Cell#handleTouch()}
+     * @param move
+     */
+    protected void addMoveToPuzzle(Move move){
+        if(this.isRecording){
+            Puzzle.Move puzzleMove = new Puzzle.Move();
+            puzzleMove.setFromCoordinate(move.getCurrentCoordinate());
+            puzzleMove.setToCoordinate(move.getDestinationCoordinate());
+            puzzleMove.setMoveCoordinates(move.toString());
+            this.puzzle.addMove(puzzleMove);
+        }
+    }
+
+    public enum Modes{
+        LOCAL_PLAY,
+        GAME_REVIEW,
+        PLAY_ONLINE,
+        PUZZLE_MODE;
+    }
+
+    public Modes getMode() {
+        return mode;
+    }
+
+    public void setMode(Modes mode) {
+        this.mode = mode;
+    }
+
+    // Convert Game To PGN Notation
+    public String getPortableGameNotation(){
+        return PGNUtilities.get().acceptMoveLog(this.moveLog.convertToEngineMoveLog());
+    }
+
+    public interface PuzzleMove{
+        void onCorrectMoveMade(boolean isCorrect);
+        void onPuzzleFinished();
     }
 }
 

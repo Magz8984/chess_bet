@@ -126,20 +126,27 @@ public class Cell extends View {
                     }
                     boardView.destinationTile = boardView.chessBoard.getTile(tileId);
                     boardView.setMoveData(boardView.movedPiece.getPiecePosition(), tileId); // Online Play
-                    boardView.chessBoard= transition.getTransitionBoard();
-                    GameUtil.playSound();  // Play sound once move is made
 
-                    if(boardView.chessBoard.currentPlayer().isInCheckMate()){
-                        move.setCheckMateMove(true);
-                    }
-                    else if(boardView.chessBoard.currentPlayer().isInCheck()){
-                        move.setCheckMove(true);
-                    }
+                    if(boardView.mode != BoardView.Modes.PUZZLE_MODE) {
+                        boardView.chessBoard = transition.getTransitionBoard();
+                        GameUtil.playSound();  // Play sound once move is made
 
-                    boardView.moveLog.addMove(move);
-                    boardView.moveCursor = boardView.moveLog.size();
-                    boardView.onMoveDoneListener.getMoves(boardView.moveLog);
-                    boardView.onMoveDoneListener.onGameResume();
+                        if (boardView.chessBoard.currentPlayer().isInCheckMate()) {
+                            move.setCheckMateMove(true);
+                        } else if (boardView.chessBoard.currentPlayer().isInCheck()) {
+                            move.setCheckMove(true);
+                        }
+
+                        boardView.moveLog.addMove(move);
+                        boardView.addMoveToPuzzle(move);
+                        boardView.moveCursor = boardView.moveLog.size();
+                        boardView.onMoveDoneListener.getMoves(boardView.moveLog);
+                        boardView.onMoveDoneListener.onGameResume();
+                    }
+                    else {
+                        // Check Move Validity
+                        puzzleModeAction(move);
+                    }
 
                     if(boardView.chessBoard.currentPlayer().isInCheckMate()){
                         boardView.onMoveDoneListener.isCheckMate(boardView.chessBoard.currentPlayer());
@@ -159,6 +166,57 @@ public class Cell extends View {
                 boardView.invalidate();
             }
     }
+
+    private void puzzleModeAction(Move move){
+        if(boardView.puzzleMoveCounter < boardView.getPuzzle().getMoves().size() && isCorrectPuzzleMove(move)){
+            boardView.puzzleMove.onCorrectMoveMade(true);
+            boardView.puzzleMoveCounter++;
+
+            if(boardView.puzzleMoveCounter < boardView.getPuzzle().getMoves().size()){
+                    Move nextMove = Move.MoveFactory.createMove(boardView.chessBoard ,boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getFromCoordinate(),
+                            boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getToCoordinate());
+                    boardView.moveLog.addMove(nextMove);
+                    boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(nextMove).getTransitionBoard();
+                    boardView.puzzleMoveCounter++;
+                    invalidate();
+            }
+            else{
+                boardView.setMode(BoardView.Modes.LOCAL_PLAY);
+                boardView.puzzleMove.onPuzzleFinished();
+            }
+
+            GameUtil.playSound();
+            boardView.moveCursor = boardView.moveLog.size();
+            boardView.onMoveDoneListener.getMoves(boardView.moveLog);
+            boardView.onMoveDoneListener.onGameResume();
+
+            invalidate();
+        } else {
+            boardView.puzzleMove.onCorrectMoveMade(false);
+        }
+    }
+
+    private boolean isCorrectPuzzleMove(Move move){
+        Board board;
+        if(boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getToCoordinate() == move.getDestinationCoordinate()){
+            if(boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getFromCoordinate() == move.getCurrentCoordinate()){
+                board = boardView.chessBoard.currentPlayer().makeMove(move).getTransitionBoard();
+                if (board.currentPlayer().isInCheckMate()) {
+                    move.setCheckMateMove(true);
+                } else if (board.currentPlayer().isInCheck()) {
+                    move.setCheckMove(true);
+                }
+                boolean correct = move.toString().equals(boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getMoveCoordinates());
+                if(correct){
+                    boardView.chessBoard = board;
+                    boardView.moveLog.addMove(move);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public boolean isTouched(final int x, final int y) {
         return tileRect.contains(x, y);
     }

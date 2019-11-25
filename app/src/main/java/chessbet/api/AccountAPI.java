@@ -2,37 +2,34 @@ package chessbet.api;
 
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.util.Date;
 import java.util.Objects;
 
 import chessbet.domain.Account;
+import chessbet.domain.Puzzle;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
-import chessbet.services.MatchMetricsUpdateListener;
+import chessbet.services.PuzzleListener;
 
 /**
  * @author Collins Magondu
  */
 public class AccountAPI {
-    private static  String USER_COLLECTION = "users";
+    private static String USER_COLLECTION = "users";
     private AccountListener accountListener;
-    private MatchMetricsUpdateListener matchMetricsUpdateListener;
-    private static  String ACCOUNT_COLLECTION = "accounts";
+    private PuzzleListener puzzleListener;
+    private static String ACCOUNT_COLLECTION = "accounts";
     private static String TAG = AccountAPI.class.getSimpleName();
     private static AccountAPI INSTANCE = new AccountAPI();
     private FirebaseFirestore db;
     private FirebaseUser user;
     private Account currentAccount;
     private User currentUser = null;
-    private DocumentSnapshot accountSnapshot = null;
 
     private AccountAPI() {
          db = FirebaseFirestore.getInstance();
@@ -51,9 +48,6 @@ public class AccountAPI {
                         currentAccount = document.toObject(Account.class);
                         accountListener.onAccountReceived(currentAccount);
                     }
-
-                    // Only one account is expected
-                    accountSnapshot = task.getResult().getDocuments().get(0);
                 }
                 else {
                     Log.d(TAG, Objects.requireNonNull(task.getException()).getMessage());
@@ -95,22 +89,19 @@ public class AccountAPI {
         return db.collection(AccountAPI.USER_COLLECTION).document(user.getUid());
     }
 
-    public void setMatchMetricsUpdateListener(MatchMetricsUpdateListener matchMetricsUpdateListener) {
-        this.matchMetricsUpdateListener = matchMetricsUpdateListener;
+    public void setPuzzleListener(PuzzleListener puzzleListener) {
+        this.puzzleListener = puzzleListener;
     }
 
-    public void updateAccountMatchDetails(){
-        currentAccount.setLast_date_modified(new Date().toString());
-        currentAccount.setLast_matchable_time(new Date().getTime());
-        if(accountSnapshot != null){
-            accountSnapshot.getReference().set(currentAccount).addOnCompleteListener(task -> {
-               if(task.isSuccessful()){
-                    matchMetricsUpdateListener.onUpdate();
-               }
-               else {
-                   Crashlytics.logException(new RuntimeException("Match Metrics Not Updated"));
-               }
-            });
-        }
+    public void sendPuzzle(Puzzle puzzle){
+        db.collection("puzzles").add(puzzle).addOnCompleteListener(task -> {
+           if(task.isSuccessful()){
+               puzzleListener.onPuzzleSent(true);
+           }
+           else{
+               puzzleListener.onPuzzleSent(false);
+               Log.d("ERROR MESSAGE : ", Objects.requireNonNull(task.getException()).getMessage());
+           }
+       });
     }
 }

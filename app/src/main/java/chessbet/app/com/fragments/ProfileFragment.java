@@ -1,6 +1,7 @@
 package chessbet.app.com.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,13 +60,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
     private void init(){
         user = AccountAPI.get().getCurrentUser();
         if(user != null) {
-            if(user.getProfile_photo_url() != null){
-                Glide.with(this).asBitmap().load(user.getProfile_photo_url()).into(imgProfilePicture);
+            try{
+                if(user.getProfile_photo_url() != null){
+                    Glide.with(this).asBitmap().load(user.getProfile_photo_url()).into(imgProfilePicture);
+                }
+
+                if(user.getEmail() != null){
+                    txtEmail.setText(user.getEmail());
+                }
+            }catch (Exception ex){
+                Log.d(getClass().getSimpleName(), ex.getMessage());
             }
 
-            if(user.getEmail() != null){
-                txtEmail.setText(user.getEmail());
-            }
         }
     }
 
