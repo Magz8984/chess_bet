@@ -3,6 +3,7 @@ package chessbet.app.com.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,23 +26,25 @@ import com.google.firebase.auth.FirebaseUser;
 import com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker;
 import com.transitionseverywhere.TransitionManager;
 
+import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
 import chessbet.adapter.GameDurationAdapter;
 import chessbet.api.AccountAPI;
+import chessbet.api.ChallengeAPI;
 import chessbet.api.MatchAPI;
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.R;
+import chessbet.domain.Challenge;
 import chessbet.domain.MatchRange;
 import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
-import chessbet.domain.User;
 import chessbet.services.MatchListener;
-import chessbet.services.MatchMetricsUpdateListener;
 import chessbet.utils.DatabaseUtil;
 
-public class MatchFragment extends Fragment implements MatchListener, View.OnClickListener, FABProgressListener, MatchMetricsUpdateListener {
+public class MatchFragment extends Fragment implements MatchListener, View.OnClickListener,
+        FABProgressListener, ChallengeAPI.ChallengeHandler {
     private FloatingActionButton findMatch;
     private FABProgressCircle progressCircle;
     private LinearLayout ratingRangeView;
@@ -48,6 +52,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     private Button btnViewRangeViewHolder;
     private ScrollableNumberPicker startValue;
     private ScrollableNumberPicker endValue;
+    private Challenge challenge;
 
     private boolean showRatingView = false;
 
@@ -70,6 +75,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         endValue = view.findViewById(R.id.endValue);
         matchAPI = MatchAPI.get();
         matchRange = new MatchRange();
+        challenge = new Challenge();
         matchAPI.setMatchListener(this);
         findMatch.setOnClickListener(this);
         initializeMatchRangeListeners();
@@ -78,6 +84,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         btnViewRangeViewHolder.setOnClickListener(this);
         user = FirebaseAuth.getInstance().getCurrentUser();
         rangeViewHolder.setVisibility(showRatingView ? View.VISIBLE : View.GONE);
+        ChallengeAPI.get().setChallengeHandler(this);
         return view;
     }
 
@@ -92,15 +99,23 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         endValue.setListener(value -> matchRange.setEndAt(value));
     }
 
+    private void createChallenge(){
+        challenge.setMatchType(MatchType.PLAY_ONLINE);
+        challenge.setEloRating(AccountAPI.get().getCurrentAccount().getElo_rating());
+        challenge.setAccepted(false);
+        challenge.setOwner(AccountAPI.get().getCurrentUser().getUid());
+        challenge.setTimeStamp(System.currentTimeMillis());
+        challenge.setDuration(AccountAPI.get().getCurrentAccount().getLast_match_duration());
+        challenge.setDateCreated(new Date().toString()); // Help us trouble shoot errors;
+        ChallengeAPI.get().setChallenge(challenge);
+    }
+
     @Override
     public void onClick(View v) {
         if(v.equals(findMatch)){
             progressCircle.show();
-            AccountAPI.get().getCurrentAccount().setLast_match_type(MatchType.PLAY_ONLINE);
-            AccountAPI.get().getCurrentAccount().setMatched(false);
-            // Shift Account API focus to this class onUpdate()
-            AccountAPI.get().setMatchMetricsUpdateListener(this);
-            AccountAPI.get().updateAccountMatchDetails();
+            createChallenge();
+            matchAPI.createUserMatchableAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE);
         }
 
         else if(v.equals(btnViewRangeViewHolder)){
@@ -124,11 +139,9 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     }
 
     @Override
-    public void onMatchCreatedNotification(User user) {
-        if(user.getEmail() != null){
-            // Begin final animation only when user is received
-            progressCircle.beginFinalAnimation();
-        }
+    public void onMatchableCreatedNotification() {
+        ChallengeAPI.get().setMatchRange(matchRange);
+        ChallengeAPI.get().getExistingChallenges();
     }
 
     @Override
@@ -142,19 +155,28 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
 
     @Override
     public void onFABProgressAnimationEnd() {
-        Snackbar.make(progressCircle, "Match Created", Snackbar.LENGTH_LONG)
+        Snackbar.make(progressCircle, "Challenge Found", Snackbar.LENGTH_LONG)
                 .setAction("Action",null)
                 .show();
     }
 
     @Override
-    public void onUpdate() {
-        user = FirebaseAuth.getInstance().getCurrentUser(); // Revalidate user
-        if(user != null){
-            matchAPI.createUserMatchableAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE, matchRange);
-        }
-        else{
-            progressCircle.hide();
-        }
+    public void challengeSent(String id) {
+        Toast.makeText(getContext(), "Challenge sent " + id, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void challengeFound(String id) {
+        progressCircle.beginFinalAnimation();
+        Toast.makeText(getContext(), "Challenge found " + id, Toast.LENGTH_LONG).show();
+        progressCircle.hide();
+    }
+
+    @Override
+    public void challengeNotFound() {
+        Toast.makeText(getContext(), "Challenge Not Found", Toast.LENGTH_LONG).show();
+        ChallengeAPI.get().sendChallenge(challenge);
+        progressCircle.hide();
+        Log.d("Challenge Found", "Nope");
     }
 }

@@ -8,7 +8,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -16,11 +15,9 @@ import java.util.Objects;
 
 import chessbet.domain.Constants;
 import chessbet.domain.MatchEvent;
-import chessbet.domain.MatchRange;
 import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.RemoteMove;
-import chessbet.domain.User;
 import chessbet.services.MatchListener;
 import chessbet.services.RemoteMoveListener;
 import chessbet.utils.DatabaseUtil;
@@ -61,9 +58,10 @@ public class MatchAPI implements Serializable {
         RemoteMove.get().clear();
         final MatchableAccount[] matchable = {null};
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        assert firebaseUser != null;
         DatabaseUtil.getAccount(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 matchable[0] = dataSnapshot.getValue(MatchableAccount.class);
                 MatchableAccount matchableAccount = matchable[0];
                 if(matchableAccount != null){
@@ -81,9 +79,7 @@ public class MatchAPI implements Serializable {
                 }
             }
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError databaseError) { }
         });
     }
 
@@ -98,7 +94,7 @@ public class MatchAPI implements Serializable {
         DatabaseUtil.getOpponentRemoteMove(matchableAccount.getMatchId(), matchableAccount.getOpponent())
                 .addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         RemoteMove remoteMove = dataSnapshot.getValue(RemoteMove.class);
                         if(remoteMove != null) {
                             if(isMatchStarted(remoteMove)){
@@ -121,42 +117,6 @@ public class MatchAPI implements Serializable {
 
     private boolean isMatchStarted(RemoteMove remoteMove){
         return remoteMove != null && remoteMove.getEvents().contains(MatchEvent.IN_PROGRESS.toString());
-    }
-
-    // TODO Remove redundant code blocks
-    private void getMatchableAccountOnEloRating(String uid, MatchType matchType, MatchRange matchRange, Callback  callback){
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .cache(null)
-                .build();
-
-        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(Constants.CLOUD_FUNCTIONS_URL.concat(Constants.GET_MATCH_PATH_ON_ELO_RATING))).newBuilder();
-        String url;
-        if(matchRange != null){
-             url = builder.addQueryParameter("match_type", matchType.toString())
-                    .addQueryParameter("uid", uid)
-                    .addQueryParameter("start_at", Integer.toString(matchRange.getStartAt()))
-                    .addQueryParameter("end_at", Integer.toString(matchRange.getEndAt()))
-                    .build().toString();
-        }
-        else{
-             url = builder.addQueryParameter("match_type", matchType.toString())
-                    .addQueryParameter("uid", uid)
-                    .build().toString();
-        }
-
-
-        RequestBody requestBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("match_type", matchType.toString())
-                .addFormDataPart("uid",uid)
-                .build();
-
-        Request request = new Request.Builder()
-                              .url(url)
-                              .method("POST",requestBody)
-                              .build();
-        Call call = okHttpClient.newCall(request);
-        call.enqueue(callback);
     }
 
     private void createUserMatchableAccount(String uid, MatchType matchType, Callback callback){
@@ -183,40 +143,8 @@ public class MatchAPI implements Serializable {
         call.enqueue(callback);
     }
 
-    private void getOnMatchableAccountImplementation(String uid, MatchType matchType, MatchRange matchRange){
-        getMatchableAccountOnEloRating(uid, matchType, matchRange, new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                matchListener.onMatchError();
-                e.printStackTrace();
-            }
 
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    try {
-
-                        switch (response.code()) {
-                            case 200 :
-                                User user = new Gson().fromJson(Objects.requireNonNull(response.body()).string(), User.class);
-                                matchListener.onMatchCreatedNotification(user);
-                                break;
-                            case 404 :
-                                matchListener.onMatchError();
-                                break;
-                            case 403:
-                                matchListener.onMatchError();
-                                break;
-                            default:
-                                matchListener.onMatchError();
-                        }
-                    } catch (Exception e) {
-                        matchListener.onMatchError();
-                    }
-            }
-        });
-    }
-
-    public void createUserMatchableAccountImplementation(String uid, MatchType matchType, MatchRange matchRange){
+    public void createUserMatchableAccountImplementation(String uid, MatchType matchType){
         createUserMatchableAccount(uid, matchType, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
@@ -226,7 +154,12 @@ public class MatchAPI implements Serializable {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response){
                 // Match User after creating a matchable
-                getOnMatchableAccountImplementation(uid,matchType,matchRange);
+                if(response.code() == 200){
+                    matchListener.onMatchableCreatedNotification();
+                }
+                else{
+                    matchListener.onMatchError();
+                }
             }
         });
     }
