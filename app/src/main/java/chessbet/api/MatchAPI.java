@@ -83,10 +83,11 @@ public class MatchAPI implements Serializable {
         });
     }
 
-    public void sendMoveData(MatchableAccount matchableAccount,int source, int destination){
+    public void sendMoveData(MatchableAccount matchableAccount,int source, int destination, String pgn){
         RemoteMove.get().setOwner(matchableAccount.getOwner());
         RemoteMove.get().setFrom(source);
         RemoteMove.get().setTo(destination);
+        RemoteMove.get().setPgn(pgn); // Pgn string of the match
         RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
     }
     // TODO Implement remote move events
@@ -100,6 +101,8 @@ public class MatchAPI implements Serializable {
                             if(isMatchStarted(remoteMove)){
                                 if(!isMatchInterrupted(remoteMove)) {
                                     remoteMoveListener.onRemoteMoveMade(remoteMove);
+                                } else {
+                                    // TODO Handle Match interruption
                                 }
                             }
                         }

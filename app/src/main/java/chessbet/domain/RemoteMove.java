@@ -10,6 +10,7 @@ public class RemoteMove {
     private int to;
     private String owner;
     private int from;
+    private String pgn;
     private List<String> events;
 
     private RemoteMove(){
@@ -44,6 +45,14 @@ public class RemoteMove {
 
     public String getOwner() {
         return owner;
+    }
+
+    public void setPgn(String pgn) {
+        this.pgn = pgn;
+    }
+
+    public String getPgn() {
+        return pgn;
     }
 
     public int getFrom() {

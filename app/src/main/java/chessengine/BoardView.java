@@ -239,7 +239,7 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
 
     public void setMoveData(int from, int to) {
         if(matchAPI != null){
-            matchAPI.sendMoveData(matchableAccount,from,to);
+            matchAPI.sendMoveData(matchableAccount,from,to, getPortableGameNotation());
         }
     }
 

@@ -7,6 +7,8 @@ import android.net.ConnectivityManager;
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import chessbet.recievers.ConnectivityReceiver;
 
 public class Application extends MultiDexApplication{
@@ -19,6 +21,7 @@ public class Application extends MultiDexApplication{
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(new ConnectivityReceiver(),intentFilter);
+        FirebaseFirestore.setLoggingEnabled(true);
     }
 
     @Override
