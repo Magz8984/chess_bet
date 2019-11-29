@@ -19,13 +19,13 @@
 
 
         <GridView
-            android:layout_width="match_parent"
+            android:layout_width="280dp"
             android:layout_height="match_parent"
             android:id="@+id/menuItems"
-            android:columnWidth="100sp"
+            android:columnWidth="100dp"
             android:numColumns="auto_fit"
-            android:verticalSpacing="10sp"
-            android:horizontalSpacing="15sp"
+            android:verticalSpacing="10dp"
+            android:horizontalSpacing="10dp"
             android:stretchMode="columnWidth"
             android:layout_gravity="center"
             android:gravity="center">

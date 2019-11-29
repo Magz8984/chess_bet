@@ -68,7 +68,6 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.whiteMoves) LinearLayout whiteMoves;
 @BindView(R.id.blackScrollView) HorizontalScrollView blackScrollView;
 @BindView(R.id.whiteScrollView) HorizontalScrollView whiteScrollView;
-@BindView(R.id.txtCountDown) TextView txtCountDown;
 @BindView(R.id.whitePieces) LinearLayout whitePieces;
 @BindView(R.id.blackPieces) LinearLayout blackPieces;
 @BindView(R.id.btnSave) Button btnSave;

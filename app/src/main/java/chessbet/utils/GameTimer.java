@@ -102,7 +102,6 @@ public class GameTimer {
         public Builder setOnMoveTimerElapsed(OnTimerElapsed onTimerElapsed) {
             this.onTimerElapsed = onTimerElapsed;
             return this;
-
         }
 
         public GameTimer build(){

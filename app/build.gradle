@@ -6,7 +6,6 @@ android {
     compileSdkVersion 28
     defaultConfig {
         multiDexEnabled true
-
         applicationId "chessbet.app.com"
         minSdkVersion 16
         targetSdkVersion 28
@@ -21,8 +20,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = '1.8'
-        targetCompatibility = '1.8'
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     buildTypes.each {
@@ -57,7 +56,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:4.2.1"
     testImplementation "com.squareup.okhttp3:mockwebserver:4.2.1"
     implementation 'com.github.QuadFlask:colorpicker:0.0.13' // Color picker
-    implementation 'com.github.Magz8984:chess-engine-dev:7425c1cb98'
+    implementation 'com.github.Magz8984:chess-engine-dev:0a288f1e4e'
     implementation 'de.hdodenhof:circleimageview:3.0.0'
     implementation 'com.github.bumptech.glide:glide:4.9.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'

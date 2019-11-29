@@ -239,7 +239,7 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
 
     public void setMoveData(int from, int to) {
         if(matchAPI != null){
-            matchAPI.sendMoveData(matchableAccount,from,to);
+            matchAPI.sendMoveData(matchableAccount,from,to, getPortableGameNotation());
         }
     }
 
@@ -372,7 +372,6 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
     }
     public void redoMove(){
         if (this.moveCursor < moveLog.size()){
-            // TODO Over kill (Fix from engine)
             Move move = Move.MoveFactory.createMove(chessBoard, moveLog.getMove(moveCursor).getCurrentCoordinate(), moveLog.getMove(moveCursor).getDestinationCoordinate());
             MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
             if(transition.getMoveStatus().isDone()){
@@ -426,7 +425,6 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
         // Lazy load puzzle only when recording
         this.puzzle = new Puzzle();
         // Sets the owner of the move will help in puzzle mode for the view
-        // TODO Set board modes eg LOCAL_PLAY,PLAY_ONLINE, PUZZLE_MODE
         this.puzzle.setPlayerType((chessBoard.currentPlayer().getAlliance() == Alliance.WHITE) ? "WHITE" : "BLACK");
         this.puzzle.setPgn(getPortableGameNotation());
     }
@@ -463,7 +461,7 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
         LOCAL_PLAY,
         GAME_REVIEW,
         PLAY_ONLINE,
-        PUZZLE_MODE;
+        PUZZLE_MODE
     }
 
     public Modes getMode() {
