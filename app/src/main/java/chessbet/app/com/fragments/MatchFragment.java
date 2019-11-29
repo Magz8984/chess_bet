@@ -110,12 +110,21 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         ChallengeAPI.get().setChallenge(challenge);
     }
 
+    private MatchableAccount createMatchableAccount(){
+        MatchableAccount matchableAccount = new MatchableAccount();
+        matchableAccount.setOwner(user.getUid());
+        matchableAccount.setMatch_type(MatchType.PLAY_ONLINE.toString());
+        matchableAccount.setDuration(AccountAPI.get().getCurrentAccount().getLast_match_duration());
+        matchableAccount.setElo_rating(AccountAPI.get().getCurrentAccount().getElo_rating());
+        return matchableAccount;
+    }
+
     @Override
     public void onClick(View v) {
         if(v.equals(findMatch)){
             progressCircle.show();
             createChallenge();
-            matchAPI.createUserMatchableAccountImplementation(user.getUid(), MatchType.PLAY_ONLINE);
+            matchAPI.createUserMatchableAccountImplementation(createMatchableAccount());
         }
 
         else if(v.equals(btnViewRangeViewHolder)){

@@ -46,13 +46,6 @@
             android:textColor="#fff"
             />
 
-        <TextView
-            android:id="@+id/txtCountDown"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5sp"
-            android:textColor="@color/white" />
-
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">

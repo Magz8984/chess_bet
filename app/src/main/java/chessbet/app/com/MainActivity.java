@@ -88,8 +88,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         profileImage.setOnClickListener(this);
         AccountAPI.get().setUser(FirebaseAuth.getInstance().getCurrentUser());
         AccountAPI.get().setAccountListener(this);
-//        AccountAPI.get().getAccount();
-//        AccountAPI.get().getUser();
+        AccountAPI.get().getAccount();
+        AccountAPI.get().getUser();
 
         navigationView.setNavigationItemSelectedListener(this);
 

@@ -19,6 +19,7 @@ public class MatchableAccount implements Parcelable {
     private boolean matchable;
     private boolean matched;
     private boolean online;
+    private long duration; // Used by game timer in board view
     private String opponent;
     private String owner;
 
@@ -29,6 +30,7 @@ public class MatchableAccount implements Parcelable {
         matchable = in.readByte() != 0;
         matched = in.readByte() != 0;
         online = in.readByte() != 0;
+        duration = in.readLong();
         opponent = in.readString();
         owner = in.readString();
     }
@@ -80,6 +82,10 @@ public class MatchableAccount implements Parcelable {
         this.owner = owner;
     }
 
+    public void setDuration(long duration) {
+        this.duration = duration;
+    }
+
     public int getElo_rating() {
         return elo_rating;
     }
@@ -102,6 +108,10 @@ public class MatchableAccount implements Parcelable {
 
     public String getOwner() {
         return owner;
+    }
+
+    public long getDuration() {
+        return duration;
     }
 
     public boolean isMatchable(){
