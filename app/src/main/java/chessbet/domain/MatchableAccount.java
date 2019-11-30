@@ -135,6 +135,7 @@ public class MatchableAccount implements Parcelable {
         dest.writeByte((byte) (matchable ? 1 : 0));
         dest.writeByte((byte) (matched ? 1 : 0));
         dest.writeByte((byte) (online ? 1 : 0));
+        dest.writeLong(duration);
         dest.writeString(opponent);
         dest.writeString(owner);
     }
@@ -154,6 +155,7 @@ public class MatchableAccount implements Parcelable {
         matchableAccount.setElo_rating(jsonObject.getInt("elo_rating"));
         matchableAccount.setMatchable(jsonObject.getBoolean("matchable"));
         matchableAccount.setMatched(jsonObject.getBoolean("matched"));
+        matchableAccount.setDuration(jsonObject.getLong("duration"));
         return matchableAccount;
     }
 
