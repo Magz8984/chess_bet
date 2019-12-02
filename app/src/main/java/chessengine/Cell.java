@@ -15,6 +15,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import com.chess.engine.Alliance;
 import com.chess.engine.Move;
 import com.chess.engine.board.Board;
 import com.chess.engine.board.Tile;
@@ -24,6 +25,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 import chessbet.app.com.R;
+import chessbet.domain.Player;
+
 public class Cell extends View {
     private final int tileId;
     private BoardView boardView;
@@ -128,6 +131,10 @@ public class Cell extends View {
                     boardView.setMoveData(boardView.movedPiece.getPiecePosition(), tileId); // Online Play
 
                     if(boardView.mode != BoardView.Modes.PUZZLE_MODE) {
+                        // Stop the current player timer
+                        if(boardView.gameTimer != null){
+                            boardView.gameTimer.stopTimer((boardView.chessBoard.currentPlayer().getAlliance() == Alliance.WHITE) ? Player.WHITE :  Player.BLACK);
+                        }
                         boardView.chessBoard = transition.getTransitionBoard();
                         GameUtil.playSound();  // Play sound once move is made
 

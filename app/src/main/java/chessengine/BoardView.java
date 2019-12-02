@@ -35,6 +35,7 @@ import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
 import chessbet.services.RemoteMoveListener;
 import chessbet.services.RemoteViewUpdateListener;
+import chessbet.utils.GameTimer;
 
 public class BoardView extends View implements RemoteMoveListener, Serializable {
     protected Board chessBoard;
@@ -53,6 +54,7 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
     private int darkCellsColor;
     protected MoveLog moveLog;
     private boolean isRecording = false;
+    protected GameTimer gameTimer;
     protected OnMoveDoneListener onMoveDoneListener;
     private MatchableAccount matchableAccount;
     private MatchAPI matchAPI;
@@ -239,7 +241,9 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
 
     public void setMoveData(int from, int to) {
         if(matchAPI != null){
-            matchAPI.sendMoveData(matchableAccount,from,to, getPortableGameNotation());
+            // Help regulate time between play
+            long timeLeft = (localAlliance == Alliance.WHITE) ? gameTimer.getWhiteTimeLeft() : gameTimer.getBlackTimeLeft();
+            matchAPI.sendMoveData(matchableAccount,from,to, getPortableGameNotation(),timeLeft);
         }
     }
 
@@ -298,7 +302,7 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
 
     public void setMatchableAccount(MatchableAccount matchableAccount) {
         // Makes sure to set match api to send and receive moves
-        if(matchableAccount != null){
+        if(matchableAccount != null && matchAPI == null){
             this.matchableAccount = matchableAccount;
             matchAPI = MatchAPI.get();
             matchAPI.setRemoteMoveListener(this);
@@ -325,6 +329,17 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
                 moveCursor = moveLog.size();
                 destinationTile = chessBoard.getTile(remoteMove.getTo());
                 GameUtil.playSound();
+                if(gameTimer != null){
+                    // Reset time from when the move was made from the other device;
+                    if(localAlliance == Alliance.WHITE) {
+                        gameTimer.setBlackTimeLeft((int) remoteMove.getGameTimeLeft());
+                        gameTimer.setBlackGameTimer();
+                    } else {
+                        gameTimer.setWhiteTimeLeft((int) remoteMove.getGameTimeLeft());
+                        gameTimer.setWhiteGameTimer();
+                    }
+                    gameTimer.stopTimer((chessBoard.currentPlayer().getAlliance() == Alliance.WHITE) ? chessbet.domain.Player.WHITE :  chessbet.domain.Player.BLACK);
+                }
                 chessBoard = transition.getTransitionBoard();
                 onMoveDoneListener.getMoves(moveLog);
                 displayGameStates();
@@ -414,6 +429,13 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
 
     public void setMatchAPI(MatchAPI matchAPI) {
         this.matchAPI = matchAPI;
+    }
+
+    public void setGameTimer(GameTimer gameTimer) {
+        this.gameTimer = gameTimer;
+        this.gameTimer.setBlackTimeLeft((int) (this.matchableAccount.getDuration() * 60000));
+        this.gameTimer.setWhiteTimeLeft((int) (this.matchableAccount.getDuration() * 60000));
+        this.gameTimer.setWhiteGameTimer();
     }
 
     public boolean isRecording() {

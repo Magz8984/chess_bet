@@ -101,8 +101,9 @@
                     android:layout_centerVertical="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/chakrapetchbold"
                     android:text="1000"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/white"
                     android:textSize="15sp"/>
             </RelativeLayout>
 

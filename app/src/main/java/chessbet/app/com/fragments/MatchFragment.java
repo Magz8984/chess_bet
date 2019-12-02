@@ -36,6 +36,7 @@ import chessbet.api.ChallengeAPI;
 import chessbet.api.MatchAPI;
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.R;
+import chessbet.domain.Account;
 import chessbet.domain.Challenge;
 import chessbet.domain.MatchRange;
 import chessbet.domain.MatchType;
@@ -70,7 +71,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         btnViewRangeViewHolder = view.findViewById(R.id.btnRatingRange);
         rangeViewHolder = view.findViewById(R.id.rangeViews);
         TextView txtAccountRating = view.findViewById(R.id.txtAccountRating);
-        txtAccountRating.setText(String.format(Locale.US,"%d", AccountAPI.get().getCurrentAccount().getElo_rating()));
+        txtAccountRating.setText(String.format(Locale.US,"%d", (AccountAPI.get().getCurrentAccount() != null) ? AccountAPI.get().getCurrentAccount().getElo_rating() : 0));
         startValue = view.findViewById(R.id.startValue);
         endValue = view.findViewById(R.id.endValue);
         matchAPI = MatchAPI.get();
