@@ -11,6 +11,7 @@ public class RemoteMove {
     private String owner;
     private int from;
     private String pgn;
+    private long gameTimeLeft;
     private List<String> events;
 
     private RemoteMove(){
@@ -43,6 +44,14 @@ public class RemoteMove {
         }
     }
 
+    public void setGameTimeLeft(long gameTimeLeft) {
+        this.gameTimeLeft = gameTimeLeft;
+    }
+
+    public long getGameTimeLeft() {
+        return gameTimeLeft;
+    }
+
     public String getOwner() {
         return owner;
     }
@@ -66,7 +75,6 @@ public class RemoteMove {
     public void send(String matchId, String self){
         DatabaseUtil.sendRemoteMove(matchId,self)
                 .setValue(this).addOnSuccessListener(aVoid -> {
-
         });
     }
 
@@ -78,5 +86,6 @@ public class RemoteMove {
         this.events.clear();
         this.to = 0;
         this.from = 0;
+        this.pgn = "";
     }
 }

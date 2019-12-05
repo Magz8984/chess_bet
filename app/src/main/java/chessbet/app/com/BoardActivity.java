@@ -33,7 +33,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Objects;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.Application;
@@ -43,20 +42,23 @@ import chessbet.app.com.fragments.CreatePuzzle;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
-import chessbet.domain.TimerEvent;
 import chessbet.recievers.ConnectivityReceiver;
 import chessbet.services.RemoteViewUpdateListener;
+import chessbet.utils.ConnectivityManager;
 import chessbet.utils.DatabaseUtil;
 import chessbet.utils.GameManager;
+import chessbet.utils.GameTimer;
 import chessbet.utils.OnTimerElapsed;
 import chessengine.BoardPreference;
 import chessengine.BoardView;
 import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
-        OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener, BoardView.PuzzleMove {
+        OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener, BoardView.PuzzleMove,
+        ConnectivityManager.ConnectionStateListener {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -72,11 +74,15 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.blackPieces) LinearLayout blackPieces;
 @BindView(R.id.btnSave) Button btnSave;
 @BindView(R.id.btnRecord) Button btnRecord;
+@BindView(R.id.blackTimer) TextView txtBlackTimer;
+@BindView(R.id.whiteTimer) TextView txtWhiteTimer;
 @BindView(R.id.txtConnectionStatus) TextView txtConnectionStatus;
+@BindView(R.id.imgConnectionStatus) CircleImageView imgConnectionStatus;
 
-    private MatchableAccount matchableAccount;
-    private boolean isGameFinished = false;
-    private boolean isStoredGame = false;
+private MatchableAccount matchableAccount;
+private ConnectivityManager connectivityManager;
+private boolean isGameFinished = false;
+private boolean isStoredGame = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,10 +91,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         boardPreference = new BoardPreference(getPreferences(Context.MODE_PRIVATE));
         setContentView(R.layout.activity_board);
         ButterKnife.bind(this);
-//        GameTimer gameTimer = new GameTimer.Builder()
-//                .setTxtMoveTimer(txtCountDown)
-//                .setOnMoveTimerElapsed(this)
-//                .build();
+        connectivityManager = new ConnectivityManager();
         boardView.setDarkCellsColor(boardPreference.getDark());
         boardView.setWhiteCellsColor(boardPreference.getWhite());
         boardView.setOnMoveDoneListener(this);
@@ -101,7 +104,8 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         btnRecord.setOnClickListener(this);
         txtWhiteStatus.setTextColor(Color.RED);
         txtBlackStatus.setTextColor(Color.RED);
-
+        connectivityManager.setConnectionStateListener(this);
+        connectivityManager.startListening();
         this.onConnectionChanged(ConnectivityReceiver.isConnected());
     }
 
@@ -114,6 +118,14 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         if (matchableAccount != null) {
             boardView.setMode(BoardView.Modes.PLAY_ONLINE);
             boardView.setMatchableAccount(matchableAccount);
+            // Set timer online game and make sure you do not set two different timers
+            if(GameTimer.get() == null){
+                GameTimer.Builder builder = new GameTimer.Builder()
+                            .setTxtBlackMoveTimer(txtBlackTimer)
+                            .setTxtWhiteMoveTimer(txtWhiteTimer)
+                            .setOnTimerElapsed(this);
+                boardView.setGameTimer(builder.build());
+            }
         }
         // Try To Reconstruct
         String pgn = intent.getStringExtra("pgn");
@@ -226,7 +238,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         runOnUiThread(() -> {
             try {
@@ -270,13 +282,6 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
                 this.getTakenPieces(move);
             }
         });
-//        gameTimer.invalidateTimer();
-//
-//        gameTimer= new GameTimer.Builder()
-//                .setTxtMoveTimer(txtCountDown)
-//                .setOnMoveTimerElapsed(this)
-//                .build();
-//        gameTimer.setMoveCountDownTask((1000 * 30) , 1000);
     }
 
     @Override
@@ -352,6 +357,12 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
+    protected void onDestroy() {
+        connectivityManager.stopListening();
+        super.onDestroy();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
     }
@@ -360,30 +371,6 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     protected void onStop() {
         super.onStop();
         GameUtil.getMediaPlayer().release();
-    }
-
-    @Override
-    public void moveTimerElapsed() {
-        try {
-            TimerElapsedDialog timerElapsedDialog = new TimerElapsedDialog();
-            timerElapsedDialog.setTimerEvent(TimerEvent.MOVE_TIMER_ELAPSED);
-            timerElapsedDialog.setResult(boardView.getCurrentPlayer().getOpponent().getAlliance().toString().concat(" WINS"));
-            timerElapsedDialog.show(this.getSupportFragmentManager(), "Timer Elapsed Dialog");
-            // Board Clearing
-            boardView.restartChessBoard();
-            whiteMoves.removeAllViews();
-            blackMoves.removeAllViews();
-            txtBlackStatus.setText("");
-            txtWhiteStatus.setText("");
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    @Override
-    public void moveGameElapsed() {
-
     }
 
     private void endGame() {
@@ -477,5 +464,35 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onPuzzleFinished() {
         Toast.makeText(this, "Finished Puzzle", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void playerTimeLapsed(chessbet.domain.Player player) {
+        // TODO Implement game over dialog fragment
+    }
+
+    @Override
+    public void onConnectionStateChanged(ConnectivityManager.ConnectionQuality connectionQuality) {
+        Log.d("SPEED_NET", connectionQuality.toString());
+        runOnUiThread(() -> {
+            switch (connectionQuality) {
+                case UNKNOWN:
+                    imgConnectionStatus.setImageDrawable(getResources().getDrawable(R.drawable.low_red));
+                    break;
+                case GOOD:
+                    imgConnectionStatus.setImageDrawable(getResources().getDrawable(R.drawable.good_connection));
+                    break;
+                case AVERAGE:
+                    imgConnectionStatus.setImageDrawable(getResources().getDrawable(R.drawable.medium_connection));
+                    break;
+                case POOR:
+                    imgConnectionStatus.setImageDrawable(getResources().getDrawable(R.drawable.low_red));
+                    break;
+                case EXCELLENT:
+                    imgConnectionStatus.setImageDrawable(getResources().getDrawable(R.drawable.high_connection));
+                    break;
+            }
+        });
+
     }
 }

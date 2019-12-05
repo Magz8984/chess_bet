@@ -77,7 +77,6 @@ public class MatchAPI implements Serializable {
                         RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
                         // Confirms a match has been made
                         matchListener.onMatchMade(matchableAccount);
-
                     }
                 }
             }
@@ -86,13 +85,15 @@ public class MatchAPI implements Serializable {
         });
     }
 
-    public void sendMoveData(MatchableAccount matchableAccount,int source, int destination, String pgn){
+    public void sendMoveData(MatchableAccount matchableAccount,int source, int destination, String pgn, long gameTimeLeft){
         RemoteMove.get().setOwner(matchableAccount.getOwner());
         RemoteMove.get().setFrom(source);
+        RemoteMove.get().setGameTimeLeft(gameTimeLeft); // Regulate game play
         RemoteMove.get().setTo(destination);
         RemoteMove.get().setPgn(pgn); // Pgn string of the match
         RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
     }
+
     // TODO Implement remote move events
     public void getRemoteMoveData(MatchableAccount matchableAccount){
         DatabaseUtil.getOpponentRemoteMove(matchableAccount.getMatchId(), matchableAccount.getOpponent())
@@ -147,7 +148,6 @@ public class MatchAPI implements Serializable {
         createUserMatchableAccount(matchableAccount, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                Log.d("MATCH_ERROR", e.getMessage());
                 matchListener.onMatchError();
             }
 

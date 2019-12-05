@@ -8,6 +8,13 @@
     android:padding="0dp"
     android:background="#262626">
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgConnectionStatus"
+        android:layout_alignParentRight="true"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentEnd="true">
+    </de.hdodenhof.circleimageview.CircleImageView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -87,6 +94,17 @@
                             android:textSize="15sp" />
 
                         <TextView
+                            android:id="@+id/blackTimer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="15sp"
+                            android:textColor="#fff"
+                            android:layout_marginLeft="@dimen/fab_margin"
+                            android:layout_marginStart="@dimen/fab_margin"
+                            android:fontFamily="@font/chakrapetchbold"
+                            />
+
+                        <TextView
                             android:id="@+id/txtBlackStatus"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -146,6 +164,17 @@
                             android:text="White"
                             android:textColor="#fff"
                             android:textSize="15sp" />
+
+                        <TextView
+                            android:id="@+id/whiteTimer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="15sp"
+                            android:textColor="#fff"
+                            android:layout_marginLeft="@dimen/fab_margin"
+                            android:layout_marginStart="@dimen/fab_margin"
+                            android:fontFamily="@font/chakrapetchbold"
+                            />
 
                         <TextView
                             android:id="@+id/txtWhiteStatus"

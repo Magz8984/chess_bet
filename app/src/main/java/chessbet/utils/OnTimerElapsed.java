@@ -1,6 +1,7 @@
 package chessbet.utils;
 
+import chessbet.domain.Player;
+
 public interface OnTimerElapsed {
-    void moveTimerElapsed();
-    void moveGameElapsed();
+    void playerTimeLapsed(Player player);
 }

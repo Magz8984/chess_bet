@@ -30,6 +30,15 @@
         android:textColor="#fff"
         android:layout_alignParentStart="true" />
 
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgConnectionStatus"
+        android:layout_alignParentRight="true"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentEnd="true">
+    </de.hdodenhof.circleimageview.CircleImageView>
+
     <RelativeLayout
         android:layout_below="@id/title"
         android:layout_above="@id/chessLayout"
@@ -55,6 +64,17 @@
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
                     android:fontFamily="@font/chakrapetchbold"/>
+
+                <TextView
+                    android:id="@+id/blackTimer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorPrimaryYellow"
+                    android:layout_marginLeft="@dimen/fab_margin"
+                    android:layout_marginStart="@dimen/fab_margin"
+                    android:fontFamily="@font/chakrapetchbold"
+                    />
 
                 <TextView
                     android:id="@+id/txtBlackStatus"
@@ -123,6 +143,17 @@
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
                 android:fontFamily="@font/chakrapetchbold"/>
+
+            <TextView
+                android:id="@+id/whiteTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textColor="@color/colorPrimaryYellow"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:layout_marginStart="@dimen/fab_margin"
+                android:fontFamily="@font/chakrapetchbold"
+                />
 
             <TextView
                 android:id="@+id/txtWhiteStatus"
