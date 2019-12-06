@@ -130,7 +130,8 @@ public class Cell extends View {
                     boardView.destinationTile = boardView.chessBoard.getTile(tileId);
                     boardView.setMoveData(boardView.movedPiece.getPiecePosition(), tileId); // Online Play
 
-                    if(boardView.mode != BoardView.Modes.PUZZLE_MODE) {
+
+                    if(boardView.mode != BoardView.Modes.PUZZLE_MODE && !boardView.isEngineLoading) {
                         // Stop the current player timer
                         if(boardView.gameTimer != null){
                             boardView.gameTimer.stopTimer((boardView.chessBoard.currentPlayer().getAlliance() == Alliance.WHITE) ? Player.WHITE :  Player.BLACK);
@@ -150,28 +151,47 @@ public class Cell extends View {
                         boardView.onMoveDoneListener.getMoves(boardView.moveLog);
                         boardView.onMoveDoneListener.onGameResume();
                     }
-                    else {
+                    else if (boardView.mode == BoardView.Modes.PUZZLE_MODE){
                         // Check Move Validity
                         puzzleModeAction(move);
                     }
 
-                    if(boardView.chessBoard.currentPlayer().isInCheckMate()){
-                        boardView.onMoveDoneListener.isCheckMate(boardView.chessBoard.currentPlayer());
+                    if(boardView.mode == BoardView.Modes.PLAY_COMPUTER && boardView.chessBoard.currentPlayer().getAlliance() == Alliance.BLACK){
+                        boardView.isEngineLoading = true;
+                        boardView.engine = new BoardView.AI_ENGINE();
+                        boardView.engine.setEngineMoveHandler(move1 -> {
+                            boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(move1).getTransitionBoard();
+                            boardView.moveLog.addMove(move1);
+                            boardView.moveCursor = boardView.moveLog.size();
+                            boardView.onMoveDoneListener.getMoves(boardView.moveLog);
+                            GameUtil.playSound();
+                            updateGameStatus();
+                            boardView.isEngineLoading = false;
+                            boardView.invalidate();
+                        });
+                        boardView.engine.execute(boardView.chessBoard);
                     }
-                    else if(boardView.chessBoard.currentPlayer().isInCheck()){
-                        boardView.onMoveDoneListener.isCheck(boardView.chessBoard.currentPlayer());
-                    }
-                    else if(boardView.chessBoard.currentPlayer().isInStaleMate()){
-                        boardView.onMoveDoneListener.isStaleMate(boardView.chessBoard.currentPlayer());
-                    }
-                    else if(boardView.chessBoard.isDraw()){
-                        boardView.onMoveDoneListener.isDraw();
-                    }
+                    updateGameStatus();
                 }
                 boardView.sourceTile = null;
                 boardView.movedPiece = null;
                 boardView.invalidate();
             }
+    }
+
+    private void updateGameStatus(){
+        if(boardView.chessBoard.currentPlayer().isInCheckMate()){
+            boardView.onMoveDoneListener.isCheckMate(boardView.chessBoard.currentPlayer());
+        }
+        else if(boardView.chessBoard.currentPlayer().isInCheck()){
+            boardView.onMoveDoneListener.isCheck(boardView.chessBoard.currentPlayer());
+        }
+        else if(boardView.chessBoard.currentPlayer().isInStaleMate()){
+            boardView.onMoveDoneListener.isStaleMate(boardView.chessBoard.currentPlayer());
+        }
+        else if(boardView.chessBoard.isDraw()){
+            boardView.onMoveDoneListener.isDraw();
+        }
     }
 
     private void puzzleModeAction(Move move){

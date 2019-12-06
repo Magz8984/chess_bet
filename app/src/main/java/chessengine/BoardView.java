@@ -7,6 +7,7 @@ package chessengine;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Rect;
+import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -21,11 +22,12 @@ import com.chess.engine.board.Tile;
 import com.chess.engine.pieces.Piece;
 import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
+import com.chess.engine.player.chess_engine_ai.MinMaxAlgorithm;
+import com.chess.engine.player.chess_engine_ai.MoveStategy;
 import com.chess.pgn.PGNMainUtils;
 import com.chess.pgn.PGNUtilities;
 import com.google.common.collect.Lists;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +39,7 @@ import chessbet.services.RemoteMoveListener;
 import chessbet.services.RemoteViewUpdateListener;
 import chessbet.utils.GameTimer;
 
-public class BoardView extends View implements RemoteMoveListener, Serializable {
+public class BoardView extends View implements RemoteMoveListener {
     protected Board chessBoard;
     protected Tile sourceTile;
     protected Tile destinationTile;
@@ -62,6 +64,8 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
     private RemoteViewUpdateListener remoteViewUpdateListener;
     protected int moveCursor = 0;
     protected PuzzleMove puzzleMove;
+    protected AI_ENGINE engine;
+    protected boolean isEngineLoading = false;
     private List<Rect> tiles = new ArrayList<>();
 
     private void initialize(Context context){
@@ -483,7 +487,8 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
         LOCAL_PLAY,
         GAME_REVIEW,
         PLAY_ONLINE,
-        PUZZLE_MODE
+        PUZZLE_MODE,
+        PLAY_COMPUTER
     }
 
     public Modes getMode() {
@@ -502,6 +507,31 @@ public class BoardView extends View implements RemoteMoveListener, Serializable 
     public interface PuzzleMove{
         void onCorrectMoveMade(boolean isCorrect);
         void onPuzzleFinished();
+    }
+
+     protected interface EngineMoveHandler{
+        void onBestMoveMade(Move move);
+    }
+
+
+    // Enable Play Online Engine as Black
+     static class AI_ENGINE extends AsyncTask<Board,Void,Move> {
+        private EngineMoveHandler engineMoveHandler;
+
+        void setEngineMoveHandler(EngineMoveHandler engineMoveHandler) {
+            this.engineMoveHandler = engineMoveHandler;
+        }
+
+        @Override
+        protected Move doInBackground(Board... boards) {
+            MoveStategy minMax = new MinMaxAlgorithm(2);
+            return minMax.execute(boards[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Move move) {
+            engineMoveHandler.onBestMoveMade(move);
+        }
     }
 }
 

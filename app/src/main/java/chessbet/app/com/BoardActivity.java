@@ -39,6 +39,7 @@ import chessbet.Application;
 import chessbet.api.AccountAPI;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
+import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
@@ -114,6 +115,12 @@ private boolean isStoredGame = false;
         super.onStart();
         GameUtil.initialize(R.raw.chess_move, this);
         Intent intent = getIntent();
+        String matchType = intent.getStringExtra("match_type");
+
+        if(matchType != null && matchType.equals(MatchType.SINGLE_PLAYER.toString())){
+            boardView.setMode(BoardView.Modes.PLAY_COMPUTER);
+        }
+
         matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
         if (matchableAccount != null) {
             boardView.setMode(BoardView.Modes.PLAY_ONLINE);
