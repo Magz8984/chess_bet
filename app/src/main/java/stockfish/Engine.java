@@ -17,8 +17,6 @@ import java.util.Objects;
 
 import chessbet.Application;
 
-
-
 public class Engine implements UCImpl {
     static {
         System.loadLibrary("nativeutil");

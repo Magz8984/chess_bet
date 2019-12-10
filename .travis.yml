@@ -41,5 +41,5 @@ dist: trusty
 
 script:
 - ./gradlew assembleRelease
-- ./gradlew clean test
+- ./gradlew clean test # FIx buy testing this
 - ./gradlew build
