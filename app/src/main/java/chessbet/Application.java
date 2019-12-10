@@ -37,4 +37,8 @@ public class Application extends MultiDexApplication{
     public void setConnectivityListener(ConnectivityReceiver.ConnectivityReceiverListener connectivityListener){
         ConnectivityReceiver.connectivityReceiverListener = connectivityListener;
     }
+
+    public static Context getContext(){
+        return INSTANCE;
+    }
 }

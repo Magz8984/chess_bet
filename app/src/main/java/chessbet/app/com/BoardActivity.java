@@ -28,6 +28,7 @@ import com.chess.pgn.PGNMainUtils;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -113,6 +114,11 @@ private boolean isStoredGame = false;
     @Override
     protected void onStart() {
         super.onStart();
+
+        if(boardView.getStockfish().isEngineRunning()){
+            Toast.makeText(this, "Stockfish 10 running", Toast.LENGTH_LONG).show();
+        }
+
         GameUtil.initialize(R.raw.chess_move, this);
         Intent intent = getIntent();
         String matchType = intent.getStringExtra("match_type");

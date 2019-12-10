@@ -12,6 +12,11 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            ndkBuild {
+                arguments '-j8'
+            }
+        }
     }
     buildTypes {
         release {
@@ -22,6 +27,12 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    externalNativeBuild {
+        ndkBuild {
+            path file('src/main/cpp/Android.mk')
+        }
     }
 
     buildTypes.each {
@@ -69,6 +80,16 @@ dependencies {
     implementation "com.andkulikov:transitionseverywhere:1.8.1" // Transition everywhere
     implementation 'com.google.firebase:firebase-analytics:17.2.1'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+}
+
+task copyToAssets(type: Copy) {
+    from('build/intermediates/ndkBuild/release/obj/local') {
+        include '*/stockfish'
+    }
+    into 'src/main/assets'
+}
+tasks.withType(JavaCompile) {
+    t -> t.dependsOn copyToAssets
 }
 
 apply plugin: 'com.google.gms.google-services'

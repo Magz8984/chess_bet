@@ -38,6 +38,9 @@ import chessbet.domain.RemoteMove;
 import chessbet.services.RemoteMoveListener;
 import chessbet.services.RemoteViewUpdateListener;
 import chessbet.utils.GameTimer;
+import stockfish.Engine;
+import stockfish.EngineUtil;
+import stockfish.InternalStockFishHandler;
 
 public class BoardView extends View implements RemoteMoveListener {
     protected Board chessBoard;
@@ -67,8 +70,22 @@ public class BoardView extends View implements RemoteMoveListener {
     protected AI_ENGINE engine;
     protected boolean isEngineLoading = false;
     private List<Rect> tiles = new ArrayList<>();
+    private InternalStockFishHandler internalStockFishHandler;
+    // Stockfish 10
+    private Engine stockfish;
 
     private void initialize(Context context){
+        stockfish = new Engine();
+        // Start Stock Fish
+        stockfish.start();
+
+        // Start listening to engine data
+        EngineUtil.startListening();
+
+        internalStockFishHandler = new InternalStockFishHandler();
+        internalStockFishHandler.setStockFishResponse(response -> {
+            Log.d("Move Response", EngineUtil.movesSearch(response));
+        });
         setSaveEnabled(true);
         moveLog= new MoveLog();
         chessBoard= Board.createStandardBoard();
@@ -78,6 +95,10 @@ public class BoardView extends View implements RemoteMoveListener {
             final  Cell cell = new Cell(context,this,i);
             this.boardCells.add(cell);
         }
+    }
+
+    public InternalStockFishHandler getInternalStockFishHandler() {
+        return internalStockFishHandler;
     }
 
     public BoardView(Context context, AttributeSet attributeSet){
@@ -94,6 +115,10 @@ public class BoardView extends View implements RemoteMoveListener {
     public boolean performClick(){
         super.performClick();
         return true;
+    }
+
+    public Engine getStockfish(){
+        return stockfish;
     }
 
     public void setPuzzleMove(PuzzleMove puzzleMove) {

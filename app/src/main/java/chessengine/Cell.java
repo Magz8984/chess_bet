@@ -20,6 +20,7 @@ import com.chess.engine.Move;
 import com.chess.engine.board.Board;
 import com.chess.engine.board.Tile;
 import com.chess.engine.player.MoveTransition;
+import com.chess.pgn.FenUtilities;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -137,6 +138,10 @@ public class Cell extends View {
                             boardView.gameTimer.stopTimer((boardView.chessBoard.currentPlayer().getAlliance() == Alliance.WHITE) ? Player.WHITE :  Player.BLACK);
                         }
                         boardView.chessBoard = transition.getTransitionBoard();
+
+                        // Ask stockfish
+                        boardView.getInternalStockFishHandler().askStockFishMove(FenUtilities.createFEN(boardView.chessBoard), 3000, 10);
+
                         GameUtil.playSound();  // Play sound once move is made
 
                         if (boardView.chessBoard.currentPlayer().isInCheckMate()) {
@@ -198,14 +203,27 @@ public class Cell extends View {
         if(boardView.puzzleMoveCounter < boardView.getPuzzle().getMoves().size() && isCorrectPuzzleMove(move)){
             boardView.puzzleMove.onCorrectMoveMade(true);
             boardView.puzzleMoveCounter++;
+            invalidate();
 
             if(boardView.puzzleMoveCounter < boardView.getPuzzle().getMoves().size()){
-                    Move nextMove = Move.MoveFactory.createMove(boardView.chessBoard ,boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getFromCoordinate(),
-                            boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getToCoordinate());
-                    boardView.moveLog.addMove(nextMove);
-                    boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(nextMove).getTransitionBoard();
-                    boardView.puzzleMoveCounter++;
-                    invalidate();
+                    new Thread(() -> {
+                        try {
+                            // Wait for a second before the next move is made
+                            Thread.sleep(1000);
+
+                            Move nextMove = Move.MoveFactory.createMove(boardView.chessBoard ,boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getFromCoordinate(),
+                                    boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getToCoordinate());
+                            boardView.destinationTile = boardView.chessBoard.getTile(tileId);
+                            boardView.moveLog.addMove(nextMove);
+                            boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(nextMove).getTransitionBoard();
+                            boardView.puzzleMoveCounter++;
+
+                            // Ensure board positions are redone
+                            boardView.postInvalidate();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
             }
             else{
                 boardView.setMode(BoardView.Modes.LOCAL_PLAY);
@@ -216,8 +234,6 @@ public class Cell extends View {
             boardView.moveCursor = boardView.moveLog.size();
             boardView.onMoveDoneListener.getMoves(boardView.moveLog);
             boardView.onMoveDoneListener.onGameResume();
-
-            invalidate();
         } else {
             boardView.puzzleMove.onCorrectMoveMade(false);
         }
