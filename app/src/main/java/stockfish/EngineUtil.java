@@ -16,6 +16,11 @@ public class EngineUtil {
     private static BufferedWriter bufferedWriter;
     private static BufferedReader bufferedReader;
     private static Thread listenerThread;
+    private volatile static OnResponseListener onResponseListener;
+
+    public static void setOnResponseListener(OnResponseListener onResponseListener) {
+        EngineUtil.onResponseListener = onResponseListener;
+    }
 
     static void setBufferedReader(BufferedReader bufferedReader) {
         EngineUtil.bufferedReader = bufferedReader;
@@ -25,20 +30,28 @@ public class EngineUtil {
         EngineUtil.bufferedWriter = bufferedWriter;
     }
 
-    static void pipe(String line, Response response){
+    static void pipe(String line){
          try {
              bufferedWriter.write(line + "\n");
              bufferedWriter.flush();
-             String endResult = "";
-             ensureBufferedReaderIsReady();
-             while (bufferedReader.ready()){
-                 endResult =  bufferedReader.readLine();
-             }
-             response.onResponseReceived(endResult);
-
          }catch (Exception ex){
              ex.printStackTrace();
          }
+    }
+
+    static void pipe(String line, Response response){
+        try {
+            bufferedWriter.write(line + "\n");
+            bufferedWriter.flush();
+            String endResult = "";
+            ensureBufferedReaderIsReady();
+            while (bufferedReader.ready()){
+                endResult =  bufferedReader.readLine();
+            }
+            response.onResponseReceived(endResult);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     public static void startListening(){
@@ -49,7 +62,10 @@ public class EngineUtil {
                  while (true){
                      try {
                          endResult =  bufferedReader.readLine();
-                         Log.d("MESSAGEX", endResult);
+                         if(endResult != null){
+                             onResponseListener.onResponse(movesSearch(endResult));
+                             Log.d("MESSAGEX", endResult);
+                         }
                      } catch (Exception e) {
                          e.printStackTrace();
                      }
@@ -101,7 +117,7 @@ public class EngineUtil {
         StringBuilder builder = new StringBuilder();
         // Handle
         if(response.startsWith("best")){
-            return response.split(" ")[1];
+            return null;
         }
         else if(response.startsWith("info")){
             List<String> list = Arrays.asList(response.split(" "));
@@ -118,5 +134,9 @@ public class EngineUtil {
             }
         }
         return builder.toString();
+    }
+
+    public interface OnResponseListener{
+        void onResponse(String moves);
     }
 }

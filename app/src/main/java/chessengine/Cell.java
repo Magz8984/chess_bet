@@ -137,9 +137,10 @@ public class Cell extends View {
                         if(boardView.gameTimer != null){
                             boardView.gameTimer.stopTimer((boardView.chessBoard.currentPlayer().getAlliance() == Alliance.WHITE) ? Player.WHITE :  Player.BLACK);
                         }
-                        boardView.chessBoard = transition.getTransitionBoard();
 
                         // Ask stockfish
+                        boardView.chessBoard = transition.getTransitionBoard();
+
                         boardView.getInternalStockFishHandler().askStockFishMove(FenUtilities.createFEN(boardView.chessBoard), 3000, 10);
 
                         GameUtil.playSound();  // Play sound once move is made

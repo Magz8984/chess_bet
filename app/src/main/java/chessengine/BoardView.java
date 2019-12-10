@@ -24,6 +24,7 @@ import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
 import com.chess.engine.player.chess_engine_ai.MinMaxAlgorithm;
 import com.chess.engine.player.chess_engine_ai.MoveStategy;
+import com.chess.pgn.FenUtilities;
 import com.chess.pgn.PGNMainUtils;
 import com.chess.pgn.PGNUtilities;
 import com.google.common.collect.Lists;
@@ -47,7 +48,7 @@ public class BoardView extends View implements RemoteMoveListener {
     protected Tile sourceTile;
     protected Tile destinationTile;
     protected Piece movedPiece;
-    private List<Cell> boardCells=null;
+    private List<Cell> boardCells = null;
     private BoardDirection boardDirection;
     private Puzzle puzzle;
     protected int puzzleMoveCounter = 0;
@@ -68,11 +69,16 @@ public class BoardView extends View implements RemoteMoveListener {
     protected int moveCursor = 0;
     protected PuzzleMove puzzleMove;
     protected AI_ENGINE engine;
+    protected boolean isHinting = false; // Is the board in hint mode
     protected boolean isEngineLoading = false;
     private List<Rect> tiles = new ArrayList<>();
+    private MoveAnimator moveAnimator = new MoveAnimator();
     private InternalStockFishHandler internalStockFishHandler;
     // Stockfish 10
     private Engine stockfish;
+
+
+    private volatile Move currentStockFishMove = null;
 
     private void initialize(Context context){
         stockfish = new Engine();
@@ -82,10 +88,14 @@ public class BoardView extends View implements RemoteMoveListener {
         // Start listening to engine data
         EngineUtil.startListening();
 
-        internalStockFishHandler = new InternalStockFishHandler();
-        internalStockFishHandler.setStockFishResponse(response -> {
-            Log.d("Move Response", EngineUtil.movesSearch(response));
+        EngineUtil.setOnResponseListener(moves -> {
+           String position =  moves.split(" ")[0];
+           currentStockFishMove = getMoveByPositions(position);
+           postInvalidate();
         });
+
+        internalStockFishHandler = new InternalStockFishHandler();
+
         setSaveEnabled(true);
         moveLog= new MoveLog();
         chessBoard= Board.createStandardBoard();
@@ -106,7 +116,7 @@ public class BoardView extends View implements RemoteMoveListener {
         initialize(context);
     }
 
-    public  BoardView(Context context){
+    public BoardView(Context context){
         super(context);
        initialize(context);
     }
@@ -215,7 +225,7 @@ public class BoardView extends View implements RemoteMoveListener {
     @Override
     protected  void onDraw(Canvas canvas){
         int i = 0;
-
+        moveAnimator.setCanvas(canvas);
         if(tiles.size() == 0){
             createTileRectangles();
         }
@@ -229,6 +239,38 @@ public class BoardView extends View implements RemoteMoveListener {
                 i++;
             }
         }
+        handleDrawHint();
+    }
+
+    public void handleDrawHint(){
+        if(currentStockFishMove != null && isHinting){
+            try {
+                int to, from;
+
+                if(!isFlipped){
+                    to =  63 - currentStockFishMove.getDestinationCoordinate();
+                    from = 63 - currentStockFishMove.getCurrentCoordinate();
+                } else {
+                    to = currentStockFishMove.getDestinationCoordinate();
+                    from = currentStockFishMove.getCurrentCoordinate();
+                }
+                moveAnimator.setDraw(true);
+                moveAnimator.setToRect(tiles.get(to));
+                moveAnimator.setFromRect(tiles.get(from));
+                moveAnimator.dispatchDraw();
+            } catch (Exception ex){
+                ex.printStackTrace();
+            }
+
+        }
+    }
+
+    public void requestHint() {
+        isHinting = !isHinting;
+        if(currentStockFishMove == null){
+            internalStockFishHandler.askStockFishMove(FenUtilities.createFEN(chessBoard), 3000, 3);
+        }
+        invalidate();
     }
 
 
@@ -320,6 +362,7 @@ public class BoardView extends View implements RemoteMoveListener {
 
 
     public void flipBoardDirection() {
+        isFlipped = !isFlipped;
         this.boardDirection = boardDirection.opposite();
         topAlliance = topAlliance.equals(Alliance.BLACK) ? Alliance.WHITE : Alliance.BLACK;
         invalidate();
@@ -396,6 +439,14 @@ public class BoardView extends View implements RemoteMoveListener {
         moveCursor = moveLog.size();
         displayGameStates();
         invalidate();
+    }
+
+    private Move getMoveByPositions(String position){
+        String from = position.substring(0,2);
+        String to = position.substring(2,4);
+        int fromIndex = BoardUtils.getCoordinateAtPosition(from);
+        int toIndex = BoardUtils.getCoordinateAtPosition(to);
+        return Move.MoveFactory.createMove(chessBoard, fromIndex, toIndex);
     }
 
     public void undoMove(){

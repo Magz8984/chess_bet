@@ -75,6 +75,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.whitePieces) LinearLayout whitePieces;
 @BindView(R.id.blackPieces) LinearLayout blackPieces;
 @BindView(R.id.btnSave) Button btnSave;
+@BindView(R.id.btnHint) Button btnHint;
 @BindView(R.id.btnRecord) Button btnRecord;
 @BindView(R.id.blackTimer) TextView txtBlackTimer;
 @BindView(R.id.whiteTimer) TextView txtWhiteTimer;
@@ -103,6 +104,7 @@ private boolean isStoredGame = false;
         btnColorPicker.setOnClickListener(this);
         btnBack.setOnClickListener(this);
         btnForward.setOnClickListener(this);
+        btnHint.setOnClickListener(this);
         btnRecord.setOnClickListener(this);
         txtWhiteStatus.setTextColor(Color.RED);
         txtBlackStatus.setTextColor(Color.RED);
@@ -214,6 +216,8 @@ private boolean isStoredGame = false;
                         });
                 snackbar.show();
             }
+        } else if(v.equals(btnHint)) {
+            boardView.requestHint();
         }
     }
 

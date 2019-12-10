@@ -226,6 +226,13 @@
         android:layout_alignParentBottom="true">
 
         <Button
+            android:id="@+id/btnHint"
+            android:background="@drawable/hint"
+            android:layout_margin="5dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp" />
+
+        <Button
             android:id="@+id/btnRecord"
             android:background="@drawable/record_game"
             android:layout_margin="5dp"

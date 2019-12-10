@@ -152,7 +152,7 @@ public class Engine implements UCImpl {
     }
 
 
-    public static boolean isRunning(){
+    static boolean isRunning(){
         return  isUCIEnabled && isReady;
     }
 
