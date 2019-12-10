@@ -23,6 +23,11 @@ android:
   - extra-android-support
   - sys-img-$ANDROID_ABI-google_apis-$ANDROID_EMU_API_LEVEL
 
+
+install:
+  - echo y | sdkmanager 'ndk-bundle'
+  - echo y | sdkmanager 'lldb;3.0'
+
 licenses:
 - '.+'
 
