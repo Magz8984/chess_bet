@@ -47,4 +47,9 @@ public class MoveLog {
         moveLog.setMoves((ArrayList<Move>) this.moves);
         return moveLog;
     }
+
+    @Override
+    public String toString() {
+        return convertToEngineMoveLog().toString();
+    }
 }

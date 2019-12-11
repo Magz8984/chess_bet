@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.chess.engine.Alliance;
+import com.chess.engine.ECOBuilder;
 import com.chess.engine.Move;
 import com.chess.engine.pieces.Piece;
 import com.chess.engine.player.Player;
@@ -28,7 +29,6 @@ import com.chess.pgn.PGNMainUtils;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -53,6 +53,7 @@ import chessbet.utils.GameTimer;
 import chessbet.utils.OnTimerElapsed;
 import chessengine.BoardPreference;
 import chessengine.BoardView;
+import chessengine.ECOBook;
 import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
@@ -60,7 +61,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
         OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener, BoardView.PuzzleMove,
-        ConnectivityManager.ConnectionStateListener {
+        ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -99,6 +100,7 @@ private boolean isStoredGame = false;
         boardView.setWhiteCellsColor(boardPreference.getWhite());
         boardView.setOnMoveDoneListener(this);
         boardView.setRemoteViewUpdateListener(this);
+        boardView.setEcoBookListener(this);
         btnFlip.setOnClickListener(this);
         btnSave.setOnClickListener(this);
         btnColorPicker.setOnClickListener(this);
@@ -209,8 +211,7 @@ private boolean isStoredGame = false;
                                 puzzle.setOwnerPhotoUrl(AccountAPI.get().getCurrentUser().getProfile_photo_url());
                                 CreatePuzzle createPuzzle = new CreatePuzzle(puzzle, () -> boardView.setRecording());
                                 createPuzzle.show(getSupportFragmentManager(), "Create Puzzle");
-                            }
-                            else {
+                            } else {
                                 Toast.makeText(this, "Start Game First", Toast.LENGTH_LONG).show();
                             }
                         });
@@ -218,6 +219,11 @@ private boolean isStoredGame = false;
             }
         } else if(v.equals(btnHint)) {
             boardView.requestHint();
+            if(boardView.isHinting()){
+                Toast.makeText(this, "Hinting On", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "Hinting Off", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -511,5 +517,10 @@ private boolean isStoredGame = false;
             }
         });
 
+    }
+
+    @Override
+    public void onGetECO(ECOBuilder.ECO eco) {
+        runOnUiThread(() -> Toast.makeText(this, eco.getOpening(), Toast.LENGTH_LONG).show());
     }
 }

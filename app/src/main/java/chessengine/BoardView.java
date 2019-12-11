@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.graphics.Canvas;
+import android.widget.Toast;
 
 import com.chess.engine.Alliance;
 import com.chess.engine.Move;
@@ -32,7 +33,6 @@ import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import chessbet.api.MatchAPI;
 import chessbet.domain.MatchableAccount;
@@ -68,6 +68,7 @@ public class BoardView extends View implements RemoteMoveListener {
     private MatchableAccount matchableAccount;
     private MatchAPI matchAPI;
     private Alliance localAlliance;
+    protected ECOBook ecoBook;
     private RemoteViewUpdateListener remoteViewUpdateListener;
     protected int moveCursor = 0;
     protected PuzzleMove puzzleMove;
@@ -86,6 +87,8 @@ public class BoardView extends View implements RemoteMoveListener {
 
     private void initialize(Context context){
         stockfish = new Engine();
+
+        ecoBook = new ECOBook();
         // Start Stock Fish
         stockfish.start();
 
@@ -254,12 +257,13 @@ public class BoardView extends View implements RemoteMoveListener {
         handleDrawHint();
     }
 
+    /**
+     * Enable move ponder feature by stockfish
+     */
     public void handleDrawHint(){
         if(currentStockFishMove != null && isHinting){
             try {
                 int bto, bfrom, pto = 0, pfrom = 0;
-//                pto = pfrom = 0;
-
                 if(ponderedStockFishMove.getMovedPiece() == null){
                     ponderedStockFishMove = null;
                 }
@@ -305,10 +309,14 @@ public class BoardView extends View implements RemoteMoveListener {
         isHinting = !isHinting;
         if(currentStockFishMove == null){
             internalStockFishHandler.askStockFishMove(FenUtilities.createFEN(chessBoard), 3000, 3);
+        } else {
+            invalidate();
         }
-        invalidate();
     }
 
+    public boolean isHinting() {
+        return isHinting;
+    }
 
     private int getCellWidth(int width){
         return  (width /8);
@@ -616,6 +624,10 @@ public class BoardView extends View implements RemoteMoveListener {
     // Convert Game To PGN Notation
     public String getPortableGameNotation(){
         return PGNUtilities.get().acceptMoveLog(this.moveLog.convertToEngineMoveLog());
+    }
+
+    public void setEcoBookListener(ECOBook.OnGetECOListener listener){
+        this.ecoBook.setListener(listener);
     }
 
     public interface PuzzleMove{

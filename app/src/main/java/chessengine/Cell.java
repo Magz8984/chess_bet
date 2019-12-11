@@ -152,6 +152,9 @@ public class Cell extends View {
                         }
 
                         boardView.moveLog.addMove(move);
+                        boardView.ecoBook.setMoveLog(boardView.moveLog.toString());
+                        boardView.ecoBook.startListening();
+
                         boardView.addMoveToPuzzle(move);
                         boardView.moveCursor = boardView.moveLog.size();
                         boardView.onMoveDoneListener.getMoves(boardView.moveLog);
