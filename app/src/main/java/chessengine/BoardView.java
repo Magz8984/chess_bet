@@ -6,6 +6,7 @@ package chessengine;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
@@ -31,6 +32,7 @@ import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import chessbet.api.MatchAPI;
 import chessbet.domain.MatchableAccount;
@@ -43,6 +45,7 @@ import stockfish.Engine;
 import stockfish.EngineUtil;
 import stockfish.InternalStockFishHandler;
 
+// TODO Split Class into SOLID
 public class BoardView extends View implements RemoteMoveListener {
     protected Board chessBoard;
     protected Tile sourceTile;
@@ -79,6 +82,7 @@ public class BoardView extends View implements RemoteMoveListener {
 
 
     private volatile Move currentStockFishMove = null;
+    private volatile Move ponderedStockFishMove = null;
 
     private void initialize(Context context){
         stockfish = new Engine();
@@ -88,9 +92,17 @@ public class BoardView extends View implements RemoteMoveListener {
         // Start listening to engine data
         EngineUtil.startListening();
 
+        // Redraw the board once engine responds
+
         EngineUtil.setOnResponseListener(moves -> {
-           String position =  moves.split(" ")[0];
-           currentStockFishMove = getMoveByPositions(position);
+            String [] sMoves = moves.split(" ");
+           if(sMoves.length == 1){
+               // END OF GAME
+               currentStockFishMove = getMoveByPositions(sMoves[0]);
+           } else  if (sMoves.length > 1 ){
+               currentStockFishMove = getMoveByPositions(sMoves[0]);
+               ponderedStockFishMove = getMoveByPositions(sMoves[1]);
+           }
            postInvalidate();
         });
 
@@ -245,23 +257,47 @@ public class BoardView extends View implements RemoteMoveListener {
     public void handleDrawHint(){
         if(currentStockFishMove != null && isHinting){
             try {
-                int to, from;
+                int bto, bfrom, pto = 0, pfrom = 0;
+//                pto = pfrom = 0;
+
+                if(ponderedStockFishMove.getMovedPiece() == null){
+                    ponderedStockFishMove = null;
+                }
 
                 if(!isFlipped){
-                    to =  63 - currentStockFishMove.getDestinationCoordinate();
-                    from = 63 - currentStockFishMove.getCurrentCoordinate();
+                    bto =  63 - currentStockFishMove.getDestinationCoordinate();
+                    bfrom = 63 - currentStockFishMove.getCurrentCoordinate();
+
+                    if(ponderedStockFishMove != null){
+                        pto = 63 - ponderedStockFishMove.getDestinationCoordinate();
+                        pfrom = 63 - ponderedStockFishMove.getCurrentCoordinate();
+                    }
+
                 } else {
-                    to = currentStockFishMove.getDestinationCoordinate();
-                    from = currentStockFishMove.getCurrentCoordinate();
+                    bto = currentStockFishMove.getDestinationCoordinate();
+                    bfrom = currentStockFishMove.getCurrentCoordinate();
+
+                    if(ponderedStockFishMove != null){
+                        pto = ponderedStockFishMove.getDestinationCoordinate();
+                        pfrom = ponderedStockFishMove.getCurrentCoordinate();
+                    }
                 }
-                moveAnimator.setDraw(true);
-                moveAnimator.setToRect(tiles.get(to));
-                moveAnimator.setFromRect(tiles.get(from));
+
+                moveAnimator.setDraw(isHinting);
+                moveAnimator.setColor(Color.BLUE);
+                moveAnimator.setToRect(tiles.get(bto));
+                moveAnimator.setFromRect(tiles.get(bfrom));
                 moveAnimator.dispatchDraw();
+
+                if(ponderedStockFishMove != null){
+                    moveAnimator.setColor(Color.GREEN);
+                    moveAnimator.setToRect(tiles.get(pto));
+                    moveAnimator.setFromRect(tiles.get(pfrom));
+                    moveAnimator.dispatchDraw();
+                }
             } catch (Exception ex){
                 ex.printStackTrace();
             }
-
         }
     }
 
@@ -465,6 +501,7 @@ public class BoardView extends View implements RemoteMoveListener {
             invalidate();
         }
     }
+
     public void redoMove(){
         if (this.moveCursor < moveLog.size()){
             Move move = Move.MoveFactory.createMove(chessBoard, moveLog.getMove(moveCursor).getCurrentCoordinate(), moveLog.getMove(moveCursor).getDestinationCoordinate());
@@ -477,6 +514,7 @@ public class BoardView extends View implements RemoteMoveListener {
             }
         }
     }
+
     private void displayGameStates(){
         if(chessBoard.currentPlayer().isInStaleMate()){
             onMoveDoneListener.isStaleMate(chessBoard.currentPlayer());
@@ -590,7 +628,7 @@ public class BoardView extends View implements RemoteMoveListener {
     }
 
 
-    // Enable Play Online Engine as Black
+    // Enable Play Computer Engine as Black
      static class AI_ENGINE extends AsyncTask<Board,Void,Move> {
         private EngineMoveHandler engineMoveHandler;
 
@@ -606,9 +644,13 @@ public class BoardView extends View implements RemoteMoveListener {
 
         @Override
         protected void onPostExecute(Move move) {
-            engineMoveHandler.onBestMoveMade(move);
+            // END GAME MIGHT RETURN A NULL
+            if(move != null){
+                engineMoveHandler.onBestMoveMade(move);
+            }
         }
     }
+
 }
 
 

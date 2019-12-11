@@ -1,7 +1,6 @@
 package chessengine;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -17,12 +16,20 @@ public class MoveAnimator {
    private Canvas canvas;
    private Paint paint;
    private boolean draw;
+   private int color;
 
-   private void getPainter(){
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    private void getPainter(){
        paint = new Paint();
        paint.setStyle(Paint.Style.STROKE);
        paint.setAntiAlias(true);
-       paint.setColor(Color.BLUE);
+
+       paint.setColor(color);
+
        paint.setStrokeWidth(5);
    }
 

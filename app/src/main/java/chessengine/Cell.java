@@ -167,6 +167,7 @@ public class Cell extends View {
                         boardView.engine = new BoardView.AI_ENGINE();
                         boardView.engine.setEngineMoveHandler(move1 -> {
                             boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(move1).getTransitionBoard();
+                            boardView.getInternalStockFishHandler().askStockFishMove(FenUtilities.createFEN(boardView.chessBoard), 3000, 10);
                             boardView.moveLog.addMove(move1);
                             boardView.moveCursor = boardView.moveLog.size();
                             boardView.onMoveDoneListener.getMoves(boardView.moveLog);

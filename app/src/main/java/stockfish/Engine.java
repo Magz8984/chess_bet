@@ -32,14 +32,14 @@ public class Engine implements UCImpl {
             context = Application.getContext();
             handleProcessCreation();
             startProcess();
-//            if(!isReady){
+
             isReady(response -> {
                 if (response.equals("readyok")){
                     isReady = true;
                 }
                 Log.d("RESPONSE_ENG", response);
             });
-//            }
+
             setUCI(response -> {
                 if(response.equals("uciok")){
                     isUCIEnabled = true;
