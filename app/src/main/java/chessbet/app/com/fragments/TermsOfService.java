@@ -14,12 +14,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import java.util.Date;
-
 import chessbet.api.AccountAPI;
 import chessbet.app.com.R;
 import chessbet.domain.AccountEvent;
 import chessbet.domain.Constants;
+import chessbet.utils.Util;
 
 public class TermsOfService extends DialogFragment implements View.OnClickListener{
     private CheckBox chkAccept;
@@ -58,7 +57,7 @@ public class TermsOfService extends DialogFragment implements View.OnClickListen
                 accountEvent.setName(AccountEvent.Event.TERMS_OF_SERVICE_ACCEPTED);
                 accountEvent.setDone(true);
                 // Reference
-                accountEvent.setDate_created(new Date().toString());
+                accountEvent.setDate_created(Util.now());
                 AccountAPI.get().getCurrentAccount().addEvent(accountEvent);
                 AccountAPI.get().getCurrentAccount().setTerms_and_condition_accepted(true);
                 AccountAPI.get().updateAccount();
