@@ -2,9 +2,12 @@ package chessbet.api;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -115,6 +118,16 @@ public class AccountAPI {
                Log.d("ERROR MESSAGE : ", Objects.requireNonNull(task.getException()).getMessage());
            }
        });
+    }
+
+    public void updateAccount(){
+        accountReference.set(currentAccount).addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                accountListener.onAccountUpdated(true);
+            } else {
+                accountListener.onAccountUpdated(false);
+            }
+        });
     }
 
     public void listenToAccountUpdate(){

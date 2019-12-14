@@ -1,7 +1,7 @@
 package chessbet.domain;
 
 public class AccountEvent {
-    private String name;
+    private Event name;
     private String date_created;
     private boolean done;
 
@@ -13,7 +13,7 @@ public class AccountEvent {
         this.done = done;
     }
 
-    public void setName(String name) {
+    public void setName(Event name) {
         this.name = name;
     }
 
@@ -25,7 +25,12 @@ public class AccountEvent {
         return date_created;
     }
 
-    public String getName() {
+    public Event getName() {
         return name;
+    }
+
+    public enum Event{
+        TERMS_OF_SERVICE_ACCEPTED,
+        CREATED
     }
 }

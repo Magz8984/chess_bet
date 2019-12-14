@@ -122,6 +122,22 @@ public class Account {
         return events;
     }
 
+    public void addEvent(AccountEvent accountEvent){
+        if(events == null){
+            events = new ArrayList<>();
+        }
+        events.add(accountEvent);
+    }
+
+    public boolean isTermsOfServiceAccepted(){
+        for (AccountEvent event: events) {
+            if(event.getName().equals(AccountEvent.Event.TERMS_OF_SERVICE_ACCEPTED)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public ArrayList<MatchDetails> getMatches() {
         return matches;
     }

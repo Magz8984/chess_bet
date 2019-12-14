@@ -52,6 +52,7 @@ import chessbet.app.com.fragments.MatchFragment;
 import chessbet.app.com.fragments.ProfileFragment;
 import chessbet.app.com.fragments.PuzzleFragment;
 import chessbet.app.com.fragments.SettingsFragment;
+import chessbet.app.com.fragments.TermsOfService;
 import chessbet.domain.Account;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
@@ -167,7 +168,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 break;
             case R.id.itm_terms:
-                Toast.makeText(this, "Accept Terms", Toast.LENGTH_LONG).show();
+                if(AccountAPI.get().getCurrentAccount() != null) {
+                    if(!AccountAPI.get().getCurrentAccount().isTermsOfServiceAccepted()){
+                        Toast.makeText(this, "Accept Terms", Toast.LENGTH_LONG).show();
+                        TermsOfService termsOfService = new TermsOfService();
+                        termsOfService.show(getSupportFragmentManager(), "Terms Of Service");
+                    } else {
+                        Toast.makeText(this, "Terms Of Service Already Accepted", Toast.LENGTH_LONG).show();
+                    }
+                }
                 break;
             case R.id.games:
                 toolbar.setTitle(getString(R.string.games));
@@ -200,6 +209,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             txtEmail.setText(user.getEmail());
             EventBroadcast.get().broadcastUserLoaded();
+        }
+    }
+
+    @Override
+    public void onAccountUpdated(boolean status) {
+        if(status){
+            Toast.makeText(this, "Account Updated", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Account Not Updated", Toast.LENGTH_LONG).show();
         }
     }
 
