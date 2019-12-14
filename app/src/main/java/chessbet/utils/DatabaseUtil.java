@@ -1,8 +1,14 @@
 package chessbet.utils;
 
+import android.database.Cursor;
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import chessbet.domain.Match;
 import chessbet.domain.MatchResult;
 
 public class DatabaseUtil {
@@ -41,5 +47,19 @@ public class DatabaseUtil {
 
     public static DatabaseReference getMatchTask(MatchResult matchResult){
         return databaseReference.child(DatabaseUtil.evaluationQueue).child(DatabaseUtil.match_task_node);
+    }
+
+    public static List<Match> getMatchesFromLocalDB(Cursor cursor){
+        List<Match> matches = new ArrayList<>();
+        if(cursor.moveToFirst()){
+            do {
+                Match match = new Match();
+                match.setMatchId(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_ID)));
+                match.setOpponentPic(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_PIC)));
+                match.setOpponentUserName(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_USERNAME)));
+                matches.add(match);
+            }while (cursor.moveToNext());
+        }
+        return matches;
     }
 }

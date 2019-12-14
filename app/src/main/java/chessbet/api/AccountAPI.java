@@ -2,29 +2,26 @@ package chessbet.api;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.List;
 import java.util.Objects;
 
 import chessbet.domain.Account;
+import chessbet.domain.Match;
+import chessbet.domain.MatchDetails;
+import chessbet.domain.MatchStatus;
 import chessbet.domain.Puzzle;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
 import chessbet.services.PuzzleListener;
+import chessbet.services.UserListener;
 import chessbet.utils.EventBroadcast;
 
 /**
@@ -33,6 +30,7 @@ import chessbet.utils.EventBroadcast;
 public class AccountAPI {
     private static String USER_COLLECTION = "users";
     private AccountListener accountListener;
+    private UserListener userListener;
     private PuzzleListener puzzleListener;
     private static String ACCOUNT_COLLECTION = "accounts";
     private static String TAG = AccountAPI.class.getSimpleName();
@@ -94,6 +92,10 @@ public class AccountAPI {
         return currentAccount;
     }
 
+    public void setUserListener(UserListener userListener) {
+        this.userListener = userListener;
+    }
+
     public User getCurrentUser() { return currentUser; }
 
     public void setAccountListener(AccountListener accountListener) {
@@ -118,6 +120,16 @@ public class AccountAPI {
                Log.d("ERROR MESSAGE : ", Objects.requireNonNull(task.getException()).getMessage());
            }
        });
+    }
+
+    public void updateUser(){
+        db.collection(AccountAPI.USER_COLLECTION).document(user.getUid()).set(currentUser).addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                userListener.onUserUpdated(true);
+            } else {
+                userListener.onUserUpdated(false);
+            }
+        });
     }
 
     public void updateAccount(){
@@ -149,5 +161,38 @@ public class AccountAPI {
 //               listenerRegistration.remove();
            }
        });
+    }
+
+
+    public void getAUser(String uid, OnUserReceived onUserReceived){
+        db.collection(AccountAPI.USER_COLLECTION).document(uid).get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                onUserReceived.onUserReceived(Objects.requireNonNull(task.getResult()).toObject(User.class));
+            } else {
+                onUserReceived.onUserReceived(null);
+            }
+        });
+    }
+
+    /** Results are got from firestore **/
+    public void assignMatchResults(List<Match> matches){
+        for (Match match : matches){
+            for (MatchDetails matchDetails: currentAccount.getMatches()) {
+                if(matchDetails.getMatch_result().getMatchId().equals(match.getMatchId())){
+                    if (matchDetails.getMatch_result().getMatchStatus().equals(MatchStatus.DRAW)){
+                        match.setMatchStatus(MatchStatus.DRAW);
+                    } else if(matchDetails.getMatch_result().getLoss().equals(currentAccount.getOwner())){
+                        match.setMatchStatus(MatchStatus.LOSS);
+                    } else if(matchDetails.getMatch_result().getGain().equals(currentAccount.getOwner())) {
+                        match.setMatchStatus(MatchStatus.WON);
+                    }
+                    match.setMatchResult(matchDetails.getMatch_result());
+                }
+            }
+        }
+    }
+
+    public interface OnUserReceived {
+        void onUserReceived(User user);
     }
 }

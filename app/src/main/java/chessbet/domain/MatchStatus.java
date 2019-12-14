@@ -18,5 +18,11 @@ public enum MatchStatus {
         public String toString() {
             return "INTERRUPTED";
         }
+    },
+    LOSS {
+        @Override
+        public String toString() {
+            return "LOSS";
+        }
     }
 }

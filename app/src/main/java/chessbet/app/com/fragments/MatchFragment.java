@@ -16,6 +16,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
@@ -31,6 +33,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import chessbet.adapter.GameDurationAdapter;
+import chessbet.adapter.MatchesAdapter;
 import chessbet.api.AccountAPI;
 import chessbet.api.ChallengeAPI;
 import chessbet.api.MatchAPI;
@@ -54,6 +57,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     private ScrollableNumberPicker startValue;
     private ScrollableNumberPicker endValue;
     private Challenge challenge;
+    private RecyclerView recMatches;
 
     private boolean showRatingView = false;
 
@@ -69,6 +73,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         progressCircle = view.findViewById(R.id.fabProgressCircle);
         ratingRangeView = view.findViewById(R.id.ratingRange);
         btnViewRangeViewHolder = view.findViewById(R.id.btnRatingRange);
+        recMatches = view.findViewById(R.id.recMatches);
         rangeViewHolder = view.findViewById(R.id.rangeViews);
         TextView txtAccountRating = view.findViewById(R.id.txtAccountRating);
         txtAccountRating.setText(String.format(Locale.US,"%d", (AccountAPI.get().getCurrentAccount() != null) ? AccountAPI.get().getCurrentAccount().getElo_rating() : 0));
@@ -79,6 +84,8 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         challenge = new Challenge();
         matchAPI.setMatchListener(this);
         findMatch.setOnClickListener(this);
+        recMatches.setHasFixedSize(true);
+        recMatches.setLayoutManager(new LinearLayoutManager(getContext()));
         initializeMatchRangeListeners();
         gameDurations.setAdapter(new GameDurationAdapter(getContext()));
         progressCircle.attachListener(this);
@@ -92,6 +99,8 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     @Override
     public void onStart() {
         super.onStart();
+        //Gets the account
+        recMatches.setAdapter(new MatchesAdapter(getContext()));
         matchAPI.getAccount();
     }
 
@@ -132,6 +141,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
             showRatingView =! showRatingView;
             TransitionManager.beginDelayedTransition(ratingRangeView);
             rangeViewHolder.setVisibility(showRatingView ? View.VISIBLE : View.GONE);
+//            rangeViewHolder.bringToFront();
         }
     }
 

@@ -6,6 +6,7 @@ public class User {
     private boolean disabled;
     private String email;
     private String uid;
+    private String userName;
     private String profile_photo_url;
 
     public String getDate_created() {
@@ -22,6 +23,14 @@ public class User {
 
     public String getUid() {
         return uid;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserName() {
+        return userName;
     }
 
     public boolean isDisabled() {
@@ -48,12 +57,13 @@ public class User {
         this.uid = ui;
     }
 
+
     public void setProfile_photo_url(String profile_photo_url) {
         this.profile_photo_url = profile_photo_url;
     }
 
     public String getProfile_photo_url() {
-        return profile_photo_url;
+        return (profile_photo_url == null) ? Constants.UTILITY_PROFILE : profile_photo_url;
     }
 }
 

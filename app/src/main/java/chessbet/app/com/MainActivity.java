@@ -41,6 +41,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -54,10 +55,12 @@ import chessbet.app.com.fragments.PuzzleFragment;
 import chessbet.app.com.fragments.SettingsFragment;
 import chessbet.app.com.fragments.TermsOfService;
 import chessbet.domain.Account;
+import chessbet.domain.Match;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
+import chessbet.utils.DatabaseUtil;
 import chessbet.utils.EventBroadcast;
-import chessbet.utils.Util;
+import chessbet.utils.SQLDatabaseHelper;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
@@ -97,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         EventBroadcast.get().addAccountUpdated(this);
 
         navigationView.setNavigationItemSelectedListener(this);
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.open,R.string.close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
@@ -115,6 +117,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user != null){
             Crashlytics.setUserIdentifier(user.getUid());
+        }
+    }
+
+    public void testMatches(){
+        List<Match> matches = DatabaseUtil.getMatchesFromLocalDB(new SQLDatabaseHelper(this).getMatches());
+        for (Match match: matches){
+            Log.d("MATCHTEST", match + "");
         }
     }
 

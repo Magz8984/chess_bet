@@ -23,10 +23,11 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import chessbet.api.AccountAPI;
 import chessbet.app.com.R;
 import chessbet.domain.User;
+import chessbet.services.UserListener;
 import chessbet.utils.EventBroadcast;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ProfileFragment extends Fragment implements View.OnClickListener, EventBroadcast.UserLoaded {
+public class ProfileFragment extends Fragment implements View.OnClickListener, EventBroadcast.UserLoaded, UserListener {
     private TextView txtEmail;
     private EditText txtNewEmail;
     private EditText txtNewPassword;
@@ -53,6 +54,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
         progressBar = view.findViewById(R.id.progress_bar);
         btnSave = view.findViewById(R.id.btnSaveProfile);
         btnSave.setOnClickListener(this);
+        AccountAPI.get().setUserListener(this);
         init();
         return view;
     }
@@ -83,8 +85,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
             if(txtNewUsername.getText().toString().length() > 0){
                 progressBar.setVisibility(View.VISIBLE);
                 builder.setDisplayName(txtNewUsername.getText().toString());
+                AccountAPI.get().getCurrentUser().setUserName(txtNewUsername.getText().toString());
                 firebaseUser.updateProfile(builder.build()).addOnCompleteListener(task -> {
                     if(task.isSuccessful()){
+                        AccountAPI.get().updateUser();
                         EventBroadcast.get().broadcastUserUpdate();
                         Toast.makeText(getContext(),"Profile update successful", Toast.LENGTH_SHORT).show();
                     }
@@ -97,5 +101,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
     @Override
     public void onUserLoaded() {
         init();
+    }
+
+    @Override
+    public void onUserUpdated(boolean status) {
+        if(getContext() != null){
+            if(status){
+                Toast.makeText(getContext(), "User Updated", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getContext(), "User Not Updated", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }

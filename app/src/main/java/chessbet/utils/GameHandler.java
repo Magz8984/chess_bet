@@ -1,20 +1,18 @@
 package chessbet.utils;
 
+import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
+import chessbet.api.AccountAPI;
 import chessbet.api.MatchAPI;
-import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchResult;
 import chessbet.domain.MatchableAccount;
-import chessbet.domain.RemoteMove;
-import chessbet.services.GameListener;
 
-public class GameHandler extends AsyncTask<Integer,Void,Void> implements GameListener {
-    private int flag = 0;
+public class GameHandler extends AsyncTask<Integer,Void,Void> {
     private static GameHandler INSTANCE = new GameHandler();
 
     private MatchResult matchResult;
-    private MatchableAccount matchableAccount;
 
     public static final int GAME_INTERRUPTED_FLAG = 18305;
     public static final int GAME_FINISHED_FLAG = 40934;
@@ -23,10 +21,6 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> implements GameLis
 
     public void setMatchResult(MatchResult matchResult) {
         this.matchResult = matchResult;
-    }
-
-    public void setMatchableAccount(MatchableAccount matchableAccount) {
-        this.matchableAccount = matchableAccount;
     }
 
     public static GameHandler getInstance() {
@@ -40,54 +34,40 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> implements GameLis
 
     @Override
     protected Void doInBackground(Integer... flags) {
-        flag = flags[0];
         MatchAPI.get().evaluateMatch(matchResult);
         matchResult = null;
         return null;
     }
 
-    public void sendMatchEvent(){
-        switch (flag){
-            case GAME_DRAWN_FLAG:
-                onGameDraw();
-                break;
-            case GAME_FINISHED_FLAG:
-                onGameFinished();
-                break;
-            case GAME_INTERRUPTED_FLAG:
-                onGameInterrupted();
-                break;
-            default:
-                break;
+
+    /**
+     * To be used in the background to collect data opponent for reference
+     */
+    public static class BackgroundMatchBuilder extends AsyncTask<Context,Void,Void> {
+        private MatchableAccount matchableAccount;
+
+        public void setMatchableAccount(MatchableAccount matchableAccount) {
+            this.matchableAccount = matchableAccount;
         }
-        // CLEAR SINGLETON MEMBERS
-        matchableAccount = null;
-        matchResult  = null;
-        flag = 0;
-    }
 
-    @Override
-    public boolean onGameInterrupted() {
-        return sendMatchEvent(MatchEvent.INTERRUPTED);
-    }
-
-    @Override
-    public boolean onGameDraw() {
-        return sendMatchEvent(MatchEvent.DRAW);
-    }
-
-    @Override
-    public boolean onGameFinished() {
-        return sendMatchEvent(MatchEvent.FINISHED);
-    }
-
-    private boolean sendMatchEvent(MatchEvent matchEvent){
-        // Game has started
-        if(RemoteMove.get().getEvents().size() != 0){
-            RemoteMove.get().addEvent(matchEvent);
-            RemoteMove.get().send(matchableAccount.getMatchId(), matchableAccount.getSelf());
-            return true;
+        @Override
+        protected Void doInBackground(Context... contexts) {
+            AccountAPI.get().getAUser(matchableAccount.getOpponentId(), user -> {
+                if(user != null){
+                    new SQLDatabaseHelper(contexts[0]).addMatch(matchableAccount.getMatchId(), user.getProfile_photo_url(), user.getUserName());
+                }
+            });
+            return null;
         }
-        return false;
+
+        @Override
+        protected void onPreExecute() {
+            Log.d(BackgroundMatchBuilder.class.getSimpleName(), "START");
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            Log.d(BackgroundMatchBuilder.class.getSimpleName(), "DONE");
+        }
     }
 }

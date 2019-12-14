@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_margin="5dp"
+    android:layout_height="wrap_content"
+    app:cardMaxElevation="4sp"
+    app:cardCornerRadius="5sp"
+    app:cardElevation="4sp">
+
+    <RelativeLayout
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imgOpponentPic"
+            android:src="@mipmap/ic_launcher"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <TextView
+            android:id="@+id/txtOpponentName"
+            android:layout_centerVertical="true"
+            android:textSize="20sp"
+            android:layout_margin="5dp"
+            android:fontFamily="@font/chakrapetchbold"
+            android:layout_toRightOf="@+id/imgOpponentPic"
+            android:text="Opponent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/imgOpponentPic" />
+
+        <TextView
+            android:id="@+id/txtResult"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:fontFamily="@font/chakrapetchbold"
+            android:textSize="20sp"
+            android:text="Result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true" />
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

@@ -191,7 +191,6 @@ public class MatchableAccount implements Parcelable {
                 .setGain(gain)
                 .setLoss(loss)
                 .build();
-        GameHandler.getInstance().setMatchableAccount(this);
         GameHandler.getInstance().setMatchResult(matchResult);
         GameHandler.getInstance().execute(flag);
     }

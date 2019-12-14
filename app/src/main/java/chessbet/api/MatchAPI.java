@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import chessbet.domain.Constants;
-import chessbet.domain.MatchEvaluationResponse;
 import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchResult;
 import chessbet.domain.MatchStatus;
@@ -30,8 +29,6 @@ import chessbet.services.MatchListener;
 import chessbet.services.RemoteMoveListener;
 import chessbet.utils.DatabaseUtil;
 
-import chessbet.utils.EventBroadcast;
-import chessbet.utils.GameHandler;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;

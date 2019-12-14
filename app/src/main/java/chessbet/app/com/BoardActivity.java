@@ -140,6 +140,11 @@ private boolean isStoredGame = false;
             boardView.setMatchableAccount(matchableAccount);
             boardView.getMatchAPI().setOnMatchEnd(this);
 
+            // Get opponent details and place in SQLiteDB
+            GameHandler.BackgroundMatchBuilder backgroundMatchBuilder = new GameHandler.BackgroundMatchBuilder();
+            backgroundMatchBuilder.setMatchableAccount(matchableAccount);
+            backgroundMatchBuilder.execute(this);
+
             // Set timer online game and make sure you do not set two different timers
             if(GameTimer.get() == null){
                 GameTimer.Builder builder = new GameTimer.Builder()
@@ -420,6 +425,7 @@ private boolean isStoredGame = false;
                 }
             }
             // End Game
+            AccountAPI.get().getAccount();
             goToMainActivity();
             GameTimer.get().stopAllTimers();
         }
@@ -548,13 +554,8 @@ private boolean isStoredGame = false;
 
     @Override
     public void onMatchEnd(MatchStatus matchStatus) {
-        MatchAPI.get().removeMatch(matchableAccount.getMatchId()).addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                Toast.makeText(this, "Match is " + matchStatus, Toast.LENGTH_LONG).show();
-                Intent intent=new Intent(this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
-
+        Toast.makeText(this, "Match is " + matchStatus, Toast.LENGTH_LONG).show();
+        Intent intent=new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 }
