@@ -24,5 +24,11 @@ public enum MatchEvent {
         public String toString() {
             return "INTERRUPTED";
         }
+    },
+    DRAW {
+        @Override
+        public String toString() {
+            return "DRAW";
+        }
     }
 }

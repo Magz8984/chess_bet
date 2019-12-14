@@ -186,7 +186,6 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     public void challengeNotFound() {
         Toast.makeText(getContext(), "Challenge Not Found", Toast.LENGTH_LONG).show();
         ChallengeAPI.get().sendChallenge(challenge);
-        progressCircle.hide();
         Log.d("Challenge Found", "Nope");
     }
 }

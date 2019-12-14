@@ -38,13 +38,13 @@ public class GamesFragment extends Fragment {
         String path = Objects.requireNonNull(getContext()).getFilesDir().toString();
         Log.d("Files" ,"Path : " + path);
         File directory = new File(path);
-        List<File> files  = Arrays.asList(directory.listFiles());
+        List<File> files = Arrays.asList(directory.listFiles());
         // TODO Find a better way to work this out
         List<File> mutatedList = new ArrayList<>(files);
 
         for(Iterator<File> iterator = mutatedList.iterator(); iterator.hasNext();){
             File file = iterator.next();
-            if (!file.getName().contains(".pgn")) {
+            if (!file.getName().contains(".pgn") || file.getName().contains("eco")) {
                 iterator.remove();
             }
         }

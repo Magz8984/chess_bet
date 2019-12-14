@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.graphics.Canvas;
-import android.widget.Toast;
 
 import com.chess.engine.Alliance;
 import com.chess.engine.Move;
@@ -425,6 +424,8 @@ public class BoardView extends View implements RemoteMoveListener {
             matchAPI.getRemoteMoveData(matchableAccount);
             if(matchableAccount.getOpponent().equals("WHITE")){
                 this.localAlliance = Alliance.BLACK;
+                // Flip board
+//                flipBoardDirection();
             }
             else if(matchableAccount.getOpponent().equals("BLACK")){
                 this.localAlliance = Alliance.WHITE;
@@ -434,6 +435,13 @@ public class BoardView extends View implements RemoteMoveListener {
 
     public Player getCurrentPlayer(){
         return chessBoard.currentPlayer();
+    }
+
+    public boolean isLocalWinner(){
+        if(chessBoard.currentPlayer().isInCheckMate()){
+            return !chessBoard.currentPlayer().getAlliance().equals(localAlliance);
+        }
+        return false;
     }
 
     public void translateRemoteMoveOnBoard(RemoteMove remoteMove){

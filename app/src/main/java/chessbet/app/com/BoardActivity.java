@@ -38,8 +38,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.Application;
 import chessbet.api.AccountAPI;
+import chessbet.api.MatchAPI;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
+import chessbet.domain.MatchStatus;
 import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.Puzzle;
@@ -48,6 +50,7 @@ import chessbet.recievers.ConnectivityReceiver;
 import chessbet.services.RemoteViewUpdateListener;
 import chessbet.utils.ConnectivityManager;
 import chessbet.utils.DatabaseUtil;
+import chessbet.utils.GameHandler;
 import chessbet.utils.GameManager;
 import chessbet.utils.GameTimer;
 import chessbet.utils.OnTimerElapsed;
@@ -61,7 +64,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
         OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener, BoardView.PuzzleMove,
-        ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener {
+        ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener, MatchAPI.OnMatchEnd {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -135,6 +138,8 @@ private boolean isStoredGame = false;
         if (matchableAccount != null) {
             boardView.setMode(BoardView.Modes.PLAY_ONLINE);
             boardView.setMatchableAccount(matchableAccount);
+            boardView.getMatchAPI().setOnMatchEnd(this);
+
             // Set timer online game and make sure you do not set two different timers
             if(GameTimer.get() == null){
                 GameTimer.Builder builder = new GameTimer.Builder()
@@ -242,17 +247,22 @@ private boolean isStoredGame = false;
         }
     }
 
+    private void goToMainActivity(){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public void onBackPressed() {
         if (!isStoredGame) {
             Snackbar snackbar = Snackbar.make(btnSave, R.string.save_end_match, Snackbar.LENGTH_LONG)
                     .setAction(R.string.forfeit, v1 -> {
-                        // Handle game forfeit
-                        if (isGameFinished) {
-                            storeGameAsPGN("*");
+                        if(matchableAccount != null && !isGameFinished){
+                           endGame(GameHandler.GAME_INTERRUPTED_FLAG);
+                        } else {
+                            goToMainActivity();
                         }
-                        Intent intent = new Intent(this, MainActivity.class);
-                        startActivity(intent);
+
                     });
             snackbar.show();
         } else {
@@ -312,12 +322,10 @@ private boolean isStoredGame = false;
         onGameResume();
         if (player.getAlliance().isBlack()) {
             txtBlackStatus.setText(getString(R.string.checkmate));
-            storeGameAsPGN("0-1");
         } else if (player.getAlliance().isWhite()) {
             txtWhiteStatus.setText(getString(R.string.checkmate));
-            storeGameAsPGN("1-0");
         }
-        endGame();
+        endGame(GameHandler.GAME_FINISHED_FLAG);
     }
 
     @Override
@@ -328,8 +336,7 @@ private boolean isStoredGame = false;
         } else if (player.getAlliance().isWhite()) {
             txtWhiteStatus.setText(getString(R.string.stalemate));
         }
-        storeGameAsPGN("1/2-1/2");
-        endGame();
+        endGame(GameHandler.GAME_DRAWN_FLAG);
     }
 
     @Override
@@ -346,7 +353,7 @@ private boolean isStoredGame = false;
     public void isDraw() {
         txtWhiteStatus.setText(getString(R.string.draw));
         txtBlackStatus.setText(getString(R.string.draw));
-        endGame();
+        endGame(GameHandler.GAME_DRAWN_FLAG);
     }
 
     @Override
@@ -396,9 +403,25 @@ private boolean isStoredGame = false;
         GameUtil.getMediaPlayer().release();
     }
 
-    private void endGame() {
+    private void endGame(int flag) {
         if (this.matchableAccount != null) {
-            this.matchableAccount.endMatch(this);
+            // Listens for an elo update
+            AccountAPI.get().listenToAccountUpdate();
+
+            if (flag == GameHandler.GAME_DRAWN_FLAG) {
+                matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_DRAWN_FLAG, MatchStatus.DRAW, null, null);
+            } else if (flag == GameHandler.GAME_INTERRUPTED_FLAG) {
+                matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_INTERRUPTED_FLAG, MatchStatus.INTERRUPTED, matchableAccount.getOpponentId(), matchableAccount.getOwner());
+            } else if (flag == GameHandler.GAME_FINISHED_FLAG) {
+                if(boardView.isLocalWinner()){
+                    matchableAccount.endMatch(boardView.getPortableGameNotation(),
+                            GameHandler.GAME_FINISHED_FLAG, MatchStatus.WON,
+                            matchableAccount.getOwner(), matchableAccount.getOpponentId());
+                }
+            }
+            // End Game
+            goToMainActivity();
+            GameTimer.get().stopAllTimers();
         }
     }
 
@@ -516,11 +539,22 @@ private boolean isStoredGame = false;
                     break;
             }
         });
-
     }
 
     @Override
     public void onGetECO(ECOBuilder.ECO eco) {
         runOnUiThread(() -> Toast.makeText(this, eco.getOpening(), Toast.LENGTH_LONG).show());
+    }
+
+    @Override
+    public void onMatchEnd(MatchStatus matchStatus) {
+        MatchAPI.get().removeMatch(matchableAccount.getMatchId()).addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                Toast.makeText(this, "Match is " + matchStatus, Toast.LENGTH_LONG).show();
+                Intent intent=new Intent(this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 }

@@ -12,5 +12,11 @@ public enum MatchStatus {
         public String toString() {
             return "DRAW";
         }
+    },
+    INTERRUPTED{
+        @Override
+        public String toString() {
+            return "INTERRUPTED";
+        }
     }
 }

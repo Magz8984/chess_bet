@@ -19,7 +19,7 @@ public class GameTimer {
     private int blackTimeLeft;
     private int whiteTimeLeft;
 
-    public GameTimer(final Builder builder){
+    GameTimer(final Builder builder){
         this.builder = builder;
         blackCountDownTask = CountDownTask.create();
         whiteCountDownTask = CountDownTask.create();
@@ -69,6 +69,14 @@ public class GameTimer {
         else if (player == Player.WHITE){
             whiteCountDownTask.cancel();
             setBlackGameTimer();
+        }
+    }
+
+    public void stopAllTimers(){
+        if(INSTANCE != null){
+            blackCountDownTask.cancel();
+            whiteCountDownTask.cancel();
+            INSTANCE = null;
         }
     }
 

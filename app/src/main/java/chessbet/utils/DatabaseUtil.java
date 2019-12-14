@@ -3,10 +3,16 @@ package chessbet.utils;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import chessbet.domain.MatchResult;
+
 public class DatabaseUtil {
     // Tables
     public static String matchables = "matchables";
-    public static String matches = "matches";
+    private static String matches = "matches";
+    private static String match_task_node = "tasks";
+    private static String evaluationQueue = "evaluationQueue";
+
+
     private static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
     private DatabaseUtil(){
@@ -31,5 +37,9 @@ public class DatabaseUtil {
 
     public static DatabaseReference getMatch (String matchId){
         return  databaseReference.child(DatabaseUtil.matches).child(matchId);
+    }
+
+    public static DatabaseReference getMatchTask(MatchResult matchResult){
+        return databaseReference.child(DatabaseUtil.evaluationQueue).child(DatabaseUtil.match_task_node);
     }
 }

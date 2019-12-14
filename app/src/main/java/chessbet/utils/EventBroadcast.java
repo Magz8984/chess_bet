@@ -6,10 +6,14 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import chessbet.api.AccountAPI;
+import chessbet.domain.Account;
+
 public class EventBroadcast {
     private static EventBroadcast INSTANCE = new EventBroadcast();
     private List<UserUpdate> userUpdateObservers = new ArrayList<>();
     private List<UserLoaded> userLoadedObservers = new ArrayList<>();
+    private List<AccountUpdated> accountUpdatedObservers = new ArrayList<>();
 
     private EventBroadcast(){}
 
@@ -19,6 +23,10 @@ public class EventBroadcast {
 
     public void addUserLoadedObserver(UserLoaded userLoaded){
         this.userLoadedObservers.add(userLoaded);
+    }
+
+    public void addAccountUpdated(AccountUpdated accountUpdated){
+        this.accountUpdatedObservers.add(accountUpdated);
     }
 
     public void broadcastUserUpdate(){
@@ -34,6 +42,12 @@ public class EventBroadcast {
         }
     }
 
+    public void broadCastAccountUpdate(){
+        for (AccountUpdated accountUpdated : accountUpdatedObservers){
+            accountUpdated.onAccountUpdated(AccountAPI.get().getCurrentAccount());
+        }
+    }
+
 
     public static EventBroadcast get(){
         return INSTANCE;
@@ -46,5 +60,9 @@ public class EventBroadcast {
 
     public interface UserLoaded{
         void onUserLoaded();
+    }
+
+    public interface AccountUpdated{
+        void onAccountUpdated(Account account);
     }
 }

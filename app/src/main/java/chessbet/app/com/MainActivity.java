@@ -40,11 +40,6 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,7 +58,8 @@ import chessbet.services.AccountListener;
 import chessbet.utils.EventBroadcast;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountListener, View.OnClickListener, EventBroadcast.UserUpdate {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+        AccountListener, View.OnClickListener, EventBroadcast.UserUpdate, EventBroadcast.AccountUpdated {
     private ProgressDialog uploadProfileDialog;
     private StorageReference storageReference;
     private FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
@@ -94,8 +90,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         profileImage.setOnClickListener(this);
         AccountAPI.get().setUser(FirebaseAuth.getInstance().getCurrentUser());
         AccountAPI.get().setAccountListener(this);
-        AccountAPI.get().getAccount();
         AccountAPI.get().getUser();
+        AccountAPI.get().getAccount();
+        EventBroadcast.get().addAccountUpdated(this);
 
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -150,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .commit();
                 break;
             case R.id.itm_play_online:
-                // TODO Remove peice of logic from UI.
+                // TODO Remove piece of logic from UI.
                 if(AccountAPI.get().getCurrentAccount() != null){
                     toolbar.setTitle(getString(R.string.play_online));
                     getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment())
@@ -313,6 +310,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onFirebaseUserUpdate(FirebaseUser user) {
         txtUserName.setText(user.getDisplayName());
+    }
+
+    @Override
+    public void onAccountUpdated(Account account) {
+        runOnUiThread(() -> txtRating.setText(getResources().getString(R.string.rating, account.getElo_rating())));
     }
 }
 

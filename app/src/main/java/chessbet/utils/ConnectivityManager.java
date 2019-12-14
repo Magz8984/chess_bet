@@ -107,7 +107,7 @@ public class ConnectivityManager {
                         }
                     });
                 }
-            },4000, 1000);
+            },3000, 1000);
             return null;
         }
     }

@@ -2,9 +2,16 @@ package chessbet.api;
 
 import android.util.Log;
 
+import androidx.annotation.Nullable;
+
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -15,6 +22,7 @@ import chessbet.domain.Puzzle;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
 import chessbet.services.PuzzleListener;
+import chessbet.utils.EventBroadcast;
 
 /**
  * @author Collins Magondu
@@ -29,7 +37,9 @@ public class AccountAPI {
     private FirebaseFirestore db;
     private FirebaseUser user;
     private Account currentAccount;
+    private ListenerRegistration listenerRegistration;
     private User currentUser = null;
+    private DocumentReference accountReference;
 
     private AccountAPI() {
          db = FirebaseFirestore.getInstance();
@@ -45,8 +55,11 @@ public class AccountAPI {
             query.get().addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())){
+                        accountReference = document.getReference();
                         currentAccount = document.toObject(Account.class);
                         accountListener.onAccountReceived(currentAccount);
+                        // Overkill we already have a listener on main activity
+                        EventBroadcast.get().broadCastAccountUpdate();
                     }
                 }
                 else {
@@ -56,7 +69,6 @@ public class AccountAPI {
         }catch (Exception ex){
             Log.d(TAG, ex.getMessage());
         }
-
     }
 
     public void getUser(){
@@ -101,6 +113,27 @@ public class AccountAPI {
            else{
                puzzleListener.onPuzzleSent(false);
                Log.d("ERROR MESSAGE : ", Objects.requireNonNull(task.getException()).getMessage());
+           }
+       });
+    }
+
+    public void listenToAccountUpdate(){
+        listenerRegistration = accountReference.addSnapshotListener((documentSnapshot, e) -> {
+           if(e !=null){
+               Crashlytics.logException(e);
+           }
+
+           if(documentSnapshot != null && documentSnapshot.exists()){
+               Account account = documentSnapshot.toObject(Account.class);
+               if (account!= null){
+                   if(currentAccount.getElo_rating() != account.getElo_rating()){
+                       listenerRegistration.remove();
+                   }
+                   currentAccount = account;
+                   EventBroadcast.get().broadCastAccountUpdate();
+               }
+
+//               listenerRegistration.remove();
            }
        });
     }
