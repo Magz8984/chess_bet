@@ -150,9 +150,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 // TODO Remove piece of logic from UI.
                 if(AccountAPI.get().getCurrentAccount() != null){
                     toolbar.setTitle(getString(R.string.play_online));
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment())
-                            .addToBackStack(getString(R.string.play_online))
-                            .commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment()).commit();
                 }
                 break;
             case R.id.itm_profile:
