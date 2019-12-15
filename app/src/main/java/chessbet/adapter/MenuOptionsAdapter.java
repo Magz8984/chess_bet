@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,22 +49,18 @@ public class MenuOptionsAdapter extends BaseAdapter {
         strings.add("Single Player");
 
         // Watch Game
-        listeners.add(v -> {
-            
-        });
+        View.OnClickListener featureUnavailable = view -> Toast.makeText(context, context.getResources().getString(R.string.feature_unavailable), Toast.LENGTH_LONG).show();
+        listeners.add(featureUnavailable);
         drawables.add(R.drawable.eye);
         strings.add("Watch");
 
         // Bet Online
-        listeners.add(v->{
-            Intent intent=new Intent(context, BoardActivity.class);
-            intent.putExtra("match_type", MatchType.BET_ONLINE.toString());
-            context.startActivity(intent);
-        });
+        listeners.add(featureUnavailable);
         drawables.add(R.drawable.bet_online);
         strings.add("Bet Online");
-
     }
+
+
     @Override
     public int getCount() {
         return listeners.size();

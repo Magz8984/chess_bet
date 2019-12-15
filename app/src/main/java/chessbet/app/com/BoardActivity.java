@@ -41,12 +41,14 @@ import chessbet.api.AccountAPI;
 import chessbet.api.MatchAPI;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
+import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchStatus;
 import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
 import chessbet.recievers.ConnectivityReceiver;
+import chessbet.services.MatchService;
 import chessbet.services.RemoteViewUpdateListener;
 import chessbet.utils.ConnectivityManager;
 import chessbet.utils.DatabaseUtil;
@@ -146,12 +148,19 @@ private boolean isStoredGame = false;
             backgroundMatchBuilder.execute(this);
 
             // Set timer online game and make sure you do not set two different timers
-            if(GameTimer.get() == null){
+            if(boardView.getGameTimer() == null){
                 GameTimer.Builder builder = new GameTimer.Builder()
-                            .setTxtBlackMoveTimer(txtBlackTimer)
-                            .setTxtWhiteMoveTimer(txtWhiteTimer)
-                            .setOnTimerElapsed(this);
-                boardView.setGameTimer(builder.build());
+                        .setTxtBlackMoveTimer(txtBlackTimer)
+                        .setTxtWhiteMoveTimer(txtWhiteTimer)
+                        .setOnTimerElapsed(this);
+                if(GameTimer.get() == null){
+                    boardView.setGameTimer(builder.build());
+                } else {
+                    // Reset timer in board view;
+                    GameTimer.get().setBuilder(builder);
+                    // Do not set a new builder it will set two new timers
+                    boardView.setGameTimer(GameTimer.get());
+                }
             }
         }
         // Try To Reconstruct
@@ -199,8 +208,8 @@ private boolean isStoredGame = false;
                             isGameFinished = true;
                         });
                 snackbar.show();
-            } else if (matchableAccount != null) {
-                storeGameAsPGN("*");
+            } else if (!isStoredGame) {
+                storeGameAsPGN(storageGameProxy());
             }
         }
         else if(v.equals(btnRecord)){
@@ -235,6 +244,21 @@ private boolean isStoredGame = false;
                 Toast.makeText(this, "Hinting Off", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private String storageGameProxy(){
+        if(isGameFinished){
+            if(boardView.getCurrentPlayer().isInStaleMate() || boardView.isGameDrawn()){
+                return "1/2-1/2";
+            } else if(boardView.getCurrentPlayer().isInCheckMate()) {
+                if(boardView.getCurrentPlayer().getAlliance().isBlack()){
+                    return "1-0";
+                } else {
+                    return "0-1";
+                }
+            }
+        }
+        return "*";
     }
 
     @Override
@@ -406,16 +430,23 @@ private boolean isStoredGame = false;
     protected void onStop() {
         super.onStop();
         GameUtil.getMediaPlayer().release();
+        this.stopService(new Intent(this, MatchService.class));
     }
 
     private void endGame(int flag) {
+        this.isGameFinished = true;
         if (this.matchableAccount != null) {
+            // Stop service
+            this.stopService(new Intent(this, MatchService.class));
+
             // Listens for an elo update
             AccountAPI.get().listenToAccountUpdate();
 
             if (flag == GameHandler.GAME_DRAWN_FLAG) {
                 matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_DRAWN_FLAG, MatchStatus.DRAW, null, null);
             } else if (flag == GameHandler.GAME_INTERRUPTED_FLAG) {
+                RemoteMove.get().addEvent(MatchEvent.INTERRUPTED);
+                RemoteMove.get().send(matchableAccount.getMatchId(), matchableAccount.getSelf());
                 matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_INTERRUPTED_FLAG, MatchStatus.INTERRUPTED, matchableAccount.getOpponentId(), matchableAccount.getOwner());
             } else if (flag == GameHandler.GAME_FINISHED_FLAG) {
                 if(boardView.isLocalWinner()){
@@ -552,8 +583,12 @@ private boolean isStoredGame = false;
         runOnUiThread(() -> Toast.makeText(this, eco.getOpening(), Toast.LENGTH_LONG).show());
     }
 
+
+
     @Override
     public void onMatchEnd(MatchStatus matchStatus) {
+        // Stop service
+        this.stopService(new Intent(this, MatchService.class));
         Toast.makeText(this, "Match is " + matchStatus, Toast.LENGTH_LONG).show();
         Intent intent=new Intent(this, MainActivity.class);
         startActivity(intent);

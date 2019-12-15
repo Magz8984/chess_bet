@@ -336,6 +336,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onFirebaseUserUpdate(FirebaseUser user) {
         txtUserName.setText(user.getDisplayName());
+        txtEmail.setText(user.getEmail());
     }
 
     @Override

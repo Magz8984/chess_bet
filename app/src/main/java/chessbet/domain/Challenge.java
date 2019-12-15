@@ -9,6 +9,8 @@ public class Challenge {
     private boolean accepted;
     private long timeStamp;
     private long eloRating;
+    private long minRating;
+    private long maxRating;
     private long duration;
     private MatchType matchType;
     private String dateCreated;
@@ -35,6 +37,22 @@ public class Challenge {
 
     public void setAccepted(boolean accepted) {
         this.accepted = accepted;
+    }
+
+    public void setMaxRating(long maxRating) {
+        this.maxRating = maxRating;
+    }
+
+    public void setMinRating(long minRating) {
+        this.minRating = minRating;
+    }
+
+    public long getMaxRating() {
+        return maxRating;
+    }
+
+    public long getMinRating() {
+        return minRating;
     }
 
     public void setRequester(String requester) {

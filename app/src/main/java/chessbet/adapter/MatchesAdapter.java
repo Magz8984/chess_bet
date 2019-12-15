@@ -39,9 +39,13 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Glide.with(context).asBitmap().load(matches.get(position).getOpponentPic()).into(holder.getImgOpponentPic());
-        holder.getOpponentUserName().setText(matches.get(position).getOpponentUserName());
-        holder.getTxtMatchStatus().setText(matches.get(position).getMatchStatus().toString());
+        try{
+            Glide.with(context).asBitmap().load(matches.get(position).getOpponentPic()).into(holder.getImgOpponentPic());
+            holder.getOpponentUserName().setText(matches.get(position).getOpponentUserName());
+            holder.getTxtMatchStatus().setText(matches.get(position).getMatchStatus().toString());
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     @Override

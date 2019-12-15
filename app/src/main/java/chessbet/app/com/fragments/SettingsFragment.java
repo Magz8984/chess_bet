@@ -4,20 +4,22 @@ package chessbet.app.com.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.Objects;
 
 import chessbet.app.com.LoginActivity;
 import chessbet.app.com.R;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
-    FirebaseAuth auth = FirebaseAuth.getInstance();
+    private FirebaseAuth auth = FirebaseAuth.getInstance();
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -36,6 +38,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 auth.signOut();
                 Intent intent = new Intent(getContext(), LoginActivity.class);
                 startActivity(intent);
+            }
+        } else if (preference.getKey().equals("reset_pin")){
+            if(auth.getCurrentUser() != null){
+                auth.sendPasswordResetEmail(Objects.requireNonNull(auth.getCurrentUser().getEmail())).addOnCompleteListener(task -> {
+                    Toast.makeText(getContext(), "Password Reset Email Has Been Sent", Toast.LENGTH_LONG).show();
+                });
             }
         }
         return true;

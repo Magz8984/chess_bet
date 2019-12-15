@@ -45,6 +45,7 @@ import chessbet.domain.MatchRange;
 import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.services.MatchListener;
+import chessbet.services.MatchService;
 import chessbet.utils.DatabaseUtil;
 
 public class MatchFragment extends Fragment implements MatchListener, View.OnClickListener,
@@ -117,6 +118,8 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         challenge.setTimeStamp(System.currentTimeMillis());
         challenge.setDuration(AccountAPI.get().getCurrentAccount().getLast_match_duration());
         challenge.setDateCreated(new Date().toString()); // Help us trouble shoot errors;
+        challenge.setMaxRating(AccountAPI.get().getCurrentAccount().getElo_rating() + matchRange.getEndAt());
+        challenge.setMinRating(AccountAPI.get().getCurrentAccount().getElo_rating() - matchRange.getStartAt());
         ChallengeAPI.get().setChallenge(challenge);
     }
 
@@ -133,6 +136,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     public void onClick(View v) {
         if(v.equals(findMatch)){
             progressCircle.show();
+            //Match Service Listener Set
             createChallenge();
             matchAPI.createUserMatchableAccountImplementation(createMatchableAccount());
         }
@@ -148,6 +152,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     @Override
     public void onMatchMade(MatchableAccount matchableAccount) {
         progressCircle.beginFinalAnimation();
+        Objects.requireNonNull(getContext()).startService(new Intent(getContext(), MatchService.class));
         new Handler().postDelayed(() -> {
             Intent target= new Intent(getContext(), BoardActivity.class);
             target.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -171,6 +176,11 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         }catch (Exception ex){
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 
     @Override

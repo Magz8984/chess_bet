@@ -16,15 +16,19 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+
+import java.util.Objects;
 
 import chessbet.api.AccountAPI;
 import chessbet.app.com.R;
 import chessbet.domain.User;
 import chessbet.services.UserListener;
 import chessbet.utils.EventBroadcast;
+import chessbet.utils.Util;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener, EventBroadcast.UserLoaded, UserListener {
@@ -55,7 +59,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
         btnSave = view.findViewById(R.id.btnSaveProfile);
         btnSave.setOnClickListener(this);
         AccountAPI.get().setUserListener(this);
-        init();
         return view;
     }
 
@@ -78,24 +81,87 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        init();
+    }
+
+    @Override
     public void onClick(View v) {
-        UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
         if(v.equals(btnSave)){
-            // Add profile matcher
-            if(txtNewUsername.getText().toString().length() > 0){
-                progressBar.setVisibility(View.VISIBLE);
-                builder.setDisplayName(txtNewUsername.getText().toString());
-                AccountAPI.get().getCurrentUser().setUserName(txtNewUsername.getText().toString());
-                firebaseUser.updateProfile(builder.build()).addOnCompleteListener(task -> {
-                    if(task.isSuccessful()){
-                        AccountAPI.get().updateUser();
-                        EventBroadcast.get().broadcastUserUpdate();
-                        Toast.makeText(getContext(),"Profile update successful", Toast.LENGTH_SHORT).show();
-                    }
-                    progressBar.setVisibility(View.GONE);
-                });
-            }
+            updateUserName();
+            updatePassword();
+            updateEmailAddress();
         }
+    }
+
+    private void updatePassword(){
+        if(Util.textViewHasText(txtNewPassword) && Util.textViewHasText(txtOldPassword)){
+            progressBar.setVisibility(View.VISIBLE);
+            firebaseUser.reauthenticate(EmailAuthProvider.getCredential(Objects.requireNonNull(firebaseUser.getEmail()),
+                    txtOldPassword.getText().toString())).addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    // Update password only after task is successful
+                    firebaseUser.updatePassword(txtNewUsername.getText().toString()).addOnCompleteListener(task1 -> {
+                        if(task1.isSuccessful()){
+                            Toast.makeText(getContext(), "Successfully updated password", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(getContext(), "Error on password update", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(getContext(), "Wrong old password provided", Toast.LENGTH_LONG).show();
+                }
+                progressBar.setVisibility(View.GONE);
+            });
+        }
+    }
+
+    private void updateUserName(){
+        if(Util.textViewHasText(txtNewUsername)){
+            progressBar.setVisibility(View.VISIBLE);
+            UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
+            builder.setDisplayName(txtNewUsername.getText().toString());
+            AccountAPI.get().getCurrentUser().setUserName(txtNewUsername.getText().toString());
+            firebaseUser.updateProfile(builder.build()).addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    AccountAPI.get().updateUser();
+                    EventBroadcast.get().broadcastUserUpdate();
+                    Toast.makeText(getContext(),"Username successfully changed", Toast.LENGTH_SHORT).show();
+                }
+                progressBar.setVisibility(View.GONE);
+            });
+        }
+    }
+
+    private void updateEmailAddress(){
+        if(Util.textViewHasText(txtNewEmail)){
+            progressBar.setVisibility(View.VISIBLE);
+            firebaseUser.updateEmail(txtNewEmail.getText().toString()).addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    AccountAPI.get().getCurrentUser().setEmail(txtNewEmail.getText().toString());
+                    AccountAPI.get().updateUser();
+                    txtEmail.setText(txtNewEmail.getText().toString());
+                    EventBroadcast.get().broadcastUserUpdate();
+                    Toast.makeText(getContext(),"Email successfully changed", Toast.LENGTH_SHORT).show();
+                    // Send email verification once new email has been set
+                    sendEmailVerification();
+                } else {
+                    Toast.makeText(getContext(), Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
+                }
+                progressBar.setVisibility(View.GONE);
+            });
+        }
+    }
+
+    private void sendEmailVerification(){
+        progressBar.setVisibility(View.VISIBLE);
+        firebaseUser.sendEmailVerification().addOnCompleteListener(task -> {
+            progressBar.setVisibility(View.GONE);
+            if(task.isSuccessful()){
+                Toast.makeText(getContext(),"Email Verification Sent", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

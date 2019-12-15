@@ -18,8 +18,9 @@ public class GameTimer {
     private CountDownTask whiteCountDownTask;
     private int blackTimeLeft;
     private int whiteTimeLeft;
+    private Player currentPlayer;
 
-    GameTimer(final Builder builder){
+    private GameTimer(final Builder builder){
         this.builder = builder;
         blackCountDownTask = CountDownTask.create();
         whiteCountDownTask = CountDownTask.create();
@@ -36,6 +37,10 @@ public class GameTimer {
 
     public static GameTimer get() {
         return INSTANCE;
+    }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
     }
 
     public void setBlackGameTimer(){
@@ -61,14 +66,20 @@ public class GameTimer {
         });
     }
 
+    public void setBuilder(Builder builder) {
+        this.builder = builder;
+    }
+
     public void stopTimer(Player player){
         if(player == Player.BLACK){
             blackCountDownTask.cancel();
             setWhiteGameTimer(); // Restart White with time left
+            currentPlayer = Player.WHITE;
         }
         else if (player == Player.WHITE){
             whiteCountDownTask.cancel();
             setBlackGameTimer();
+            currentPlayer = Player.BLACK;
         }
     }
 
@@ -78,6 +89,10 @@ public class GameTimer {
             whiteCountDownTask.cancel();
             INSTANCE = null;
         }
+    }
+
+    public void setGameTimer(GameTimer gameTimer){
+        INSTANCE = gameTimer;
     }
 
     public void setWhiteGameTimer(){

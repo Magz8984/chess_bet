@@ -14,7 +14,7 @@
         <item
             android:id="@+id/itm_play_online"
             android:icon="@drawable/online"
-            android:title="Play Online"
+            android:title="Online Chess"
             />
 
         <item

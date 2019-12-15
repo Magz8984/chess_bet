@@ -66,8 +66,7 @@ public class ChallengeAPI {
                      if (task.isSuccessful() && task.getResult() != null){
                          for (QueryDocumentSnapshot documentSnapshot : task.getResult()){
                              Challenge candidateChallenge = documentSnapshot.toObject(Challenge.class);
-                             if((candidateChallenge.getEloRating() >= challenge.getEloRating() - matchRange.getStartAt()) &&
-                                     (candidateChallenge.getEloRating() <= matchRange.getEndAt() + challenge.getEloRating()) && !challenge.getOwner().equals(candidateChallenge.getOwner())){
+                             if(isWithinRange(candidateChallenge)){
                                  availableMatches.add(documentSnapshot.getReference());
                              }
                          }
@@ -96,6 +95,16 @@ public class ChallengeAPI {
                            .addOnFailureListener(e -> this.challengeHandler.challengeNotFound());
                      }
                 });
+    }
+
+    /**
+     * Ensures match happens between people who choose the same rating
+     * @param challenge
+     * @return
+     */
+    private boolean isWithinRange(Challenge challenge){
+        return (challenge.getMaxRating() <= (matchRange.getEndAt() + AccountAPI.get().getCurrentAccount().getElo_rating())) &&
+                (challenge.getMinRating() >= (AccountAPI.get().getCurrentAccount().getElo_rating() - matchRange.getStartAt()));
     }
 
     public void getExistingChallenges(){

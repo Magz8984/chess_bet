@@ -433,6 +433,10 @@ public class BoardView extends View implements RemoteMoveListener {
         }
     }
 
+    public GameTimer getGameTimer() {
+        return gameTimer;
+    }
+
     public Player getCurrentPlayer(){
         return chessBoard.currentPlayer();
     }
@@ -549,6 +553,10 @@ public class BoardView extends View implements RemoteMoveListener {
         }
     }
 
+    public boolean isGameDrawn(){
+        return chessBoard.isDraw();
+    }
+
     public MoveLog getMoveLog() {
         return moveLog;
     }
@@ -567,9 +575,24 @@ public class BoardView extends View implements RemoteMoveListener {
 
     public void setGameTimer(GameTimer gameTimer) {
         this.gameTimer = gameTimer;
-        this.gameTimer.setBlackTimeLeft((int) (this.matchableAccount.getDuration() * 60000));
-        this.gameTimer.setWhiteTimeLeft((int) (this.matchableAccount.getDuration() * 60000));
-        this.gameTimer.setWhiteGameTimer();
+        if(gameTimer.getCurrentPlayer() != null){
+            // Reset timer to the old time left
+            setGameTimerTime(gameTimer.getWhiteTimeLeft(), gameTimer.getBlackTimeLeft());
+        } else {
+            this.gameTimer.setBlackTimeLeft((int) (this.matchableAccount.getDuration() * 60000));
+            this.gameTimer.setWhiteTimeLeft((int) (this.matchableAccount.getDuration() * 60000));
+            this.gameTimer.setWhiteGameTimer();
+        }
+    }
+
+    private void setGameTimerTime(int white, int black) {
+        this.gameTimer.setBlackTimeLeft(black);
+        this.gameTimer.setWhiteTimeLeft(white);
+        if(this.gameTimer.getCurrentPlayer().equals(chessbet.domain.Player.BLACK)){
+            this.gameTimer.setBlackGameTimer();
+        } else {
+            this.gameTimer.setWhiteGameTimer();
+        }
     }
 
     public boolean isRecording() {
