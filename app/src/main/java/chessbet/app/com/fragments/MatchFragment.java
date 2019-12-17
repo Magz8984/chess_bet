@@ -39,7 +39,6 @@ import chessbet.api.ChallengeAPI;
 import chessbet.api.MatchAPI;
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.R;
-import chessbet.domain.Account;
 import chessbet.domain.Challenge;
 import chessbet.domain.MatchRange;
 import chessbet.domain.MatchType;
@@ -135,10 +134,15 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     @Override
     public void onClick(View v) {
         if(v.equals(findMatch)){
-            progressCircle.show();
-            //Match Service Listener Set
-            createChallenge();
-            matchAPI.createUserMatchableAccountImplementation(createMatchableAccount());
+            if(AccountAPI.get().getCurrentAccount().getLast_match_duration() == 0){
+                // Match duration not set
+                Toast.makeText(getContext(), "Match duration not selected", Toast.LENGTH_LONG).show();
+            } else {
+                progressCircle.show();
+                //Match Service Listener Set
+                createChallenge();
+                matchAPI.createUserMatchableAccountImplementation(createMatchableAccount());
+            }
         }
 
         else if(v.equals(btnViewRangeViewHolder)){
@@ -151,6 +155,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
 
     @Override
     public void onMatchMade(MatchableAccount matchableAccount) {
+        AccountAPI.get().getCurrentAccount().setLast_match_duration(0);
         progressCircle.beginFinalAnimation();
         Objects.requireNonNull(getContext()).startService(new Intent(getContext(), MatchService.class));
         new Handler().postDelayed(() -> {

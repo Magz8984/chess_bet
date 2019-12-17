@@ -11,7 +11,7 @@ public class Account {
     private String last_date_modified;
     private long last_matchable_time;
     private MatchType last_match_type;
-    private long last_match_duration;
+    private long last_match_duration = 0;
     private Amount last_match_amount;
     private AccountStatus status;
     private String owner;

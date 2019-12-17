@@ -49,15 +49,9 @@ public class MenuOptionsAdapter extends BaseAdapter {
         strings.add("Single Player");
 
         // Watch Game
-        View.OnClickListener featureUnavailable = view -> Toast.makeText(context, context.getResources().getString(R.string.feature_unavailable), Toast.LENGTH_LONG).show();
-        listeners.add(featureUnavailable);
+        listeners.add(view -> Toast.makeText(context, context.getResources().getString(R.string.feature_unavailable), Toast.LENGTH_LONG).show());
         drawables.add(R.drawable.eye);
         strings.add("Watch");
-
-        // Bet Online
-        listeners.add(featureUnavailable);
-        drawables.add(R.drawable.bet_online);
-        strings.add("Bet Online");
     }
 
 
