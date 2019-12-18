@@ -16,4 +16,5 @@ public class Constants {
             "?alt=media&token=887183ec-e95f-443e-9a12-2ff0ab711b96";
     public static String connectionTesterURL = "https://www.google.com/url?sa=i&source=images&cd=&ved=2ahUKEwipr-" +
             "6TrpTmAhUD1RoKHedPAgUQjRx6BAgBEAQ&url=https%3A%2F%2Fwww.bigstockphoto.com%2F&psig=AOvVaw3ItTsZxypaHe-yhvNLp7-Y&ust=1575286630471989";
+    public static long MAX_MATCHING_DURATION = 40000;
 }

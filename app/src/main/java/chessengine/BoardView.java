@@ -408,7 +408,7 @@ public class BoardView extends View implements RemoteMoveListener {
         isFlipped = !isFlipped;
         this.boardDirection = boardDirection.opposite();
         topAlliance = topAlliance.equals(Alliance.BLACK) ? Alliance.WHITE : Alliance.BLACK;
-        invalidate();
+        postInvalidate();
     }
 
     public void  setOnMoveDoneListener(final OnMoveDoneListener onMoveDoneListener){
@@ -424,11 +424,19 @@ public class BoardView extends View implements RemoteMoveListener {
             matchAPI.getRemoteMoveData(matchableAccount);
             if(matchableAccount.getOpponent().equals("WHITE")){
                 this.localAlliance = Alliance.BLACK;
-                // Flip board
-//                flipBoardDirection();
             }
             else if(matchableAccount.getOpponent().equals("BLACK")){
                 this.localAlliance = Alliance.WHITE;
+            }
+        }
+    }
+
+    public void setOnlineBoardDirection(){
+        if(matchableAccount != null){
+            if (localAlliance.isBlack()){
+                this.boardDirection = BoardDirection.NORMAL;
+            } else if (localAlliance.isWhite()){
+                this.boardDirection = BoardDirection.REVERSE;
             }
         }
     }
@@ -454,6 +462,11 @@ public class BoardView extends View implements RemoteMoveListener {
             final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
             if(transition.getMoveStatus().isDone()){
                 moveLog.addMove(move);
+
+                // Listen for book moves from opponent
+                this.ecoBook.setMoveLog(this.moveLog.toString());
+                this.ecoBook.startListening();
+
                 moveCursor = moveLog.size();
                 destinationTile = chessBoard.getTile(remoteMove.getTo());
                 GameUtil.playSound();

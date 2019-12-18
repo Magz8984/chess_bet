@@ -38,6 +38,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.Application;
 import chessbet.api.AccountAPI;
+import chessbet.api.ChallengeAPI;
 import chessbet.api.MatchAPI;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
@@ -412,6 +413,7 @@ private boolean isStoredGame = false;
     @Override
     protected void onResume() {
         super.onResume();
+        boardView.setOnlineBoardDirection();
         Application.getInstance().setConnectivityListener(this);
     }
 
@@ -456,6 +458,8 @@ private boolean isStoredGame = false;
                 }
             }
             // End Game
+            // Deletes challenge when the game ends
+            ChallengeAPI.get().deleteChallenge();
             AccountAPI.get().getAccount();
             goToMainActivity();
             GameTimer.get().stopAllTimers();
@@ -588,6 +592,7 @@ private boolean isStoredGame = false;
     @Override
     public void onMatchEnd(MatchStatus matchStatus) {
         // Stop service
+        AccountAPI.get().listenToAccountUpdate();
         this.stopService(new Intent(this, MatchService.class));
         Toast.makeText(this, "Match is " + matchStatus, Toast.LENGTH_LONG).show();
         Intent intent=new Intent(this, MainActivity.class);

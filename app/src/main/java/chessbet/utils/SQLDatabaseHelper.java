@@ -34,18 +34,18 @@ public class SQLDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public boolean addMatch(String matchId, String opponentPic, String opponentUserName){
+    void addMatch(String matchId, String opponentPic, String opponentUserName){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_MATCH_ID, matchId);
         contentValues.put(COLUMN_OPPONENT_PIC, opponentPic);
         contentValues.put(COLUMN_OPPONENT_USERNAME, opponentUserName);
-        return sqLiteDatabase.insert(MATCHES_TABLE, null, contentValues) != -1;
+        sqLiteDatabase.insert(MATCHES_TABLE, null, contentValues);
     }
 
     public Cursor getMatches(){
         SQLiteDatabase sqLiteDatabase = getReadableDatabase();
-        String sql =  "SELECT * FROM " + MATCHES_TABLE + ";";
+        String sql =  "SELECT * FROM " + MATCHES_TABLE + " LIMIT 10;";
         return sqLiteDatabase.rawQuery(sql, null);
     }
 

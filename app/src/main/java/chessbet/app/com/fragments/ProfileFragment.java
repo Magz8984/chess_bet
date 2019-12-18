@@ -102,7 +102,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
                     txtOldPassword.getText().toString())).addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     // Update password only after task is successful
-                    firebaseUser.updatePassword(txtNewUsername.getText().toString()).addOnCompleteListener(task1 -> {
+                    firebaseUser.updatePassword(txtNewPassword.getText().toString()).addOnCompleteListener(task1 -> {
                         if(task1.isSuccessful()){
                             Toast.makeText(getContext(), "Successfully updated password", Toast.LENGTH_LONG).show();
                         } else {

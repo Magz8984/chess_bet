@@ -120,13 +120,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public void testMatches(){
-        List<Match> matches = DatabaseUtil.getMatchesFromLocalDB(new SQLDatabaseHelper(this).getMatches());
-        for (Match match: matches){
-            Log.d("MATCHTEST", match + "");
-        }
-    }
-
     @Override
     public  void onBackPressed(){
         if(drawerLayout.isDrawerOpen(GravityCompat.START)){

@@ -100,6 +100,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     public void onStart() {
         super.onStart();
         //Gets the account
+        findMatch.setEnabled(true);
         recMatches.setAdapter(new MatchesAdapter(getContext()));
         matchAPI.getAccount();
     }
@@ -138,6 +139,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
                 // Match duration not set
                 Toast.makeText(getContext(), "Match duration not selected", Toast.LENGTH_LONG).show();
             } else {
+                findMatch.setEnabled(false);
                 progressCircle.show();
                 //Match Service Listener Set
                 createChallenge();
@@ -197,6 +199,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
 
     @Override
     public void challengeSent(String id) {
+        findMatch.setEnabled(true);
         Toast.makeText(getContext(), "Challenge sent " + id, Toast.LENGTH_LONG).show();
     }
 
