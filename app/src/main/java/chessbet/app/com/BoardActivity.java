@@ -156,6 +156,7 @@ private boolean isStoredGame = false;
                         .setOnTimerElapsed(this);
                 if(GameTimer.get() == null){
                     boardView.setGameTimer(builder.build());
+
                 } else {
                     // Reset timer in board view;
                     GameTimer.get().setBuilder(builder);
@@ -279,7 +280,9 @@ private boolean isStoredGame = false;
 
     private void goToMainActivity(){
         Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+        finish();
     }
 
     @Override
@@ -432,6 +435,8 @@ private boolean isStoredGame = false;
     protected void onStop() {
         super.onStop();
         GameUtil.getMediaPlayer().release();
+        // Stop stockfish process
+//        boardView.getStockfish().stopProcess();
         this.stopService(new Intent(this, MatchService.class));
     }
 
@@ -440,6 +445,7 @@ private boolean isStoredGame = false;
         if (this.matchableAccount != null) {
             // Stop service
             this.stopService(new Intent(this, MatchService.class));
+            GameTimer.get().stopAllTimers();
 
             // Listens for an elo update
             AccountAPI.get().listenToAccountUpdate();
@@ -456,13 +462,18 @@ private boolean isStoredGame = false;
                             GameHandler.GAME_FINISHED_FLAG, MatchStatus.WON,
                             matchableAccount.getOwner(), matchableAccount.getOpponentId());
                 }
+            } else if (flag == GameHandler.GAME_TIMER_LAPSED){
+                // TODO WORK ON THIS ON A BACKGROUND SERVICE
+                RemoteMove.get().addEvent(MatchEvent.TIMER_LAPSED);
+                RemoteMove.get().send(matchableAccount.getMatchId(), matchableAccount.getSelf());
+                matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_TIMER_LAPSED,
+                        MatchStatus.TIMER_LAPSED, matchableAccount.getOpponentId(), matchableAccount.getOwner());
             }
             // End Game
             // Deletes challenge when the game ends
             ChallengeAPI.get().deleteChallenge();
             AccountAPI.get().getAccount();
             goToMainActivity();
-            GameTimer.get().stopAllTimers();
         }
     }
 
@@ -483,6 +494,7 @@ private boolean isStoredGame = false;
             imageView.invalidate();
 
             if (piece.getPieceAlliance().equals(Alliance.BLACK)) {
+//                GameTimer.get().stopAllTimers();
                 blackPieces.addView(imageView);
             } else if (piece.getPieceAlliance().equals(Alliance.WHITE)) {
                 whitePieces.addView(imageView);
@@ -556,6 +568,11 @@ private boolean isStoredGame = false;
     @Override
     public void playerTimeLapsed(chessbet.domain.Player player) {
         // TODO Implement game over dialog fragment
+        if(player.equals(chessbet.domain.Player.BLACK)){
+            endGame(GameHandler.GAME_INTERRUPTED_FLAG);
+        } else if(player.equals(chessbet.domain.Player.WHITE)){
+
+        }
     }
 
     @Override
@@ -592,6 +609,7 @@ private boolean isStoredGame = false;
     @Override
     public void onMatchEnd(MatchStatus matchStatus) {
         // Stop service
+        GameTimer.get().stopAllTimers();
         AccountAPI.get().listenToAccountUpdate();
         this.stopService(new Intent(this, MatchService.class));
         Toast.makeText(this, "Match is " + matchStatus, Toast.LENGTH_LONG).show();

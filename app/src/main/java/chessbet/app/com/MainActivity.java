@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -41,7 +40,6 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
@@ -55,12 +53,10 @@ import chessbet.app.com.fragments.PuzzleFragment;
 import chessbet.app.com.fragments.SettingsFragment;
 import chessbet.app.com.fragments.TermsOfService;
 import chessbet.domain.Account;
-import chessbet.domain.Match;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
-import chessbet.utils.DatabaseUtil;
 import chessbet.utils.EventBroadcast;
-import chessbet.utils.SQLDatabaseHelper;
+import chessbet.utils.GameTimer;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
@@ -140,15 +136,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onStop();
     }
 
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.itm_play_chess :
                 toolbar.setTitle(getString(R.string.app_name));
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MainFragment())
-                        .addToBackStack(getString(R.string.app_name))
-                        .commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MainFragment()).commit();
                 break;
             case R.id.itm_play_online:
                 // TODO Remove piece of logic from UI.
@@ -159,15 +152,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.itm_profile:
                 toolbar.setTitle(getString(R.string.profile));
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment())
-                        .addToBackStack(getString(R.string.profile))
-                        .commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
                 break;
             case R.id.itm_account_settings:
                 toolbar.setTitle(getString(R.string.settings));
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment())
-                        .addToBackStack(getString(R.string.settings))
-                        .commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment()).commit();
 
                 break;
             case R.id.itm_terms:
@@ -183,13 +172,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.games:
                 toolbar.setTitle(getString(R.string.games));
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new GamesFragment())
-                        .addToBackStack(getString(R.string.games)).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new GamesFragment()).commit();
                 break;
             case R.id.puzzles:
                 toolbar.setTitle("Puzzles");
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PuzzleFragment())
-                        .addToBackStack(getString(R.string.puzzles)).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PuzzleFragment()).commit();
                 break;
         }
         return true;

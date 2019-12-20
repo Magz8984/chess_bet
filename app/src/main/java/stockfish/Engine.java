@@ -24,7 +24,7 @@ public class Engine implements UCImpl {
 
     private String engineDir;
     private static boolean isReady = false;
-    private static boolean isUCIEnabled = true;
+    private static boolean isUCIEnabled = false;
     private Context context;
     private Process process;
     public void start(){
@@ -34,7 +34,7 @@ public class Engine implements UCImpl {
             startProcess();
 
             isReady(response -> {
-                if (response.equals("readyok")){
+                if (!response.equals("")){
                     isReady = true;
                 }
                 Log.d("RESPONSE_ENG", response);

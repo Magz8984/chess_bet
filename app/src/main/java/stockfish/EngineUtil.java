@@ -64,7 +64,6 @@ public class EngineUtil {
                          endResult =  bufferedReader.readLine();
                          if(endResult != null){
                              onResponseListener.onResponse(movesSearch(endResult));
-                             Log.d("MESSAGEX", endResult);
                          }
                      } catch (Exception e) {
                          e.printStackTrace();
@@ -82,7 +81,6 @@ public class EngineUtil {
     private static void ensureBufferedReaderIsReady(){
         for (int i = 0; i < 10; i++){
             try {
-                Log.d("Here", bufferedReader.ready() + "");
                 if(!bufferedReader.ready()){
                     if(!Engine.isRunning()){
                         Thread.sleep(100);

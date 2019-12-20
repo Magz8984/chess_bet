@@ -184,6 +184,7 @@ public class MatchableAccount implements Parcelable {
     }
 
     public void endMatch(String pgn, int flag, MatchStatus matchStatus, String gain, String loss){
+        GameHandler.getInstance().resetInstance();
         MatchResult matchResult = new MatchResult.Builder()
                 .setMatchId(this.getMatchId())
                 .setMatchStatus(matchStatus)

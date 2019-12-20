@@ -126,6 +126,8 @@ public class MatchAPI implements Serializable {
                                     onMatchEnd.onMatchEnd(MatchStatus.DRAW);
                                 } else if(isMatchFinished(remoteMove)){
                                     onMatchEnd.onMatchEnd(MatchStatus.WON);
+                                } else if(isMatchTimerLapsed(remoteMove)){
+                                    onMatchEnd.onMatchEnd(MatchStatus.TIMER_LAPSED);
                                 }
                             }
                         }
@@ -151,6 +153,10 @@ public class MatchAPI implements Serializable {
 
     private boolean isMatchFinished(RemoteMove remoteMove){
         return remoteMove != null && remoteMove.getEvents().contains(MatchEvent.FINISHED.toString());
+    }
+
+    private boolean isMatchTimerLapsed(RemoteMove remoteMove){
+        return remoteMove!= null && remoteMove.getEvents().contains(MatchEvent.TIMER_LAPSED.toString());
     }
 
     private boolean isMatchDrawn(RemoteMove remoteMove){

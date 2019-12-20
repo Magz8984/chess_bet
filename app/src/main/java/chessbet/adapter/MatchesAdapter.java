@@ -27,7 +27,7 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHold
     public MatchesAdapter(Context context){
         this.context = context;
         this.matches = DatabaseUtil.getMatchesFromLocalDB(new SQLDatabaseHelper(context).getMatches());
-        AccountAPI.get().assignMatchResults(this.matches);
+        matches = AccountAPI.get().assignMatchResults(this.matches);
     }
 
     @NonNull
