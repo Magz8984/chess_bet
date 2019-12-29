@@ -45,6 +45,7 @@ android {
         it.buildConfigField("String", "CLOUD_FUNCTIONS_URL", cloudFunctionsURL)
         it.buildConfigField("String", "ADD_MOB_UNIT_ID", adUnitId)
         it.buildConfigField("String", "ADD_MOB_TEST_UNIT_ID", testAdUnitId)
+        it.buildConfigField("String", "AD_MOB_APP_ID", adMobAppId)
     }
 
     lintOptions {

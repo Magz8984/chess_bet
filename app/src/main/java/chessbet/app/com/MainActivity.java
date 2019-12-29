@@ -110,7 +110,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initializeCrashReporter();
 
         // Initialize Mobile Ads SDK
-        MobileAds.initialize(this, initializationStatus -> Log.d(MainActivity.class.getSimpleName(), "Mobile Ads SDK Initialized"));
+        MobileAds.initialize(this, BuildConfig.AD_MOB_APP_ID);
+//        MobileAds.initialize(this, initializationStatus -> Log.d(MainActivity.class.getSimpleName(), "Mobile Ads SDK Initialized"));
     }
 
     private void initializeCrashReporter(){

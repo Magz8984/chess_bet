@@ -68,5 +68,6 @@
     <string name="puzzles">Puzzles</string>
     <string name="create_puzzle_from_recording">Create puzzle from recording</string>
     <string name="create_puzzle">Create Puzzle</string>
+    <string name="company">Iconic King</string>
     <string name="feature_unavailable">Feature Unavailable</string>
 </resources>

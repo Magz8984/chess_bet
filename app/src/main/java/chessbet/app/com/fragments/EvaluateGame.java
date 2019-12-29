@@ -129,7 +129,7 @@ public class EvaluateGame extends DialogFragment {
     }
 
     private void viewAd(){
-        AdLoader.Builder builder = new AdLoader.Builder(Objects.requireNonNull(getContext()), BuildConfig.ADD_MOB_UNIT_ID);
+        AdLoader.Builder builder = new AdLoader.Builder(Objects.requireNonNull(getContext()), BuildConfig.ADD_MOB_TEST_UNIT_ID);
         builder.forUnifiedNativeAd(unifiedNativeAd -> {
             if(nativeAd != null){
                 nativeAd.destroy();
