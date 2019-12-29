@@ -24,6 +24,7 @@ import chessbet.services.AccountListener;
 import chessbet.services.PuzzleListener;
 import chessbet.services.UserListener;
 import chessbet.utils.EventBroadcast;
+import chessbet.utils.TokenGenerator;
 
 /**
  * @author Collins Magondu
@@ -98,6 +99,10 @@ public class AccountAPI {
     }
 
     public User getCurrentUser() { return currentUser; }
+
+    public FirebaseUser getFirebaseUser(){
+        return this.user;
+    }
 
     public void setAccountListener(AccountListener accountListener) {
         this.accountListener = accountListener;

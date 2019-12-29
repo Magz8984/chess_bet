@@ -29,6 +29,7 @@ import chessbet.services.MatchListener;
 import chessbet.services.RemoteMoveListener;
 import chessbet.utils.DatabaseUtil;
 
+import chessbet.utils.TokenGenerator;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -172,13 +173,18 @@ public class MatchAPI implements Serializable {
 
         String url = builder.build().toString();
         RequestBody requestBody = RequestBody.create(JSON,new Gson().toJson(matchResult));
-        Request request = new Request.Builder()
-                .addHeader("Content-Type", "application/json")
-                .url(url)
-                .post(requestBody)
-                .build();
-        Call call = okHttpClient.newCall(request);
-        call.enqueue(callback);
+
+        // Generate token for cloud functions to verify user
+        TokenGenerator.genetrateToken(token -> {
+            Request request = new Request.Builder()
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Authorization", "Bearer " + token)
+                    .url(url)
+                    .post(requestBody)
+                    .build();
+            Call call = okHttpClient.newCall(request);
+            call.enqueue(callback);
+        });
     }
 
     private void createUserMatchableAccount(MatchableAccount matchableAccount, Callback callback){
@@ -193,13 +199,18 @@ public class MatchAPI implements Serializable {
 
         RequestBody requestBody = RequestBody.create(JSON,new Gson().toJson(matchableAccount));
 
-        Request request = new Request.Builder()
-                .addHeader("Content-Type", "application/json")
-                .url(url)
-                .post(requestBody)
-                .build();
-        Call call = okHttpClient.newCall(request);
-        call.enqueue(callback);
+
+        // Generate token for cloud functions to verify user
+        TokenGenerator.genetrateToken(token -> {
+            Request request = new Request.Builder()
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Authorization", "Bearer " + token)
+                    .url(url)
+                    .post(requestBody)
+                    .build();
+            Call call = okHttpClient.newCall(request);
+            call.enqueue(callback);
+        });
     }
 
     public void createUserMatchableAccountImplementation(MatchableAccount matchableAccount){
