@@ -158,7 +158,7 @@ public class EvaluateGame extends DialogFragment {
                         Toast.makeText(getContext(), "Failed to load due to an invalid request", Toast.LENGTH_LONG).show();
                         break;
                     case AdRequest.ERROR_CODE_NETWORK_ERROR:
-                        Toast.makeText(getContext(), "Failed to load due to an network error", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Failed to load due to a network error", Toast.LENGTH_LONG).show();
                         break;
                     case AdRequest.ERROR_CODE_NO_FILL:
                         Toast.makeText(getContext(), "Failed to load due to code no fill", Toast.LENGTH_LONG).show();
