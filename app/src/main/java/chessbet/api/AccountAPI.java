@@ -10,6 +10,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -175,7 +176,8 @@ public class AccountAPI {
     }
 
     /** Results are got from firestore **/
-    public void assignMatchResults(List<Match> matches){
+    public List<Match> assignMatchResults(List<Match> matches){
+        List<Match> newList = new ArrayList<>();
         for (Match match : matches){
             for (MatchDetails matchDetails: currentAccount.getMatches()) {
                 if(matchDetails.getMatch_result().getMatchId().equals(match.getMatchId())){
@@ -187,9 +189,11 @@ public class AccountAPI {
                         match.setMatchStatus(MatchStatus.WON);
                     }
                     match.setMatchResult(matchDetails.getMatch_result());
+                    newList.add(match);
                 }
             }
         }
+        return newList;
     }
 
     public interface OnUserReceived {

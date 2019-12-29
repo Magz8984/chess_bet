@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,20 +23,20 @@ public class Engine implements UCImpl {
     static {
         System.loadLibrary("nativeutil");
     }
-
     private String engineDir;
     private static boolean isReady = false;
-    private static boolean isUCIEnabled = true;
+    private static boolean isUCIEnabled = false;
     private Context context;
     private Process process;
+
     public void start(){
         try {
             context = Application.getContext();
-            handleProcessCreation();
+            findEnginePath();
             startProcess();
 
             isReady(response -> {
-                if (response.equals("readyok")){
+                if (!response.equals("")){
                     isReady = true;
                 }
                 Log.d("RESPONSE_ENG", response);
@@ -53,34 +55,49 @@ public class Engine implements UCImpl {
         }
     }
 
-    private void handleProcessCreation(){
+    private void findEnginePath(){
         String enginePath = enginePath();
         engineDir = copyFiles(enginePath);
         chmod(engineDir);
     }
 
+    /**
+     * Creates a process from a process builder that is reused.
+     * @return Process
+     */
+    private Process createProcess() {
+        try {
+            File engineWorkingDirectory = new File(engineDir);
+            boolean state = engineWorkingDirectory.setExecutable(true, false);
+            ProcessBuilder processBuilder = new ProcessBuilder(engineDir);
+            processBuilder.redirectErrorStream(true);
+            if (engineWorkingDirectory.canRead() && engineWorkingDirectory.canExecute()) {
+                if (state) {
+                    return processBuilder.start();
+                }
+            }
+        } catch (Exception e) {
+            Crashlytics.logException(e);
+        }
+        return null;
+    }
+
     // Start Process
     private void startProcess(){
-        File engineWorkingDirectory = new File(engineDir);
-        boolean state = engineWorkingDirectory.setExecutable(true, false);
-        ProcessBuilder processBuilder = new ProcessBuilder(engineDir);
-        processBuilder.redirectErrorStream(true);
-        if(engineWorkingDirectory.canRead() && engineWorkingDirectory.canExecute()){
-                try {
-                    if(state){
-                        process = processBuilder.start();
-                        // Set IO streams from process
-                        EngineUtil.setBufferedReader(new BufferedReader(new InputStreamReader(process.getInputStream())));
-                        EngineUtil.setBufferedWriter(new BufferedWriter(new OutputStreamWriter(process.getOutputStream())));
-                    }
-                    java.lang.reflect.Field f = process.getClass().getDeclaredField("pid");
-                    f.setAccessible(true);
-                    int pid = f.getInt(process);
-                    changePriority(pid, 1);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        process = createProcess();
+        if(process != null){
+            try {
+                // Set IO streams from process
+                EngineUtil.setBufferedReader(new BufferedReader(new InputStreamReader(process.getInputStream())));
+                EngineUtil.setBufferedWriter(new BufferedWriter(new OutputStreamWriter(process.getOutputStream())));
+                java.lang.reflect.Field f = null;
+                f = process.getClass().getDeclaredField("pid");
+                f.setAccessible(true);
+                int pid = f.getInt(process);
+                changePriority(pid, 1);
+            } catch (Exception e) {
+                Crashlytics.logException(e);
+            }
         }
     }
 
@@ -129,13 +146,14 @@ public class Engine implements UCImpl {
 
     @Override
     public void setUCI(EngineUtil.Response response) {
-      EngineUtil.pipe(UCIOption.UCI.command(),response);
+//        Thread uciThread = new Thread(() -> EngineUtil.pipe(UCIOption.UCI.command(),response));
     }
 
     @Override
     public void isReady(EngineUtil.Response response) {
-        EngineUtil.pipe(UCIOption.IS_READY.command(), response);
+//        Thread readyThread = new Thread(() -> EngineUtil.pipe(UCIOption.IS_READY.command(), response));
     }
+
 
     @Override
     public void getBestMove(int depth, long ms, long pv) {
@@ -157,9 +175,14 @@ public class Engine implements UCImpl {
     }
 
 
-    /** Destroy Engine Process */
+    /** Destroy engine process and removes the listener thread */
     public void destroyEngineProcess(){
-        process.destroy();
+        if(process != null){
+            isUCIEnabled = false;
+            isReady = false;
+            EngineUtil.stopCurrentListenerThread();
+            process.destroy();
+        }
     }
     /**Sets engine as an executable*/
     static native boolean chmod(String exePath);

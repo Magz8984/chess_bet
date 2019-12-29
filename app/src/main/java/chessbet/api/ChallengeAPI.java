@@ -130,7 +130,7 @@ public class ChallengeAPI {
     private boolean isWithinRange(Challenge challenge){
         return ((challenge.getEloRating() >= this.challenge.getMinRating() &&  challenge.getEloRating() <= this.challenge.getMaxRating())
                 && (this.challenge.getEloRating() >= challenge.getMinRating() && this.challenge.getEloRating() <= challenge.getMaxRating()))
-                && (challenge.getTimeStamp() > System.currentTimeMillis() + 40000);
+                && (challenge.getTimeStamp() > System.currentTimeMillis() - 40000);
     }
 
     public void getExistingChallenges(){

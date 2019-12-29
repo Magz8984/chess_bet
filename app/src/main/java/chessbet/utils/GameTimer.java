@@ -84,10 +84,14 @@ public class GameTimer {
     }
 
     public void stopAllTimers(){
-        if(INSTANCE != null){
-            blackCountDownTask.cancel();
-            whiteCountDownTask.cancel();
-            INSTANCE = null;
+        try{
+            if(INSTANCE != null){
+                blackCountDownTask.cancel();
+                whiteCountDownTask.cancel();
+                INSTANCE = null;
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
     }
 

@@ -24,5 +24,11 @@ public enum MatchStatus {
         public String toString() {
             return "LOSS";
         }
+    },
+    TIMER_LAPSED {
+        @Override
+        public String toString() {
+            return "TIMER LAPSED";
+        }
     }
 }

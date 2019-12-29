@@ -141,7 +141,10 @@ public class Cell extends View {
                         // Ask stockfish
                         boardView.chessBoard = transition.getTransitionBoard();
 
-                        boardView.getInternalStockFishHandler().askStockFishMove(FenUtilities.createFEN(boardView.chessBoard), 3000, 10);
+                        // Only ask for a move form stockfish if engine is on
+                        if(boardView.isHinting){
+                            boardView.getInternalStockFishHandler().askStockFishMove(FenUtilities.createFEN(boardView.chessBoard), 3000, 10);
+                        }
 
                         GameUtil.playSound();  // Play sound once move is made
 

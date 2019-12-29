@@ -30,5 +30,11 @@ public enum MatchEvent {
         public String toString() {
             return "DRAW";
         }
+    },
+    TIMER_LAPSED {
+        @Override
+        public String toString() {
+            return "TIMER LAPSED";
+        }
     }
 }

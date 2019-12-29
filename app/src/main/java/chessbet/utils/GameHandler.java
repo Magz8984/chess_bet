@@ -17,7 +17,7 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
     public static final int GAME_INTERRUPTED_FLAG = 18305;
     public static final int GAME_FINISHED_FLAG = 40934;
     public static final int GAME_DRAWN_FLAG = 13780;
-
+    public static final int GAME_TIMER_LAPSED = 472489;
 
     public void setMatchResult(MatchResult matchResult) {
         this.matchResult = matchResult;
@@ -25,6 +25,13 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
 
     public static GameHandler getInstance() {
         return INSTANCE;
+    }
+
+    /**
+     * Resets Instance Object
+     */
+    public void resetInstance(){
+        INSTANCE = new GameHandler();
     }
 
     @Override

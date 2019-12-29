@@ -45,7 +45,7 @@ import stockfish.EngineUtil;
 import stockfish.InternalStockFishHandler;
 
 // TODO Split Class into SOLID
-public class BoardView extends View implements RemoteMoveListener {
+public class BoardView extends View implements RemoteMoveListener, EngineUtil.OnResponseListener {
     protected Board chessBoard;
     protected Tile sourceTile;
     protected Tile destinationTile;
@@ -88,6 +88,7 @@ public class BoardView extends View implements RemoteMoveListener {
         stockfish = new Engine();
 
         ecoBook = new ECOBook();
+
         // Start Stock Fish
         stockfish.start();
 
@@ -96,17 +97,7 @@ public class BoardView extends View implements RemoteMoveListener {
 
         // Redraw the board once engine responds
 
-        EngineUtil.setOnResponseListener(moves -> {
-            String [] sMoves = moves.split(" ");
-           if(sMoves.length == 1){
-               // END OF GAME
-               currentStockFishMove = getMoveByPositions(sMoves[0]);
-           } else  if (sMoves.length > 1 ){
-               currentStockFishMove = getMoveByPositions(sMoves[0]);
-               ponderedStockFishMove = getMoveByPositions(sMoves[1]);
-           }
-           postInvalidate();
-        });
+        EngineUtil.setOnResponseListener(this);
 
         internalStockFishHandler = new InternalStockFishHandler();
 
@@ -306,7 +297,7 @@ public class BoardView extends View implements RemoteMoveListener {
 
     public void requestHint() {
         isHinting = !isHinting;
-        if(currentStockFishMove == null){
+        if (currentStockFishMove == null){
             internalStockFishHandler.askStockFishMove(FenUtilities.createFEN(chessBoard), 3000, 3);
         } else {
             invalidate();
@@ -368,6 +359,19 @@ public class BoardView extends View implements RemoteMoveListener {
     @Override
     public void onRemoteMoveMade(RemoteMove remoteMove) {
         this.remoteViewUpdateListener.onRemoteMoveMade(remoteMove);
+    }
+
+    @Override
+    public void onResponse(String moves) {
+        String [] sMoves = moves.split(" ");
+        if(sMoves.length == 1){
+            // END OF GAME
+            currentStockFishMove = getMoveByPositions(sMoves[0]);
+        } else  if (sMoves.length > 1 ){
+            currentStockFishMove = getMoveByPositions(sMoves[0]);
+            ponderedStockFishMove = getMoveByPositions(sMoves[1]);
+        }
+        postInvalidate();
     }
 
     private enum BoardDirection {

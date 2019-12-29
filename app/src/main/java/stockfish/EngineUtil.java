@@ -16,6 +16,7 @@ public class EngineUtil {
     private static BufferedWriter bufferedWriter;
     private static BufferedReader bufferedReader;
     private static Thread listenerThread;
+    private static volatile boolean shutDown = false;
     private volatile static OnResponseListener onResponseListener;
 
     public static void setOnResponseListener(OnResponseListener onResponseListener) {
@@ -55,16 +56,14 @@ public class EngineUtil {
     }
 
     public static void startListening(){
-
         listenerThread = new Thread(() -> {
              if(bufferedReader != null){
                  String endResult;
-                 while (true){
+                 while (!shutDown){
                      try {
                          endResult =  bufferedReader.readLine();
                          if(endResult != null){
                              onResponseListener.onResponse(movesSearch(endResult));
-                             Log.d("MESSAGEX", endResult);
                          }
                      } catch (Exception e) {
                          e.printStackTrace();
@@ -79,10 +78,21 @@ public class EngineUtil {
         return listenerThread;
     }
 
+    /**
+     * Should be called during process termination
+     */
+     static void stopCurrentListenerThread(){
+        try {
+            shutDown = true;
+            listenerThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static void ensureBufferedReaderIsReady(){
         for (int i = 0; i < 10; i++){
             try {
-                Log.d("Here", bufferedReader.ready() + "");
                 if(!bufferedReader.ready()){
                     if(!Engine.isRunning()){
                         Thread.sleep(100);
