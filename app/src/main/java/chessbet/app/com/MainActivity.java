@@ -30,6 +30,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -45,6 +46,7 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.api.AccountAPI;
+import chessbet.app.com.fragments.EvaluateGame;
 import chessbet.app.com.fragments.GamesFragment;
 import chessbet.app.com.fragments.MainFragment;
 import chessbet.app.com.fragments.MatchFragment;
@@ -56,7 +58,6 @@ import chessbet.domain.Account;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
 import chessbet.utils.EventBroadcast;
-import chessbet.utils.GameTimer;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
@@ -107,6 +108,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         EventBroadcast.get().addUserUpdateObserver(this);
         initializeCrashReporter();
+
+        // Initialize Mobile Ads SDK
+        MobileAds.initialize(this, initializationStatus -> Log.d(MainActivity.class.getSimpleName(), "Mobile Ads SDK Initialized"));
     }
 
     private void initializeCrashReporter(){
@@ -177,6 +181,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.puzzles:
                 toolbar.setTitle("Puzzles");
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PuzzleFragment()).commit();
+                break;
+            case R.id.itm_eval: // TODO REMOVE THIS
+                EvaluateGame evaluateGame = new EvaluateGame();
+                evaluateGame.show(getSupportFragmentManager(), "Eval");
                 break;
         }
         return true;
