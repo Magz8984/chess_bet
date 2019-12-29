@@ -129,7 +129,7 @@ public class EvaluateGame extends DialogFragment {
     }
 
     private void viewAd(){
-        AdLoader.Builder builder = new AdLoader.Builder(Objects.requireNonNull(getContext()), BuildConfig.ADD_MOB_TEST_UNIT_ID); // TODO Change UNIT ID to live ad unit id
+        AdLoader.Builder builder = new AdLoader.Builder(Objects.requireNonNull(getContext()), BuildConfig.ADD_MOB_UNIT_ID);
         builder.forUnifiedNativeAd(unifiedNativeAd -> {
             if(nativeAd != null){
                 nativeAd.destroy();
@@ -150,7 +150,23 @@ public class EvaluateGame extends DialogFragment {
         AdLoader adLoader = builder.withAdListener(new AdListener() {
             @Override
             public void onAdFailedToLoad(int i) {
-                Toast.makeText(getContext(), "Failed to load ad with error code " + i, Toast.LENGTH_LONG).show();
+                switch(i){
+                    case AdRequest.ERROR_CODE_INTERNAL_ERROR:
+                        Toast.makeText(getContext(), "Failed to load due to an internal error", Toast.LENGTH_LONG).show();
+                        break;
+                    case AdRequest.ERROR_CODE_INVALID_REQUEST:
+                        Toast.makeText(getContext(), "Failed to load due to an invalid request", Toast.LENGTH_LONG).show();
+                        break;
+                    case AdRequest.ERROR_CODE_NETWORK_ERROR:
+                        Toast.makeText(getContext(), "Failed to load due to an network error", Toast.LENGTH_LONG).show();
+                        break;
+                    case AdRequest.ERROR_CODE_NO_FILL:
+                        Toast.makeText(getContext(), "Failed to load due to code no fill", Toast.LENGTH_LONG).show();
+                        break;
+                    default:
+                        Toast.makeText(getContext(), "Failed to load with error code " + i, Toast.LENGTH_LONG).show();
+                        break;
+                }
             }
         }).build();
 
