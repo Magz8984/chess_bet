@@ -64,7 +64,6 @@ import chessengine.ECOBook;
 import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
-import customviews.EvalView;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
@@ -486,16 +485,21 @@ private EvaluateGame evaluateGame;
             AccountAPI.get().getAccount();
 //            goToMainActivity();
 
-            // End Game
+            // Makes sure only one player has a chance to store a game.
             if(boardView.getLocalAlliance().equals(Alliance.WHITE)){
-                MatchAPI.get().storeCurrentMatchOnCloud(PGNMainUtils.writeGameAsPGN(boardView.getMoveLog().convertToEngineMoveLog(),
-                        AccountAPI.get().getCurrentUser().getUserName(),
-                        MatchAPI.get().getCurrentMatch().getOpponentUserName(), "1/2"),
-                        taskSnapshot -> Log.d(BoardActivity.class.getSimpleName(), "Match Uploaded"));
+               storeGameOnCloud();
             }
+
             MatchAPI.get().removeCurrentMatch();
             evaluateGame.show(getSupportFragmentManager(), "EvaluateGame"); // Span Up Ad
         }
+    }
+
+    private void storeGameOnCloud(){
+        MatchAPI.get().storeCurrentMatchOnCloud(PGNMainUtils.writeGameAsPGN(boardView.getMoveLog().convertToEngineMoveLog(),
+                AccountAPI.get().getCurrentUser().getUserName(),
+                MatchAPI.get().getCurrentMatch().getOpponentUserName(), "1/2"),
+                taskSnapshot -> Log.d(BoardActivity.class.getSimpleName(), "Match Uploaded"));
     }
 
     private void getTakenPieces(Move move) {

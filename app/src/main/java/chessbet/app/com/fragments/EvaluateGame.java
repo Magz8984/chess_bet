@@ -56,6 +56,7 @@ public class EvaluateGame extends DialogFragment implements EventBroadcast.Accou
     @Override
     public void onStart() {
         super.onStart();
+        setParams();
         viewAd();
     }
 
@@ -84,12 +85,16 @@ public class EvaluateGame extends DialogFragment implements EventBroadcast.Accou
     }
 
     public void setInitialPoints(int initialPoints) {
-        evalView.setPoints("Updating...");
         this.initialPoints = initialPoints;
     }
 
     public void setMatchStatus(MatchStatus matchStatus) {
         this.matchStatus = matchStatus;
+
+    }
+
+    private void setParams(){
+        evalView.setPoints("Updating...");
         evalView.setWinnerInfo("Match is " + matchStatus);
         // Always set winner info after match status
         setWinnerInfo();
@@ -181,7 +186,7 @@ public class EvaluateGame extends DialogFragment implements EventBroadcast.Accou
     }
 
     private void viewAd(){
-        AdLoader.Builder builder = new AdLoader.Builder(Objects.requireNonNull(getContext()), BuildConfig.ADD_MOB_TEST_UNIT_ID);
+        AdLoader.Builder builder = new AdLoader.Builder(Objects.requireNonNull(getContext()), BuildConfig.ADD_MOB_UNIT_ID);
         builder.forUnifiedNativeAd(unifiedNativeAd -> {
             if(nativeAd != null){
                 nativeAd.destroy();
