@@ -42,6 +42,7 @@ import chessbet.api.ChallengeAPI;
 import chessbet.api.MatchAPI;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
+import chessbet.app.com.fragments.EvaluateGame;
 import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchStatus;
 import chessbet.domain.MatchType;
@@ -63,6 +64,7 @@ import chessengine.ECOBook;
 import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
+import customviews.EvalView;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
@@ -93,6 +95,7 @@ private MatchableAccount matchableAccount;
 private ConnectivityManager connectivityManager;
 private boolean isGameFinished = false;
 private boolean isStoredGame = false;
+private EvaluateGame evaluateGame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -435,8 +438,6 @@ private boolean isStoredGame = false;
     protected void onStop() {
         super.onStop();
         GameUtil.getMediaPlayer().release();
-        // Stop stockfish process
-//        boardView.getStockfish().stopProcess();
         this.stopService(new Intent(this, MatchService.class));
     }
 
@@ -450,20 +451,30 @@ private boolean isStoredGame = false;
             // Listens for an elo update
             AccountAPI.get().listenToAccountUpdate();
 
+            evaluateGame = new EvaluateGame(); // Game evaluation fragment
+            evaluateGame.setInitialPoints(AccountAPI.get().getCurrentAccount().getElo_rating());
+            evaluateGame.setOpponent(MatchAPI.get().getCurrentMatch().getOpponentUserName());
+
             if (flag == GameHandler.GAME_DRAWN_FLAG) {
                 matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_DRAWN_FLAG, MatchStatus.DRAW, null, null);
+                evaluateGame.setMatchStatus(MatchStatus.DRAW);
             } else if (flag == GameHandler.GAME_INTERRUPTED_FLAG) {
+                evaluateGame.setMatchStatus(MatchStatus.INTERRUPTED);
                 RemoteMove.get().addEvent(MatchEvent.INTERRUPTED);
                 RemoteMove.get().send(matchableAccount.getMatchId(), matchableAccount.getSelf());
                 matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_INTERRUPTED_FLAG, MatchStatus.INTERRUPTED, matchableAccount.getOpponentId(), matchableAccount.getOwner());
             } else if (flag == GameHandler.GAME_FINISHED_FLAG) {
                 if(boardView.isLocalWinner()){
+                    evaluateGame.setMatchStatus(MatchStatus.WON);
                     matchableAccount.endMatch(boardView.getPortableGameNotation(),
                             GameHandler.GAME_FINISHED_FLAG, MatchStatus.WON,
                             matchableAccount.getOwner(), matchableAccount.getOpponentId());
+                } else {
+                    evaluateGame.setMatchStatus(MatchStatus.LOSS);
                 }
             } else if (flag == GameHandler.GAME_TIMER_LAPSED){
                 // TODO WORK ON THIS ON A BACKGROUND SERVICE
+                evaluateGame.setMatchStatus(MatchStatus.TIMER_LAPSED);
                 RemoteMove.get().addEvent(MatchEvent.TIMER_LAPSED);
                 RemoteMove.get().send(matchableAccount.getMatchId(), matchableAccount.getSelf());
                 matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_TIMER_LAPSED,
@@ -473,7 +484,17 @@ private boolean isStoredGame = false;
             // Deletes challenge when the game ends
             ChallengeAPI.get().deleteChallenge();
             AccountAPI.get().getAccount();
-            goToMainActivity();
+//            goToMainActivity();
+
+            // End Game
+            if(boardView.getLocalAlliance().equals(Alliance.WHITE)){
+                MatchAPI.get().storeCurrentMatchOnCloud(PGNMainUtils.writeGameAsPGN(boardView.getMoveLog().convertToEngineMoveLog(),
+                        AccountAPI.get().getCurrentUser().getUserName(),
+                        MatchAPI.get().getCurrentMatch().getOpponentUserName(), "1/2"),
+                        taskSnapshot -> Log.d(BoardActivity.class.getSimpleName(), "Match Uploaded"));
+            }
+            MatchAPI.get().removeCurrentMatch();
+            evaluateGame.show(getSupportFragmentManager(), "EvaluateGame"); // Span Up Ad
         }
     }
 
@@ -508,6 +529,7 @@ private boolean isStoredGame = false;
     }
 
     protected void storeGameAsPGN(String result) {
+        // Ignore game storage if game is a puzzle
         if(boardView.getMode().equals(BoardView.Modes.PUZZLE_MODE)){
             return;
         }
@@ -568,10 +590,10 @@ private boolean isStoredGame = false;
     @Override
     public void playerTimeLapsed(chessbet.domain.Player player) {
         // TODO Implement game over dialog fragment
-        if(player.equals(chessbet.domain.Player.BLACK)){
-            endGame(GameHandler.GAME_INTERRUPTED_FLAG);
-        } else if(player.equals(chessbet.domain.Player.WHITE)){
-
+        if(player.equals(chessbet.domain.Player.WHITE) && boardView.getLocalAlliance().equals(Alliance.WHITE)){
+            endGame(GameHandler.GAME_TIMER_LAPSED);
+        } else if (player.equals(chessbet.domain.Player.BLACK) && boardView.getLocalAlliance().equals(Alliance.BLACK)){
+            endGame(GameHandler.GAME_TIMER_LAPSED);
         }
     }
 
@@ -604,16 +626,16 @@ private boolean isStoredGame = false;
         runOnUiThread(() -> Toast.makeText(this, eco.getOpening(), Toast.LENGTH_LONG).show());
     }
 
-
-
     @Override
     public void onMatchEnd(MatchStatus matchStatus) {
         // Stop service
+        evaluateGame = new EvaluateGame();
         GameTimer.get().stopAllTimers();
         AccountAPI.get().listenToAccountUpdate();
         this.stopService(new Intent(this, MatchService.class));
-        Toast.makeText(this, "Match is " + matchStatus, Toast.LENGTH_LONG).show();
-        Intent intent=new Intent(this, MainActivity.class);
-        startActivity(intent);
+        evaluateGame.setInitialPoints(AccountAPI.get().getCurrentAccount().getElo_rating());
+        evaluateGame.setMatchStatus(matchStatus);
+        evaluateGame.show(getSupportFragmentManager(), "EvaluateGame");
+//        goToMainActivity();
     }
 }

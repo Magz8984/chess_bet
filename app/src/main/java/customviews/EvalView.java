@@ -82,6 +82,7 @@ public class EvalView extends View {
 
     public void setWinnerInfo(String winnerInfo) {
         this.winnerInfo = winnerInfo;
+        invalidate();
     }
 
     public String getWinnerInfo() {

@@ -24,20 +24,32 @@ import com.google.android.gms.ads.formats.NativeAdOptions;
 import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 
+import java.util.Locale;
 import java.util.Objects;
 
 import chessbet.app.com.BuildConfig;
 import chessbet.app.com.R;
+import chessbet.domain.Account;
+import chessbet.domain.MatchStatus;
+import chessbet.utils.EventBroadcast;
+import customviews.EvalView;
 
-public class EvaluateGame extends DialogFragment {
+public class EvaluateGame extends DialogFragment implements EventBroadcast.AccountUpdated {
     private UnifiedNativeAdView nativeAdView;
     private UnifiedNativeAd nativeAd = null;
+    private EvalView evalView;
+    private String winnerInfo;
+    private int initialPoints;
+    private MatchStatus matchStatus;
+    private String opponent;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.evaluate_game_dialog, container, false);
         nativeAdView = view.findViewById(R.id.addView);
+        evalView = view.findViewById(R.id.evalView);
+        EventBroadcast.get().addAccountUpdated(this);
         return view;
     }
 
@@ -45,6 +57,46 @@ public class EvaluateGame extends DialogFragment {
     public void onStart() {
         super.onStart();
         viewAd();
+    }
+
+    private void setWinnerInfo() {
+        if(matchStatus != null){
+            switch (matchStatus) {
+                case WON:
+                    evalView.setWinnerInfo("You won");
+                    break;
+                case DRAW:
+                    evalView.setWinnerInfo("Draw");
+                    break;
+                case LOSS:
+                    evalView.setWinnerInfo(opponent + " won");
+                    break;
+                case INTERRUPTED:
+                    evalView.setWinnerInfo("Interrupted");
+                    break;
+                case TIMER_LAPSED:
+                    evalView.setWinnerInfo("Timer Lapsed");
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public void setInitialPoints(int initialPoints) {
+        evalView.setPoints("Updating...");
+        this.initialPoints = initialPoints;
+    }
+
+    public void setMatchStatus(MatchStatus matchStatus) {
+        this.matchStatus = matchStatus;
+        evalView.setWinnerInfo("Match is " + matchStatus);
+        // Always set winner info after match status
+        setWinnerInfo();
+    }
+
+    public void setOpponent(String opponent) {
+        this.opponent = opponent;
     }
 
     private void populateAdView(UnifiedNativeAd nativeAd){
@@ -179,5 +231,12 @@ public class EvaluateGame extends DialogFragment {
             nativeAd.destroy();
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onAccountUpdated(Account account) {
+        int pointDifference = account.getElo_rating() - initialPoints;
+        String points = String.format(Locale.US,"%d(%d) -> %d ", initialPoints, pointDifference, account.getElo_rating());
+        evalView.setPoints(points);
     }
 }

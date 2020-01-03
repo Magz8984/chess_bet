@@ -1,16 +1,21 @@
 package chessbet.api;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +25,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import chessbet.domain.Constants;
+import chessbet.domain.Match;
 import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchResult;
 import chessbet.domain.MatchStatus;
@@ -44,6 +50,7 @@ public class MatchAPI implements Serializable {
     private FirebaseUser firebaseUser;
     private MatchListener matchListener;
     private RemoteMoveListener remoteMoveListener;
+    private Match currentMatch;
     private static MatchAPI INSTANCE = new MatchAPI();
     private static int RESPONSE_OKAY_FLAG = 200;
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
@@ -59,6 +66,10 @@ public class MatchAPI implements Serializable {
 
     public void setMatchListener(MatchListener matchListener) {
         this.matchListener = matchListener;
+    }
+
+    public Match getCurrentMatch() {
+        return currentMatch;
     }
 
     public void setRemoteMoveListener(RemoteMoveListener remoteMoveListener) {
@@ -97,11 +108,31 @@ public class MatchAPI implements Serializable {
         });
     }
 
+    /**
+     * @deprecated
+     * @param matchId
+     * @return
+     */
     public Task<Void> removeMatch(String matchId){
        return DatabaseUtil.getMatch(matchId).removeValue();
     }
 
-    public void sendMoveData(MatchableAccount matchableAccount,int source, int destination, String pgn, long gameTimeLeft){
+    /**
+     * This match is the current match being played
+     * @param currentMatch
+     */
+    public void setCurrentMatch(Match currentMatch) {
+        this.currentMatch = currentMatch;
+    }
+
+    /**
+     * Used during end game
+     */
+    public void removeCurrentMatch(){
+        this.currentMatch = null;
+    }
+
+    public void sendMoveData(MatchableAccount matchableAccount, int source, int destination, String pgn, long gameTimeLeft){
         RemoteMove.get().setOwner(matchableAccount.getOwner());
         RemoteMove.get().setFrom(source);
         RemoteMove.get().setGameTimeLeft(gameTimeLeft); // Regulate game play
@@ -119,9 +150,7 @@ public class MatchAPI implements Serializable {
                         RemoteMove remoteMove = dataSnapshot.getValue(RemoteMove.class);
                         if(remoteMove != null) {
                             if(isMatchStarted(remoteMove)){
-                                if(!isMatchInterrupted(remoteMove)) {
-                                    remoteMoveListener.onRemoteMoveMade(remoteMove);
-                                } else if(isMatchInterrupted(remoteMove)) {
+                                if(isMatchInterrupted(remoteMove)) {
                                     onMatchEnd.onMatchEnd(MatchStatus.INTERRUPTED);
                                 } else if(isMatchDrawn(remoteMove)){
                                     onMatchEnd.onMatchEnd(MatchStatus.DRAW);
@@ -129,6 +158,8 @@ public class MatchAPI implements Serializable {
                                     onMatchEnd.onMatchEnd(MatchStatus.WON);
                                 } else if(isMatchTimerLapsed(remoteMove)){
                                     onMatchEnd.onMatchEnd(MatchStatus.TIMER_LAPSED);
+                                } else if(!isMatchInterrupted(remoteMove)) {
+                                    remoteMoveListener.onRemoteMoveMade(remoteMove);
                                 }
                             }
                         }
@@ -138,6 +169,35 @@ public class MatchAPI implements Serializable {
                         Crashlytics.log(databaseError.getMessage());
                     }
                 });
+    }
+
+    public void storeCurrentMatchOnCloud(String gameText, OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener){
+        MatchStorageTask matchStorageTask = new MatchStorageTask();
+        matchStorageTask.setCurrentMatch(currentMatch);
+        matchStorageTask.setOnSuccessListener(onSuccessListener);
+        matchStorageTask.execute(gameText);
+    }
+
+    /**
+     * Match Storage
+     */
+    public static class MatchStorageTask extends AsyncTask<String,Void,Void>{
+        private OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener;
+        private Match currentMatch;
+        @Override
+        protected Void doInBackground(String... strings) {
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference(Constants.GAMES_CLOUD_REFERENCE + "/" + currentMatch.getMatchId() + ".pgn" );
+            storageReference.putBytes(strings[0].getBytes()).addOnSuccessListener(onSuccessListener);
+            return null;
+        }
+
+        void setCurrentMatch(Match currentMatch) {
+            this.currentMatch = currentMatch;
+        }
+
+        void setOnSuccessListener(OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener) {
+            this.onSuccessListener = onSuccessListener;
+        }
     }
 
     public void evaluateMatch(MatchResult matchResult){

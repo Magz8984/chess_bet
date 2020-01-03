@@ -62,4 +62,15 @@ public class DatabaseUtil {
         }
         return matches;
     }
+
+    public static Match getMatchFromLocalDB(Cursor cursor){
+        if(cursor.moveToFirst()){
+            Match match = new Match();
+            match.setMatchId(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_ID)));
+            match.setOpponentPic(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_PIC)));
+            match.setOpponentUserName(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_USERNAME)));
+            return match;
+        }
+        return null;
+    }
 }
