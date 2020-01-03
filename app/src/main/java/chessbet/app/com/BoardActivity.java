@@ -498,7 +498,7 @@ private EvaluateGame evaluateGame;
     private void storeGameOnCloud(){
         MatchAPI.get().storeCurrentMatchOnCloud(PGNMainUtils.writeGameAsPGN(boardView.getMoveLog().convertToEngineMoveLog(),
                 AccountAPI.get().getCurrentUser().getUserName(),
-                MatchAPI.get().getCurrentMatch().getOpponentUserName(), "1/2"),
+                MatchAPI.get().getCurrentMatch().getOpponentUserName(), "*"),
                 taskSnapshot -> Log.d(BoardActivity.class.getSimpleName(), "Match Uploaded"));
     }
 
