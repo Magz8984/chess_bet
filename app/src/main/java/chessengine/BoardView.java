@@ -337,10 +337,6 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         invalidate();
     }
 
-    public void setEngineResponse(EngineResponse engineResponse) {
-        this.engineResponse = engineResponse;
-    }
-
     public int getWhiteCellsColor() {
         return whiteCellsColor;
     }
