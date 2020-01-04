@@ -1,5 +1,7 @@
 package chessbet.api;
 
+import android.util.Log;
+
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -128,9 +130,12 @@ public class ChallengeAPI {
      * @return
      */
     private boolean isWithinRange(Challenge challenge){
+        Log.d("ChallengeData1", challenge.getEloRating() + " " + challenge.getMaxRating() + " " + challenge.getMinRating());
+        Log.d("ChallengeData2", this.challenge.getEloRating() + " " + this.challenge.getMaxRating() + " " + this.challenge.getMinRating());
+        Log.d("ChallengeData3", (System.currentTimeMillis() - 40000) + " " + challenge.getTimeStamp());
         return ((challenge.getEloRating() >= this.challenge.getMinRating() &&  challenge.getEloRating() <= this.challenge.getMaxRating())
                 && (this.challenge.getEloRating() >= challenge.getMinRating() && this.challenge.getEloRating() <= challenge.getMaxRating()))
-                && (challenge.getTimeStamp() > System.currentTimeMillis() - 40000);
+                && (challenge.getTimeStamp() > System.currentTimeMillis() - 70000);
     }
 
     public void getExistingChallenges(){

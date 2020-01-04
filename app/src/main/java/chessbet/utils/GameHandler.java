@@ -6,6 +6,7 @@ import android.util.Log;
 
 import chessbet.api.AccountAPI;
 import chessbet.api.MatchAPI;
+import chessbet.domain.Match;
 import chessbet.domain.MatchResult;
 import chessbet.domain.MatchableAccount;
 
@@ -61,7 +62,10 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
         protected Void doInBackground(Context... contexts) {
             AccountAPI.get().getAUser(matchableAccount.getOpponentId(), user -> {
                 if(user != null){
-                    new SQLDatabaseHelper(contexts[0]).addMatch(matchableAccount.getMatchId(), user.getProfile_photo_url(), user.getUserName());
+                   SQLDatabaseHelper sqlDatabaseHelper = new SQLDatabaseHelper(contexts[0]);
+                   sqlDatabaseHelper.addMatch(matchableAccount.getMatchId(), user.getProfile_photo_url(), user.getUserName());
+                   Match match = DatabaseUtil.getMatchFromLocalDB(sqlDatabaseHelper.getMatch(matchableAccount.getMatchId()));
+                   MatchAPI.get().setCurrentMatch(match);
                 }
             });
             return null;

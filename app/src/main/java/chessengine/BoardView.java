@@ -336,6 +336,10 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         invalidate();
     }
 
+    public Alliance getLocalAlliance() {
+        return localAlliance;
+    }
+
     public int getWhiteCellsColor() {
         return whiteCellsColor;
     }

@@ -49,6 +49,12 @@ public class SQLDatabaseHelper extends SQLiteOpenHelper {
         return sqLiteDatabase.rawQuery(sql, null);
     }
 
+    Cursor getMatch(String id){
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        String sql = "SELECT * FROM " + MATCHES_TABLE + " WHERE " + COLUMN_MATCH_ID +  " = \"" + id  +"\";";
+        return sqLiteDatabase.rawQuery(sql, null);
+    }
+
     public void deleteAllMatches(){
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         String sql = "DELETE  FROM "  + MATCHES_TABLE + ";";
