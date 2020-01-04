@@ -153,19 +153,19 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             Entry entry = new Entry(size, centipawnEval);
 
             if(boardView.getCurrentPlayer().getAlliance().isWhite()){
-                blackEntries.add(entry);
-            } else {
                 whiteEntries.add(entry);
+            } else {
+                blackEntries.add(entry);
             }
 
             LineDataSet whiteDataSet = new LineDataSet(whiteEntries, "White");
             LineDataSet blackDataSet = new LineDataSet(blackEntries, "Black");
 
-            whiteDataSet.setCircleColor(Color.BLACK);
-            whiteDataSet.setColor(Color.BLACK);
+            whiteDataSet.setCircleColor(Color.WHITE);
+            whiteDataSet.setColor(Color.WHITE);
 
-            blackDataSet.setCircleColor(Color.WHITE);
-            blackDataSet.setColor(Color.WHITE);
+            blackDataSet.setCircleColor(Color.BLACK);
+            blackDataSet.setColor(Color.BLACK);
 
             List<ILineDataSet> dataSets = new ArrayList<>();
             dataSets.add(whiteDataSet);
