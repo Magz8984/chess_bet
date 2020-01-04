@@ -77,6 +77,8 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     private List<Rect> tiles = new ArrayList<>();
     private MoveAnimator moveAnimator = new MoveAnimator();
     private InternalStockFishHandler internalStockFishHandler;
+    private EngineResponse engineResponse; // Used To get The Full Response String for Analysis Purpose
+
     // Stockfish 10
     private Engine stockfish;
 
@@ -96,7 +98,6 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         EngineUtil.startListening();
 
         // Redraw the board once engine responds
-
         EngineUtil.setOnResponseListener(this);
 
         internalStockFishHandler = new InternalStockFishHandler();
@@ -336,6 +337,10 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         invalidate();
     }
 
+    public void setEngineResponse(EngineResponse engineResponse) {
+        this.engineResponse = engineResponse;
+    }
+
     public int getWhiteCellsColor() {
         return whiteCellsColor;
     }
@@ -372,6 +377,13 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
             ponderedStockFishMove = getMoveByPositions(sMoves[1]);
         }
         postInvalidate();
+    }
+
+    @Override
+    public void onStockfishFullResponse(String response) {
+        if(engineResponse != null){
+            engineResponse.onEngineResponse(response);
+        }
     }
 
     private enum BoardDirection {
@@ -687,6 +699,10 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         void onBestMoveMade(Move move);
     }
 
+    public interface EngineResponse{
+        void onEngineResponse(String response);
+    }
+
 
     // Enable Play Computer Engine as Black
      static class AI_ENGINE extends AsyncTask<Board,Void,Move> {
@@ -710,7 +726,6 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
             }
         }
     }
-
 }
 
 
