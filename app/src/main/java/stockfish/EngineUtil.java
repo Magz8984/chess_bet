@@ -64,6 +64,7 @@ public class EngineUtil {
                          endResult =  bufferedReader.readLine();
                          if(endResult != null){
                              onResponseListener.onResponse(movesSearch(endResult));
+                             onResponseListener.onStockfishFullResponse(endResult);
                          }
                      } catch (Exception e) {
                          e.printStackTrace();
@@ -122,7 +123,7 @@ public class EngineUtil {
      * @param response
      * @return Move String
      */
-    public static String movesSearch(String response) {
+    private static String movesSearch(String response) {
         Log.d("Move", response);
         StringBuilder builder = new StringBuilder();
         // Handle
@@ -148,5 +149,6 @@ public class EngineUtil {
 
     public interface OnResponseListener{
         void onResponse(String moves);
+        void onStockfishFullResponse(String response);
     }
 }

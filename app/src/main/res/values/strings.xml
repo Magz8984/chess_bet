@@ -70,4 +70,5 @@
     <string name="create_puzzle">Create Puzzle</string>
     <string name="company">Iconic King</string>
     <string name="feature_unavailable">Feature Unavailable</string>
+    <string name="analysis_board">Analysis Board</string>
 </resources>
