@@ -113,6 +113,10 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         }
     }
 
+    public void setEngineResponse(EngineResponse engineResponse) {
+        this.engineResponse = engineResponse;
+    }
+
     public InternalStockFishHandler getInternalStockFishHandler() {
         return internalStockFishHandler;
     }
@@ -135,6 +139,10 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
 
     public Engine getStockfish(){
         return stockfish;
+    }
+
+    public Alliance getLocalAlliance() {
+        return localAlliance;
     }
 
     public void setPuzzleMove(PuzzleMove puzzleMove) {

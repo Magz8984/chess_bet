@@ -33,7 +33,8 @@ import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
 
-public class GameAnalysisActivity extends AppCompatActivity implements OnMoveDoneListener, ECOBook.OnGetECOListener, View.OnClickListener, BoardView.EngineResponse {
+public class GameAnalysisActivity extends AppCompatActivity implements
+        OnMoveDoneListener, ECOBook.OnGetECOListener, View.OnClickListener, BoardView.EngineResponse {
     @BindView(R.id.board) BoardView boardView;
     @BindView(R.id.btnBack) Button btnBack;
     @BindView(R.id.btnForward) Button btnForward;
