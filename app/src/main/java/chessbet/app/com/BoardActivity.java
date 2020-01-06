@@ -633,6 +633,7 @@ private EvaluateGame evaluateGame;
     @Override
     public void onMatchEnd(MatchStatus matchStatus) {
         // Stop service
+        isGameFinished = true; // Flag Game Has Ended
         evaluateGame = new EvaluateGame();
         GameTimer.get().stopAllTimers();
         AccountAPI.get().listenToAccountUpdate();

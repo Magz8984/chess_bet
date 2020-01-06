@@ -31,7 +31,7 @@
     <string name="new_email">New Email</string>
     <string name="btn_sign_out">Sign Out</string>
     <string name="lbl_forgot_password">Forgot password?</string>
-    <string name="forgot_password_msg">We just need your registered Email to sent you password reset instructions.</string>
+    <string name="forgot_password_msg">We just need your registered Email to send you password reset instructions.</string>
     <string name="flip">FLIP</string>
     <string name="color_picker">Board Color</string>
     <string name="black">Black</string>
