@@ -38,6 +38,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 auth.signOut();
                 Intent intent = new Intent(getContext(), LoginActivity.class);
                 startActivity(intent);
+                // Close current activity
+                Objects.requireNonNull(getActivity()).finish();
             }
         } else if (preference.getKey().equals("reset_pin")){
             if(auth.getCurrentUser() != null){
