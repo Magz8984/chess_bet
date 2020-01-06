@@ -42,6 +42,7 @@ import java.io.ByteArrayOutputStream;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -203,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 try {
                     Glide.with(this).asBitmap().load(user.getProfile_photo_url()).into(profileImage);
                 }catch (Exception ex) {
-                    Log.d(this.getClass().getSimpleName(), ex.getMessage());
+                    Log.d(this.getClass().getSimpleName(), Objects.requireNonNull(ex.getMessage()));
                 }
             }
             txtEmail.setText(user.getEmail());

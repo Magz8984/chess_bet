@@ -24,6 +24,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -69,7 +70,7 @@ public class GameAnalysisActivity extends AppCompatActivity implements
         super.onStart();
         boardView.requestHint();
         Description description = new Description();
-        description.setText("Centipawn Position Advantage");
+        description.setText("Position Advantage");
 
         lineChart.setDescription(description);
 
@@ -96,23 +97,23 @@ public class GameAnalysisActivity extends AppCompatActivity implements
 
     @Override
     public void isCheckMate(Player player) {
-        txtGameStatus.setText(player.toString() + " Checkmated");
+        txtGameStatus.setText(String.format(Locale.US, "%s %s", player.toString(), getResources().getString(R.string.checkmate)));
         boardView.requestHint();
     }
 
     @Override
     public void isStaleMate(Player player) {
-        txtGameStatus.setText("StaleMate");
+        txtGameStatus.setText(getResources().getString(R.string.stalemate));
     }
 
     @Override
     public void isCheck(Player player) {
-        txtGameStatus.setText(player.toString() + " Check");
+        txtGameStatus.setText(String.format(Locale.US, "%s %s", player.toString(), getResources().getString(R.string.check)));
     }
 
     @Override
     public void isDraw() {
-        txtGameStatus.setText("Draw");
+        txtGameStatus.setText(getResources().getString(R.string.draw));
     }
 
     @Override
@@ -144,14 +145,14 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             }
 
             size = boardView.getMoveLog().size();
-            float centipawnEval = getCentiPawnEvaluation(response);
+            float centiPawnEval = getCentiPawnEvaluation(response);
 
-            if(centipawnEval == -1000f){
+            if(centiPawnEval == -1000f){
                 txtResponse.setText(mateString);
                 return;
             }
 
-            Entry entry = new Entry(size, centipawnEval);
+            Entry entry = new Entry(size, centiPawnEval);
 
             if(boardView.getCurrentPlayer().getAlliance().isWhite()){
                 whiteEntries.add(entry);
