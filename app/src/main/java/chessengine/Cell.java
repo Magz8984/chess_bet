@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -222,10 +223,9 @@ public class Cell extends View {
                             Move nextMove = Move.MoveFactory.createMove(boardView.chessBoard ,boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getFromCoordinate(),
                                     boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getToCoordinate());
                             boardView.destinationTile = boardView.chessBoard.getTile(tileId);
-                            boardView.moveLog.addMove(nextMove);
+                            boardView.nextPuzzleMove = nextMove;
                             boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(nextMove).getTransitionBoard();
                             boardView.puzzleMoveCounter++;
-
                             // Ensure board positions are redone
                             boardView.postInvalidate();
                         } catch (Exception e) {
@@ -260,6 +260,10 @@ public class Cell extends View {
                 boolean correct = move.toString().equals(boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getMoveCoordinates());
                 if(correct){
                     boardView.chessBoard = board;
+                    if(boardView.nextPuzzleMove != null){
+                        boardView.moveLog.addMove(boardView.nextPuzzleMove);
+                        boardView.nextPuzzleMove = null;
+                    }
                     boardView.moveLog.addMove(move);
                     return true;
                 }

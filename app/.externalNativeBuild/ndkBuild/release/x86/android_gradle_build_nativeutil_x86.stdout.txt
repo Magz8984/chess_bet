@@ -1,0 +1,2 @@
+[x86] Compile++      : nativeutil <= nativeutil.cpp
+[x86] SharedLibrary  : libnativeutil.so

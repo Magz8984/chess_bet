@@ -1,0 +1,2 @@
+[armeabi-v7a] Compile++ thumb: nativeutil <= nativeutil.cpp
+[armeabi-v7a] SharedLibrary  : libnativeutil.so

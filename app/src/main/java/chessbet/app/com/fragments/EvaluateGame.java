@@ -38,7 +38,6 @@ public class EvaluateGame extends DialogFragment implements EventBroadcast.Accou
     private UnifiedNativeAdView nativeAdView;
     private UnifiedNativeAd nativeAd = null;
     private EvalView evalView;
-    private String winnerInfo;
     private int initialPoints;
     private MatchStatus matchStatus;
     private String opponent;

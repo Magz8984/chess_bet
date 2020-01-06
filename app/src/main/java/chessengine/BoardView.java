@@ -78,6 +78,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     private MoveAnimator moveAnimator = new MoveAnimator();
     private InternalStockFishHandler internalStockFishHandler;
     private EngineResponse engineResponse; // Used To get The Full Response String for Analysis Purpose
+    protected volatile Move nextPuzzleMove = null;
 
     // Stockfish 10
     private Engine stockfish;

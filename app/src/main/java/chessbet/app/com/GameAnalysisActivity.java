@@ -69,7 +69,8 @@ public class GameAnalysisActivity extends AppCompatActivity implements
         super.onStart();
         boardView.requestHint();
         Description description = new Description();
-        description.setText("Centipawn Analysis");
+        description.setText("Centipawn Position Advantage");
+
         lineChart.setDescription(description);
 
         GameUtil.initialize(R.raw.chess_move, this);
