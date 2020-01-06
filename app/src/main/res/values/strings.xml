@@ -71,4 +71,8 @@
     <string name="company">Iconic King</string>
     <string name="feature_unavailable">Feature Unavailable</string>
     <string name="analysis_board">Analysis Board</string>
+    <string name="you_won">You Won</string>
+    <string name="interrupted">Interrupted</string>
+    <string name="timer_lapsed">Timer Lapsed</string>
+    <string name="opponent_won">%1$s Won</string>
 </resources>

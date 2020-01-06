@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         }catch (Exception e){
-            Log.e("FILE ERROR",e.getMessage());
+            Log.e("FILE ERROR", Objects.requireNonNull(e.getMessage()));
         }
     }
 
@@ -306,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         storageReference = firebaseStorage.getReference(FirebaseAuth.getInstance().getUid() + "/" + "profile_photo");
         uploadProfilePhotoTask(bitmap).addOnFailureListener(e -> {
             uploadProfileDialog.dismiss();
-            Log.d("Upload",e.getMessage());
+            Log.d("Upload", Objects.requireNonNull(e.getMessage()));
         });
 
         uploadProfilePhotoTask(bitmap).addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnCompleteListener(task -> {

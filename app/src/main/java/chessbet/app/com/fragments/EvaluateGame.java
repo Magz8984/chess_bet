@@ -63,19 +63,19 @@ public class EvaluateGame extends DialogFragment implements EventBroadcast.Accou
         if(matchStatus != null){
             switch (matchStatus) {
                 case WON:
-                    evalView.setWinnerInfo("You won");
+                    evalView.setWinnerInfo(getResources().getString(R.string.you_won));
                     break;
                 case DRAW:
-                    evalView.setWinnerInfo("Draw");
+                    evalView.setWinnerInfo(getResources().getString(R.string.draw));
                     break;
                 case LOSS:
-                    evalView.setWinnerInfo(opponent + " won");
+                    evalView.setWinnerInfo(getResources().getString(R.string.opponent_won, opponent));
                     break;
                 case INTERRUPTED:
-                    evalView.setWinnerInfo("Interrupted");
+                    evalView.setWinnerInfo(getResources().getString(R.string.interrupted));
                     break;
                 case TIMER_LAPSED:
-                    evalView.setWinnerInfo("Timer Lapsed");
+                    evalView.setWinnerInfo(getResources().getString(R.string.timer_lapsed));
                     break;
                 default:
                     break;
@@ -83,17 +83,23 @@ public class EvaluateGame extends DialogFragment implements EventBroadcast.Accou
         }
     }
 
+    /**
+     * @param initialPoints Initial Points Before Game Is Evaluated By Cloud Functions
+     */
     public void setInitialPoints(int initialPoints) {
         this.initialPoints = initialPoints;
     }
 
+    /**
+     * @param matchStatus match status defined the game state if won,drew etc
+     */
     public void setMatchStatus(MatchStatus matchStatus) {
         this.matchStatus = matchStatus;
-
     }
 
     private void setParams(){
         evalView.setPoints("Updating...");
+
         evalView.setWinnerInfo("Match is " + matchStatus);
         // Always set winner info after match status
         setWinnerInfo();
