@@ -89,6 +89,8 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.whiteTimer) TextView txtWhiteTimer;
 @BindView(R.id.txtConnectionStatus) TextView txtConnectionStatus;
 @BindView(R.id.imgConnectionStatus) CircleImageView imgConnectionStatus;
+@BindView(R.id.txtWhite) TextView txtWhite;
+@BindView(R.id.txtBlack) TextView txtBlack;
 
 private MatchableAccount matchableAccount;
 private ConnectivityManager connectivityManager;
@@ -136,6 +138,8 @@ private EvaluateGame evaluateGame;
         String matchType = intent.getStringExtra("match_type");
 
         if(matchType != null && matchType.equals(MatchType.SINGLE_PLAYER.toString())){
+            txtWhite.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
+            txtBlack.setText(getResources().getString(R.string.computer));
             boardView.setMode(BoardView.Modes.PLAY_COMPUTER);
         }
 
