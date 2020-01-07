@@ -76,4 +76,6 @@
     <string name="timer_lapsed">Timer Lapsed</string>
     <string name="opponent_won">%1$s Won</string>
     <string name="computer">Computer</string>
+    <string name="analysis_prompt">Forfeit Match Analyze Game</string>
+    <string name="yes">Yes</string>
 </resources>

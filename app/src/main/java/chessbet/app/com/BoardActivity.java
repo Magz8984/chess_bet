@@ -91,6 +91,7 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
 @BindView(R.id.txtConnectionStatus) TextView txtConnectionStatus;
 @BindView(R.id.imgConnectionStatus) CircleImageView imgConnectionStatus;
 @BindView(R.id.txtWhite) TextView txtWhite;
+@BindView(R.id.btnAnalysis) Button btnAnalysis;
 @BindView(R.id.txtBlack) TextView txtBlack;
 
 private MatchableAccount matchableAccount;
@@ -119,6 +120,7 @@ private EvaluateGame evaluateGame;
         btnForward.setOnClickListener(this);
         btnHint.setOnClickListener(this);
         btnRecord.setOnClickListener(this);
+        btnAnalysis.setOnClickListener(this);
         txtWhiteStatus.setTextColor(Color.RED);
         txtBlackStatus.setTextColor(Color.RED);
         connectivityManager.setConnectionStateListener(this);
@@ -129,10 +131,6 @@ private EvaluateGame evaluateGame;
     @Override
     protected void onStart() {
         super.onStart();
-
-        if(boardView.getStockfish().isEngineRunning()){
-            Toast.makeText(this, "Stockfish 10 running", Toast.LENGTH_LONG).show();
-        }
 
         GameUtil.initialize(R.raw.chess_move, this);
         Intent intent = getIntent();
@@ -253,6 +251,14 @@ private EvaluateGame evaluateGame;
             } else {
                 Toast.makeText(this, "Hinting Off", Toast.LENGTH_LONG).show();
             }
+        }  else if (v.equals(btnAnalysis)){
+            if (!isGameFinished) {
+                Snackbar snackbar = Snackbar.make(btnAnalysis, R.string.analysis_prompt, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.yes, view -> goToGameAnalysisActivity());
+                snackbar.show();
+            } else {
+                goToMainActivity();
+            }
         }
     }
 
@@ -269,6 +275,13 @@ private EvaluateGame evaluateGame;
             }
         }
         return "*";
+    }
+
+    private void goToGameAnalysisActivity(){
+        Intent intent = new Intent(this, GameAnalysisActivity.class);
+        intent.putExtra("pgn", boardView.getPortableGameNotation());
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -478,7 +491,6 @@ private EvaluateGame evaluateGame;
                     evaluateGame.setMatchStatus(MatchStatus.LOSS);
                 }
             } else if (flag == GameHandler.GAME_TIMER_LAPSED){
-                // TODO WORK ON THIS ON A BACKGROUND SERVICE
                 evaluateGame.setMatchStatus(MatchStatus.TIMER_LAPSED);
                 RemoteMove.get().addEvent(MatchEvent.TIMER_LAPSED);
                 RemoteMove.get().send(matchableAccount.getMatchId(), matchableAccount.getSelf());
@@ -599,7 +611,6 @@ private EvaluateGame evaluateGame;
 
     @Override
     public void playerTimeLapsed(chessbet.domain.Player player) {
-        // TODO Implement game over dialog fragment
         if(player.equals(chessbet.domain.Player.WHITE) && boardView.getLocalAlliance().equals(Alliance.WHITE)){
             endGame(GameHandler.GAME_TIMER_LAPSED);
         } else if (player.equals(chessbet.domain.Player.BLACK) && boardView.getLocalAlliance().equals(Alliance.BLACK)){
