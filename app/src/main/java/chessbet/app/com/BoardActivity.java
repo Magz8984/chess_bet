@@ -51,6 +51,7 @@ import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
 import chessbet.recievers.ConnectivityReceiver;
 import chessbet.services.MatchService;
+import chessbet.services.OpponentListener;
 import chessbet.services.RemoteViewUpdateListener;
 import chessbet.utils.ConnectivityManager;
 import chessbet.utils.DatabaseUtil;
@@ -68,7 +69,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
         OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener, BoardView.PuzzleMove,
-        ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener, MatchAPI.OnMatchEnd {
+        ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener, MatchAPI.OnMatchEnd, OpponentListener {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -151,6 +152,7 @@ private EvaluateGame evaluateGame;
 
             // Get opponent details and place in SQLiteDB
             GameHandler.BackgroundMatchBuilder backgroundMatchBuilder = new GameHandler.BackgroundMatchBuilder();
+            backgroundMatchBuilder.setOpponentListener(this);
             backgroundMatchBuilder.setMatchableAccount(matchableAccount);
             backgroundMatchBuilder.execute(this);
 
@@ -645,6 +647,20 @@ private EvaluateGame evaluateGame;
         evaluateGame.setInitialPoints(AccountAPI.get().getCurrentAccount().getElo_rating());
         evaluateGame.setMatchStatus(matchStatus);
         evaluateGame.show(getSupportFragmentManager(), "EvaluateGame");
-//        goToMainActivity();
+    }
+
+    @Override
+    public void onOpponentReceived(String opponent) {
+        runOnUiThread(() -> {
+            if (boardView.getLocalAlliance().isWhite()) {
+                txtWhite.setText(AccountAPI.get().getCurrentUser().getUserName());
+                txtBlack.setText(opponent);
+            }
+
+            if(boardView.getLocalAlliance().isBlack())  {
+                txtWhite.setText(opponent);
+                txtBlack.setText(AccountAPI.get().getCurrentUser().getUserName());
+            }
+        });
     }
 }

@@ -9,6 +9,7 @@ import chessbet.api.MatchAPI;
 import chessbet.domain.Match;
 import chessbet.domain.MatchResult;
 import chessbet.domain.MatchableAccount;
+import chessbet.services.OpponentListener;
 
 public class GameHandler extends AsyncTask<Integer,Void,Void> {
     private static GameHandler INSTANCE = new GameHandler();
@@ -53,6 +54,7 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
      */
     public static class BackgroundMatchBuilder extends AsyncTask<Context,Void,Void> {
         private MatchableAccount matchableAccount;
+        private OpponentListener opponentListener;
 
         public void setMatchableAccount(MatchableAccount matchableAccount) {
             this.matchableAccount = matchableAccount;
@@ -66,6 +68,8 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
                    sqlDatabaseHelper.addMatch(matchableAccount.getMatchId(), user.getProfile_photo_url(), user.getUserName());
                    Match match = DatabaseUtil.getMatchFromLocalDB(sqlDatabaseHelper.getMatch(matchableAccount.getMatchId()));
                    MatchAPI.get().setCurrentMatch(match);
+                    assert match != null;
+                    opponentListener.onOpponentReceived(match.getOpponentUserName());
                 }
             });
             return null;
@@ -79,6 +83,10 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
         @Override
         protected void onPostExecute(Void aVoid) {
             Log.d(BackgroundMatchBuilder.class.getSimpleName(), "DONE");
+        }
+
+        public void setOpponentListener(OpponentListener opponentListener) {
+            this.opponentListener = opponentListener;
         }
     }
 }

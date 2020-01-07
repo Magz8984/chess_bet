@@ -11,7 +11,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -173,6 +172,9 @@ public class Cell extends View {
                         boardView.isEngineLoading = true;
                         boardView.engine = new BoardView.AI_ENGINE();
                         boardView.engine.setEngineMoveHandler(move1 -> {
+                            // Highlight the destination tile
+                            boardView.destinationTile =  boardView.chessBoard.getTile(move1.getDestinationCoordinate());
+
                             boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(move1).getTransitionBoard();
                             boardView.getInternalStockFishHandler().askStockFishMove(FenUtilities.createFEN(boardView.chessBoard), 3000, 10);
                             boardView.moveLog.addMove(move1);
