@@ -15,7 +15,7 @@ public class MoveLog {
 
     public List<Move> getMoves() {return  this.moves;};
 
-    void addMove(final Move move){
+    public void addMove(final Move move){
         this.moves.add(move);
     }
 

@@ -173,7 +173,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     @Override
     public void onMatchableCreatedNotification() {
         ChallengeAPI.get().setMatchRange(matchRange);
-        ChallengeAPI.get().getExistingChallenges();
+        ChallengeAPI.get().getChallenge();
     }
 
     @Override
@@ -213,7 +213,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     @Override
     public void challengeNotFound() {
         Toast.makeText(getContext(), "Challenge Not Found", Toast.LENGTH_LONG).show();
-        ChallengeAPI.get().sendChallenge(challenge);
+        ChallengeAPI.get().deleteSendChallenge(challenge);
         Log.d("Challenge Found", "Nope");
     }
 }

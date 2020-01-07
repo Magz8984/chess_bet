@@ -56,7 +56,7 @@ public class ChallengeAPI {
         this.challengeHandler = challengeHandler;
     }
 
-    public void sendChallenge(Challenge challenge){
+    private void sendChallenge(Challenge challenge){
         db.collection(CHALLENGE_COLLECTION).add(challenge).addOnCompleteListener(task -> {
             if(task.isSuccessful()){
                 if(task.getResult() != null){
@@ -78,7 +78,7 @@ public class ChallengeAPI {
         }
     }
 
-    private void getChallenge(){
+    public void getChallenge(){
         // TODO set time to a universal standard time
         db.collection(CHALLENGE_COLLECTION)
                 .whereEqualTo("matchType", challenge.getMatchType())
@@ -132,13 +132,13 @@ public class ChallengeAPI {
     private boolean isWithinRange(Challenge challenge){
         Log.d("ChallengeData1", challenge.getEloRating() + " " + challenge.getMaxRating() + " " + challenge.getMinRating());
         Log.d("ChallengeData2", this.challenge.getEloRating() + " " + this.challenge.getMaxRating() + " " + this.challenge.getMinRating());
-        Log.d("ChallengeData3", (System.currentTimeMillis() - 40000) + " " + challenge.getTimeStamp());
+        Log.d("ChallengeData3", (this.challenge.getTimeStamp() - 100000) + " " + challenge.getTimeStamp());
         return ((challenge.getEloRating() >= this.challenge.getMinRating() &&  challenge.getEloRating() <= this.challenge.getMaxRating())
                 && (this.challenge.getEloRating() >= challenge.getMinRating() && this.challenge.getEloRating() <= challenge.getMaxRating()))
-                && (challenge.getTimeStamp() > System.currentTimeMillis() - 70000);
+                && (challenge.getTimeStamp() > (this.challenge.getTimeStamp() - 100000));
     }
 
-    public void getExistingChallenges(){
+    public void  deleteSendChallenge(Challenge challenge){
         user = FirebaseAuth.getInstance().getCurrentUser();
         db.collection(CHALLENGE_COLLECTION).whereEqualTo("owner", user.getUid()).get().addOnCompleteListener(task -> {
             if(task.isSuccessful()){
@@ -146,18 +146,15 @@ public class ChallengeAPI {
                     if(task.getResult().size() != 0){
                         task.getResult().getDocuments().get(0).getReference().delete().addOnCompleteListener(task1 -> {
                             if(task1.isSuccessful()){
-                                // Make sure to remove previous challenges before adding a new one
-                                getChallenge();
+                                sendChallenge(challenge);
                             }
                         });
-                    }
-                    else {
-                        getChallenge();
+                    } else {
+                        sendChallenge(challenge);
                     }
                 }
-                else {
-                    getChallenge();
-                }
+            } else {
+                sendChallenge(challenge);
             }
         });
     }

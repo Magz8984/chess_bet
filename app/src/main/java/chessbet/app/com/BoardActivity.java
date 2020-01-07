@@ -254,10 +254,15 @@ private EvaluateGame evaluateGame;
         }  else if (v.equals(btnAnalysis)){
             if (!isGameFinished) {
                 Snackbar snackbar = Snackbar.make(btnAnalysis, R.string.analysis_prompt, Snackbar.LENGTH_LONG)
-                        .setAction(R.string.yes, view -> goToGameAnalysisActivity());
+                        .setAction(R.string.yes, view -> {
+                            if(matchableAccount != null){
+                                endGame(GameHandler.GAME_INTERRUPTED_FLAG);
+                            }
+                            goToGameAnalysisActivity();
+                        });
                 snackbar.show();
             } else {
-                goToMainActivity();
+                goToGameAnalysisActivity();
             }
         }
     }
@@ -459,9 +464,11 @@ private EvaluateGame evaluateGame;
         this.stopService(new Intent(this, MatchService.class));
     }
 
+
     private void endGame(int flag) {
         this.isGameFinished = true;
         if (this.matchableAccount != null) {
+            storeGameOnCloud();
             // Stop service
             this.stopService(new Intent(this, MatchService.class));
             GameTimer.get().stopAllTimers();
@@ -514,10 +521,12 @@ private EvaluateGame evaluateGame;
     }
 
     private void storeGameOnCloud(){
-        MatchAPI.get().storeCurrentMatchOnCloud(PGNMainUtils.writeGameAsPGN(boardView.getMoveLog().convertToEngineMoveLog(),
-                AccountAPI.get().getCurrentUser().getUserName(),
-                MatchAPI.get().getCurrentMatch().getOpponentUserName(), "*"),
-                taskSnapshot -> Log.d(BoardActivity.class.getSimpleName(), "Match Uploaded"));
+        if(matchableAccount != null && boardView.getLocalAlliance().equals(Alliance.WHITE)){
+            MatchAPI.get().storeCurrentMatchOnCloud(PGNMainUtils.writeGameAsPGN(boardView.getMoveLog().convertToEngineMoveLog(),
+                    AccountAPI.get().getCurrentUser().getUserName(),
+                    MatchAPI.get().getCurrentMatch().getOpponentUserName(), "*"),
+                    taskSnapshot -> Log.d(BoardActivity.class.getSimpleName(), "Match Uploaded"));
+        }
     }
 
     private void getTakenPieces(Move move) {

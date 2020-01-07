@@ -12,7 +12,7 @@ public class GameUtil {
     }
 
     }
-    static void playSound(){
+    public static void playSound(){
         try{
             mp.start();
         }

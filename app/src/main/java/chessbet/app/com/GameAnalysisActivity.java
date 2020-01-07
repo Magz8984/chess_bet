@@ -2,6 +2,7 @@ package chessbet.app.com;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +14,12 @@ import android.widget.TextView;
 
 import com.chess.engine.ECOBuilder;
 import com.chess.engine.Move;
+import com.chess.engine.board.Board;
+import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
+import com.chess.pgn.FenUtilities;
+import com.chess.pgn.PGNMainUtils;
+import com.crashlytics.android.Crashlytics;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.data.Entry;
@@ -33,6 +39,7 @@ import chessengine.ECOBook;
 import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
+import stockfish.InternalStockFishHandler;
 
 public class GameAnalysisActivity extends AppCompatActivity implements
         OnMoveDoneListener, ECOBook.OnGetECOListener, View.OnClickListener, BoardView.EngineResponse {
@@ -44,6 +51,12 @@ public class GameAnalysisActivity extends AppCompatActivity implements
     @BindView(R.id.txtBookMove) TextView txtBookMove;
     @BindView(R.id.chart) LineChart lineChart;
     @BindView(R.id.txtResponse) TextView txtResponse;
+
+
+    private int moveCursor = 0; // Move Log Cursor
+    private com.chess.gui.MoveLog importMoveLog; // Move Log From PGN String
+    private InternalStockFishHandler internalStockFishHandler;
+
 
     private List<Entry> whiteEntries = new ArrayList<>();
     private List<Entry> blackEntries = new ArrayList<>();
@@ -63,11 +76,28 @@ public class GameAnalysisActivity extends AppCompatActivity implements
         boardView.setEcoBookListener(this);
         btnBack.setOnClickListener(this);
         btnForward.setOnClickListener(this);
+        internalStockFishHandler = new InternalStockFishHandler();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        Intent intent = getIntent();
+        String pgn = intent.getStringExtra("pgn");
+
+        if(pgn != null){
+            importMoveLog = createMoveLogFromPGN(pgn);
+            if(importMoveLog != null){
+                // Flag does not accept user moves but move log moves
+                boardView.setMode(BoardView.Modes.ANALYSIS);
+                handleAnalysis();
+            } else {
+                // Log exception
+                Crashlytics.logException(new RuntimeException("Wrong PGN Format : " + pgn));
+            }
+        }
+
+
         boardView.requestHint();
         Description description = new Description();
         description.setText("Position Advantage");
@@ -97,28 +127,30 @@ public class GameAnalysisActivity extends AppCompatActivity implements
 
     @Override
     public void isCheckMate(Player player) {
-        txtGameStatus.setText(String.format(Locale.US, "%s %s", player.toString(), getResources().getString(R.string.checkmate)));
-        boardView.requestHint();
+        runOnUiThread(() -> {
+            txtGameStatus.setText(String.format(Locale.US, "%s %s", player.toString(), getResources().getString(R.string.checkmate)));
+            boardView.requestHint();
+        });
     }
 
     @Override
     public void isStaleMate(Player player) {
-        txtGameStatus.setText(getResources().getString(R.string.stalemate));
+        runOnUiThread(() -> txtGameStatus.setText(getResources().getString(R.string.stalemate)));
     }
 
     @Override
     public void isCheck(Player player) {
-        txtGameStatus.setText(String.format(Locale.US, "%s %s", player.toString(), getResources().getString(R.string.check)));
+        runOnUiThread(() -> txtGameStatus.setText(String.format(Locale.US, "%s %s", player.toString(), getResources().getString(R.string.check))));
     }
 
     @Override
     public void isDraw() {
-        txtGameStatus.setText(getResources().getString(R.string.draw));
+        runOnUiThread(() -> txtGameStatus.setText(getResources().getString(R.string.draw)));
     }
 
     @Override
     public void onGameResume() {
-        txtGameStatus.setText("");
+        runOnUiThread(() -> txtGameStatus.setText(""));
     }
 
     @Override
@@ -187,7 +219,8 @@ public class GameAnalysisActivity extends AppCompatActivity implements
         int indexOfCP = segments.indexOf("cp");
         try {
             int result = Integer.parseInt(segments.get(indexOfCP + 1));
-            return (result / 100f); // Get Integer
+            Log.d(GameAnalysisActivity.class.getSimpleName(), result + " " + boardView.getFen());
+            return Math.abs(result); // Get Integer
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -196,5 +229,55 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             mateString =  "mate in " + Math.abs(Integer.parseInt(segments.get(segments.indexOf("mate") + 1)));
         }
         return -1000f;
+    }
+
+    /**
+     * Create A MoveLog List From PGN String
+     * @param pgn game pgn string
+     * @return Invalid move logs should not be returned
+     */
+    private com.chess.gui.MoveLog createMoveLogFromPGN(String pgn){
+        Board board = Board.createStandardBoard();
+        com.chess.gui.MoveLog moveLog = new com.chess.gui.MoveLog();
+        List<String> strMoves = PGNMainUtils.processMoveText(pgn);
+        for(String strMove: strMoves){
+            Move move = PGNMainUtils.createMove(board, strMove);
+            MoveTransition moveTransition = board.currentPlayer().makeMove(move);
+            if(moveTransition.getMoveStatus().isDone()){
+                moveLog.addMove(move);
+                board = moveTransition.getTransitionBoard();
+            } else {
+                return null;
+            }
+        }
+        return moveLog;
+    }
+
+    private void handleAnalysis(){
+        new Thread(() -> {
+            while (moveCursor < importMoveLog.getMoves().size()){
+                try {
+                    internalStockFishHandler.askStockFishMove(FenUtilities.createFEN(boardView.getChessBoard()), 1000, 20);
+                    Thread.sleep(1000);
+                    Move move = importMoveLog.getMoves().get(moveCursor);
+
+                    // TODO Handle Logic In BoardView
+                    MoveTransition moveTransition = boardView.getChessBoard().currentPlayer().makeMove(move);
+                    if(moveTransition.getMoveStatus().isDone()){
+                        boardView.getMoveLog().addMove(move);
+                        boardView.setChessBoard(moveTransition.getTransitionBoard());
+                        boardView.highlightDestinationTile(move.getDestinationCoordinate());
+                        boardView.updateEcoView();
+                        boardView.updateMoveView();
+                        boardView.displayGameStates();
+                        boardView.postInvalidate();
+                    }
+                    moveCursor++;
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+       }).start();
     }
 }

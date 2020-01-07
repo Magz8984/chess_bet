@@ -84,7 +84,7 @@
         android:fontFamily="@font/chakrapetchbold"
         android:textColor="@color/bootstrap_red"
         android:text="Game Status"
-        android:textSize="15sp"
+        android:textSize="12sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
@@ -96,7 +96,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/white"
         android:fontFamily="@font/chakrapetchbold"
-        android:textSize="15sp"/>
+        android:textSize="12sp"/>
 
 
     <com.github.mikephil.charting.charts.LineChart
