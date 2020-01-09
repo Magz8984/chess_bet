@@ -146,6 +146,27 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         return localAlliance;
     }
 
+    public Board getChessBoard() {
+        return chessBoard;
+    }
+
+    public void setChessBoard(Board chessBoard) {
+        this.chessBoard = chessBoard;
+    }
+
+    public void updateEcoView(){
+        ecoBook.setMoveLog(moveLog.toString());
+        ecoBook.startListening();
+    }
+
+    public void updateMoveView(){
+        onMoveDoneListener.getMoves(moveLog);
+    }
+
+    public String getFen(){
+        return FenUtilities.createFEN(chessBoard);
+    }
+
     public void setPuzzleMove(PuzzleMove puzzleMove) {
         this.puzzleMove = puzzleMove;
     }
@@ -179,7 +200,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
             final int x = (int) event.getX();
             final int y = (int) event.getY();
             for (int i = 0; i < BoardUtils.NUMBER_OF_TILES; i++) {
-                if(boardCells.get(i).isTouched(x,y)){
+                if(boardCells.get(i).isTouched(x,y) && mode != Modes.ANALYSIS){
                         if(matchableAccount != null  && chessBoard.getTile(i).isOccupied()){
                             if(chessBoard.getTile(i).getPiece().getPieceAlliance() == localAlliance){
                                 boardCells.get(i).handleTouch();
@@ -569,7 +590,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         }
     }
 
-    private void displayGameStates(){
+    public void displayGameStates(){
         if(chessBoard.currentPlayer().isInStaleMate()){
             onMoveDoneListener.isStaleMate(chessBoard.currentPlayer());
         }
@@ -675,7 +696,8 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         GAME_REVIEW,
         PLAY_ONLINE,
         PUZZLE_MODE,
-        PLAY_COMPUTER
+        PLAY_COMPUTER,
+        ANALYSIS
     }
 
     public Modes getMode() {
@@ -708,6 +730,9 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         void onEngineResponse(String response);
     }
 
+    public void highlightDestinationTile(int coordinate){
+       destinationTile = chessBoard.getTile(coordinate);
+    }
 
     // Enable Play Computer Engine as Black
      static class AI_ENGINE extends AsyncTask<Board,Void,Move> {

@@ -184,10 +184,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 toolbar.setTitle("Puzzles");
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PuzzleFragment()).commit();
                 break;
-            case R.id.itm_eval: // TODO REMOVE THIS
-                EvaluateGame evaluateGame = new EvaluateGame();
-                evaluateGame.show(getSupportFragmentManager(), "Eval");
-                break;
         }
         return true;
     }

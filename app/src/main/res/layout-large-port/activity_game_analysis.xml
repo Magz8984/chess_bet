@@ -20,10 +20,11 @@
         android:textColor="@color/white"/>
 
     <chessengine.BoardView
+        android:layout_centerHorizontal="true"
         android:id="@+id/board"
         android:layout_below="@+id/txtBoardType"
         android:orientation="vertical"
-        android:layout_width="match_parent"
+        android:layout_width="500dp"
         android:layout_height= "0dp"/>
 
 

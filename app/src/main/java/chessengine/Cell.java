@@ -155,8 +155,7 @@ public class Cell extends View {
                         }
 
                         boardView.moveLog.addMove(move);
-                        boardView.ecoBook.setMoveLog(boardView.moveLog.toString());
-                        boardView.ecoBook.startListening();
+                        boardView.updateEcoView();
 
                         boardView.addMoveToPuzzle(move);
                         boardView.moveCursor = boardView.moveLog.size();
@@ -176,7 +175,7 @@ public class Cell extends View {
                             boardView.destinationTile =  boardView.chessBoard.getTile(move1.getDestinationCoordinate());
 
                             boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(move1).getTransitionBoard();
-                            boardView.getInternalStockFishHandler().askStockFishMove(FenUtilities.createFEN(boardView.chessBoard), 3000, 10);
+                            boardView.getInternalStockFishHandler().askStockFishMove(FenUtilities.createFEN(boardView.chessBoard), 4000, 20);
                             boardView.moveLog.addMove(move1);
                             boardView.moveCursor = boardView.moveLog.size();
                             boardView.onMoveDoneListener.getMoves(boardView.moveLog);
