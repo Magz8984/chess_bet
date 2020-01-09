@@ -187,9 +187,10 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             Entry entry = new Entry(size, centiPawnEval);
 
             if(boardView.getCurrentPlayer().getAlliance().isWhite()){
-                whiteEntries.add(entry);
-            } else {
                 blackEntries.add(entry);
+            } else {
+                whiteEntries.add(entry);
+
             }
 
             LineDataSet whiteDataSet = new LineDataSet(whiteEntries, "White");
@@ -220,7 +221,7 @@ public class GameAnalysisActivity extends AppCompatActivity implements
         try {
             int result = Integer.parseInt(segments.get(indexOfCP + 1));
             Log.d(GameAnalysisActivity.class.getSimpleName(), result + " " + boardView.getFen());
-            return Math.abs(result); // Get Integer
+            return result/100f; // Get Integer
         } catch (Exception ex) {
             ex.printStackTrace();
         }

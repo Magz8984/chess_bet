@@ -135,7 +135,7 @@ public class ChallengeAPI {
         Log.d("ChallengeData3", (this.challenge.getTimeStamp() - 100000) + " " + challenge.getTimeStamp());
         return ((challenge.getEloRating() >= this.challenge.getMinRating() &&  challenge.getEloRating() <= this.challenge.getMaxRating())
                 && (this.challenge.getEloRating() >= challenge.getMinRating() && this.challenge.getEloRating() <= challenge.getMaxRating()))
-                && (challenge.getTimeStamp() > (this.challenge.getTimeStamp() - 100000));
+                && (challenge.getTimeStamp() > (this.challenge.getTimeStamp() - 40000));
     }
 
     public void  deleteSendChallenge(Challenge challenge){

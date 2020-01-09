@@ -38,11 +38,6 @@
             android:icon="@drawable/settings"
             android:title="@string/settings"
             />
-        <!--TODO REMOVE THIS-->
-        <item
-            android:id="@+id/itm_eval"
-            android:title="Ad Test"
-            />
     </group>
 
 

@@ -659,6 +659,7 @@ private EvaluateGame evaluateGame;
     @Override
     public void onMatchEnd(MatchStatus matchStatus) {
         // Stop service
+        ChallengeAPI.get().deleteChallenge(); // Delete current challenge
         isGameFinished = true; // Flag Game Has Ended
         evaluateGame = new EvaluateGame();
         GameTimer.get().stopAllTimers();
