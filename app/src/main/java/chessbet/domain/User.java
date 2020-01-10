@@ -6,7 +6,7 @@ public class User {
     private boolean disabled;
     private String email;
     private String uid;
-    private String userName;
+    private String user_name;
     private String profile_photo_url;
 
     public String getDate_created() {
@@ -25,12 +25,12 @@ public class User {
         return uid;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUser_name(String userName) {
+        this.user_name = userName;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUser_name() {
+        return user_name;
     }
 
     public boolean isDisabled() {

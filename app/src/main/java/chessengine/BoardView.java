@@ -58,6 +58,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     protected Modes mode = Modes.LOCAL_PLAY;
     private int squareSize = 0;
     private boolean isFlipped = false;
+    private boolean isEnabled = true;
     private int whiteCellsColor;
     private int darkCellsColor;
     protected MoveLog moveLog;
@@ -159,6 +160,11 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         ecoBook.startListening();
     }
 
+    @Override
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+
     public void updateMoveView(){
         onMoveDoneListener.getMoves(moveLog);
     }
@@ -200,7 +206,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
             final int x = (int) event.getX();
             final int y = (int) event.getY();
             for (int i = 0; i < BoardUtils.NUMBER_OF_TILES; i++) {
-                if(boardCells.get(i).isTouched(x,y) && mode != Modes.ANALYSIS){
+                if(boardCells.get(i).isTouched(x,y) && isEnabled){
                         if(matchableAccount != null  && chessBoard.getTile(i).isOccupied()){
                             if(chessBoard.getTile(i).getPiece().getPieceAlliance() == localAlliance){
                                 boardCells.get(i).handleTouch();

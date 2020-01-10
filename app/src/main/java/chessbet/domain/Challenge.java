@@ -12,8 +12,10 @@ public class Challenge {
     private long minRating;
     private long maxRating;
     private long duration;
+    private boolean isFriendly = false;
     private MatchType matchType;
     private String dateCreated;
+    private String id;
 
     public void setMatchType(MatchType matchType) {
         this.matchType = matchType;
@@ -93,5 +95,21 @@ public class Challenge {
 
     public void setDuration(long duration) {
         this.duration = duration;
+    }
+
+    public void setFriendly(boolean friendly) {
+        isFriendly = friendly;
+    }
+
+    public boolean isFriendly() {
+        return isFriendly;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 }

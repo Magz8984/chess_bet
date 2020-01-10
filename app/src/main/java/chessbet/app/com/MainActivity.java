@@ -47,22 +47,26 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.api.AccountAPI;
-import chessbet.app.com.fragments.EvaluateGame;
+import chessbet.api.ChallengeAPI;
 import chessbet.app.com.fragments.GamesFragment;
 import chessbet.app.com.fragments.MainFragment;
 import chessbet.app.com.fragments.MatchFragment;
+import chessbet.app.com.fragments.PlayFriendFragment;
 import chessbet.app.com.fragments.ProfileFragment;
 import chessbet.app.com.fragments.PuzzleFragment;
 import chessbet.app.com.fragments.SettingsFragment;
 import chessbet.app.com.fragments.TermsOfService;
 import chessbet.domain.Account;
+import chessbet.domain.MatchableAccount;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
+import chessbet.services.ChallengeService;
+import chessbet.utils.DatabaseUtil;
 import chessbet.utils.EventBroadcast;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        AccountListener, View.OnClickListener, EventBroadcast.UserUpdate, EventBroadcast.AccountUpdated {
+        AccountListener, View.OnClickListener, EventBroadcast.UserUpdate, EventBroadcast.AccountUpdated , ChallengeAPI.DeleteChallenge, ChallengeAPI.ChallengeAccepted{
     private ProgressDialog uploadProfileDialog;
     private StorageReference storageReference;
     private FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
@@ -95,6 +99,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         AccountAPI.get().setAccountListener(this);
         AccountAPI.get().getUser();
         AccountAPI.get().getAccount();
+        ChallengeAPI.get().setChallengeAccepted(this);
+
+        ChallengeAPI.get().deleteAllChallenges(this); // Delete previously created challenges;
+
         EventBroadcast.get().addAccountUpdated(this);
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -138,6 +146,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopService(new Intent(this, ChallengeService.class)); // Stop listening to challenges
+    }
+
+    @Override
     protected void onStop(){
         super.onStop();
     }
@@ -152,8 +166,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.itm_play_online:
                 // TODO Remove piece of logic from UI.
                 if(AccountAPI.get().getCurrentAccount() != null){
-                    toolbar.setTitle(getString(R.string.play_online));
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment()).commit();
+                    if(ChallengeAPI.get().isLoaded()){
+                        toolbar.setTitle(getString(R.string.play_online));
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment()).commit();
+                    } else {
+                        Toast.makeText(this, "Challenges Loading", Toast.LENGTH_LONG).show();
+                    }
                 }
                 break;
             case R.id.itm_profile:
@@ -184,12 +202,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 toolbar.setTitle("Puzzles");
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PuzzleFragment()).commit();
                 break;
+            case R.id.itm_play_friend:
+                if(ChallengeAPI.get().isLoaded()){
+                    toolbar.setTitle(getString(R.string.play_friend));
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PlayFriendFragment()).commit();
+                } else {
+                    Toast.makeText(this, "Challenges Loading", Toast.LENGTH_LONG).show();
+
+                }
+                break;
         }
         return true;
     }
 
     @Override
     public void onAccountReceived(Account account) {
+        try {
+            startService(new Intent(this, ChallengeService.class)); // Listen to challenges
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
         txtRating.setText(getResources().getString(R.string.rating, account.getElo_rating()));
     }
 
@@ -328,6 +360,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onAccountUpdated(Account account) {
         runOnUiThread(() -> txtRating.setText(getResources().getString(R.string.rating, account.getElo_rating())));
+    }
+
+    @Override
+    public void onChallengeDeleted() {
+        Log.d(MainActivity.class.getSimpleName(), "All challenges deleted");
+    }
+
+    @Override
+    public void onChallengeAccepted(MatchableAccount matchableAccount) {
+        startService(new Intent(this, ChallengeService.class)); // Listen to challenges
+        Intent target= new Intent(this, BoardActivity.class);
+        target.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(DatabaseUtil.matchables,matchableAccount);
+        target.putExtras(bundle);
+        startActivity(target);
     }
 }
 

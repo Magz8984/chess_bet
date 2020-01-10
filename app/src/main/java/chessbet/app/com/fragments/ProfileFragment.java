@@ -122,7 +122,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
             progressBar.setVisibility(View.VISIBLE);
             UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
             builder.setDisplayName(txtNewUsername.getText().toString());
-            AccountAPI.get().getCurrentUser().setUserName(txtNewUsername.getText().toString());
+            AccountAPI.get().getCurrentUser().setUser_name(txtNewUsername.getText().toString());
             firebaseUser.updateProfile(builder.build()).addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     AccountAPI.get().updateUser();
