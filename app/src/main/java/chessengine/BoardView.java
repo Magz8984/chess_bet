@@ -153,6 +153,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
 
     public void setChessBoard(Board chessBoard) {
         this.chessBoard = chessBoard;
+        this.destinationTile = null; // Deselect destination tile
     }
 
     public void updateEcoView(){

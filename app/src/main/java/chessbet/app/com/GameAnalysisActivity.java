@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.chess.engine.ECOBuilder;
 import com.chess.engine.Move;
@@ -25,7 +26,9 @@ import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +45,7 @@ import chessengine.OnMoveDoneListener;
 import stockfish.InternalStockFishHandler;
 
 public class GameAnalysisActivity extends AppCompatActivity implements
-        OnMoveDoneListener, ECOBook.OnGetECOListener, View.OnClickListener, BoardView.EngineResponse {
+        OnMoveDoneListener, ECOBook.OnGetECOListener, View.OnClickListener, BoardView.EngineResponse, OnChartValueSelectedListener {
     @BindView(R.id.board) BoardView boardView;
     @BindView(R.id.btnBack) Button btnBack;
     @BindView(R.id.btnForward) Button btnForward;
@@ -61,7 +64,7 @@ public class GameAnalysisActivity extends AppCompatActivity implements
     private List<Entry> whiteEntries = new ArrayList<>();
     private List<Entry> blackEntries = new ArrayList<>();
 
-    private int size = 1;
+    private volatile int size = 1;
     private String mateString;
 
     @Override
@@ -104,6 +107,7 @@ public class GameAnalysisActivity extends AppCompatActivity implements
         description.setText("Position Advantage");
 
         lineChart.setDescription(description);
+        lineChart.setOnChartValueSelectedListener(this);
 
         GameUtil.initialize(R.raw.chess_move, this);
     }
@@ -176,7 +180,6 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             if(size == boardView.getMoveLog().size()){
                 return;
             }
-
             size = boardView.getMoveLog().size();
             float centiPawnEval = getCentiPawnEvaluation(response);
 
@@ -186,6 +189,9 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             }
 
             Entry entry = new Entry(size, centiPawnEval);
+            if(!boardView.getMoveLog().getMoves().isEmpty()){
+                entry.setData(boardView.getMoveLog().getMoves().get(size - 1));
+            }
 
             if(boardView.getCurrentPlayer().getAlliance().isWhite()){
                 blackEntries.add(entry);
@@ -259,6 +265,10 @@ public class GameAnalysisActivity extends AppCompatActivity implements
         new Thread(() -> {
             while (moveCursor < importMoveLog.getMoves().size()){
                 try {
+                    size = boardView.getMoveLog().size();
+                    if(size == importMoveLog.size()){
+                        boardView.requestHint();
+                    }
                     internalStockFishHandler.askStockFishMove(FenUtilities.createFEN(boardView.getChessBoard()), 1000, 20);
                     Thread.sleep(1000);
                     Move move = importMoveLog.getMoves().get(moveCursor);
@@ -281,5 +291,28 @@ public class GameAnalysisActivity extends AppCompatActivity implements
                 }
             }
        }).start();
+    }
+
+    @Override
+    public void onValueSelected(Entry e, Highlight h) {
+        try{
+            if(size == importMoveLog.size()){
+                Move move = (Move) e.getData();
+                Board board = move.undo();
+                board = board.currentPlayer().makeMove(move).getTransitionBoard();
+                boardView.setChessBoard(board);
+                boardView.invalidate();
+
+            } else {
+                Toast.makeText(this, "Cannot change board during analysis", Toast.LENGTH_LONG).show();
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onNothingSelected() {
+
     }
 }
