@@ -43,6 +43,7 @@ import chessbet.api.MatchAPI;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
 import chessbet.app.com.fragments.EvaluateGame;
+import chessbet.domain.Constants;
 import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchStatus;
 import chessbet.domain.MatchType;
@@ -50,6 +51,7 @@ import chessbet.domain.MatchableAccount;
 import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
 import chessbet.recievers.ConnectivityReceiver;
+import chessbet.services.MatchListener;
 import chessbet.services.MatchService;
 import chessbet.services.OpponentListener;
 import chessbet.services.RemoteViewUpdateListener;
@@ -131,9 +133,19 @@ private EvaluateGame evaluateGame;
     @Override
     protected void onStart() {
         super.onStart();
+        isGameFinished = false;
 
         GameUtil.initialize(R.raw.chess_move, this);
         Intent intent = getIntent();
+
+        String challengeId = intent.getStringExtra(Constants.CHALLENGE_ID);
+        if(challengeId != null){
+            Toast.makeText(this, "Accepting Challenge", Toast.LENGTH_LONG).show();
+            boardView.setEnabled(false);
+            ChallengeTaker challengeTaker = new ChallengeTaker(challengeId);
+            challengeTaker.acceptChallenge();
+        }
+
         String matchType = intent.getStringExtra("match_type");
 
         if(matchType != null && matchType.equals(MatchType.SINGLE_PLAYER.toString())){
@@ -144,32 +156,7 @@ private EvaluateGame evaluateGame;
 
         matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
         if (matchableAccount != null) {
-            boardView.setMode(BoardView.Modes.PLAY_ONLINE);
-            boardView.setMatchableAccount(matchableAccount);
-            boardView.getMatchAPI().setOnMatchEnd(this);
-
-            // Get opponent details and place in SQLiteDB
-            GameHandler.BackgroundMatchBuilder backgroundMatchBuilder = new GameHandler.BackgroundMatchBuilder();
-            backgroundMatchBuilder.setOpponentListener(this);
-            backgroundMatchBuilder.setMatchableAccount(matchableAccount);
-            backgroundMatchBuilder.execute(this);
-
-            // Set timer online game and make sure you do not set two different timers
-            if(boardView.getGameTimer() == null){
-                GameTimer.Builder builder = new GameTimer.Builder()
-                        .setTxtBlackMoveTimer(txtBlackTimer)
-                        .setTxtWhiteMoveTimer(txtWhiteTimer)
-                        .setOnTimerElapsed(this);
-                if(GameTimer.get() == null){
-                    boardView.setGameTimer(builder.build());
-
-                } else {
-                    // Reset timer in board view;
-                    GameTimer.get().setBuilder(builder);
-                    // Do not set a new builder it will set two new timers
-                    boardView.setGameTimer(GameTimer.get());
-                }
-            }
+            configureMatch(matchableAccount);
         }
         // Try To Reconstruct
         String pgn = intent.getStringExtra("pgn");
@@ -187,6 +174,42 @@ private EvaluateGame evaluateGame;
             btnBack.setVisibility(View.INVISIBLE);
             btnForward.setVisibility(View.INVISIBLE);
             boardView.setPuzzle(puzzle);
+        }
+    }
+
+
+    private void configureMatch(MatchableAccount matchableAccount){
+        // Remove advantage controls
+        btnHint.setVisibility(View.INVISIBLE);
+        btnForward.setVisibility(View.INVISIBLE);
+        btnBack.setVisibility(View.INVISIBLE);
+
+        this.matchableAccount = matchableAccount;
+        boardView.setMode(BoardView.Modes.PLAY_ONLINE);
+        boardView.setMatchableAccount(matchableAccount);
+        boardView.getMatchAPI().setOnMatchEnd(this);
+
+        // Get opponent details and place in SQLiteDB
+        GameHandler.BackgroundMatchBuilder backgroundMatchBuilder = new GameHandler.BackgroundMatchBuilder();
+        backgroundMatchBuilder.setOpponentListener(this);
+        backgroundMatchBuilder.setMatchableAccount(matchableAccount);
+        backgroundMatchBuilder.execute(this);
+
+        // Set timer online game and make sure you do not set two different timers
+        if(boardView.getGameTimer() == null){
+            GameTimer.Builder builder = new GameTimer.Builder()
+                    .setTxtBlackMoveTimer(txtBlackTimer)
+                    .setTxtWhiteMoveTimer(txtWhiteTimer)
+                    .setOnTimerElapsed(this);
+            if(GameTimer.get() == null){
+                boardView.setGameTimer(builder.build());
+
+            } else {
+                // Reset timer in board view;
+                GameTimer.get().setBuilder(builder);
+                // Do not set a new builder it will set two new timers
+                boardView.setGameTimer(GameTimer.get());
+            }
         }
     }
 
@@ -523,7 +546,7 @@ private EvaluateGame evaluateGame;
     private void storeGameOnCloud(){
         if(matchableAccount != null && boardView.getLocalAlliance().equals(Alliance.WHITE)){
             MatchAPI.get().storeCurrentMatchOnCloud(PGNMainUtils.writeGameAsPGN(boardView.getMoveLog().convertToEngineMoveLog(),
-                    AccountAPI.get().getCurrentUser().getUserName(),
+                    AccountAPI.get().getCurrentUser().getUser_name(),
                     MatchAPI.get().getCurrentMatch().getOpponentUserName(), "*"),
                     taskSnapshot -> Log.d(BoardActivity.class.getSimpleName(), "Match Uploaded"));
         }
@@ -674,14 +697,54 @@ private EvaluateGame evaluateGame;
     public void onOpponentReceived(String opponent) {
         runOnUiThread(() -> {
             if (boardView.getLocalAlliance().isWhite()) {
-                txtWhite.setText(AccountAPI.get().getCurrentUser().getUserName());
+                txtWhite.setText(AccountAPI.get().getCurrentUser().getUser_name());
                 txtBlack.setText(opponent);
             }
 
             if(boardView.getLocalAlliance().isBlack())  {
                 txtWhite.setText(opponent);
-                txtBlack.setText(AccountAPI.get().getCurrentUser().getUserName());
+                txtBlack.setText(AccountAPI.get().getCurrentUser().getUser_name());
             }
         });
+    }
+
+    /**
+     * @author Collins Magondu 10/01/2020
+     * Used to accept challenges from notifications
+     */
+    private class ChallengeTaker implements MatchListener {
+        private String challengeId;
+
+        ChallengeTaker(String challengeId){
+            this.challengeId = challengeId;
+            MatchAPI.get().setMatchListener(this);
+            MatchAPI.get().getAccount();
+        }
+
+        void acceptChallenge(){
+            MatchableAccount matchableAccount = new MatchableAccount();
+            matchableAccount.setOwner(AccountAPI.get().getCurrentUser().getUid());
+            matchableAccount.setMatch_type(MatchType.PLAY_ONLINE.toString());
+            matchableAccount.setDuration(Constants.DEFAULT_MATCH_DURATION);
+            matchableAccount.setElo_rating(AccountAPI.get().getCurrentAccount().getElo_rating());
+            MatchAPI.get().createUserMatchableAccountImplementation(matchableAccount);
+        }
+
+        @Override
+        public void onMatchMade(MatchableAccount matchableAccount) {
+            configureMatch(matchableAccount);
+        }
+
+        @Override
+        public void onMatchableCreatedNotification() {
+            ChallengeAPI.get().acceptChallenge(challengeId);
+        }
+
+        @Override
+        public void onMatchError() {
+            Crashlytics.logException(new RuntimeException("Match could was not created for "
+                    + AccountAPI.get().getCurrentUser().getUid()
+                    + " " + new Date().toString()));
+        }
     }
 }

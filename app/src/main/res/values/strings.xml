@@ -78,4 +78,10 @@
     <string name="computer">Computer</string>
     <string name="analysis_prompt">Forfeit Match Analyze Game</string>
     <string name="yes">YES</string>
+    <string name="username">Username</string>
+    <string name="search">Search</string>
+    <string name="play_friend">Play Friend</string>
+    <string name="user_not_found">No user found</string>
+    <string name="challenge">Challenge</string>
+    <string name="challenge_service">challenge_service</string>
 </resources>

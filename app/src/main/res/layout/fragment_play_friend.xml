@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:background="@color/white"
+    android:padding="5dp"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/controls"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/txtUserName"
+            android:inputType="text"
+            android:hint="@string/username"
+            android:layout_width="0dp"
+            android:textColor="@color/colorPrimary"
+            android:imeOptions="actionSearch"
+            android:textColorHint="@color/colorPrimary"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/chakrapetchbold"
+            android:background="@null"
+            android:layout_weight=".70"/>
+
+        <ImageView
+            android:id="@+id/imgSearch"
+            android:src="@drawable/search_black"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_weight=".03"
+            android:contentDescription="@string/search" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recUsers"
+        android:layout_above="@id/progress_bar"
+        android:layout_below="@+id/controls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <ProgressBar
+        android:visibility="gone"
+        android:id="@+id/progress_bar"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_width="40dp"
+        android:layout_height="40dp"/>
+
+</RelativeLayout>

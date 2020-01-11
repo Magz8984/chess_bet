@@ -90,6 +90,7 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             if(importMoveLog != null){
                 // Flag does not accept user moves but move log moves
                 boardView.setMode(BoardView.Modes.ANALYSIS);
+                boardView.setEnabled(false);
                 handleAnalysis();
             } else {
                 // Log exception
