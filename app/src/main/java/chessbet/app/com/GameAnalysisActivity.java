@@ -300,6 +300,8 @@ public class GameAnalysisActivity extends AppCompatActivity implements
                 boardView.setChessBoard(board);
                 boardView.invalidate();
 
+            } else {
+                Toast.makeText(this, "Cannot change board during analysis", Toast.LENGTH_LONG).show();
             }
         }catch (Exception ex){
             ex.printStackTrace();
