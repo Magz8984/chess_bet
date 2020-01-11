@@ -64,7 +64,7 @@ public class GameAnalysisActivity extends AppCompatActivity implements
     private List<Entry> whiteEntries = new ArrayList<>();
     private List<Entry> blackEntries = new ArrayList<>();
 
-    private int size = 1;
+    private volatile int size = 1;
     private String mateString;
 
     @Override
@@ -180,7 +180,6 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             if(size == boardView.getMoveLog().size()){
                 return;
             }
-
             size = boardView.getMoveLog().size();
             float centiPawnEval = getCentiPawnEvaluation(response);
 
@@ -266,6 +265,10 @@ public class GameAnalysisActivity extends AppCompatActivity implements
         new Thread(() -> {
             while (moveCursor < importMoveLog.getMoves().size()){
                 try {
+                    size = boardView.getMoveLog().size();
+                    if(size == importMoveLog.size()){
+                        boardView.requestHint();
+                    }
                     internalStockFishHandler.askStockFishMove(FenUtilities.createFEN(boardView.getChessBoard()), 1000, 20);
                     Thread.sleep(1000);
                     Move move = importMoveLog.getMoves().get(moveCursor);
