@@ -212,6 +212,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
 
     @Override
     public void challengeNotFound() {
+        findMatch.setEnabled(true);
         Toast.makeText(getContext(), "Challenge Not Found", Toast.LENGTH_LONG).show();
         ChallengeAPI.get().deleteSendChallenge(challenge);
         Log.d("Challenge Found", "Nope");

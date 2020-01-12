@@ -101,6 +101,8 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
      */
     public static class NoMoveReactor  extends AsyncTask<Void,Void,Void>{
         private volatile boolean hasOpponentMoved;
+        private volatile boolean hasMadeMove;
+        private volatile boolean isMyPly;
         private volatile int noMoveSeconds = 0; // Provide a counter for seconds without move that is changed by any thread
         private MatchableAccount matchableAccount;
         private NoMoveEndMatch noMoveEndMatch;
@@ -126,7 +128,7 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
                 @Override
                 public void run() {
                     noMoveSeconds++;
-                    if(noMoveSeconds == 30){
+                    if(noMoveSeconds == 60 && !isMyPly){
                         if(hasOpponentMoved){
                             matchableAccount.endMatch(pgn, GameHandler.GAME_ABANDONED_FLAG,MatchStatus.ABANDONMENT, matchableAccount.getOwner(), matchableAccount.getOpponentId());
                             noMoveEndMatch.onNoMoveEndMatch(MatchStatus.ABANDONMENT);
@@ -134,9 +136,19 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
                             matchableAccount.endMatch(pgn, GameHandler.GAME_ABORTED_FLAG ,MatchStatus.GAME_ABORTED, "", "");
                             noMoveEndMatch.onNoMoveEndMatch(MatchStatus.GAME_ABORTED);
                         }
+                    } else if (noMoveSeconds == 50 && !isMyPly){
+                        noMoveEndMatch.onNoMoveOpponentReacting();
+                    } else if (noMoveSeconds == 50 && isMyPly){
+                        noMoveEndMatch.onNoMoveSelfReacting();
+                    } else if (noMoveSeconds == 60 && isMyPly){
+                        if(hasMadeMove){
+                            noMoveEndMatch.onLoseNoMove(MatchStatus.ABANDONMENT);
+                        } else {
+                            noMoveEndMatch.onLoseNoMove(MatchStatus.GAME_ABORTED);
+                        }
                     }
                 }
-            },1000,1000);
+            },0,1000);
             return null;
         }
 
@@ -152,8 +164,19 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
             timer.cancel();
         }
 
+        public void setMyPly(boolean myPly) {
+            isMyPly = myPly;
+        }
+
+        public void setHasMadeMove(boolean hasMadeMove) {
+            this.hasMadeMove = hasMadeMove;
+        }
+
         public interface NoMoveEndMatch{
             void onNoMoveEndMatch(MatchStatus matchStatus);
+            void onNoMoveOpponentReacting();
+            void onNoMoveSelfReacting();
+            void onLoseNoMove(MatchStatus matchStatus);
         }
     }
 }

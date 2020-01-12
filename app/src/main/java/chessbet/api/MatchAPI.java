@@ -46,6 +46,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MatchAPI implements Serializable {
+    private boolean isRecentMatchEvaluated = false;
     private OnMatchEnd onMatchEnd;
     private FirebaseUser firebaseUser;
     private MatchListener matchListener;
@@ -162,6 +163,8 @@ public class MatchAPI implements Serializable {
                                     remoteMoveListener.onRemoteMoveMade(remoteMove);
                                 }
                             }
+                        } else {
+                            isRecentMatchEvaluated = true;
                         }
                     }
                     @Override
@@ -176,6 +179,18 @@ public class MatchAPI implements Serializable {
         matchStorageTask.setCurrentMatch(currentMatch);
         matchStorageTask.setOnSuccessListener(onSuccessListener);
         matchStorageTask.execute(gameText);
+    }
+
+    public boolean isRecentMatchEvaluated() {
+        return isRecentMatchEvaluated;
+    }
+
+    /**
+     * Should be reset to false for every new game
+     * @param recentMatchEvaluated boolean value
+     */
+    public void setRecentMatchEvaluated(boolean recentMatchEvaluated) {
+        isRecentMatchEvaluated = recentMatchEvaluated;
     }
 
     /**

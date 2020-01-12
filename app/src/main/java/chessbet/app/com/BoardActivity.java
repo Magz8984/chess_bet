@@ -68,6 +68,7 @@ import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
         OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener, BoardView.PuzzleMove,
@@ -184,11 +185,16 @@ private GameHandler.NoMoveReactor noMoveReactor;
         btnHint.setVisibility(View.INVISIBLE);
         btnForward.setVisibility(View.INVISIBLE);
         btnBack.setVisibility(View.INVISIBLE);
+        noMoveReactor = new GameHandler.NoMoveReactor(matchableAccount);
+        noMoveReactor.setNoMoveEndMatch(this);
+        noMoveReactor.execute();
 
         this.matchableAccount = matchableAccount;
         boardView.setMode(BoardView.Modes.PLAY_ONLINE);
         boardView.setMatchableAccount(matchableAccount);
         boardView.getMatchAPI().setOnMatchEnd(this);
+        boardView.getMatchAPI().setRecentMatchEvaluated(false);
+        setNoMoveReactorPly();
 
         // Get opponent details and place in SQLiteDB
         GameHandler.BackgroundMatchBuilder backgroundMatchBuilder = new GameHandler.BackgroundMatchBuilder();
@@ -379,6 +385,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
             whiteMoves.removeAllViews();
             blackPieces.removeAllViews();
             whitePieces.removeAllViews();
+            setNoMoveReactorPly();
             for (Move move : moveLog.getMoves()) {
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 params.setMargins(10, 0, 10, 0);
@@ -398,6 +405,17 @@ private GameHandler.NoMoveReactor noMoveReactor;
                 this.getTakenPieces(move);
             }
         });
+    }
+
+    public void setNoMoveReactorPly(){
+        if(noMoveReactor != null){
+            noMoveReactor.clearNoMoveSeconds();
+            noMoveReactor.setMyPly(boardView.isMyPly());
+            // Notify NoMoveReactor You Have Made A Move
+            if(boardView.isMyPly() && !boardView.getMoveLog().getMoves().isEmpty()){
+                noMoveReactor.setHasMadeMove(true);
+            }
+        }
     }
 
     @Override
@@ -472,8 +490,11 @@ private GameHandler.NoMoveReactor noMoveReactor;
 
     @Override
     protected void onDestroy() {
-        connectivityManager.stopListening();
         super.onDestroy();
+        connectivityManager.stopListening();
+        if(noMoveReactor != null){
+            noMoveReactor.stopTimer();
+        }
     }
 
     @Override
@@ -492,6 +513,9 @@ private GameHandler.NoMoveReactor noMoveReactor;
     private void endGame(int flag) {
         this.isGameFinished = true;
         if (this.matchableAccount != null) {
+            if(boardView.getMatchAPI().isRecentMatchEvaluated()){
+                return;
+            }
             storeGameOnCloud();
             // Stop service
             this.stopService(new Intent(this, MatchService.class));
@@ -533,12 +557,6 @@ private GameHandler.NoMoveReactor noMoveReactor;
             ChallengeAPI.get().deleteChallenge();
             AccountAPI.get().getAccount();
 //            goToMainActivity();
-
-            // Makes sure only one player has a chance to store a game.
-            if(boardView.getLocalAlliance().equals(Alliance.WHITE)){
-               storeGameOnCloud();
-            }
-
             MatchAPI.get().removeCurrentMatch();
             evaluateGame.show(getSupportFragmentManager(), "EvaluateGame"); // Span Up Ad
         }
@@ -580,7 +598,12 @@ private GameHandler.NoMoveReactor noMoveReactor;
 
     @Override
     public void onRemoteMoveMade(RemoteMove remoteMove) {
-        runOnUiThread(() -> boardView.translateRemoteMoveOnBoard(remoteMove));
+        runOnUiThread(() -> {
+            boardView.translateRemoteMoveOnBoard(remoteMove);
+            noMoveReactor.clearNoMoveSeconds();
+            noMoveReactor.setHasOpponentMoved(true);
+            noMoveReactor.setPgn(boardView.getPortableGameNotation()); // Set current game status
+        });
     }
 
     protected void storeGameAsPGN(String result) {
@@ -657,22 +680,40 @@ private GameHandler.NoMoveReactor noMoveReactor;
         runOnUiThread(() -> {
             switch (connectionQuality) {
                 case UNKNOWN:
+                    notifyLowInternetConnection();
                     imgConnectionStatus.setImageDrawable(getResources().getDrawable(R.drawable.low_red));
                     break;
                 case GOOD:
+                    notifyGoodInternetConnection();
                     imgConnectionStatus.setImageDrawable(getResources().getDrawable(R.drawable.good_connection));
                     break;
                 case AVERAGE:
+                    notifyGoodInternetConnection();
                     imgConnectionStatus.setImageDrawable(getResources().getDrawable(R.drawable.medium_connection));
                     break;
                 case POOR:
+                    notifyLowInternetConnection();
                     imgConnectionStatus.setImageDrawable(getResources().getDrawable(R.drawable.low_red));
                     break;
                 case EXCELLENT:
+                    notifyGoodInternetConnection();
                     imgConnectionStatus.setImageDrawable(getResources().getDrawable(R.drawable.high_connection));
                     break;
             }
         });
+    }
+
+    private void notifyLowInternetConnection(){
+        if(matchableAccount != null){
+            Toasty.warning(this, R.string.low_internet_connection, Toasty.LENGTH_LONG).show();
+            boardView.setEnabled(false);
+        }
+    }
+
+    private void notifyGoodInternetConnection() {
+        if (matchableAccount != null) {
+            boardView.setEnabled(true);
+        }
     }
 
     @Override
@@ -683,12 +724,13 @@ private GameHandler.NoMoveReactor noMoveReactor;
     @Override
     public void onMatchEnd(MatchStatus matchStatus) {
         // Stop service
+        this.stopService(new Intent(this, MatchService.class));
+        storeGameOnCloud();
         ChallengeAPI.get().deleteChallenge(); // Delete current challenge
         isGameFinished = true; // Flag Game Has Ended
         evaluateGame = new EvaluateGame();
         GameTimer.get().stopAllTimers();
         AccountAPI.get().listenToAccountUpdate();
-        this.stopService(new Intent(this, MatchService.class));
         evaluateGame.setInitialPoints(AccountAPI.get().getCurrentAccount().getElo_rating());
         evaluateGame.setMatchStatus(matchStatus);
         evaluateGame.show(getSupportFragmentManager(), "EvaluateGame");
@@ -751,6 +793,23 @@ private GameHandler.NoMoveReactor noMoveReactor;
 
     @Override
     public void onNoMoveEndMatch(MatchStatus matchStatus) {
+        noMoveReactor.stopTimer();
+        onMatchEnd(matchStatus);
+    }
+
+    @Override
+    public void onNoMoveOpponentReacting() {
+        runOnUiThread(() -> Toasty.warning(this, "10 seconds left for opponent", Toasty.LENGTH_LONG).show());
+    }
+
+    @Override
+    public void onNoMoveSelfReacting() {
+        runOnUiThread(() -> Toasty.warning(this, "10 seconds left to make move", Toasty.LENGTH_LONG).show());
+    }
+
+    @Override
+    public void onLoseNoMove(MatchStatus matchStatus) {
+        noMoveReactor.stopTimer();
         onMatchEnd(matchStatus);
     }
 }

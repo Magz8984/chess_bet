@@ -91,6 +91,7 @@ dependencies {
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
     implementation 'com.google.android.gms:play-services-ads:18.3.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'com.github.GrenderG:Toasty:1.4.2'
 }
 
 task copyToAssets(type: Copy) {

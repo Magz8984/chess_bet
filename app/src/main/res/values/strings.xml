@@ -76,6 +76,7 @@
     <string name="timer_lapsed">Timer Lapsed</string>
     <string name="game_aborted">Game Aborted</string>
     <string name="abandonment">Game Abandoned</string>
+    <string name="low_internet_connection">You Have Low Internet Connection</string>
     <string name="opponent_won">%1$s Won</string>
     <string name="computer">Computer</string>
     <string name="analysis_prompt">Forfeit Match Analyze Game</string>
