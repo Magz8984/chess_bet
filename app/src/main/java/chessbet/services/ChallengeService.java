@@ -16,7 +16,6 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.crashlytics.android.Crashlytics;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.ListenerRegistration;
 
 import chessbet.api.AccountAPI;
@@ -28,11 +27,10 @@ import chessbet.domain.Challenge;
 import chessbet.domain.Constants;
 import chessbet.domain.User;
 
-public class ChallengeService extends Service{
-    private User challengerUser;
+public class ChallengeService extends Service implements AccountAPI.OnUserReceived{
     private Account challengerAccount;
+    private Challenge currentChallenge;
     private ListenerRegistration listenerRegistration;
-    private ListenerRegistration challengeListener;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -42,21 +40,16 @@ public class ChallengeService extends Service{
     @Override
     public int onStartCommand(Intent intent,int flags, int startId){
         listenToAccountChallenge();
-        listenToChallengeReceived();
         Log.d(ChallengeService.class.getSimpleName(),"STARTED");
         return Service.START_STICKY;
     }
 
     @Override
     public void onDestroy(){
+        super.onDestroy();
         if(listenerRegistration != null){
             listenerRegistration.remove();
         }
-
-        if(challengeListener != null){
-            challengeListener.remove();
-        }
-        super.onDestroy();
     }
 
 
@@ -73,43 +66,35 @@ public class ChallengeService extends Service{
      * Listen to account for new challenge
      */
     private void listenToAccountChallenge(){
-         listenerRegistration = AccountAPI.get().getAccountReference().addSnapshotListener((documentSnapshot, e) -> {
-            if(e != null){
-                Crashlytics.logException(e);
-            } else if (documentSnapshot != null) {
-                Account account = documentSnapshot.toObject(Account.class);
-                assert account != null;
-                if(account.getCurrent_challenge_timestamp() > (System.currentTimeMillis() - 40000)){
-                    ChallengeAPI.get().getChallenge(account.getCurrent_challenge_id(), challenge -> AccountAPI.get().getAUser(challenge.getOwner(), user -> {
-                        ChallengeAPI.get().setOnChallenge(true);
-                        challengerAccount = account;
-                        challengerUser = user;
-                        startChallengeNotification(challengerUser, challengerAccount);
-                    }));
+        try {
+            listenerRegistration = AccountAPI.get().getAccountReference().addSnapshotListener((documentSnapshot, e) -> {
+                if(e != null){
+                    Crashlytics.logException(e);
+                } else if (documentSnapshot != null) {
+                    Account account = documentSnapshot.toObject(Account.class);
+                    assert account != null;
+                    if(account.getCurrent_challenge_timestamp() > (System.currentTimeMillis() - 40000)){
+                        ChallengeAPI.get().getChallenge(account.getCurrent_challenge_id(), challenge -> {
+                            challengerAccount = account;
+                            currentChallenge = challenge;
+                            if(Challenge.isAccepted(challenge)){
+                                AccountAPI.get().getAUser(challenge.getRequester(), this);
+                            } else {
+                                AccountAPI.get().getAUser(challenge.getOwner(), this);
+                            }
+                        });
+                    }
                 }
-            }
-        });
-    }
-
-    private void listenToChallengeReceived(){
-        DocumentReference documentReference = ChallengeAPI.get().getCurrentChallengeReference();
-        if(documentReference != null){
-           challengeListener =  documentReference.addSnapshotListener((documentSnapshot, e) -> {
-               assert documentSnapshot != null;
-               Challenge challenge = documentSnapshot.toObject(Challenge.class);
-               if(challenge != null){
-                   if(challenge.isAccepted()){
-                       startChallengeAcceptedNotification();
-                   }
-               }
             });
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
     }
 
     /**
      * Notify user on they have been challenged
      */
-    private void startChallengeNotification(User user, Account account){
+    private void startChallengeNotification(User user, Account account, Challenge challenge){
         try{
             String channel_id="default";
 
@@ -117,6 +102,8 @@ public class ChallengeService extends Service{
             ChallengeAPI.get().setCurrentChallengeId(account.getCurrent_challenge_id());
 
             intent.putExtra(Constants.CHALLENGE_ID, account.getCurrent_challenge_id());
+            intent.putExtra(Constants.IS_CHALLENGER, isChallengeOwner(challenge));
+            intent.putExtra(Constants.CHALLENGER, challenge.getOwner());
 
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -125,8 +112,8 @@ public class ChallengeService extends Service{
                 channel_id = getNotificationChannel(getResources().getString(R.string.challenge_service),"Background Service");
             }
             Notification notification = new NotificationCompat.Builder( this,channel_id)
-                    .setContentTitle("You have been challenged")
-                    .setContentText(user.getUser_name() + " has challenged you")
+                    .setContentTitle(getContentTitle(challenge))
+                    .setContentText(getContextText(challenge, user))
                     .setSmallIcon(R.drawable.chesslogo)
                     .setContentIntent(contentIntent)
                     .setPriority(1)
@@ -138,22 +125,34 @@ public class ChallengeService extends Service{
         }
     }
 
-    private void startChallengeAcceptedNotification(){
-        try{
-            String channel_id = "default";
-            if(Build.VERSION.SDK_INT >=   Build.VERSION_CODES.O){
-                channel_id = getNotificationChannel(getResources().getString(R.string.challenge_service),"Background Service");
-            }
-            Notification notification = new NotificationCompat.Builder( this,channel_id)
-                    .setContentTitle("Your challenge is accepted")
-                    .setContentText(ChallengeAPI.get().getLastChallengedUser().getUser_name() + " has accepted your challenge")
-                    .setSmallIcon(R.drawable.chesslogo)
-                    .setPriority(1)
-                    .build();
-            startForeground(1, notification);
+    private String getContentTitle(Challenge challenge){
+        if(!Challenge.isAccepted(challenge)){
+            return "You have been challenged";
+        } else {
+            return "Your challenge has been accepted";
         }
-        catch (Exception ex){
-            ex.printStackTrace();
+    }
+
+    private String getContextText(Challenge challenge,User user){
+        if(!Challenge.isAccepted(challenge)){
+            return user.getUser_name() + " has challenged you" ;
+        } else {
+            return user.getUser_name() + " has accepted your challenge";
         }
+    }
+
+    /**
+     * Check is the current user is the owner of the challenge
+     * @param challenge Evaluated challenge
+     * @return boolean value
+     */
+    private boolean isChallengeOwner(Challenge challenge){
+        return !(challenge.getRequester() == null || challenge.getRequester().equals(""));
+    }
+
+    @Override
+    public void onUserReceived(User user) {
+        ChallengeAPI.get().setOnChallenge(true);
+        startChallengeNotification(user, challengerAccount,currentChallenge);
     }
 }

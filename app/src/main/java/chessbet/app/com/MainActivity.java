@@ -57,16 +57,14 @@ import chessbet.app.com.fragments.PuzzleFragment;
 import chessbet.app.com.fragments.SettingsFragment;
 import chessbet.app.com.fragments.TermsOfService;
 import chessbet.domain.Account;
-import chessbet.domain.MatchableAccount;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
 import chessbet.services.ChallengeService;
-import chessbet.utils.DatabaseUtil;
 import chessbet.utils.EventBroadcast;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        AccountListener, View.OnClickListener, EventBroadcast.UserUpdate, EventBroadcast.AccountUpdated , ChallengeAPI.DeleteChallenge, ChallengeAPI.ChallengeAccepted{
+        AccountListener, View.OnClickListener, EventBroadcast.UserUpdate, EventBroadcast.AccountUpdated , ChallengeAPI.DeleteChallenge{
     private ProgressDialog uploadProfileDialog;
     private StorageReference storageReference;
     private FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
@@ -99,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         AccountAPI.get().setAccountListener(this);
         AccountAPI.get().getUser();
         AccountAPI.get().getAccount();
-        ChallengeAPI.get().setChallengeAccepted(this);
 
         ChallengeAPI.get().deleteAllChallenges(this); // Delete previously created challenges;
 
@@ -148,7 +145,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopService(new Intent(this, ChallengeService.class)); // Stop listening to challenges
     }
 
     @Override
@@ -365,17 +361,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onChallengeDeleted() {
         Log.d(MainActivity.class.getSimpleName(), "All challenges deleted");
-    }
-
-    @Override
-    public void onChallengeAccepted(MatchableAccount matchableAccount) {
-        startService(new Intent(this, ChallengeService.class)); // Listen to challenges
-        Intent target= new Intent(this, BoardActivity.class);
-        target.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(DatabaseUtil.matchables,matchableAccount);
-        target.putExtras(bundle);
-        startActivity(target);
     }
 }
 

@@ -1,5 +1,7 @@
 package chessbet.api;
 
+import android.util.Log;
+
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -88,9 +90,7 @@ public class ChallengeAPI {
         MatchListener matchListener = new MatchListener() {
             @Override
             public void onMatchMade(MatchableAccount matchableAccount) {
-                if(challengeAccepted  != null){
-                    challengeAccepted.onChallengeAccepted(matchableAccount);
-                }
+                Log.d(ChallengeAPI.class.getSimpleName(), "Match made");
             }
 
             /**
@@ -161,9 +161,9 @@ public class ChallengeAPI {
      * @param accountOwner Account Owner UID
      * @param challengeId Set challenge Id
      */
-    private void setChallengeByAccount(String accountOwner, String challengeId, ChallengeSent challengeSent){
+    public void setChallengeByAccount(String accountOwner, String challengeId, ChallengeSent challengeSent){
         AccountAPI.get().getAccount(accountOwner, account -> {
-            long time = currentChallenge.getTimeStamp();
+            long time = System.currentTimeMillis();
             if((account.getCurrent_challenge_timestamp() < (time - Constants.MAX_MATCHING_DURATION)) ||
                     (account.getCurrent_challenge_timestamp() <= 0)){ // Timer lapsed or no challenge found
                 if(challengeId != null){ // Make sure we don't send nulls

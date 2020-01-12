@@ -20,4 +20,6 @@ public class Constants {
     public static long MAX_MATCHING_DURATION = 40000;
     public static long DEFAULT_MATCH_DURATION = 15;
     public static String CHALLENGE_ID = "challengeId";
+    public static String IS_CHALLENGER = "isChallenger";
+    public static String CHALLENGER = "Challenger";
 }
