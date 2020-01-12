@@ -4,10 +4,14 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import chessbet.api.AccountAPI;
 import chessbet.api.MatchAPI;
 import chessbet.domain.Match;
 import chessbet.domain.MatchResult;
+import chessbet.domain.MatchStatus;
 import chessbet.domain.MatchableAccount;
 import chessbet.services.OpponentListener;
 
@@ -20,6 +24,8 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
     public static final int GAME_FINISHED_FLAG = 40934;
     public static final int GAME_DRAWN_FLAG = 13780;
     public static final int GAME_TIMER_LAPSED = 472489;
+    private static final int GAME_ABANDONED_FLAG = 40428;
+    private static final int GAME_ABORTED_FLAG = 10077;
 
     public void setMatchResult(MatchResult matchResult) {
         this.matchResult = matchResult;
@@ -87,6 +93,67 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
 
         public void setOpponentListener(OpponentListener opponentListener) {
             this.opponentListener = opponentListener;
+        }
+    }
+
+    /**
+     * Listen to remote moves being made if none within 30 seconds terminate match
+     */
+    public static class NoMoveReactor  extends AsyncTask<Void,Void,Void>{
+        private volatile boolean hasOpponentMoved;
+        private volatile int noMoveSeconds = 0; // Provide a counter for seconds without move that is changed by any thread
+        private MatchableAccount matchableAccount;
+        private NoMoveEndMatch noMoveEndMatch;
+        private Timer timer;
+        private String pgn = "";
+
+        public NoMoveReactor(MatchableAccount matchableAccount){
+           this.matchableAccount = matchableAccount;
+           timer = new Timer();
+        }
+
+        public void setNoMoveEndMatch(NoMoveEndMatch noMoveEndMatch) {
+            this.noMoveEndMatch = noMoveEndMatch;
+        }
+
+        public void setPgn(String pgn) {
+            this.pgn = pgn;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    noMoveSeconds++;
+                    if(noMoveSeconds == 30){
+                        if(hasOpponentMoved){
+                            matchableAccount.endMatch(pgn, GameHandler.GAME_ABANDONED_FLAG,MatchStatus.ABANDONMENT, matchableAccount.getOwner(), matchableAccount.getOpponentId());
+                            noMoveEndMatch.onNoMoveEndMatch(MatchStatus.ABANDONMENT);
+                        } else {
+                            matchableAccount.endMatch(pgn, GameHandler.GAME_ABORTED_FLAG ,MatchStatus.GAME_ABORTED, "", "");
+                            noMoveEndMatch.onNoMoveEndMatch(MatchStatus.GAME_ABORTED);
+                        }
+                    }
+                }
+            },1000,1000);
+            return null;
+        }
+
+        public void setHasOpponentMoved(boolean hasOpponentMoved) {
+            this.hasOpponentMoved = hasOpponentMoved;
+        }
+
+        public void clearNoMoveSeconds(){
+            noMoveSeconds = 0;
+        }
+
+        public void stopTimer(){
+            timer.cancel();
+        }
+
+        public interface NoMoveEndMatch{
+            void onNoMoveEndMatch(MatchStatus matchStatus);
         }
     }
 }

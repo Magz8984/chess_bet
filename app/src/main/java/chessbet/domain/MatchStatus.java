@@ -30,5 +30,17 @@ public enum MatchStatus {
         public String toString() {
             return "TIMER LAPSED";
         }
+    },
+    ABANDONMENT {
+        @Override
+        public String toString() {
+            return "ABANDONMENT";
+        }
+    },
+    GAME_ABORTED{
+        @Override
+        public String toString() {
+            return "GAME_ABORTED";
+        }
     }
 }

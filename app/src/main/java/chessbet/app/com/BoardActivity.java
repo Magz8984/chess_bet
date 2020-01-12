@@ -69,7 +69,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
         OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener, BoardView.PuzzleMove,
-        ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener, MatchAPI.OnMatchEnd, OpponentListener {
+        ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener, MatchAPI.OnMatchEnd, OpponentListener , GameHandler.NoMoveReactor.NoMoveEndMatch {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -99,6 +99,7 @@ private ConnectivityManager connectivityManager;
 private boolean isGameFinished = false;
 private boolean isStoredGame = false;
 private EvaluateGame evaluateGame;
+private GameHandler.NoMoveReactor noMoveReactor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -683,5 +684,10 @@ private EvaluateGame evaluateGame;
                 txtBlack.setText(AccountAPI.get().getCurrentUser().getUserName());
             }
         });
+    }
+
+    @Override
+    public void onNoMoveEndMatch(MatchStatus matchStatus) {
+        onMatchEnd(matchStatus);
     }
 }

@@ -77,6 +77,12 @@ public class EvaluateGame extends DialogFragment implements EventBroadcast.Accou
                 case TIMER_LAPSED:
                     evalView.setWinnerInfo(getResources().getString(R.string.timer_lapsed));
                     break;
+                case GAME_ABORTED:
+                    evalView.setWinnerInfo(getResources().getString(R.string.game_aborted));
+                    break;
+                case ABANDONMENT:
+                    evalView.setWinnerInfo(getResources().getString(R.string.abandonment));
+                    break;
                 default:
                     break;
             }

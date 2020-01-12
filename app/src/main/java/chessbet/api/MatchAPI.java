@@ -110,8 +110,8 @@ public class MatchAPI implements Serializable {
 
     /**
      * @deprecated
-     * @param matchId
-     * @return
+     * @param matchId The match id to be removed
+     * @return remove match promise
      */
     public Task<Void> removeMatch(String matchId){
        return DatabaseUtil.getMatch(matchId).removeValue();
@@ -119,7 +119,7 @@ public class MatchAPI implements Serializable {
 
     /**
      * This match is the current match being played
-     * @param currentMatch
+     * @param currentMatch Current match being played
      */
     public void setCurrentMatch(Match currentMatch) {
         this.currentMatch = currentMatch;
@@ -235,7 +235,7 @@ public class MatchAPI implements Serializable {
         RequestBody requestBody = RequestBody.create(JSON,new Gson().toJson(matchResult));
 
         // Generate token for cloud functions to verify user
-        TokenGenerator.genetrateToken(token -> {
+        TokenGenerator.generateToken(token -> {
             Request request = new Request.Builder()
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Authorization", "Bearer " + token)
@@ -261,7 +261,7 @@ public class MatchAPI implements Serializable {
 
 
         // Generate token for cloud functions to verify user
-        TokenGenerator.genetrateToken(token -> {
+        TokenGenerator.generateToken(token -> {
             Request request = new Request.Builder()
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Authorization", "Bearer " + token)
