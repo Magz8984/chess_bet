@@ -1,6 +1,6 @@
 package chessbet.domain;
 
-public class Match {
+public class DatabaseMatch {
     private String opponentUserName;
     private String opponentPic;
     private String matchId;

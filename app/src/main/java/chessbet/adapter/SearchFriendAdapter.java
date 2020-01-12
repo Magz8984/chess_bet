@@ -68,6 +68,7 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
                    ChallengeAPI.get().challengeAccount(users.get(position).getUid(), new ChallengeAPI.ChallengeSent() {
                        @Override
                        public void onChallengeSent() {
+                           MatchAPI.get().setMatchCreated(true);
                            MatchAPI.get().getAccount(); // Listener for challenge acceptance
                            ChallengeAPI.get().setLastChallengedUser(users.get(position));
                            Toast.makeText(context, "Challenge sent to " + users.get(position).getUser_name(), Toast.LENGTH_LONG).show();

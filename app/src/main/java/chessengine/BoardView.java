@@ -266,7 +266,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     }
 
     @Override
-    protected  void onDraw(Canvas canvas){
+    protected void onDraw(Canvas canvas){
         int i = 0;
         moveAnimator.setCanvas(canvas);
         if(tiles.size() == 0){
@@ -283,6 +283,13 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
             }
         }
         handleDrawHint();
+    }
+
+    public boolean isMyPly(){
+        if(matchableAccount != null){
+            return chessBoard.currentPlayer().getAlliance().equals(localAlliance);
+        }
+        return false;
     }
 
     /**

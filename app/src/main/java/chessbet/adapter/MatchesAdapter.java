@@ -15,19 +15,19 @@ import java.util.List;
 
 import chessbet.api.AccountAPI;
 import chessbet.app.com.R;
-import chessbet.domain.Match;
+import chessbet.domain.DatabaseMatch;
 import chessbet.utils.DatabaseUtil;
 import chessbet.utils.SQLDatabaseHelper;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHolder>{
-    private List<Match> matches;
+    private List<DatabaseMatch> databaseMatches;
     private Context context;
 
     public MatchesAdapter(Context context){
         this.context = context;
-        this.matches = DatabaseUtil.getMatchesFromLocalDB(new SQLDatabaseHelper(context).getMatches());
-        matches = AccountAPI.get().assignMatchResults(this.matches);
+        this.databaseMatches = DatabaseUtil.getMatchesFromLocalDB(new SQLDatabaseHelper(context).getMatches());
+        databaseMatches = AccountAPI.get().assignMatchResults(this.databaseMatches);
     }
 
     @NonNull
@@ -40,9 +40,9 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         try{
-            Glide.with(context).asBitmap().load(matches.get(position).getOpponentPic()).into(holder.getImgOpponentPic());
-            holder.getOpponentUserName().setText(matches.get(position).getOpponentUserName());
-            holder.getTxtMatchStatus().setText(matches.get(position).getMatchStatus().toString());
+            Glide.with(context).asBitmap().load(databaseMatches.get(position).getOpponentPic()).into(holder.getImgOpponentPic());
+            holder.getOpponentUserName().setText(databaseMatches.get(position).getOpponentUserName());
+            holder.getTxtMatchStatus().setText(databaseMatches.get(position).getMatchStatus().toString());
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -50,7 +50,7 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return matches.size();
+        return databaseMatches.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder{

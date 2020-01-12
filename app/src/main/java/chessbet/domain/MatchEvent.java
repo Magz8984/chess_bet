@@ -36,5 +36,17 @@ public enum MatchEvent {
         public String toString() {
             return "TIMER LAPSED";
         }
+    },
+    DISCONNECTED{
+        @Override
+        public String toString() {
+            return "DISCONNECTED";
+        }
+    },
+    NO_EVENT{
+        @Override
+        public String toString() {
+            return "NO_EVENT";
+        }
     }
 }

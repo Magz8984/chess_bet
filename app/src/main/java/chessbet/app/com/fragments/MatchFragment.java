@@ -136,12 +136,12 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     public void onClick(View v) {
         if(v.equals(findMatch)){
             if(AccountAPI.get().getCurrentAccount().getLast_match_duration() == 0){
-                // Match duration not set
-                Toast.makeText(getContext(), "Match duration not selected", Toast.LENGTH_LONG).show();
+                // DatabaseMatch duration not set
+                Toast.makeText(getContext(), "DatabaseMatch duration not selected", Toast.LENGTH_LONG).show();
             } else {
                 findMatch.setEnabled(false);
                 progressCircle.show();
-                //Match Service Listener Set
+                //DatabaseMatch Service Listener Set
                 createChallenge();
                 matchAPI.createUserMatchableAccountImplementation(createMatchableAccount());
             }
@@ -172,6 +172,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
 
     @Override
     public void onMatchableCreatedNotification() {
+        MatchAPI.get().setMatchCreated(true);
         ChallengeAPI.get().setMatchRange(matchRange);
         ChallengeAPI.get().getChallenge();
     }
@@ -212,6 +213,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
 
     @Override
     public void challengeNotFound() {
+        findMatch.setEnabled(true);
         Toast.makeText(getContext(), "Challenge Not Found", Toast.LENGTH_LONG).show();
         ChallengeAPI.get().deleteSendChallenge(challenge);
         Log.d("Challenge Found", "Nope");

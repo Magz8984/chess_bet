@@ -98,6 +98,7 @@ public class ChallengeAPI {
              */
             @Override
             public void onMatchableCreatedNotification() {
+                MatchAPI.get().setMatchCreated(true);
                 MatchAPI.get().getAccount();
                 Challenge challenge = createFriendChallenge();
                 currentChallenge = challenge;

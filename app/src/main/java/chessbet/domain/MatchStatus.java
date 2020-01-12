@@ -1,6 +1,6 @@
 package chessbet.domain;
 
-public enum MatchStatus {
+public enum MatchStatus{
     WON{
         @Override
         public String toString() {
@@ -29,6 +29,24 @@ public enum MatchStatus {
         @Override
         public String toString() {
             return "TIMER LAPSED";
+        }
+    },
+    ABANDONMENT {
+        @Override
+        public String toString(){
+            return "ABANDONMENT";
+        }
+    },
+    GAME_ABORTED{
+        @Override
+        public String toString() {
+            return "GAME_ABORTED";
+        }
+    },
+    DISCONNECTED{
+        @Override
+        public String toString() {
+            return "DISCONNECTED";
         }
     }
 }

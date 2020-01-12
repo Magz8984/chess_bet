@@ -10,9 +10,9 @@ import com.google.firebase.auth.FirebaseUser;
 public class TokenGenerator {
     /**
      * Used for all api calls to cloud functions
-     * @param onTokenGeneratedListener
+     * @param onTokenGeneratedListener Interface to be called by API
      */
-    public static void genetrateToken(OnTokenGeneratedListener onTokenGeneratedListener){
+    public static void generateToken(OnTokenGeneratedListener onTokenGeneratedListener){
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         assert firebaseUser != null;
         firebaseUser.getIdToken(true).addOnCompleteListener(task -> {

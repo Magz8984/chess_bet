@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.chess.engine.Alliance;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -175,7 +174,7 @@ public class MatchableAccount implements Parcelable {
     }
 
     public void endMatch(Context context){
-        DatabaseUtil.getAccount(this.owner).removeValue();
+        DatabaseUtil.getAccount(this.owner).removeValue(); // Remove matchable account
         // Remove match from rdb
         GameManager.delayedTask(() -> DatabaseUtil.getMatch(this.matchId).removeValue().addOnSuccessListener(aVoid -> {
             Intent intent=new Intent(context, MainActivity.class);
@@ -183,6 +182,7 @@ public class MatchableAccount implements Parcelable {
         }), 3000);
     }
 
+    // TODO Shift to Database Match API
     public void endMatch(String pgn, int flag, MatchStatus matchStatus, String gain, String loss){
         GameHandler.getInstance().resetInstance();
         MatchResult matchResult = new MatchResult.Builder()
