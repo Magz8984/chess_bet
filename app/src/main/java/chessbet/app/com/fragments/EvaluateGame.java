@@ -83,6 +83,8 @@ public class EvaluateGame extends DialogFragment implements EventBroadcast.Accou
                 case ABANDONMENT:
                     evalView.setWinnerInfo(getResources().getString(R.string.abandonment));
                     break;
+                case DISCONNECTED:
+                    evalView.setWinnerInfo(getResources().getString(R.string.disconnected));
                 default:
                     break;
             }

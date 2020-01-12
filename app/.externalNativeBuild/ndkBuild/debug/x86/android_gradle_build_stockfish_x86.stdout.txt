@@ -18,5 +18,4 @@
 [x86] Compile++      : stockfish <= search.cpp
 [x86] Compile++      : stockfish <= tt.cpp
 [x86] Compile++      : stockfish <= tbprobe.cpp
-[x86] Prebuilt       : libc++_shared.so <= <NDK>/sources/cxx-stl/llvm-libc++/libs/x86/
 [x86] Executable     : stockfish

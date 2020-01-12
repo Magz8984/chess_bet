@@ -182,7 +182,7 @@ public class MatchableAccount implements Parcelable {
         }), 3000);
     }
 
-    // TODO Shift to Match API
+    // TODO Shift to Database Match API
     public void endMatch(String pgn, int flag, MatchStatus matchStatus, String gain, String loss){
         GameHandler.getInstance().resetInstance();
         MatchResult matchResult = new MatchResult.Builder()

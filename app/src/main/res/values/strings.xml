@@ -57,7 +57,7 @@
     <string name="select_profile_photo">Select Profile Photo</string>
     <string name="upload_profile_photo">Upload Profile Photo</string>
     <string name="match_exact_rating">Match is set on exact rating</string>
-    <string name="save_end_match">Save and end match</string>
+    <string name="save_end_match">Save Match</string>
     <string name="save">Save</string>
     <string name="games">Games</string>
     <string name="forfeit">Forfeit</string>
@@ -77,6 +77,7 @@
     <string name="game_aborted">Game Aborted</string>
     <string name="abandonment">Game Abandoned</string>
     <string name="low_internet_connection">You Have Low Internet Connection</string>
+    <string name="opponent_disconnected">Opponent Disconnected</string>
     <string name="opponent_won">%1$s Won</string>
     <string name="computer">Computer</string>
     <string name="analysis_prompt">Forfeit Match Analyze Game</string>
@@ -87,4 +88,5 @@
     <string name="user_not_found">No user found</string>
     <string name="challenge">Challenge</string>
     <string name="challenge_service">challenge_service</string>
+    <string name="disconnected">Disconnected</string>
 </resources>

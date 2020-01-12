@@ -22,10 +22,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import chessbet.domain.Constants;
-import chessbet.domain.Match;
+import chessbet.domain.DatabaseMatch;
 import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchResult;
 import chessbet.domain.MatchStatus;
@@ -46,12 +50,15 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MatchAPI implements Serializable {
+    private List<String> unevaluatedMatches = new ArrayList<>(); // Matches yet to be evaluated
+
     private boolean isRecentMatchEvaluated = false;
+    private boolean isMatchCreated;
     private OnMatchEnd onMatchEnd;
     private FirebaseUser firebaseUser;
     private MatchListener matchListener;
     private RemoteMoveListener remoteMoveListener;
-    private Match currentMatch;
+    private DatabaseMatch currentDatabaseMatch;
     private static MatchAPI INSTANCE = new MatchAPI();
     private static int RESPONSE_OKAY_FLAG = 200;
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
@@ -69,8 +76,8 @@ public class MatchAPI implements Serializable {
         this.matchListener = matchListener;
     }
 
-    public Match getCurrentMatch() {
-        return currentMatch;
+    public DatabaseMatch getCurrentDatabaseMatch() {
+        return currentDatabaseMatch;
     }
 
     public void setRemoteMoveListener(RemoteMoveListener remoteMoveListener) {
@@ -81,6 +88,9 @@ public class MatchAPI implements Serializable {
         this.onMatchEnd = onMatchEnd;
     }
 
+    /**
+     * Listen for matches and make matches
+     */
     public void getAccount(){
         RemoteMove.get().clear();
         final MatchableAccount[] matchable = {null};
@@ -93,14 +103,19 @@ public class MatchAPI implements Serializable {
                 MatchableAccount matchableAccount = matchable[0];
                 if(matchableAccount != null){
                     if(matchableAccount.isMatched()){
-                        // Remove listener once the match is made
-                        DatabaseUtil.getAccount(firebaseUser.getUid()).removeEventListener(this);
-                        // Add Started Event
-                        RemoteMove.get().addEvent(MatchEvent.IN_PROGRESS);
-                        RemoteMove.get().setOwner(matchableAccount.getOwner());
-                        RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
-                        // Confirms a match has been made
-                        matchListener.onMatchMade(matchableAccount);
+                        if(!isMatchCreated || unevaluatedMatches.contains(matchableAccount.getMatchId())){
+                            unevaluatedMatches.add(matchableAccount.getMatchId());
+                            forceEvaluateMatch(matchableAccount.getMatchId());
+                        } else {
+                            // Remove listener once the match is made
+                            DatabaseUtil.getAccount(firebaseUser.getUid()).removeEventListener(this);
+                            // Add Started Event
+                            RemoteMove.get().addEvent(MatchEvent.IN_PROGRESS);
+                            RemoteMove.get().setOwner(matchableAccount.getOwner());
+                            RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
+                            // Confirms a match has been made
+                            matchListener.onMatchMade(matchableAccount);
+                        }
                     }
                 }
             }
@@ -120,17 +135,31 @@ public class MatchAPI implements Serializable {
 
     /**
      * This match is the current match being played
-     * @param currentMatch Current match being played
+     * @param currentDatabaseMatch Current match being played
      */
-    public void setCurrentMatch(Match currentMatch) {
-        this.currentMatch = currentMatch;
+    public void setCurrentDatabaseMatch(DatabaseMatch currentDatabaseMatch) {
+        this.currentDatabaseMatch = currentDatabaseMatch;
+    }
+
+    /**
+     * Force evaluation of a previously unfinished match
+     * @param matchId match id from matchable account
+     */
+    private void forceEvaluateMatch(String matchId){
+        Map<String, Object> map = new HashMap<>();
+        map.put("scheduleEvaluation", true);
+        DatabaseUtil.getMatch(matchId).updateChildren(map).addOnCompleteListener(task -> {
+            if(!task.isSuccessful()){
+                Crashlytics.logException(task.getException());
+            }
+        });
     }
 
     /**
      * Used during end game
      */
     public void removeCurrentMatch(){
-        this.currentMatch = null;
+        this.currentDatabaseMatch = null;
     }
 
     public void sendMoveData(MatchableAccount matchableAccount, int source, int destination, String pgn, long gameTimeLeft){
@@ -176,13 +205,25 @@ public class MatchAPI implements Serializable {
 
     public void storeCurrentMatchOnCloud(String gameText, OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener){
         MatchStorageTask matchStorageTask = new MatchStorageTask();
-        matchStorageTask.setCurrentMatch(currentMatch);
+        matchStorageTask.setCurrentDatabaseMatch(currentDatabaseMatch);
         matchStorageTask.setOnSuccessListener(onSuccessListener);
         matchStorageTask.execute(gameText);
     }
 
     public boolean isRecentMatchEvaluated() {
         return isRecentMatchEvaluated;
+    }
+
+    public boolean isMatchCreated() {
+        return isMatchCreated;
+    }
+
+    /**
+     * Flag match that will come after is intentional
+     * @param matchCreated boolean value
+     */
+    public void setMatchCreated(boolean matchCreated) {
+        isMatchCreated = matchCreated;
     }
 
     /**
@@ -194,20 +235,20 @@ public class MatchAPI implements Serializable {
     }
 
     /**
-     * Match Storage
+     * DatabaseMatch Storage
      */
     public static class MatchStorageTask extends AsyncTask<String,Void,Void>{
         private OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener;
-        private Match currentMatch;
+        private DatabaseMatch currentDatabaseMatch;
         @Override
         protected Void doInBackground(String... strings) {
-            StorageReference storageReference = FirebaseStorage.getInstance().getReference(Constants.GAMES_CLOUD_REFERENCE + "/" + currentMatch.getMatchId() + ".pgn" );
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference(Constants.GAMES_CLOUD_REFERENCE + "/" + currentDatabaseMatch.getMatchId() + ".pgn" );
             storageReference.putBytes(strings[0].getBytes()).addOnSuccessListener(onSuccessListener);
             return null;
         }
 
-        void setCurrentMatch(Match currentMatch) {
-            this.currentMatch = currentMatch;
+        void setCurrentDatabaseMatch(DatabaseMatch currentDatabaseMatch) {
+            this.currentDatabaseMatch = currentDatabaseMatch;
         }
 
         void setOnSuccessListener(OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener) {
@@ -297,7 +338,7 @@ public class MatchAPI implements Serializable {
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                // Match User after creating a matchable
+                // DatabaseMatch User after creating a matchable
                 if(response.code() == RESPONSE_OKAY_FLAG){
                     matchListener.onMatchableCreatedNotification();
                 }

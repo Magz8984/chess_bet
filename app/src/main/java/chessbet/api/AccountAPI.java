@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 
 import chessbet.domain.Account;
-import chessbet.domain.Match;
+import chessbet.domain.DatabaseMatch;
 import chessbet.domain.MatchDetails;
 import chessbet.domain.MatchStatus;
 import chessbet.domain.Puzzle;
@@ -235,20 +235,20 @@ public class AccountAPI {
     }
 
     /** Results are got from firestore **/
-    public List<Match> assignMatchResults(List<Match> matches){
-        List<Match> newList = new ArrayList<>();
-        for (Match match : matches){
+    public List<DatabaseMatch> assignMatchResults(List<DatabaseMatch> databaseMatches){
+        List<DatabaseMatch> newList = new ArrayList<>();
+        for (DatabaseMatch databaseMatch : databaseMatches){
             for (MatchDetails matchDetails: currentAccount.getMatches()) {
-                if(matchDetails.getMatch_result().getMatchId().equals(match.getMatchId())){
+                if(matchDetails.getMatch_result().getMatchId().equals(databaseMatch.getMatchId())){
                     if (matchDetails.getMatch_result().getMatchStatus().equals(MatchStatus.DRAW)){
-                        match.setMatchStatus(MatchStatus.DRAW);
+                        databaseMatch.setMatchStatus(MatchStatus.DRAW);
                     } else if(matchDetails.getMatch_result().getLoss().equals(currentAccount.getOwner())){
-                        match.setMatchStatus(MatchStatus.LOSS);
+                        databaseMatch.setMatchStatus(MatchStatus.LOSS);
                     } else if(matchDetails.getMatch_result().getGain().equals(currentAccount.getOwner())) {
-                        match.setMatchStatus(MatchStatus.WON);
+                        databaseMatch.setMatchStatus(MatchStatus.WON);
                     }
-                    match.setMatchResult(matchDetails.getMatch_result());
-                    newList.add(match);
+                    databaseMatch.setMatchResult(matchDetails.getMatch_result());
+                    newList.add(databaseMatch);
                 }
             }
         }

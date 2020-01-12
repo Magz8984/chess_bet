@@ -218,6 +218,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
                 boardView.setGameTimer(GameTimer.get());
             }
         }
+        MatchAPI.get().setMatchCreated(false);
     }
 
     @Override
@@ -526,7 +527,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
 
             evaluateGame = new EvaluateGame(); // Game evaluation fragment
             evaluateGame.setInitialPoints(AccountAPI.get().getCurrentAccount().getElo_rating());
-            evaluateGame.setOpponent(MatchAPI.get().getCurrentMatch().getOpponentUserName());
+            evaluateGame.setOpponent(MatchAPI.get().getCurrentDatabaseMatch().getOpponentUserName());
 
             if (flag == GameHandler.GAME_DRAWN_FLAG) {
                 matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_DRAWN_FLAG, MatchStatus.DRAW, null, null);
@@ -566,8 +567,8 @@ private GameHandler.NoMoveReactor noMoveReactor;
         if(matchableAccount != null && boardView.getLocalAlliance().equals(Alliance.WHITE)){
             MatchAPI.get().storeCurrentMatchOnCloud(PGNMainUtils.writeGameAsPGN(boardView.getMoveLog().convertToEngineMoveLog(),
                     AccountAPI.get().getCurrentUser().getUser_name(),
-                    MatchAPI.get().getCurrentMatch().getOpponentUserName(), "*"),
-                    taskSnapshot -> Log.d(BoardActivity.class.getSimpleName(), "Match Uploaded"));
+                    MatchAPI.get().getCurrentDatabaseMatch().getOpponentUserName(), "*"),
+                    taskSnapshot -> Log.d(BoardActivity.class.getSimpleName(), "DatabaseMatch Uploaded"));
         }
     }
 
@@ -599,11 +600,23 @@ private GameHandler.NoMoveReactor noMoveReactor;
     @Override
     public void onRemoteMoveMade(RemoteMove remoteMove) {
         runOnUiThread(() -> {
+            checkIfOpponentIsOnline(remoteMove);
             boardView.translateRemoteMoveOnBoard(remoteMove);
             noMoveReactor.clearNoMoveSeconds();
             noMoveReactor.setHasOpponentMoved(true);
             noMoveReactor.setPgn(boardView.getPortableGameNotation()); // Set current game status
         });
+    }
+
+    /**
+     * See if opponent disconnected;
+     * @param remoteMove Remote move from opponent
+     */
+    public void checkIfOpponentIsOnline(RemoteMove remoteMove){
+        if(remoteMove.isLastEventDisconnected()){
+            Toasty.warning(this,R.string.opponent_disconnected, Toasty.LENGTH_LONG).show();
+            noMoveReactor.setOpponentDisconnected(true);
+        }
     }
 
     protected void storeGameAsPGN(String result) {
@@ -706,13 +719,20 @@ private GameHandler.NoMoveReactor noMoveReactor;
     private void notifyLowInternetConnection(){
         if(matchableAccount != null){
             Toasty.warning(this, R.string.low_internet_connection, Toasty.LENGTH_LONG).show();
+            sendDisconnectedEvent();
             boardView.setEnabled(false);
+            if(noMoveReactor != null){
+                noMoveReactor.setDisconnected(true);
+            }
         }
     }
 
     private void notifyGoodInternetConnection() {
         if (matchableAccount != null) {
             boardView.setEnabled(true);
+            if(noMoveReactor != null){
+                noMoveReactor.setDisconnected(false);
+            }
         }
     }
 
@@ -751,6 +771,13 @@ private GameHandler.NoMoveReactor noMoveReactor;
         });
     }
 
+
+    private void sendDisconnectedEvent(){
+        RemoteMove.get().addEvent(MatchEvent.DISCONNECTED);
+        RemoteMove.get().setOwner(matchableAccount.getOwner());
+        RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
+    }
+
     /**
      * @author Collins Magondu 10/01/2020
      * Used to accept challenges from notifications
@@ -761,6 +788,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
         ChallengeTaker(String challengeId){
             this.challengeId = challengeId;
             MatchAPI.get().setMatchListener(this);
+            MatchAPI.get().setMatchCreated(true);
             MatchAPI.get().getAccount();
         }
 
@@ -785,7 +813,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
 
         @Override
         public void onMatchError() {
-            Crashlytics.logException(new RuntimeException("Match could was not created for "
+            Crashlytics.logException(new RuntimeException("DatabaseMatch could was not created for "
                     + AccountAPI.get().getCurrentUser().getUid()
                     + " " + new Date().toString()));
         }
@@ -809,6 +837,12 @@ private GameHandler.NoMoveReactor noMoveReactor;
 
     @Override
     public void onLoseNoMove(MatchStatus matchStatus) {
+        noMoveReactor.stopTimer();
+        onMatchEnd(matchStatus);
+    }
+
+    @Override
+    public void onDisconnected(MatchStatus matchStatus) {
         noMoveReactor.stopTimer();
         onMatchEnd(matchStatus);
     }

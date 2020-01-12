@@ -60,8 +60,8 @@ public class MatchService extends Service{
                 channel_id = getNotificationChannel("match_service","Background Service");
             }
             Notification notification = new NotificationCompat.Builder( this,channel_id)
-                    .setContentTitle("Online Match")
-                    .setContentText("Match will end if left idle for 30 seconds")
+                    .setContentTitle("Online DatabaseMatch")
+                    .setContentText("DatabaseMatch will end if left idle for 30 seconds")
                     .setSmallIcon(R.drawable.chesslogo)
                     .setPriority(1)
                     .build();

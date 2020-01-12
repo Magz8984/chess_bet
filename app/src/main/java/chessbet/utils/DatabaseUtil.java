@@ -8,7 +8,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import chessbet.domain.Match;
+import chessbet.domain.DatabaseMatch;
 import chessbet.domain.MatchResult;
 
 public class DatabaseUtil {
@@ -49,27 +49,27 @@ public class DatabaseUtil {
         return databaseReference.child(DatabaseUtil.evaluationQueue).child(DatabaseUtil.match_task_node);
     }
 
-    public static List<Match> getMatchesFromLocalDB(Cursor cursor){
-        List<Match> matches = new ArrayList<>();
+    public static List<DatabaseMatch> getMatchesFromLocalDB(Cursor cursor){
+        List<DatabaseMatch> databaseMatches = new ArrayList<>();
         if(cursor.moveToFirst()){
             do {
-                Match match = new Match();
-                match.setMatchId(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_ID)));
-                match.setOpponentPic(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_PIC)));
-                match.setOpponentUserName(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_USERNAME)));
-                matches.add(match);
+                DatabaseMatch databaseMatch = new DatabaseMatch();
+                databaseMatch.setMatchId(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_ID)));
+                databaseMatch.setOpponentPic(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_PIC)));
+                databaseMatch.setOpponentUserName(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_USERNAME)));
+                databaseMatches.add(databaseMatch);
             }while (cursor.moveToNext());
         }
-        return matches;
+        return databaseMatches;
     }
 
-    public static Match getMatchFromLocalDB(Cursor cursor){
+    public static DatabaseMatch getMatchFromLocalDB(Cursor cursor){
         if(cursor.moveToFirst()){
-            Match match = new Match();
-            match.setMatchId(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_ID)));
-            match.setOpponentPic(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_PIC)));
-            match.setOpponentUserName(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_USERNAME)));
-            return match;
+            DatabaseMatch databaseMatch = new DatabaseMatch();
+            databaseMatch.setMatchId(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_ID)));
+            databaseMatch.setOpponentPic(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_PIC)));
+            databaseMatch.setOpponentUserName(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_USERNAME)));
+            return databaseMatch;
         }
         return null;
     }

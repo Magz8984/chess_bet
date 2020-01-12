@@ -44,6 +44,15 @@ public class RemoteMove {
         }
     }
 
+    public boolean isLastEventDisconnected(){
+        if(events.isEmpty()){
+            return false;
+        } else {
+            int index  = events.size() - 1;
+            return events.get(index).equals(MatchEvent.DISCONNECTED.toString());
+        }
+    }
+
     public void setGameTimeLeft(long gameTimeLeft) {
         this.gameTimeLeft = gameTimeLeft;
     }
