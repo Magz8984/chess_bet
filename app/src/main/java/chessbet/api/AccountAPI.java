@@ -24,7 +24,6 @@ import chessbet.services.AccountListener;
 import chessbet.services.PuzzleListener;
 import chessbet.services.UserListener;
 import chessbet.utils.EventBroadcast;
-import chessbet.utils.TokenGenerator;
 
 /**
  * @author Collins Magondu
@@ -43,6 +42,7 @@ public class AccountAPI {
     private ListenerRegistration listenerRegistration;
     private User currentUser = null;
     private DocumentReference accountReference;
+    private UsersReceived usersReceived;
 
     private AccountAPI() {
          db = FirebaseFirestore.getInstance();
@@ -60,17 +60,18 @@ public class AccountAPI {
                     for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())){
                         accountReference = document.getReference();
                         currentAccount = document.toObject(Account.class);
+                        currentAccount.setId(accountReference.getId());
                         accountListener.onAccountReceived(currentAccount);
                         // Overkill we already have a listener on main activity
                         EventBroadcast.get().broadCastAccountUpdate();
                     }
                 }
                 else {
-                    Log.d(TAG, Objects.requireNonNull(task.getException()).getMessage());
+                    Log.d(TAG, Objects.requireNonNull(Objects.requireNonNull(task.getException()).getMessage()));
                 }
             });
         }catch (Exception ex){
-            Log.d(TAG, ex.getMessage());
+            Log.d(TAG, Objects.requireNonNull(ex.getMessage()));
         }
     }
 
@@ -81,7 +82,7 @@ public class AccountAPI {
                accountListener.onUserReceived(currentUser);
            }
            else {
-               Log.d(TAG, Objects.requireNonNull(task.getException()).getMessage());
+               Log.d(TAG, Objects.requireNonNull(Objects.requireNonNull(task.getException()).getMessage()));
            }
         });
     }
@@ -108,6 +109,10 @@ public class AccountAPI {
         this.accountListener = accountListener;
     }
 
+    public void setUsersRecived(UsersReceived usersRecived) {
+        this.usersReceived = usersRecived;
+    }
+
     public DocumentReference getUserPath(){
         return db.collection(AccountAPI.USER_COLLECTION).document(user.getUid());
     }
@@ -123,7 +128,7 @@ public class AccountAPI {
            }
            else{
                puzzleListener.onPuzzleSent(false);
-               Log.d("ERROR MESSAGE : ", Objects.requireNonNull(task.getException()).getMessage());
+               Log.d("ERROR MESSAGE : ", Objects.requireNonNull(Objects.requireNonNull(task.getException()).getMessage()));
            }
        });
     }
@@ -148,6 +153,36 @@ public class AccountAPI {
         });
     }
 
+    /**
+     * Used to get an account on user Id
+     * @param owner userId
+     */
+    void getAccount(String owner, AccountReceived accountReceived){
+        Query query = db.collection(AccountAPI.ACCOUNT_COLLECTION).whereEqualTo("owner", owner);
+        query.get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())){
+                    if (accountReceived != null) {
+                        accountReceived.onAccountReceived(document.toObject(Account.class));
+                    }
+                }
+            }
+            else {
+                Log.d(TAG, Objects.requireNonNull(Objects.requireNonNull(task.getException()).getMessage()));
+            }
+        });
+    }
+
+    void updateAccount(Account account){
+        db.collection(ACCOUNT_COLLECTION).whereEqualTo("owner", account.getOwner()).get().addOnCompleteListener(task -> {
+            for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())){
+                DocumentReference documentReference = document.getReference();
+                documentReference.set(account);
+            }
+        });
+    }
+
+
     public void listenToAccountUpdate(){
         listenerRegistration = accountReference.addSnapshotListener((documentSnapshot, e) -> {
            if(e !=null){
@@ -167,6 +202,25 @@ public class AccountAPI {
 //               listenerRegistration.remove();
            }
        });
+    }
+
+    /**
+     * Get a list of users matching username
+     * @param username Text Username
+     */
+    public void getUsersByUserName(String username){
+       List<User> users = new ArrayList<>();
+       Query query = db.collection(AccountAPI.USER_COLLECTION).whereEqualTo("user_name", username).limit(10);
+       query.get().addOnCompleteListener(task -> {
+            for(QueryDocumentSnapshot documentSnapshot: Objects.requireNonNull(task.getResult())){
+                users.add(documentSnapshot.toObject(User.class));
+            }
+            if (users.size() > 0) {
+                usersReceived.onUserReceived(users);
+            } else {
+                usersReceived.onUserNotFound();
+            }
+       }).addOnFailureListener(e -> usersReceived.onUserNotFound());
     }
 
 
@@ -201,7 +255,23 @@ public class AccountAPI {
         return newList;
     }
 
+    public DocumentReference getAccountReference() {
+        return accountReference;
+    }
+
     public interface OnUserReceived {
         void onUserReceived(User user);
+    }
+
+    public interface UsersReceived {
+        void onUserReceived(List<User> user);
+        void onUserNotFound();
+    }
+
+    /**
+     * Get other users account
+     */
+    public interface AccountReceived{
+        void onAccountReceived(Account account);
     }
 }

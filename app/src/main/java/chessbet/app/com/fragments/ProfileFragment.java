@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -82,6 +83,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
 
     @Override
     public void onStart() {
+        // Make sure soft keyboard does not adjust layout
+        Objects.requireNonNull(getActivity()).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         super.onStart();
         init();
     }
@@ -122,7 +125,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
             progressBar.setVisibility(View.VISIBLE);
             UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
             builder.setDisplayName(txtNewUsername.getText().toString());
-            AccountAPI.get().getCurrentUser().setUserName(txtNewUsername.getText().toString());
+            AccountAPI.get().getCurrentUser().setUser_name(txtNewUsername.getText().toString());
             firebaseUser.updateProfile(builder.build()).addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     AccountAPI.get().updateUser();

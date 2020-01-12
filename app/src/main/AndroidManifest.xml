@@ -48,6 +48,11 @@
             android:name="chessbet.services.MatchService"
             android:icon="@drawable/chesslogo"
             android:label="@string/match_service" />
+
+        <service android:name="chessbet.services.ChallengeService"
+            android:icon="@drawable/chesslogo"
+            android:label="@string/challenge_service"/>
+
     </application>
 
 </manifest>
