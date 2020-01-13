@@ -112,4 +112,8 @@ public class Challenge {
     public String getId() {
         return id;
     }
+
+    public static boolean isAccepted(Challenge challenge){
+        return !(challenge.requester == null || challenge.requester.isEmpty());
+    }
 }

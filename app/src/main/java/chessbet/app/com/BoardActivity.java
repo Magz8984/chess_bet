@@ -29,6 +29,7 @@ import com.chess.pgn.PGNMainUtils;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.material.snackbar.Snackbar;
 
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -140,14 +141,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
         GameUtil.initialize(R.raw.chess_move, this);
         Intent intent = getIntent();
 
-        String challengeId = intent.getStringExtra(Constants.CHALLENGE_ID);
-        if(challengeId != null){
-            Toast.makeText(this, "Accepting Challenge", Toast.LENGTH_LONG).show();
-            boardView.setEnabled(false);
-            ChallengeTaker challengeTaker = new ChallengeTaker(challengeId);
-            challengeTaker.acceptChallenge();
-        }
-
+        configureChallenge(intent);
         String matchType = intent.getStringExtra("match_type");
 
         if(matchType != null && matchType.equals(MatchType.SINGLE_PLAYER.toString())){
@@ -219,6 +213,31 @@ private GameHandler.NoMoveReactor noMoveReactor;
             }
         }
         MatchAPI.get().setMatchCreated(false);
+    }
+
+    private void configureChallenge(Intent intent){
+        String challengeId = intent.getStringExtra(Constants.CHALLENGE_ID);
+        String challenger = intent.getStringExtra(Constants.CHALLENGER);
+        boolean isChallenger = intent.getBooleanExtra(Constants.IS_CHALLENGER, false);
+        if(challengeId != null){
+            Toast.makeText(this, "Accepting Challenge", Toast.LENGTH_LONG).show();
+            boardView.setEnabled(false);
+            ChallengeTaker challengeTaker = new ChallengeTaker(challengeId);
+            if(!isChallenger){
+                ChallengeAPI.get().setChallengeByAccount(challenger, challengeId, new ChallengeAPI.ChallengeSent() {
+                    @Override
+                    public void onChallengeSent() {
+                        Log.d(BoardActivity.class.getSimpleName(), "Challenge sent to sender");
+                    }
+
+                    @Override
+                    public void onChallengeNotSent() {
+                        Crashlytics.logException(new RuntimeException("Challenge not sent back"));
+                    }
+                });
+                challengeTaker.acceptChallenge();
+            }
+        }
     }
 
     @Override
