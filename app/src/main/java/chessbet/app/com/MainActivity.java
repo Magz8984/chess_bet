@@ -31,9 +31,19 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.tasks.OnCanceledListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -42,12 +52,13 @@ import java.io.ByteArrayOutputStream;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.api.AccountAPI;
 import chessbet.api.ChallengeAPI;
+import chessbet.api.NotificationAPI;
+import chessbet.api.PresenceAPI;
 import chessbet.app.com.fragments.GamesFragment;
 import chessbet.app.com.fragments.MainFragment;
 import chessbet.app.com.fragments.MatchFragment;
@@ -64,7 +75,8 @@ import chessbet.utils.EventBroadcast;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        AccountListener, View.OnClickListener, EventBroadcast.UserUpdate, EventBroadcast.AccountUpdated , ChallengeAPI.DeleteChallenge{
+        AccountListener, View.OnClickListener, EventBroadcast.UserUpdate, EventBroadcast.AccountUpdated ,
+        ChallengeAPI.DeleteChallenge, PresenceAPI.UserOnline, NotificationAPI.TokenRetrieved {
     private ProgressDialog uploadProfileDialog;
     private StorageReference storageReference;
     private FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
@@ -93,6 +105,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         txtRating = navigationView.getHeaderView(0).findViewById(R.id.rating);
         profileImage = navigationView.getHeaderView(0).findViewById(R.id.profile_photo);
         profileImage.setOnClickListener(this);
+
+        FirebaseFirestore.setLoggingEnabled(true);
         AccountAPI.get().setUser(FirebaseAuth.getInstance().getCurrentUser());
         AccountAPI.get().setAccountListener(this);
         AccountAPI.get().getUser();
@@ -214,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onAccountReceived(Account account) {
         try {
-            startService(new Intent(this, ChallengeService.class)); // Listen to challenges
+            startService(new Intent(this, ChallengeService.class)); // Listen to challenges;
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -223,12 +237,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onUserReceived(User user) {
+        NotificationAPI.get().getNotificationToken(this); // Get Instance Token
         if( user != null){
+            PresenceAPI.get().setUser(user);
+            PresenceAPI.get().getAmOnline(this);
             if(user.getProfile_photo_url() != null){
                 try {
                     Glide.with(this).asBitmap().load(user.getProfile_photo_url()).into(profileImage);
                 }catch (Exception ex) {
-                    Log.d(this.getClass().getSimpleName(), Objects.requireNonNull(ex.getMessage()));
+                    Crashlytics.logException(ex);
                 }
             }
             txtEmail.setText(user.getEmail());
@@ -276,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         }catch (Exception e){
-            Log.e("FILE ERROR", Objects.requireNonNull(e.getMessage()));
+            Crashlytics.logException(e);
         }
     }
 
@@ -328,23 +345,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void uploadProfilePhoto(Bitmap bitmap){
         storageReference = firebaseStorage.getReference(FirebaseAuth.getInstance().getUid() + "/" + "profile_photo");
-        uploadProfilePhotoTask(bitmap).addOnFailureListener(e -> {
-            uploadProfileDialog.dismiss();
-            Log.d("Upload", Objects.requireNonNull(e.getMessage()));
+        uploadProfilePhotoTask(bitmap).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                uploadProfileDialog.dismiss();
+                Crashlytics.logException(e);
+            }
         });
 
-        uploadProfilePhotoTask(bitmap).addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnCompleteListener(task -> {
-            final Uri uri = task.getResult();
-            Map<String,Object> map = new HashMap<>();
-            assert uri != null;
-            map.put("profile_photo_url", uri.toString());
-            AccountAPI.get().getUserPath().update(map).addOnCompleteListener(task2 -> {
-                Toast.makeText(MainActivity.this,R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
-                Log.d("Done","Is Done");
-                uploadProfileDialog.dismiss();
-                AccountAPI.get().getUser();
-            }).addOnCanceledListener(() -> uploadProfileDialog.dismiss());
-        }));
+        uploadProfilePhotoTask(bitmap).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                storageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Uri> task) {
+                        final Uri uri = task.getResult();
+                        Map<String,Object> map = new HashMap<>();
+                        assert uri != null;
+                        map.put("profile_photo_url", uri.toString());
+                        AccountAPI.get().getUserPath().update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                Toast.makeText(MainActivity.this,R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
+                                Log.d("Done","Is Done");
+                                uploadProfileDialog.dismiss();
+                                AccountAPI.get().getUser();
+                            }
+                        }).addOnCanceledListener(new OnCanceledListener() {
+                            @Override
+                            public void onCanceled() {
+                                uploadProfileDialog.dismiss();
+                            }
+                        });
+                    }
+            });
+        }
+    });
     }
 
     @Override
@@ -354,13 +390,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onAccountUpdated(Account account) {
-        runOnUiThread(() -> txtRating.setText(getResources().getString(R.string.rating, account.getElo_rating())));
+    public void onAccountUpdated(final Account account) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                txtRating.setText(getResources().getString(R.string.rating, account.getElo_rating()));
+            }
+        });
     }
 
     @Override
     public void onChallengeDeleted() {
         Log.d(MainActivity.class.getSimpleName(), "All challenges deleted");
+    }
+
+    @Override
+    public void amOnline(boolean isOnline) {
+        Log.d(MainActivity.class.getSimpleName(), "IS_ONLINE");
+    }
+
+    @Override
+    public void onNotificationTokenReceived(String token) {
+        User user = AccountAPI.get().getCurrentUser();
+        if(!user.getFcmToken().equals(token)){
+            NotificationAPI.get().updateUserToken(token, user);
+        }
+    }
+
+    @Override
+    public void onNotificationTokenErrorReceived(Exception e) {
+        Crashlytics.logException(e);
     }
 }
 
