@@ -89,4 +89,5 @@
     <string name="challenge">Challenge</string>
     <string name="challenge_service">challenge_service</string>
     <string name="disconnected">Disconnected</string>
+    <string name="online_users">Online Users</string>
 </resources>

@@ -413,7 +413,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
                 textView.setLayoutParams(params);
                 textView.setText(move.toString());
                 textView.setTextColor(Color.WHITE);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
                 textView.setOnClickListener(v -> Log.d("MOVE", move.toString()));
                 if (move.getMovedPiece().getPieceAlliance() == Alliance.BLACK) {
                     blackMoves.addView(textView);
@@ -601,7 +601,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
             assert drawable != null;
             drawable.clearColorFilter();
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(40, 40);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(35, 35);
 
             imageView.setLayoutParams(params);
             imageView.setBackground(drawable);
@@ -712,6 +712,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
         runOnUiThread(() -> {
             switch (connectionQuality) {
                 case UNKNOWN:
+                case POOR:
                     notifyLowInternetConnection();
                     imgConnectionStatus.setImageDrawable(getResources().getDrawable(R.drawable.low_red));
                     break;
@@ -722,10 +723,6 @@ private GameHandler.NoMoveReactor noMoveReactor;
                 case AVERAGE:
                     notifyGoodInternetConnection();
                     imgConnectionStatus.setImageDrawable(getResources().getDrawable(R.drawable.medium_connection));
-                    break;
-                case POOR:
-                    notifyLowInternetConnection();
-                    imgConnectionStatus.setImageDrawable(getResources().getDrawable(R.drawable.low_red));
                     break;
                 case EXCELLENT:
                     notifyGoodInternetConnection();

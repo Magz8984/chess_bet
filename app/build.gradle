@@ -21,6 +21,7 @@ android {
     packagingOptions {
         pickFirst 'META-INF/*'
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -30,8 +31,9 @@ android {
             minifyEnabled false
         }
     }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
@@ -52,12 +54,15 @@ android {
         abortOnError false
     }
 }
+
 dependencies {
-    implementation 'androidx.multidex:multidex:2.0.1'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    //noinspection GradleCompatible
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation "androidx.core:core:1.1.0"
+
+    implementation 'com.google.firebase:firebase-core:17.2.1'
+    implementation 'com.google.firebase:firebase-firestore:21.3.1'
+
     implementation 'com.google.android.material:material:1.2.0-alpha03'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation "androidx.preference:preference:1.1.0"
@@ -66,25 +71,29 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation "androidx.annotation:annotation:1.1.0"
-    implementation 'com.jakewharton:butterknife:10.1.0'
-    annotationProcessor 'com.jakewharton:butterknife-compiler:10.1.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
+    implementation 'com.jakewharton:butterknife:10.2.1'
+    implementation 'androidx.multidex:multidex:2.0.1'
+
     implementation 'com.google.firebase:firebase-auth:19.2.0'
+
     implementation 'com.google.firebase:firebase-database:19.2.0'
-    implementation 'com.google.firebase:firebase-firestore:21.3.1'
     implementation 'com.firebaseui:firebase-ui-firestore:6.1.0'
+    implementation 'com.firebaseui:firebase-ui-database:6.1.0'
+
     implementation 'com.google.firebase:firebase-storage:19.1.0'
-    implementation "com.squareup.okhttp3:okhttp:4.2.1"
-    testImplementation "com.squareup.okhttp3:mockwebserver:4.2.1"
+    implementation 'com.squareup.okhttp3:okhttp:4.3.1'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.3.1'
     implementation 'com.github.QuadFlask:colorpicker:0.0.13' // Color picker
-    implementation 'com.github.Magz8984:chess-engine-dev:a7f8df6b34'
     implementation 'de.hdodenhof:circleimageview:3.0.0'
-    implementation 'com.github.bumptech.glide:glide:4.9.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     implementation 'com.android.support:cardview-v7:29.0.0'
-    implementation 'com.google.guava:guava:27.1-jre'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.github.Magz8984:chess-engine-dev:7d8db682fd'
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.github.erehmi:countdowntask:1.0.1' // Count Down Timer
     implementation 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar' // Fab Progress Bar
+    implementation 'com.google.firebase:firebase-messaging:20.1.0'
     implementation 'com.michaelmuenzer.android:ScrollableNumberPicker:0.2.2' // Range Picker
     implementation "com.andkulikov:transitionseverywhere:1.8.1" // Transition everywhere
     implementation 'com.google.firebase:firebase-analytics:17.2.1'

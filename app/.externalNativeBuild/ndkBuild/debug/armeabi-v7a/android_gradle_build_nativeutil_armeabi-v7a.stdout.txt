@@ -1,1 +1,0 @@
-make: `/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/build/intermediates/ndkBuild/debug/obj/local/armeabi-v7a/libnativeutil.so' is up to date.
