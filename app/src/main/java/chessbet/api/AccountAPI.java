@@ -144,7 +144,7 @@ public class AccountAPI {
         });
     }
 
-    public void updateUser(User user, UserUpdated userUpdated){
+    void updateUser(User user, UserUpdated userUpdated){
         db.collection(AccountAPI.USER_COLLECTION).document(user.getUid()).set(user).addOnCompleteListener(task -> {
             if(task.isSuccessful()){
                 userUpdated.onUserUpdate();
