@@ -44,8 +44,8 @@ import stockfish.Engine;
 import stockfish.EngineUtil;
 import stockfish.InternalStockFishHandler;
 
-// TODO Split Class into SOLID
 public class BoardView extends View implements RemoteMoveListener, EngineUtil.OnResponseListener {
+    private int boardSize; // In dp
     protected Board chessBoard;
     protected Tile sourceTile;
     protected Tile destinationTile;
@@ -137,6 +137,10 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     public boolean performClick(){
         super.performClick();
         return true;
+    }
+
+    public int getBoardSize() {
+        return boardSize;
     }
 
     public Engine getStockfish(){
@@ -241,6 +245,9 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         else {
             result = desiredSize;
             if(specMode == MeasureSpec.AT_MOST){
+                if(result == 0){
+                    boardSize = specSize;
+                }
                 result = Math.min(result,specSize);
             }
         }
@@ -249,7 +256,12 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
             Log.e("Board View","Too Small A Size");
         }
 
-        return result;
+        // Make sure we get correct measurement for width and height
+        if(result != 0){
+            boardSize = result;
+        }
+
+        return Math.max(result, boardSize);
     }
 
     @Override

@@ -6,10 +6,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,7 +29,6 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,15 +40,10 @@ import chessengine.OnMoveDoneListener;
 import stockfish.InternalStockFishHandler;
 
 public class GameAnalysisActivity extends AppCompatActivity implements
-        OnMoveDoneListener, ECOBook.OnGetECOListener, View.OnClickListener, BoardView.EngineResponse, OnChartValueSelectedListener {
+        OnMoveDoneListener, ECOBook.OnGetECOListener, BoardView.EngineResponse, OnChartValueSelectedListener {
     @BindView(R.id.board) BoardView boardView;
-    @BindView(R.id.btnBack) Button btnBack;
-    @BindView(R.id.btnForward) Button btnForward;
-    @BindView(R.id.moves) LinearLayout movesLog;
-    @BindView(R.id.txtGameStatus) TextView txtGameStatus;
     @BindView(R.id.txtBookMove) TextView txtBookMove;
     @BindView(R.id.chart) LineChart lineChart;
-    @BindView(R.id.txtResponse) TextView txtResponse;
 
 
     private int moveCursor = 0; // Move Log Cursor
@@ -65,7 +55,6 @@ public class GameAnalysisActivity extends AppCompatActivity implements
     private List<Entry> blackEntries = new ArrayList<>();
 
     private volatile int size = 1;
-    private String mateString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +66,6 @@ public class GameAnalysisActivity extends AppCompatActivity implements
         boardView.setOnMoveDoneListener(this);
         boardView.setEngineResponse(this);
         boardView.setEcoBookListener(this);
-        btnBack.setOnClickListener(this);
-        btnForward.setOnClickListener(this);
         internalStockFishHandler = new InternalStockFishHandler();
     }
 
@@ -101,8 +88,6 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             }
         }
 
-
-        boardView.requestHint();
         Description description = new Description();
         description.setText("Position Advantage");
 
@@ -114,64 +99,33 @@ public class GameAnalysisActivity extends AppCompatActivity implements
 
     @Override
     public void getMoves(MoveLog movelog) {
-        runOnUiThread(() -> {
-            movesLog.removeAllViews();
-            for(Move move : movelog.getMoves()){
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.setMargins(10, 0, 10, 0);
-                TextView textView = new TextView(this);
-                textView.setLayoutParams(params);
-                textView.setText(move.toString());
-                textView.setTextColor(Color.WHITE);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-                textView.setOnClickListener(v -> Log.d("MOVE", move.toString()));
-                movesLog.addView(textView);
-            }
-        });
     }
 
     @Override
     public void isCheckMate(Player player) {
-        runOnUiThread(() -> {
-            txtGameStatus.setText(String.format(Locale.US, "%s %s", player.toString(), getResources().getString(R.string.checkmate)));
-            boardView.requestHint();
-        });
+        runOnUiThread(() -> boardView.requestHint());
     }
 
     @Override
     public void isStaleMate(Player player) {
-        runOnUiThread(() -> txtGameStatus.setText(getResources().getString(R.string.stalemate)));
     }
 
     @Override
     public void isCheck(Player player) {
-        runOnUiThread(() -> txtGameStatus.setText(String.format(Locale.US, "%s %s", player.toString(), getResources().getString(R.string.check))));
     }
 
     @Override
     public void isDraw() {
-        runOnUiThread(() -> txtGameStatus.setText(getResources().getString(R.string.draw)));
     }
 
     @Override
     public void onGameResume() {
-        runOnUiThread(() -> txtGameStatus.setText(""));
     }
 
     @Override
     public void onGetECO(ECOBuilder.ECO eco) {
         runOnUiThread(() -> txtBookMove.setText(eco.getOpening()));
     }
-
-    @ Override
-    public void onClick(View view) {
-        if(view.equals(btnBack)){
-            boardView.undoMove();
-        } else if(view.equals(btnForward)){
-            boardView.redoMove();
-        }
-    }
-
     @Override
     public void onEngineResponse(String response) {
         Log.d(GameAnalysisActivity.class.getSimpleName(), response);
@@ -184,7 +138,6 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             float centiPawnEval = getCentiPawnEvaluation(response);
 
             if(centiPawnEval == -1000f){
-                txtResponse.setText(mateString);
                 return;
             }
 
@@ -231,10 +184,6 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             return result/100f; // Get Integer
         } catch (Exception ex) {
             ex.printStackTrace();
-        }
-
-        if(segments.contains("mate")){
-            mateString =  "mate in " + Math.abs(Integer.parseInt(segments.get(segments.indexOf("mate") + 1)));
         }
         return -1000f;
     }

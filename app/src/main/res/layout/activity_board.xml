@@ -14,7 +14,7 @@
        android:layout_height="wrap_content"
        android:text="@string/app_name"
        android:textColor="#fff"
-       android:textSize="20sp"
+       android:textSize="15sp"
        android:layout_centerHorizontal="true"
        android:fontFamily="@font/chakrapetchbold"
        />
@@ -49,7 +49,7 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="15dp">
+            android:paddingBottom="0dp">
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -62,14 +62,14 @@
                     android:textColor="#fff"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp"
+                    android:textSize="12sp"
                     android:fontFamily="@font/chakrapetchbold"/>
 
                 <TextView
                     android:id="@+id/blackTimer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp"
+                    android:textSize="12sp"
                     android:textColor="@color/colorPrimaryYellow"
                     android:layout_marginLeft="@dimen/fab_margin"
                     android:layout_marginStart="@dimen/fab_margin"
@@ -80,7 +80,7 @@
                     android:id="@+id/txtBlackStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp"
+                    android:textSize="12sp"
                     android:fontFamily="@font/chakrapetchbold"
                     android:layout_marginLeft="@dimen/fab_margin"
                     android:layout_marginStart="@dimen/fab_margin" />
@@ -106,7 +106,7 @@
                 android:orientation="horizontal"
                 android:id="@+id/whitePieces"
                 android:layout_width="match_parent"
-                android:layout_height="20dp"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
     </RelativeLayout>
@@ -141,14 +141,14 @@
                 android:textColor="#fff"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
+                android:textSize="12sp"
                 android:fontFamily="@font/chakrapetchbold"/>
 
             <TextView
                 android:id="@+id/whiteTimer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
+                android:textSize="12sp"
                 android:textColor="@color/colorPrimaryYellow"
                 android:layout_marginLeft="@dimen/fab_margin"
                 android:layout_marginStart="@dimen/fab_margin"
@@ -159,7 +159,7 @@
                 android:id="@+id/txtWhiteStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
+                android:textSize="12sp"
                 android:layout_marginLeft="@dimen/fab_margin"
                 android:fontFamily="@font/chakrapetchbold"
                 android:layout_marginStart="@dimen/fab_margin" />
@@ -171,7 +171,7 @@
                 android:id="@+id/whiteScrollView"
                 android:fillViewport="true"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:scrollbars="none">
                 <LinearLayout
                     android:orientation="horizontal"
@@ -185,7 +185,7 @@
                 android:orientation="horizontal"
                 android:id="@+id/blackPieces"
                 android:layout_width="match_parent"
-                android:layout_height="20dp"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
    </RelativeLayout>
 

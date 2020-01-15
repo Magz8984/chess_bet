@@ -17,6 +17,8 @@ public class DatabaseUtil {
     private static String matches = "matches";
     private static String match_task_node = "tasks";
     private static String evaluationQueue = "evaluationQueue";
+    private static String info = ".info";
+    private static String connected = "connected";
 
 
     private static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -61,6 +63,10 @@ public class DatabaseUtil {
             }while (cursor.moveToNext());
         }
         return databaseMatches;
+    }
+
+    public static DatabaseReference getConnected(){
+        return databaseReference.child(info).child(connected);
     }
 
     public static DatabaseMatch getMatchFromLocalDB(Cursor cursor){

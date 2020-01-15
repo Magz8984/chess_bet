@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorPrimary"
     tools:context=".GameAnalysisActivity">
 
@@ -11,12 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
         <LinearLayout
             android:id="@+id/section1"
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
+
             <TextView
                 android:id="@+id/txtBoardType"
                 android:textSize="20sp"
@@ -29,6 +28,7 @@
                 android:layout_marginBottom="5dp"
                 android:textColor="@color/white"/>
 
+
             <chessengine.BoardView
                 android:id="@+id/board"
                 android:orientation="vertical"
@@ -37,83 +37,28 @@
         </LinearLayout>
 
         <LinearLayout
+            android:padding="5dp"
             android:layout_toRightOf="@id/section1"
             android:orientation="vertical"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_toEndOf="@id/section1">
 
-            <!--Moves-->
-            <HorizontalScrollView
-                android:id="@+id/scrollView"
-                android:fillViewport="true"
+            <LinearLayout
+                android:layout_gravity="end"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="none">
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:id="@+id/moves"
-                    android:layout_width="wrap_content"
-                    android:layout_height="20sp">
-
-                </LinearLayout>
-            </HorizontalScrollView>
-
-            <RelativeLayout
-                android:id="@+id/controls"
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:id="@+id/txtBookMove"
-                        android:layout_margin="10dp"
-                        android:fontFamily="@font/chakrapetchbold"
-                        android:textColor="@color/white"
-                        android:text="Book Move "
-                        android:textSize="15sp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-                    <Button
-                        android:id="@+id/btnBack"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/img_back"/>
-
-                    <Button
-                        android:id="@id/btnForward"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/img_forward"/>
-                </LinearLayout>
-
-            </RelativeLayout>
-
-            <TextView
-                android:id="@+id/txtGameStatus"
-                android:layout_margin="10dp"
-                android:fontFamily="@font/chakrapetchbold"
-                android:textColor="@color/bootstrap_red"
-                android:text="Game Status"
-                android:textSize="12sp"
-                android:textAlignment="center"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:textAlignment="center"
-                android:id="@+id/txtResponse"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:fontFamily="@font/chakrapetchbold"
-                android:textSize="12sp"/>
+                <TextView
+                    android:textAlignment="center"
+                    android:id="@+id/txtBookMove"
+                    android:layout_margin="5dp"
+                    android:fontFamily="@font/chakrapetchbold"
+                    android:textColor="@color/white"
+                    android:text="Book Move "
+                    android:textSize="15sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
 
 
             <com.github.mikephil.charting.charts.LineChart
@@ -123,10 +68,6 @@
                 android:layout_height="match_parent" />
 
         </LinearLayout>
-
-
-
-
     </RelativeLayout>
 
 </RelativeLayout>

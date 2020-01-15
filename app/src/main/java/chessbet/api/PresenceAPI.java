@@ -35,7 +35,7 @@ public class PresenceAPI {
 
     // Gets to see if user is online
     public void getAmOnline(final UserOnline userOnline){
-        DatabaseUtil.connectedRefrence().addValueEventListener(new ValueEventListener() {
+        DatabaseUtil.getConnected().addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){

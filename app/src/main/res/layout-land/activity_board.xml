@@ -250,6 +250,7 @@
             android:layout_height="35dp"
             android:background="@drawable/img_change_board_color"
             android:layout_margin="5dp"/>
+
         <Button
             android:id="@+id/btnBack"
             android:layout_width="35dp"

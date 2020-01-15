@@ -8,6 +8,9 @@ public class User {
     private String uid;
     private String user_name;
     private String profile_photo_url;
+    private long lastSeen;
+    private String fcmToken;
+    private boolean online;
 
     public String getDate_created() {
         return date_created;
@@ -64,6 +67,30 @@ public class User {
 
     public String getProfile_photo_url() {
         return (profile_photo_url == null) ? Constants.UTILITY_PROFILE : profile_photo_url;
+    }
+
+    public void setLastSeen(long lastSeen) {
+        this.lastSeen = lastSeen;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public long getLastSeen() {
+        return lastSeen;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
+    public String getFcmToken() {
+        return fcmToken;
     }
 }
 

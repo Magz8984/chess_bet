@@ -34,6 +34,7 @@ public class AccountAPI {
     private UserListener userListener;
     private PuzzleListener puzzleListener;
     private static String ACCOUNT_COLLECTION = "accounts";
+    private static String OWNER_FIELD= "owner";
     private static String TAG = AccountAPI.class.getSimpleName();
     private static AccountAPI INSTANCE = new AccountAPI();
     private FirebaseFirestore db;
@@ -54,7 +55,7 @@ public class AccountAPI {
 
     public void getAccount() {
         try {
-            Query query = db.collection(AccountAPI.ACCOUNT_COLLECTION).whereEqualTo("owner", user.getUid());
+            Query query = db.collection(AccountAPI.ACCOUNT_COLLECTION).whereEqualTo(OWNER_FIELD, user.getUid());
             query.get().addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())){
@@ -139,6 +140,16 @@ public class AccountAPI {
                 userListener.onUserUpdated(true);
             } else {
                 userListener.onUserUpdated(false);
+            }
+        });
+    }
+
+    public void updateUser(User user, UserUpdated userUpdated){
+        db.collection(AccountAPI.USER_COLLECTION).document(user.getUid()).set(user).addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                userUpdated.onUserUpdate();
+            } else {
+                userUpdated.onUserUpdateFail(task.getException());
             }
         });
     }
@@ -266,6 +277,11 @@ public class AccountAPI {
     public interface UsersReceived {
         void onUserReceived(List<User> user);
         void onUserNotFound();
+    }
+
+    public interface UserUpdated{
+        void onUserUpdate();
+        void onUserUpdateFail(Exception ex);
     }
 
     /**

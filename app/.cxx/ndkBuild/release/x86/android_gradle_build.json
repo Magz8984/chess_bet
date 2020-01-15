@@ -1,0 +1,123 @@
+{
+  "buildFiles": [
+    "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/Android.mk",
+    "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/Application.mk"
+  ],
+  "cleanCommands": [
+    "/home/collins/Android/Sdk/ndk-bundle/ndk-build NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/Android.mk NDK_APPLICATION_MK\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/Application.mk APP_ABI\u003dx86 NDK_ALL_ABIS\u003dx86 NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-16 NDK_OUT\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/build/intermediates/ndkBuild/release/lib clean"
+  ],
+  "buildTargetsCommand": "/home/collins/Android/Sdk/ndk-bundle/ndk-build NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/Android.mk NDK_APPLICATION_MK\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/Application.mk APP_ABI\u003dx86 NDK_ALL_ABIS\u003dx86 NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-16 NDK_OUT\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/build/intermediates/ndkBuild/release/lib -j8 {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "nativeutil-release-x86": {
+      "buildCommand": "/home/collins/Android/Sdk/ndk-bundle/ndk-build NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/Android.mk NDK_APPLICATION_MK\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/Application.mk APP_ABI\u003dx86 NDK_ALL_ABIS\u003dx86 NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-16 NDK_OUT\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/build/intermediates/ndkBuild/release/lib -j8 /home/collins/Documents/Projects/CHESS-BET/chess_bet/app/build/intermediates/ndkBuild/release/obj/local/x86/libnativeutil.so",
+      "toolchain": "toolchain-x86",
+      "abi": "x86",
+      "artifactName": "nativeutil",
+      "files": [
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/nativeutil.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -I/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp -std\u003dc++11 -DANDROID -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        }
+      ],
+      "output": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/build/intermediates/ndkBuild/release/obj/local/x86/libnativeutil.so"
+    },
+    "stockfish-release-x86": {
+      "buildCommand": "/home/collins/Android/Sdk/ndk-bundle/ndk-build NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/Android.mk NDK_APPLICATION_MK\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/Application.mk APP_ABI\u003dx86 NDK_ALL_ABIS\u003dx86 NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-16 NDK_OUT\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003d/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/build/intermediates/ndkBuild/release/lib -j8 /home/collins/Documents/Projects/CHESS-BET/chess_bet/app/build/intermediates/ndkBuild/release/obj/local/x86/stockfish",
+      "toolchain": "toolchain-x86",
+      "abi": "x86",
+      "artifactName": "stockfish",
+      "files": [
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/benchmark.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/bitbase.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/bitboard.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/endgame.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/evaluate.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/main.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/material.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/misc.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/movegen.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/movepick.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/pawns.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/position.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/psqt.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/search.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/syzygy/tbprobe.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/thread.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/timeman.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/tt.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/uci.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        },
+        {
+          "src": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/src/main/cpp/stockfish/ucioption.cpp",
+          "flags": "-target i686-none-linux-android16 -fdata-sections -ffunction-sections -fstack-protector-strong -funwind-tables -no-canonical-prefixes --sysroot /home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/sysroot -g -Wno-invalid-command-line-argument -Wno-unused-command-line-argument -fno-addrsig -fno-exceptions -fno-rtti -fPIC -O2 -DNDEBUG -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include -I/home/collins/Android/Sdk/ndk-bundle/sources/cxx-stl/llvm-libc++abi/include -Isrc/main/cpp/stockfish -std\u003dc++11 -DANDROID -std\u003dc++11 -O2 -fPIE -s -nostdinc++ -Wa,--noexecstack -Wformat -Werror\u003dformat-security -mstackrealign"
+        }
+      ],
+      "output": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/build/intermediates/ndkBuild/release/obj/local/x86/stockfish"
+    }
+  },
+  "toolchains": {
+    "toolchain-x86": {
+      "cppCompilerExecutable": "/home/collins/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

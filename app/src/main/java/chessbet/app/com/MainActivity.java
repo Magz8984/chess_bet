@@ -39,11 +39,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -106,7 +102,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         profileImage = navigationView.getHeaderView(0).findViewById(R.id.profile_photo);
         profileImage.setOnClickListener(this);
 
-        FirebaseFirestore.setLoggingEnabled(true);
+        FirebaseFirestore.setLoggingEnabled(true); // Set up logging
+
         AccountAPI.get().setUser(FirebaseAuth.getInstance().getCurrentUser());
         AccountAPI.get().setAccountListener(this);
         AccountAPI.get().getUser();
