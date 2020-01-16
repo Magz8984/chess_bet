@@ -57,8 +57,8 @@
     <string name="select_profile_photo">Select Profile Photo</string>
     <string name="upload_profile_photo">Upload Profile Photo</string>
     <string name="match_exact_rating">Match is set on exact rating</string>
-    <string name="save_end_match">Save Match</string>
-    <string name="save">Save</string>
+    <string name="end_match">End Match</string>
+    <string name="save">Save Match</string>
     <string name="games">Games</string>
     <string name="forfeit">Forfeit</string>
     <string name="userVerification">Kindly verify email</string>

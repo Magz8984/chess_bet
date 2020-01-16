@@ -26,7 +26,7 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
     public static final int GAME_TIMER_LAPSED = 472489;
     private static final int GAME_ABANDONED_FLAG = 40428;
     private static final int GAME_ABORTED_FLAG = 10077;
-    private static final int DISCONNECTED_FLAG = 47924;
+//    private static final int DISCONNECTED_FLAG = 47924;
 
     public void setMatchResult(MatchResult matchResult) {
         this.matchResult = matchResult;

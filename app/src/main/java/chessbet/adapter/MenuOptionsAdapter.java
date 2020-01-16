@@ -53,16 +53,6 @@ public class MenuOptionsAdapter extends BaseAdapter {
         listeners.add(view -> Toast.makeText(context, context.getResources().getString(R.string.feature_unavailable), Toast.LENGTH_LONG).show());
         drawables.add(R.drawable.eye);
         strings.add("Watch");
-
-        // Analyze Game
-        listeners.add(view -> {
-            Intent intent=new Intent(context, GameAnalysisActivity.class);
-//            intent.putExtra("match_type", MatchType.SINGLE_PLAYER.toString());
-            context.startActivity(intent);
-        });
-        drawables.add(R.drawable.trend_dark);
-        strings.add("Analysis");
-
     }
 
 

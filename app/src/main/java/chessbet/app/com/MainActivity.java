@@ -31,11 +31,6 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.tasks.OnCanceledListener;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -343,42 +338,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void uploadProfilePhoto(Bitmap bitmap){
         storageReference = firebaseStorage.getReference(FirebaseAuth.getInstance().getUid() + "/" + "profile_photo");
-        uploadProfilePhotoTask(bitmap).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                uploadProfileDialog.dismiss();
-                Crashlytics.logException(e);
-            }
+        uploadProfilePhotoTask(bitmap).addOnFailureListener(e -> {
+            uploadProfileDialog.dismiss();
+            Crashlytics.logException(e);
         });
 
-        uploadProfilePhotoTask(bitmap).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                storageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Uri> task) {
-                        final Uri uri = task.getResult();
-                        Map<String,Object> map = new HashMap<>();
-                        assert uri != null;
-                        map.put("profile_photo_url", uri.toString());
-                        AccountAPI.get().getUserPath().update(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                Toast.makeText(MainActivity.this,R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
-                                Log.d("Done","Is Done");
-                                uploadProfileDialog.dismiss();
-                                AccountAPI.get().getUser();
-                            }
-                        }).addOnCanceledListener(new OnCanceledListener() {
-                            @Override
-                            public void onCanceled() {
-                                uploadProfileDialog.dismiss();
-                            }
-                        });
-                    }
-            });
-        }
-    });
+        uploadProfilePhotoTask(bitmap).addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnCompleteListener(task -> {
+            final Uri uri = task.getResult();
+            Map<String,Object> map = new HashMap<>();
+            assert uri != null;
+            map.put("profile_photo_url", uri.toString());
+            AccountAPI.get().getUserPath().update(map).addOnCompleteListener(task1 -> {
+                Toast.makeText(MainActivity.this,R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
+                Log.d("Done","Is Done");
+                uploadProfileDialog.dismiss();
+                AccountAPI.get().getUser();
+            }).addOnCanceledListener(() -> uploadProfileDialog.dismiss());
+        }));
     }
 
     @Override
@@ -389,12 +365,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onAccountUpdated(final Account account) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                txtRating.setText(getResources().getString(R.string.rating, account.getElo_rating()));
-            }
-        });
+        runOnUiThread(() -> txtRating.setText(getResources().getString(R.string.rating, account.getElo_rating())));
     }
 
     @Override
