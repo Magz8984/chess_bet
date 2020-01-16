@@ -260,7 +260,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
             boardView.redoMove();
         } else if (v.equals(btnSave)) {
             if (!isGameFinished && matchableAccount == null && !isStoredGame) { // Enable this for none online games
-                Snackbar snackbar = Snackbar.make(btnSave, R.string.save_end_match, Snackbar.LENGTH_LONG)
+                Snackbar snackbar = Snackbar.make(btnSave, R.string.end_match, Snackbar.LENGTH_LONG)
                         .setAction(R.string.save, v1 -> {
                             storeGameAsPGN("*");
                             isGameFinished = true;
@@ -364,7 +364,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
     @Override
     public void onBackPressed() {
         if (!isStoredGame) {
-            Snackbar snackbar = Snackbar.make(btnSave, R.string.save_end_match, Snackbar.LENGTH_LONG)
+            Snackbar snackbar = Snackbar.make(btnSave, R.string.end_match, Snackbar.LENGTH_LONG)
                     .setAction(R.string.forfeit, v1 -> {
                         if(matchableAccount != null && !isGameFinished){
                            endGame(GameHandler.GAME_INTERRUPTED_FLAG);
