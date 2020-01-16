@@ -266,6 +266,10 @@ public class AccountAPI {
         return newList;
     }
 
+    public boolean isUser(String uid){
+        return (currentUser != null) && currentUser.getUid().equals(uid);
+    }
+
     public DocumentReference getAccountReference() {
         return accountReference;
     }

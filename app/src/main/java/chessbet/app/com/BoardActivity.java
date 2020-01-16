@@ -41,6 +41,7 @@ import chessbet.Application;
 import chessbet.api.AccountAPI;
 import chessbet.api.ChallengeAPI;
 import chessbet.api.MatchAPI;
+import chessbet.api.PresenceAPI;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
 import chessbet.app.com.fragments.EvaluateGame;
@@ -51,6 +52,7 @@ import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
+import chessbet.domain.User;
 import chessbet.recievers.ConnectivityReceiver;
 import chessbet.services.MatchListener;
 import chessbet.services.MatchService;
@@ -73,7 +75,7 @@ import es.dmoral.toasty.Toasty;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
         OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener, BoardView.PuzzleMove,
-        ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener, MatchAPI.OnMatchEnd, OpponentListener , GameHandler.NoMoveReactor.NoMoveEndMatch {
+        ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener, MatchAPI.OnMatchEnd, OpponentListener , GameHandler.NoMoveReactor.NoMoveEndMatch, PresenceAPI.UserOnline {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
@@ -773,15 +775,16 @@ private GameHandler.NoMoveReactor noMoveReactor;
     }
 
     @Override
-    public void onOpponentReceived(String opponent) {
+    public void onOpponentReceived(User user) {
+        PresenceAPI.get().getUserOnline(user, this); // Listen to user disconnection
         runOnUiThread(() -> {
             if (boardView.getLocalAlliance().isWhite()) {
                 txtWhite.setText(AccountAPI.get().getCurrentUser().getUser_name());
-                txtBlack.setText(opponent);
+                txtBlack.setText(user.getUser_name());
             }
 
             if(boardView.getLocalAlliance().isBlack())  {
-                txtWhite.setText(opponent);
+                txtWhite.setText(user.getUser_name());
                 txtBlack.setText(AccountAPI.get().getCurrentUser().getUser_name());
             }
         });
@@ -792,6 +795,14 @@ private GameHandler.NoMoveReactor noMoveReactor;
         RemoteMove.get().addEvent(MatchEvent.DISCONNECTED);
         RemoteMove.get().setOwner(matchableAccount.getOwner());
         RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
+    }
+
+    @Override
+    public void onUserOnline(User user, boolean isOnline) {
+        // If Listening to another user and the user is offline. Notify me
+        if(!AccountAPI.get().isUser(user.getUid()) && !isOnline){
+            Toasty.info(this, user.getUser_name() + "is offline").show();
+        }
     }
 
     /**

@@ -27,6 +27,11 @@ public class DatabaseUtil {
         throw new RuntimeException("Cannot be instantiated");
     }
 
+    /**
+     * Get user matchable account
+     * @param uid user unique identifier
+     * @return DatabaseReference
+     */
     public static DatabaseReference getAccount(String uid) {
         return databaseReference.child(DatabaseUtil.matchables).child(uid);
     }

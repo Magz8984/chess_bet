@@ -17,6 +17,8 @@ import chessbet.utils.DatabaseUtil;
 public class PresenceAPI {
     private static PresenceAPI INSTANCE = new PresenceAPI();
     private static final String PRESENCE_PATH = "presence";
+    private ValueEventListener userValueEventListener;
+    private ValueEventListener customUserListener; // TODO SET THIS AS S LIST OF LISTENERS
 
     private FirebaseDatabase db;
     private User user;
@@ -35,21 +37,40 @@ public class PresenceAPI {
 
     // Gets to see if user is online
     public void getAmOnline(final UserOnline userOnline){
-        DatabaseUtil.getConnected().addValueEventListener(new ValueEventListener() {
+        userValueEventListener = DatabaseUtil.getConnected().addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
                     setUserOnline();
-                    userOnline.amOnline(true);
+                    userOnline.onUserOnline(user, true);
                 } else {
-                    userOnline.amOnline(false);
+                    userOnline.onUserOnline(user, false);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                userOnline.amOnline(false);
+                userOnline.onUserOnline(user,false);
                 Crashlytics.logException(databaseError.toException());
+            }
+        });
+    }
+
+    public void getUserOnline(final User user, UserOnline userOnline){
+        customUserListener = db.getReference().child(PRESENCE_PATH).child(user.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    User customUser = (User) dataSnapshot.getValue();
+                    userOnline.onUserOnline(customUser, true);
+                } else {
+                userOnline.onUserOnline(user, false);
+
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                userOnline.onUserOnline(user, false);
             }
         });
     }
@@ -61,12 +82,25 @@ public class PresenceAPI {
         db.getReference().child(PRESENCE_PATH).child(user.getUid()).onDisconnect().removeValue();
     }
 
-    public void setUserOffline(){
-        user.setOnline(false);
-        db.getReference().child(PRESENCE_PATH).child(user.getUid()).setValue(user);
-    }
+//    public void setUserOffline(){
+//        user.setOnline(false);
+//        db.getReference().child(PRESENCE_PATH).child(user.getUid()).setValue(user);
+//    }
 
     public interface UserOnline{
-        void amOnline(boolean isOnline);
+        void onUserOnline(User user,boolean isOnline);
+    }
+
+
+    /**
+     * Remove listeners
+     */
+    public void stopListening(){
+        if(userValueEventListener != null) {
+            DatabaseUtil.getConnected().removeEventListener(userValueEventListener);
+        }
+        if(customUserListener != null){
+            DatabaseUtil.getConnected().removeEventListener(customUserListener);
+        }
     }
 }

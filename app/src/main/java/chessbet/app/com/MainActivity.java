@@ -155,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onDestroy() {
+        PresenceAPI.get().stopListening();
         super.onDestroy();
     }
 
@@ -402,11 +403,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void amOnline(boolean isOnline) {
-        Log.d(MainActivity.class.getSimpleName(), "IS_ONLINE");
-    }
-
-    @Override
     public void onNotificationTokenReceived(String token) {
         User user = AccountAPI.get().getCurrentUser();
         if(!user.getFcmToken().equals(token)){
@@ -417,6 +413,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onNotificationTokenErrorReceived(Exception e) {
         Crashlytics.logException(e);
+    }
+
+    /**
+     * Checking user is online
+     * @param user the user being listened to
+     * @param isOnline boolean value
+     */
+    @Override
+    public void onUserOnline(User user, boolean isOnline) {
+        Log.d(MainActivity.class.getSimpleName(), "User Online " + isOnline);
     }
 }
 

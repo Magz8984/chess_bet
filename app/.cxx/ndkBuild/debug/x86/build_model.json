@@ -5,7 +5,7 @@
       "sdkFolder": "/home/collins/Android/Sdk",
       "isNativeCompilerSettingsCacheEnabled": false,
       "isBuildOnlyTargetAbiEnabled": true,
-      "ideBuildTargetAbi": "x86",
+      "ideBuildTargetAbi": "x86_64,x86",
       "splitsAbiFilterSet": [],
       "intermediatesFolder": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/build/intermediates",
       "gradleModulePathName": ":app",
@@ -42,6 +42,7 @@
     "gradleBuildOutputFolder": "/home/collins/Documents/Projects/CHESS-BET/chess_bet/app/.cxx/cxx/debug",
     "isDebuggableEnabled": true,
     "validAbiList": [
+      "X86_64",
       "X86"
     ],
     "buildTargetSet": []
