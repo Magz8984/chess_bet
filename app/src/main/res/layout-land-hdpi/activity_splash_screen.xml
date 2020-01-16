@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <LinearLayout
+        android:id="@+id/titleimage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerInParent="true">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/chesslogo"/>
+
+        <LinearLayout
+            android:id="@+id/titletxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                app:fontFamily="@font/monotonregular"
+                android:id="@+id/splashText"
+                android:layout_width="300sp"
+                android:layout_height="37dp"
+                android:text="@string/app_name"
+                android:layout_gravity="center"
+                android:textAlignment="center"
+                android:textSize="22sp"
+                android:textColor="@color/colorPrimaryYellow"/>
+
+            <TextView
+                android:id="@+id/splashDesc"
+                android:layout_width="500sp"
+                android:layout_height="37sp"
+                android:layout_gravity="center"
+                android:text="@string/motto"
+                android:textAlignment="center"
+                android:textColor="@color/colorWhite"
+                android:textSize="16sp"
+                app:fontFamily="@font/chakrapetchbold"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_margin="5dp"
+        android:text="@string/company"
+        android:fontFamily="@font/monotonregular"
+        android:textColor="@color/colorPrimaryYellow"
+        android:layout_below="@+id/titleimage"
+        android:textSize="18sp"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+</RelativeLayout>
