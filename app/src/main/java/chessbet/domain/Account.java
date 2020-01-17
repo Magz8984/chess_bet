@@ -1,5 +1,6 @@
 package chessbet.domain;
 
+
 import java.util.ArrayList;
 
 public class Account {

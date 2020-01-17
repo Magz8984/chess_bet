@@ -13,12 +13,13 @@ import chessbet.domain.MatchResult;
 
 public class DatabaseUtil {
     // Tables
-    public static String matchables = "matchables";
-    private static String matches = "matches";
-    private static String match_task_node = "tasks";
-    private static String evaluationQueue = "evaluationQueue";
-    private static String info = ".info";
-    private static String connected = "connected";
+    public static final String matchables = "matchables";
+    private static final String matches = "matches";
+    private static final String match_task_node = "tasks";
+    private static final String evaluationQueue = "evaluationQueue";
+    private static final String info = ".info";
+    private static final String connected = "connected";
+    private static final String PRESENCE_PATH = "presence";
 
 
     private static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -27,6 +28,11 @@ public class DatabaseUtil {
         throw new RuntimeException("Cannot be instantiated");
     }
 
+    /**
+     * Get user matchable account
+     * @param uid user unique identifier
+     * @return DatabaseReference
+     */
     public static DatabaseReference getAccount(String uid) {
         return databaseReference.child(DatabaseUtil.matchables).child(uid);
     }
@@ -45,6 +51,10 @@ public class DatabaseUtil {
 
     public static DatabaseReference getMatch (String matchId){
         return  databaseReference.child(DatabaseUtil.matches).child(matchId);
+    }
+
+    public static DatabaseReference getOnlineUsers(){
+        return databaseReference.child(PRESENCE_PATH);
     }
 
     public static DatabaseReference getMatchTask(MatchResult matchResult){
@@ -69,7 +79,7 @@ public class DatabaseUtil {
         return databaseReference.child(info).child(connected);
     }
 
-    public static DatabaseMatch getMatchFromLocalDB(Cursor cursor){
+    static DatabaseMatch getMatchFromLocalDB(Cursor cursor){
         if(cursor.moveToFirst()){
             DatabaseMatch databaseMatch = new DatabaseMatch();
             databaseMatch.setMatchId(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_ID)));

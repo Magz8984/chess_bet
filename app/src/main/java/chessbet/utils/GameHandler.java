@@ -76,7 +76,7 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
                    DatabaseMatch databaseMatch = DatabaseUtil.getMatchFromLocalDB(sqlDatabaseHelper.getMatch(matchableAccount.getMatchId()));
                    MatchAPI.get().setCurrentDatabaseMatch(databaseMatch);
                     assert databaseMatch != null;
-                    opponentListener.onOpponentReceived(databaseMatch.getOpponentUserName());
+                    opponentListener.onOpponentReceived(user);
                 }
             });
             return null;

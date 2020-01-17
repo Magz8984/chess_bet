@@ -12,6 +12,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import chessbet.domain.Account;
@@ -33,7 +34,7 @@ public class AccountAPI {
     private AccountListener accountListener;
     private UserListener userListener;
     private PuzzleListener puzzleListener;
-    private static String ACCOUNT_COLLECTION = "accounts";
+    public static String ACCOUNT_COLLECTION = "accounts";
     private static String OWNER_FIELD= "owner";
     private static String TAG = AccountAPI.class.getSimpleName();
     private static AccountAPI INSTANCE = new AccountAPI();
@@ -154,6 +155,17 @@ public class AccountAPI {
         });
     }
 
+    public void updateUser(String uid, Map<String,Object> values, UserUpdated userUpdated){
+        db.collection(AccountAPI.USER_COLLECTION).document(uid).update(values).addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                userUpdated.onUserUpdate();
+            } else {
+                userUpdated.onUserUpdateFail(task.getException());
+            }
+        });
+    }
+
+
     public void updateAccount(){
         accountReference.set(currentAccount).addOnCompleteListener(task -> {
             if(task.isSuccessful()){
@@ -174,7 +186,9 @@ public class AccountAPI {
             if(task.isSuccessful()){
                 for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())){
                     if (accountReceived != null) {
-                        accountReceived.onAccountReceived(document.toObject(Account.class));
+                        Account account = document.toObject(Account.class);
+                        account.setId(document.getId());
+                        accountReceived.onAccountReceived(account);
                     }
                 }
             }
@@ -192,7 +206,6 @@ public class AccountAPI {
             }
         });
     }
-
 
     public void listenToAccountUpdate(){
         listenerRegistration = accountReference.addSnapshotListener((documentSnapshot, e) -> {
@@ -264,6 +277,10 @@ public class AccountAPI {
             }
         }
         return newList;
+    }
+
+    public boolean isUser(String uid){
+        return (currentUser != null) && currentUser.getUid().equals(uid);
     }
 
     public DocumentReference getAccountReference() {
