@@ -507,6 +507,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
                 this.boardDirection = BoardDirection.REVERSE;
             }
         }
+        invalidate();
     }
 
     public GameTimer getGameTimer() {

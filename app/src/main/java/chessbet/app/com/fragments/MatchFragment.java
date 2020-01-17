@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.crashlytics.android.Crashlytics;
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -157,17 +158,21 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
 
     @Override
     public void onMatchMade(MatchableAccount matchableAccount) {
-        AccountAPI.get().getCurrentAccount().setLast_match_duration(0);
-        progressCircle.beginFinalAnimation();
-        Objects.requireNonNull(getContext()).startService(new Intent(getContext(), MatchService.class));
-        new Handler().postDelayed(() -> {
-            Intent target= new Intent(getContext(), BoardActivity.class);
-            target.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(DatabaseUtil.matchables,matchableAccount);
-            target.putExtras(bundle);
-            startActivity(target);
-        },3000);
+        try {
+            AccountAPI.get().getCurrentAccount().setLast_match_duration(0);
+            progressCircle.beginFinalAnimation();
+            Objects.requireNonNull(getContext()).startService(new Intent(getContext(), MatchService.class));
+            new Handler().postDelayed(() -> {
+                Intent target= new Intent(getContext(), BoardActivity.class);
+                target.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(DatabaseUtil.matchables,matchableAccount);
+                target.putExtras(bundle);
+                startActivity(target);
+            },3000);
+        } catch (Exception ex){
+            Crashlytics.logException(ex);
+        }
     }
 
     @Override

@@ -114,6 +114,6 @@ public class Challenge {
     }
 
     public static boolean isAccepted(Challenge challenge){
-        return !(challenge.requester == null || challenge.requester.isEmpty());
+        return challenge.requester != null;
     }
 }

@@ -54,6 +54,7 @@ import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
 import chessbet.domain.User;
 import chessbet.recievers.ConnectivityReceiver;
+import chessbet.services.ChallengeService;
 import chessbet.services.MatchListener;
 import chessbet.services.MatchService;
 import chessbet.services.OpponentListener;
@@ -106,6 +107,7 @@ private boolean isGameFinished = false;
 private boolean isStoredGame = false;
 private EvaluateGame evaluateGame;
 private GameHandler.NoMoveReactor noMoveReactor;
+private boolean isActiveConnectionFlag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -188,6 +190,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
         this.matchableAccount = matchableAccount;
         boardView.setMode(BoardView.Modes.PLAY_ONLINE);
         boardView.setMatchableAccount(matchableAccount);
+        boardView.setOnlineBoardDirection();
         boardView.getMatchAPI().setOnMatchEnd(this);
         boardView.getMatchAPI().setRecentMatchEvaluated(false);
         setNoMoveReactorPly();
@@ -221,6 +224,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
         String challengeId = intent.getStringExtra(Constants.CHALLENGE_ID);
         String challenger = intent.getStringExtra(Constants.CHALLENGER);
         boolean isChallenger = intent.getBooleanExtra(Constants.IS_CHALLENGER, false);
+        Log.d(BoardActivity.class.getSimpleName(), challengeId + " " + challenger +  " " + isChallenger);
         if(challengeId != null){
             Toast.makeText(this, "Accepting Challenge", Toast.LENGTH_LONG).show();
             boardView.setEnabled(false);
@@ -368,6 +372,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
         if (!isStoredGame) {
             Snackbar snackbar = Snackbar.make(btnSave, R.string.end_match, Snackbar.LENGTH_LONG)
                     .setAction(R.string.forfeit, v1 -> {
+                        PresenceAPI.get().stopListening(); // Stop listening to opponent online state
                         if(matchableAccount != null && !isGameFinished){
                            endGame(GameHandler.GAME_INTERRUPTED_FLAG);
                         } else {
@@ -514,6 +519,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
     protected void onDestroy() {
         super.onDestroy();
         connectivityManager.stopListening();
+        PresenceAPI.get().stopListening(); // Stop listening to opponent
         if(noMoveReactor != null){
             noMoveReactor.stopTimer();
         }
@@ -736,6 +742,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
 
     private void notifyLowInternetConnection(){
         if(matchableAccount != null){
+            isActiveConnectionFlag = false;
             Toasty.warning(this, R.string.low_internet_connection, Toasty.LENGTH_LONG).show();
             sendDisconnectedEvent();
             boardView.setEnabled(false);
@@ -751,6 +758,12 @@ private GameHandler.NoMoveReactor noMoveReactor;
             if(noMoveReactor != null){
                 noMoveReactor.setDisconnected(false);
             }
+
+            // If the connection was previously changed then notify that you are back
+            if(!isActiveConnectionFlag){
+                PresenceAPI.get().setUserOnline(AccountAPI.get().getCurrentUser());
+                isActiveConnectionFlag = true;
+            }
         }
     }
 
@@ -763,6 +776,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
     public void onMatchEnd(MatchStatus matchStatus) {
         // Stop service
         this.stopService(new Intent(this, MatchService.class));
+        PresenceAPI.get().stopListening();
         storeGameOnCloud();
         ChallengeAPI.get().deleteChallenge(); // Delete current challenge
         isGameFinished = true; // Flag Game Has Ended
@@ -801,7 +815,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
     public void onUserOnline(User user, boolean isOnline) {
         // If Listening to another user and the user is offline. Notify me
         if(!AccountAPI.get().isUser(user.getUid()) && !isOnline){
-            Toasty.info(this, user.getUser_name() + "is offline").show();
+            Toasty.info(this, user.getUser_name() + " is offline").show();
         }
     }
 
@@ -817,6 +831,7 @@ private GameHandler.NoMoveReactor noMoveReactor;
             MatchAPI.get().setMatchListener(this);
             MatchAPI.get().setMatchCreated(true);
             MatchAPI.get().getAccount();
+            stopService(new Intent(BoardActivity.this, ChallengeService.class)); // Stop challenge service
         }
 
         void acceptChallenge(){

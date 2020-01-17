@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
     tools:context=".PresenceActivity">
-    <TextView
-        android:id="@+id/txtOnlineUsers"
-        android:textColor="@color/white"
-        android:text="@string/online_users"
-        android:fontFamily="@font/chakrapetchbold"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="20sp"/>
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/online_users_toolbar"
+        app:titleTextColor="@color/white"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+    </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_margin="10dp"
-        android:layout_below="@id/txtOnlineUsers"
         android:id="@+id/recOnlineUsers"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </androidx.recyclerview.widget.RecyclerView>
-</RelativeLayout>
+        android:layout_height="wrap_content"></androidx.recyclerview.widget.RecyclerView>
+</LinearLayout>

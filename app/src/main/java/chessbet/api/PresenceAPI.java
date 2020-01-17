@@ -41,7 +41,7 @@ public class PresenceAPI {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
-                    setUserOnline();
+                    setUserOnline(user);
                     userOnline.onUserOnline(user, true);
                 } else {
                     userOnline.onUserOnline(user, false);
@@ -61,7 +61,7 @@ public class PresenceAPI {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
-                    User customUser = (User) dataSnapshot.getValue();
+                    User customUser = dataSnapshot.getValue(User.class);
                     userOnline.onUserOnline(customUser, true);
                 } else {
                 userOnline.onUserOnline(user, false);
@@ -75,7 +75,7 @@ public class PresenceAPI {
         });
     }
 
-    private void setUserOnline(){
+    public void setUserOnline(User user){
         user.setOnline(true);
         user.setLastSeen(System.currentTimeMillis());
         db.getReference().child(PRESENCE_PATH).child(user.getUid()).setValue(user);

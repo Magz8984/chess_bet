@@ -90,4 +90,5 @@
     <string name="challenge_service">challenge_service</string>
     <string name="disconnected">Disconnected</string>
     <string name="online_users">Online Users</string>
+    <string name="default_notification_channel_id">10077</string>
 </resources>

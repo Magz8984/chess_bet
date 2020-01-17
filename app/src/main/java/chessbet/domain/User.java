@@ -9,7 +9,7 @@ public class User {
     private String user_name;
     private String profile_photo_url;
     private long lastSeen;
-    private String fcmToken;
+    private String fcmToken = "";
     private boolean online;
 
     public String getDate_created() {
