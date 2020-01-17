@@ -197,3 +197,5 @@ tmtags
 
 # Pencil File
 *.epgz
+
+release/
