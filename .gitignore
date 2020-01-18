@@ -22,6 +22,7 @@ native/project/obj/
 .gradle/
 build/
 cxx/
+release/
 
 # Local configuration file (sdk path, etc)
 local.properties
