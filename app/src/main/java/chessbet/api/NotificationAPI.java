@@ -16,7 +16,7 @@ public class NotificationAPI {
 
     public void getNotificationToken(final TokenRetrieved tokenRetrieved){
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
-            if(task.isSuccessful() && task.getResult()!= null){
+            if(task.isSuccessful() && task.getResult() != null){
                 tokenRetrieved.onNotificationTokenReceived(task.getResult().getToken());
             } else {
                 tokenRetrieved.onNotificationTokenErrorReceived(task.getException());
