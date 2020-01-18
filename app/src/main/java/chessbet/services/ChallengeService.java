@@ -27,7 +27,7 @@ import chessbet.domain.Challenge;
 import chessbet.domain.Constants;
 import chessbet.domain.User;
 
-public class ChallengeService extends Service implements AccountAPI.OnUserReceived{
+public class ChallengeService extends Service implements AccountAPI.OnUserReceived {
     private Account challengerAccount;
     private Challenge currentChallenge;
     private ListenerRegistration listenerRegistration;
@@ -109,7 +109,7 @@ public class ChallengeService extends Service implements AccountAPI.OnUserReceiv
 
 
             if(Build.VERSION.SDK_INT >=   Build.VERSION_CODES.O){
-                channel_id = getNotificationChannel(getResources().getString(R.string.challenge_service),"Background Service");
+                channel_id = getNotificationChannel(getResources().getString(R.string.default_notification_channel_id),"Background Service");
             }
             Notification notification = new NotificationCompat.Builder( this,channel_id)
                     .setContentTitle(getContentTitle(challenge))
@@ -126,7 +126,7 @@ public class ChallengeService extends Service implements AccountAPI.OnUserReceiv
     }
 
     private String getContentTitle(Challenge challenge){
-        if(!Challenge.isAccepted(challenge)){
+        if(!ChallengeAPI.get().isChallengeOwner(challenge)){
             return "You have been challenged";
         } else {
             return "Your challenge has been accepted";
@@ -134,10 +134,10 @@ public class ChallengeService extends Service implements AccountAPI.OnUserReceiv
     }
 
     private String getContextText(Challenge challenge,User user){
-        if(!Challenge.isAccepted(challenge)){
+        if(!ChallengeAPI.get().isChallengeOwner(challenge)){
             return user.getUser_name() + " has challenged you" ;
         } else {
-            return user.getUser_name() + " has accepted your challenge";
+            return "Challenge accepted";
         }
     }
 
@@ -147,7 +147,7 @@ public class ChallengeService extends Service implements AccountAPI.OnUserReceiv
      * @return boolean value
      */
     private boolean isChallengeOwner(Challenge challenge){
-        return !(challenge.getRequester() == null || challenge.getRequester().equals(""));
+        return ChallengeAPI.get().isChallengeOwner(challenge);
     }
 
     @Override

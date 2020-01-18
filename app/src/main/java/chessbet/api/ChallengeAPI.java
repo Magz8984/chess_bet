@@ -2,6 +2,9 @@ package chessbet.api;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -10,12 +13,14 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import chessbet.domain.Account;
 import chessbet.domain.Challenge;
 import chessbet.domain.Constants;
 import chessbet.domain.MatchRange;
@@ -43,6 +48,7 @@ public class ChallengeAPI {
     private List<DocumentReference> availableMatches = new ArrayList<>();
     private ChallengeAPI(){
         db = FirebaseFirestore.getInstance();
+        user = FirebaseAuth.getInstance().getCurrentUser();
     }
     public static ChallengeAPI get() {
         return INSTANCE;
@@ -162,23 +168,39 @@ public class ChallengeAPI {
      * @param challengeId Set challenge Id
      */
     public void setChallengeByAccount(String accountOwner, String challengeId, ChallengeSent challengeSent){
-        AccountAPI.get().getAccount(accountOwner, account -> {
-            long time = System.currentTimeMillis();
-            if((account.getCurrent_challenge_timestamp() < (time - Constants.MAX_MATCHING_DURATION)) ||
-                    (account.getCurrent_challenge_timestamp() <= 0)){ // Timer lapsed or no challenge found
-                if(challengeId != null){ // Make sure we don't send nulls
-                    account.setCurrent_challenge_id(challengeId);
-                    account.setCurrent_challenge_timestamp(System.currentTimeMillis());
-                    // Update account with current challenge data
-                    AccountAPI.get().updateAccount(account);
-                    challengeSent.onChallengeSent();
+        AccountAPI.get().getAccount(accountOwner, account -> setChallengeByAccount(account, challengeSent, challengeId));
+    }
+
+    /**
+     * Runs transaction to make sure no other user challenges the account during the process
+     * @param account The account found
+     * @param challengeSent callback
+     * @param challengeId created challenge id
+     */
+    private void setChallengeByAccount(Account account, ChallengeSent challengeSent, String challengeId){
+        if(!account.getId().isEmpty()){
+            DocumentReference accountRef = db.collection(AccountAPI.ACCOUNT_COLLECTION).document(account.getId());
+            db.runTransaction(transaction -> {
+                DocumentSnapshot documentSnapshot = transaction.get(accountRef);
+                Account selectedAccount = documentSnapshot.toObject(Account.class);
+                long time = System.currentTimeMillis();
+                if((selectedAccount != null && (selectedAccount.getCurrent_challenge_timestamp() < (time - Constants.MAX_MATCHING_DURATION) ||
+                        (selectedAccount.getCurrent_challenge_timestamp() <= 0)))){ // Timer lapsed or no challenge found
+                    if(challengeId != null){ // Make sure we don't send nulls
+                        selectedAccount.setCurrent_challenge_id(challengeId);
+                        selectedAccount.setCurrent_challenge_timestamp(System.currentTimeMillis());
+                        // Update account with current challenge data
+                        AccountAPI.get().updateAccount(selectedAccount);
+                        challengeSent.onChallengeSent();
+                    } else {
+                        challengeSent.onChallengeNotSent();
+                    }
                 } else {
                     challengeSent.onChallengeNotSent();
                 }
-            } else {
-                challengeSent.onChallengeNotSent();
-            }
-        });
+                return null;
+            });
+        }
     }
 
     public void setLastChallengedUser(User lastChallengedUser) {
@@ -373,5 +395,14 @@ public class ChallengeAPI {
 
     public boolean isOnChallenge() {
         return isOnChallenge;
+    }
+
+    public FirebaseUser getUser() {
+        return user;
+    }
+
+
+    public boolean isChallengeOwner(Challenge challenge){
+        return challenge.getOwner().equals(user.getUid());
     }
 }

@@ -35,6 +35,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -98,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         profileImage.setOnClickListener(this);
 
         FirebaseFirestore.setLoggingEnabled(true); // Set up logging
+        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+
 
         AccountAPI.get().setUser(FirebaseAuth.getInstance().getCurrentUser());
         AccountAPI.get().setAccountListener(this);
@@ -150,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onDestroy() {
+        PresenceAPI.get().stopListening();
         super.onDestroy();
     }
 
@@ -373,11 +377,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void amOnline(boolean isOnline) {
-        Log.d(MainActivity.class.getSimpleName(), "IS_ONLINE");
-    }
-
-    @Override
     public void onNotificationTokenReceived(String token) {
         User user = AccountAPI.get().getCurrentUser();
         if(!user.getFcmToken().equals(token)){
@@ -388,6 +387,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onNotificationTokenErrorReceived(Exception e) {
         Crashlytics.logException(e);
+    }
+
+    /**
+     * Checking user is online
+     * @param user the user being listened to
+     * @param isOnline boolean value
+     */
+    @Override
+    public void onUserOnline(User user, boolean isOnline) {
+        Log.d(MainActivity.class.getSimpleName(), "User Online " + isOnline);
     }
 }
 

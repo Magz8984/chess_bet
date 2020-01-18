@@ -1,5 +1,7 @@
 package chessbet.services;
 
+import chessbet.domain.User;
+
 public interface OpponentListener {
-    void onOpponentReceived(String opponent);
+    void onOpponentReceived(User user);
 }

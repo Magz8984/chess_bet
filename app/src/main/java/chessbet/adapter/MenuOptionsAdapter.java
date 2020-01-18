@@ -15,8 +15,10 @@ import java.util.List;
 
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.GameAnalysisActivity;
+import chessbet.app.com.PresenceActivity;
 import chessbet.app.com.R;
 import chessbet.domain.MatchType;
+import es.dmoral.toasty.Toasty;
 
 
 public class MenuOptionsAdapter extends BaseAdapter {
@@ -53,6 +55,13 @@ public class MenuOptionsAdapter extends BaseAdapter {
         listeners.add(view -> Toast.makeText(context, context.getResources().getString(R.string.feature_unavailable), Toast.LENGTH_LONG).show());
         drawables.add(R.drawable.eye);
         strings.add("Watch");
+
+        listeners.add(view -> {
+           Intent intent = new  Intent(context, PresenceActivity.class);
+           context.startActivity(intent);
+        });
+        drawables.add(R.drawable.wifi_four_bar);
+        strings.add(context.getResources().getString(R.string.online_users));
     }
 
 
