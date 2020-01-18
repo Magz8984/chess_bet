@@ -212,57 +212,57 @@
             android:id="@+id/btnAnalysis"
             android:background="@drawable/trend"
             android:layout_margin="3dp"
-            android:layout_width="28dp"
-            android:layout_height="28dp" />
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
 
         <Button
             android:id="@+id/btnHint"
             android:background="@drawable/hint"
             android:layout_margin="3dp"
-            android:layout_width="28dp"
-            android:layout_height="28dp" />
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
 
         <Button
             android:id="@+id/btnRecord"
             android:background="@drawable/record_game"
             android:layout_margin="3dp"
-            android:layout_width="28dp"
-            android:layout_height="28dp" />
+            android:layout_width="30dp"
+            android:layout_height="30dp" />
 
         <Button
             android:id="@+id/btnSave"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:background="@drawable/save"
             android:layout_margin="3dp"/>
 
 
         <Button
             android:id="@+id/btnFlip"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:background="@drawable/img_flip"
             android:layout_margin="3dp"/>
 
         <Button
             android:visibility="gone"
             android:id="@+id/btnColorPicker"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:background="@drawable/img_change_board_color"
             android:layout_margin="3dp"/>
 
         <Button
             android:id="@+id/btnBack"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:background="@drawable/img_back"
             android:layout_margin="3dp"/>
 
         <Button
             android:id="@+id/btnForward"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:background="@drawable/img_forward"
             android:layout_margin="3dp"/>
     </LinearLayout>

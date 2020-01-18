@@ -14,11 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import chessbet.app.com.BoardActivity;
-import chessbet.app.com.GameAnalysisActivity;
 import chessbet.app.com.PresenceActivity;
 import chessbet.app.com.R;
 import chessbet.domain.MatchType;
-import es.dmoral.toasty.Toasty;
 
 
 public class MenuOptionsAdapter extends BaseAdapter {

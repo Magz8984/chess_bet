@@ -22,4 +22,19 @@ public class Constants {
     public static String CHALLENGE_ID = "challengeId";
     public static String IS_CHALLENGER = "isChallenger";
     public static String CHALLENGER = "Challenger";
+
+    /**
+     * Used to remove characters from strings
+     * @param string input string
+     * @return output string
+     */
+    public static String GetDigitsFromString(String string){
+        StringBuilder builder = new StringBuilder();
+        for (char c: string.toCharArray()) {
+            if(Character.isDigit(c)){
+               builder.append(c);
+            }
+        }
+        return builder.toString();
+    }
 }

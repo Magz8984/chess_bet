@@ -11,7 +11,7 @@ import chessbet.domain.MatchableAccount;
 
 // TODO All functionality of this class should be in the Game Handler
 public class GameManager{
-    public static final String GAME_FILE_NAME = "Chess_MVP_PGN";
+    public static final String GAME_FILE_NAME = "Chess_Bet_PGN";
     public static final String FULL_GAME_FILE = GAME_FILE_NAME + "_%s.pgn";
     /**
      * @see MatchableAccount#endMatch(Context)
