@@ -220,7 +220,6 @@ private ProgressDialog challengeProgressDialog;
                 boardView.setGameTimer(GameTimer.get());
             }
         }
-        MatchAPI.get().setMatchCreated(false);
     }
 
     private void configureChallenge(Intent intent){
@@ -377,6 +376,7 @@ private ProgressDialog challengeProgressDialog;
         if (!isStoredGame) {
             Snackbar snackbar = Snackbar.make(btnSave, R.string.end_match, Snackbar.LENGTH_LONG)
                     .setAction(R.string.forfeit, v1 -> {
+                        MatchAPI.get().setMatchCreated(false); // FLAG MatchAPI
                         PresenceAPI.get().stopListening(); // Stop listening to opponent online state
                         if(matchableAccount != null && !isGameFinished){
                            endGame(GameHandler.GAME_INTERRUPTED_FLAG);
@@ -537,6 +537,7 @@ private ProgressDialog challengeProgressDialog;
     @Override
     protected void onStop() {
         super.onStop();
+        MatchAPI.get().setMatchCreated(false); // FLAG MatchAPI
         GameUtil.getMediaPlayer().release();
         PresenceAPI.get().stopListening(); // Stop listening to opponent
         this.stopService(new Intent(this, MatchService.class));
@@ -781,6 +782,7 @@ private ProgressDialog challengeProgressDialog;
     public void onMatchEnd(MatchStatus matchStatus) {
         // Stop service
         this.stopService(new Intent(this, MatchService.class));
+        MatchAPI.get().setMatchCreated(false);
         PresenceAPI.get().stopListening();
         storeGameOnCloud();
         ChallengeAPI.get().deleteChallenge(); // Delete current challenge

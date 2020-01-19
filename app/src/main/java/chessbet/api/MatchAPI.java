@@ -51,7 +51,7 @@ public class MatchAPI implements Serializable {
     private List<String> unevaluatedMatches = new ArrayList<>(); // Matches yet to be evaluated
 
     private boolean isRecentMatchEvaluated = false;
-    private boolean isMatchCreated;
+    private boolean isMatchCreated = false;
     private OnMatchEnd onMatchEnd;
     private FirebaseUser firebaseUser;
     private MatchListener matchListener;
@@ -298,12 +298,11 @@ public class MatchAPI implements Serializable {
 
         HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(Constants.CLOUD_FUNCTIONS_URL
                 .concat(Constants.FORCE_EVALUATE_MATCH)))
-                .newBuilder()
-                .addQueryParameter("matchId", matchId);
+                .newBuilder();
 
         String url = builder.build().toString();
 
-        RequestBody requestBody = RequestBody.create(JSON,new byte[0]);
+        RequestBody requestBody = RequestBody.create(JSON, matchId);
 
 
         // Generate token for cloud functions to verify user
