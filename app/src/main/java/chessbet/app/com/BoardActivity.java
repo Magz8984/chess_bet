@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.app.ProgressDialog;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -108,6 +109,7 @@ private boolean isStoredGame = false;
 private EvaluateGame evaluateGame;
 private GameHandler.NoMoveReactor noMoveReactor;
 private boolean isActiveConnectionFlag = false;
+private ProgressDialog challengeProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +119,7 @@ private boolean isActiveConnectionFlag = false;
         setContentView(R.layout.activity_board);
         ButterKnife.bind(this);
         connectivityManager = new ConnectivityManager();
+        challengeProgressDialog = new ProgressDialog(this);
         boardView.setDarkCellsColor(boardPreference.getDark());
         boardView.setWhiteCellsColor(boardPreference.getWhite());
         boardView.setOnMoveDoneListener(this);
@@ -224,9 +227,11 @@ private boolean isActiveConnectionFlag = false;
         String challengeId = intent.getStringExtra(Constants.CHALLENGE_ID);
         String challenger = intent.getStringExtra(Constants.CHALLENGER);
         boolean isChallenger = intent.getBooleanExtra(Constants.IS_CHALLENGER, false);
-        Log.d(BoardActivity.class.getSimpleName(), challengeId + " " + challenger +  " " + isChallenger);
         if(challengeId != null){
-            Toast.makeText(this, "Accepting Challenge", Toast.LENGTH_LONG).show();
+            // Start challenge dialog
+            challengeProgressDialog.setMessage(getResources().getString(R.string.accepting_challenge));
+            challengeProgressDialog.setCancelable(false);
+            challengeProgressDialog.show();
             boardView.setEnabled(false);
             ChallengeTaker challengeTaker = new ChallengeTaker(challengeId);
             if(!isChallenger){
@@ -519,7 +524,6 @@ private boolean isActiveConnectionFlag = false;
     protected void onDestroy() {
         super.onDestroy();
         connectivityManager.stopListening();
-        PresenceAPI.get().stopListening(); // Stop listening to opponent
         if(noMoveReactor != null){
             noMoveReactor.stopTimer();
         }
@@ -534,6 +538,7 @@ private boolean isActiveConnectionFlag = false;
     protected void onStop() {
         super.onStop();
         GameUtil.getMediaPlayer().release();
+        PresenceAPI.get().stopListening(); // Stop listening to opponent
         this.stopService(new Intent(this, MatchService.class));
     }
 
@@ -845,6 +850,7 @@ private boolean isActiveConnectionFlag = false;
 
         @Override
         public void onMatchMade(MatchableAccount matchableAccount) {
+            challengeProgressDialog.dismiss(); // Close challenge acceptance
             configureMatch(matchableAccount);
         }
 

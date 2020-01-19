@@ -1,7 +1,7 @@
 package chessbet.domain;
 
-/**
- * Author Collins Magondu
+/*
+  @author Collins Magondu
  */
 
 import chessbet.app.com.BuildConfig;
@@ -11,6 +11,7 @@ public class Constants {
     public static String GET_MATCH_PATH_ON_ELO_RATING = "/getMatchableAccountOnEloRating";
     public static String CREATE_USER_MATCHABLE_ACCOUNT = "/createUserMatchableAccount";
     public static String EVALUATE_AND_STORE_MATCH = "/evaluateMatch";
+    public static String FORCE_EVALUATE_MATCH = "/forceEvaluateMatch";
     public static String TERMS_OF_SERVICE_URL = "https://chess-mvp.com/#/home/tos";
     public static String GAMES_CLOUD_REFERENCE = "Games";
     public static String UTILITY_PROFILE = "https://firebasestorage.googleapis.com/v0/b/chessbet-app-com-v1.appspot.com/o/utilities%2Fuser.png" +
@@ -22,7 +23,8 @@ public class Constants {
     public static String CHALLENGE_ID = "challengeId";
     public static String IS_CHALLENGER = "isChallenger";
     public static String CHALLENGER = "Challenger";
-
+    public static final int TIME_NO_MOVE_END_MATCH = 120;
+    public static final int TIME_NO_MOVE_CAUTION = 110;
     /**
      * Used to remove characters from strings
      * @param string input string

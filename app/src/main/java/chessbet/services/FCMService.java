@@ -41,7 +41,9 @@ public class FCMService extends FirebaseMessagingService  implements  AccountAPI
         super.onNewToken(s);
         Map<String, Object> values = new HashMap<>();
         values.put("fcmToken", s);
-        AccountAPI.get().updateUser(user.getUid(), values, this);
+        if(user != null){
+            AccountAPI.get().updateUser(user.getUid(), values, this);
+        }
     }
 
 

@@ -9,6 +9,7 @@ import java.util.TimerTask;
 
 import chessbet.api.AccountAPI;
 import chessbet.api.MatchAPI;
+import chessbet.domain.Constants;
 import chessbet.domain.DatabaseMatch;
 import chessbet.domain.MatchResult;
 import chessbet.domain.MatchStatus;
@@ -131,10 +132,10 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
                 @Override
                 public void run() {
                     noMoveSeconds++;
-                    if(noMoveSeconds == 60 && isDisconnected){
+                    if(noMoveSeconds == Constants.TIME_NO_MOVE_END_MATCH && isDisconnected){
                         noMoveEndMatch.onDisconnected(MatchStatus.DISCONNECTED);
                     }
-                    else if(noMoveSeconds == 60 && !isMyPly){
+                    else if(noMoveSeconds == Constants.TIME_NO_MOVE_END_MATCH && !isMyPly){
                         if(hasOpponentMoved){
                             matchableAccount.endMatch(pgn, GameHandler.GAME_ABANDONED_FLAG,MatchStatus.ABANDONMENT, matchableAccount.getOwner(), matchableAccount.getOpponentId());
                             noMoveEndMatch.onNoMoveEndMatch(MatchStatus.ABANDONMENT);
@@ -142,11 +143,11 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
                             matchableAccount.endMatch(pgn, GameHandler.GAME_ABORTED_FLAG ,MatchStatus.GAME_ABORTED, "", "");
                             noMoveEndMatch.onNoMoveEndMatch(MatchStatus.GAME_ABORTED);
                         }
-                    } else if (noMoveSeconds == 50 && !isMyPly){
+                    } else if (noMoveSeconds == Constants.TIME_NO_MOVE_CAUTION && !isMyPly){
                         noMoveEndMatch.onNoMoveOpponentReacting();
-                    } else if (noMoveSeconds == 50 && isMyPly){
+                    } else if (noMoveSeconds == Constants.TIME_NO_MOVE_CAUTION && isMyPly){
                         noMoveEndMatch.onNoMoveSelfReacting();
-                    } else if (noMoveSeconds == 60 && isMyPly && !isOpponentDisconnected){
+                    } else if (noMoveSeconds == Constants.TIME_NO_MOVE_END_MATCH && isMyPly && !isOpponentDisconnected){
                         if(hasMadeMove){
                             noMoveEndMatch.onLoseNoMove(MatchStatus.ABANDONMENT);
                         } else {
@@ -163,7 +164,7 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
         }
 
         public void clearNoMoveSeconds(){
-            noMoveSeconds = 0;
+            this.noMoveSeconds = 0;
         }
 
         public void stopTimer(){

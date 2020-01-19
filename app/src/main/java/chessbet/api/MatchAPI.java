@@ -23,9 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import chessbet.domain.Constants;
@@ -105,7 +103,7 @@ public class MatchAPI implements Serializable {
                     if(matchableAccount.isMatched()){
                         if(!isMatchCreated || unevaluatedMatches.contains(matchableAccount.getMatchId())){
                             unevaluatedMatches.add(matchableAccount.getMatchId());
-                            forceEvaluateMatch(matchableAccount.getMatchId());
+                            forceEvaluateMatchImplementation(matchableAccount.getMatchId());
                         } else {
                             // Remove listener once the match is made
                             DatabaseUtil.getAccount(firebaseUser.getUid()).removeEventListener(this);
@@ -139,20 +137,6 @@ public class MatchAPI implements Serializable {
      */
     public void setCurrentDatabaseMatch(DatabaseMatch currentDatabaseMatch) {
         this.currentDatabaseMatch = currentDatabaseMatch;
-    }
-
-    /**
-     * Force evaluation of a previously unfinished match
-     * @param matchId match id from matchable account
-     */
-    private void forceEvaluateMatch(String matchId){
-        Map<String, Object> map = new HashMap<>();
-        map.put("scheduleEvaluation", true);
-        DatabaseUtil.getMatch(matchId).updateChildren(map).addOnCompleteListener(task -> {
-            if(!task.isSuccessful()){
-                Crashlytics.logException(task.getException());
-            }
-        });
     }
 
     /**
@@ -303,6 +287,38 @@ public class MatchAPI implements Serializable {
         });
     }
 
+    /**
+     * Force evaluation of a previously unfinished match
+     * @param matchId match id from matchable account
+     */
+    private void forceEvaluateMatch(String matchId, Callback callback){
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .cache(null)
+                .build();
+
+        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(Constants.CLOUD_FUNCTIONS_URL
+                .concat(Constants.FORCE_EVALUATE_MATCH)))
+                .newBuilder()
+                .addQueryParameter("matchId", matchId);
+
+        String url = builder.build().toString();
+
+        RequestBody requestBody = RequestBody.create(JSON,new byte[0]);
+
+
+        // Generate token for cloud functions to verify user
+        TokenGenerator.generateToken(token -> {
+            Request request = new Request.Builder()
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Authorization", "Bearer " + token)
+                    .url(url)
+                    .post(requestBody)
+                    .build();
+            Call call = okHttpClient.newCall(request);
+            call.enqueue(callback);
+        });
+    }
+
     private void createUserMatchableAccount(MatchableAccount matchableAccount, Callback callback){
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                                         .cache(null)
@@ -363,6 +379,24 @@ public class MatchAPI implements Serializable {
                 }
                 else {
                     Crashlytics.logException(new Exception("Evaluate match unsuccessful"));
+                }
+            }
+        });
+    }
+
+    private void forceEvaluateMatchImplementation(String matchId){
+        forceEvaluateMatch(matchId, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Crashlytics.logException(e);
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if(response.code() == RESPONSE_OKAY_FLAG){
+                    Log.d(MatchAPI.class.getSimpleName(), Objects.requireNonNull(response.body()).string());
+                } else {
+                    Crashlytics.logException(new Exception("Force evaluate match unsuccessful"));
                 }
             }
         });

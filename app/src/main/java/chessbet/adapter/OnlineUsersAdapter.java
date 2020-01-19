@@ -29,7 +29,7 @@ public class OnlineUsersAdapter extends FirebaseRecyclerAdapter<User, OnlineUser
      * Initialize a {@link RecyclerView.Adapter} that listens to a Firebase query. See
      * {@link FirebaseRecyclerOptions} for configuration options.
      *
-     * @param options
+     * @param options Adapter options
      */
     public OnlineUsersAdapter(@NonNull FirebaseRecyclerOptions<User> options) {
         super(options);
@@ -54,6 +54,7 @@ public class OnlineUsersAdapter extends FirebaseRecyclerAdapter<User, OnlineUser
         }
 
         holder.getBtnChallenge().setOnClickListener(view -> {
+            holder.getBtnChallenge().setEnabled(false); // Disable button
             Toast.makeText(context, "Sending a challenge  " + user.getUser_name(), Toast.LENGTH_LONG).show();
             if(!ChallengeAPI.get().isCurrentChallengeValid()){
                 ChallengeAPI.get().challengeAccount(user.getUid(), new ChallengeAPI.ChallengeSent() {
@@ -100,7 +101,7 @@ public class OnlineUsersAdapter extends FirebaseRecyclerAdapter<User, OnlineUser
             btnChallenge = itemView.findViewById(R.id.btnChallenge);
         }
 
-        public Button getBtnChallenge() {
+        Button getBtnChallenge() {
             return btnChallenge;
         }
 

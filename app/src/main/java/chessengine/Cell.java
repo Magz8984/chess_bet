@@ -289,10 +289,10 @@ public class Cell extends View {
 
     private void assignCellColor(){
         if((row + column + 2) % 2 == 0 ){
-            this.color=boardView.getDarkCellsColor();
+            this.color = boardView.getDarkCellsColor();
         }
         else{
-            this.color=boardView.getWhiteCellsColor();
+            this.color = boardView.getWhiteCellsColor();
         }
     }
 
