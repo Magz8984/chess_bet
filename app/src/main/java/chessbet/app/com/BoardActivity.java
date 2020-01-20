@@ -29,6 +29,8 @@ import com.chess.engine.player.Player;
 import com.chess.pgn.PGNMainUtils;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 
 import java.io.FileNotFoundException;
@@ -46,6 +48,7 @@ import chessbet.api.PresenceAPI;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
 import chessbet.app.com.fragments.EvaluateGame;
+import chessbet.domain.Account;
 import chessbet.domain.Constants;
 import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchStatus;
@@ -55,7 +58,7 @@ import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
 import chessbet.domain.User;
 import chessbet.recievers.ConnectivityReceiver;
-import chessbet.services.ChallengeService;
+import chessbet.services.AccountListener;
 import chessbet.services.MatchListener;
 import chessbet.services.MatchService;
 import chessbet.services.OpponentListener;
@@ -110,6 +113,7 @@ private EvaluateGame evaluateGame;
 private GameHandler.NoMoveReactor noMoveReactor;
 private boolean isActiveConnectionFlag = false;
 private ProgressDialog challengeProgressDialog;
+private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +147,7 @@ private ProgressDialog challengeProgressDialog;
     @Override
     protected void onStart() {
         super.onStart();
+        user = FirebaseAuth.getInstance().getCurrentUser();
         isGameFinished = false;
 
         GameUtil.initialize(R.raw.chess_move, this);
@@ -190,6 +195,8 @@ private ProgressDialog challengeProgressDialog;
         noMoveReactor.setNoMoveEndMatch(this);
         noMoveReactor.execute();
 
+        GameHandler.getInstance().setNoMoveReactor(noMoveReactor); // Save this in current single tone
+
         this.matchableAccount = matchableAccount;
         boardView.setMode(BoardView.Modes.PLAY_ONLINE);
         boardView.setMatchableAccount(matchableAccount);
@@ -203,7 +210,14 @@ private ProgressDialog challengeProgressDialog;
         backgroundMatchBuilder.setOpponentListener(this);
         backgroundMatchBuilder.setMatchableAccount(matchableAccount);
         backgroundMatchBuilder.execute(this);
+        setBoardViewGameTimer();
+    }
 
+    /**
+     * Helper Method
+     * Sets BoardView game timer if game timer is new or has been lost by configuration changes
+     */
+    private void setBoardViewGameTimer(){
         // Set timer online game and make sure you do not set two different timers
         if(boardView.getGameTimer() == null){
             GameTimer.Builder builder = new GameTimer.Builder()
@@ -212,7 +226,6 @@ private ProgressDialog challengeProgressDialog;
                     .setOnTimerElapsed(this);
             if(GameTimer.get() == null){
                 boardView.setGameTimer(builder.build());
-
             } else {
                 // Reset timer in board view;
                 GameTimer.get().setBuilder(builder);
@@ -223,6 +236,10 @@ private ProgressDialog challengeProgressDialog;
     }
 
     private void configureChallenge(Intent intent){
+        // Disable challenge creation if user has either accepted challenge or has an accepted challenge
+        if(ChallengeAPI.get().isChallengeAccepted() ||  ChallengeAPI.get().hasAcceptedChallenge()){
+            return;
+        }
         String challengeId = intent.getStringExtra(Constants.CHALLENGE_ID);
         String challenger = intent.getStringExtra(Constants.CHALLENGER);
         boolean isChallenger = intent.getBooleanExtra(Constants.IS_CHALLENGER, false);
@@ -234,6 +251,7 @@ private ProgressDialog challengeProgressDialog;
             boardView.setEnabled(false);
             ChallengeTaker challengeTaker = new ChallengeTaker(challengeId);
             if(!isChallenger){
+                ChallengeAPI.get().sendChallengeNotification(challengeId, challenger); // Send notification to the challenger
                 ChallengeAPI.get().setChallengeByAccount(challenger, challengeId, new ChallengeAPI.ChallengeSent() {
                     @Override
                     public void onChallengeSent() {
@@ -246,6 +264,8 @@ private ProgressDialog challengeProgressDialog;
                     }
                 });
                 challengeTaker.acceptChallenge();
+            } else {
+                ChallengeAPI.get().setChallengeAccepted(true);
             }
         }
     }
@@ -399,7 +419,9 @@ private ProgressDialog challengeProgressDialog;
                 isGameFinished = savedInstanceState.getBoolean("gameFinished");
                 isStoredGame = savedInstanceState.getBoolean("isStoredGame");
                 MatchableAccount matchableAccount = savedInstanceState.getParcelable("matchableAccount");
-                boardView.setMatchableAccount(matchableAccount);
+                if(matchableAccount != null){
+                    configureMatch(matchableAccount);
+                }
                 String gameState = savedInstanceState.getString("matchString");
                 if (gameState != null) {
                     boardView.reconstructBoardFromPGN(Objects.requireNonNull(savedInstanceState.getString("matchString")));
@@ -749,7 +771,6 @@ private ProgressDialog challengeProgressDialog;
     private void notifyLowInternetConnection(){
         if(matchableAccount != null){
             isActiveConnectionFlag = false;
-            Toasty.warning(this, R.string.low_internet_connection, Toasty.LENGTH_LONG).show();
             sendDisconnectedEvent();
             boardView.setEnabled(false);
             if(noMoveReactor != null){
@@ -764,7 +785,6 @@ private ProgressDialog challengeProgressDialog;
             if(noMoveReactor != null){
                 noMoveReactor.setDisconnected(false);
             }
-
             // If the connection was previously changed then notify that you are back
             if(!isActiveConnectionFlag){
                 PresenceAPI.get().setUserOnline(AccountAPI.get().getCurrentUser());
@@ -830,7 +850,7 @@ private ProgressDialog challengeProgressDialog;
      * @author Collins Magondu 10/01/2020
      * Used to accept challenges from notifications
      */
-    private class ChallengeTaker implements MatchListener {
+    private class ChallengeTaker implements MatchListener, AccountListener  {
         private String challengeId;
 
         ChallengeTaker(String challengeId){
@@ -838,15 +858,27 @@ private ProgressDialog challengeProgressDialog;
             MatchAPI.get().setMatchListener(this);
             MatchAPI.get().setMatchCreated(true);
             MatchAPI.get().getAccount();
-            stopService(new Intent(BoardActivity.this, ChallengeService.class)); // Stop challenge service
         }
 
         void acceptChallenge(){
+            if(AccountAPI.get().getCurrentUser() == null) {
+                AccountAPI.get().getAccount(user.getUid(), account -> {
+                    createMatchableAccount(account);
+                    AccountAPI.get().setAccountListener(this);
+                    AccountAPI.get().getAccount();
+                    AccountAPI.get().getUser();
+                });
+            } else {
+                createMatchableAccount(AccountAPI.get().getCurrentAccount());
+            }
+        }
+
+        private void createMatchableAccount(Account account){
             MatchableAccount matchableAccount = new MatchableAccount();
-            matchableAccount.setOwner(AccountAPI.get().getCurrentUser().getUid());
+            matchableAccount.setOwner(account.getOwner());
             matchableAccount.setMatch_type(MatchType.PLAY_ONLINE.toString());
             matchableAccount.setDuration(Constants.DEFAULT_MATCH_DURATION);
-            matchableAccount.setElo_rating(AccountAPI.get().getCurrentAccount().getElo_rating());
+            matchableAccount.setElo_rating(account.getElo_rating());
             MatchAPI.get().createUserMatchableAccountImplementation(matchableAccount);
         }
 
@@ -858,7 +890,7 @@ private ProgressDialog challengeProgressDialog;
 
         @Override
         public void onMatchableCreatedNotification() {
-            ChallengeAPI.get().acceptChallenge(challengeId);
+           ChallengeAPI.get().acceptChallenge(challengeId);
         }
 
         @Override
@@ -866,6 +898,21 @@ private ProgressDialog challengeProgressDialog;
             Crashlytics.logException(new RuntimeException("DatabaseMatch could was not created for "
                     + AccountAPI.get().getCurrentUser().getUid()
                     + " " + new Date().toString()));
+        }
+
+        @Override
+        public void onAccountReceived(Account account) {
+            // Handle Account Received Logic
+        }
+
+        @Override
+        public void onUserReceived(User user) {
+            // Handle User Received Logic
+        }
+
+        @Override
+        public void onAccountUpdated(boolean status) {
+            // Handle Account Updated Logic
         }
     }
 

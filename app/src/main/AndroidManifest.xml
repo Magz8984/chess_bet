@@ -33,7 +33,7 @@
         <!-- FCM SETUP-->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@mipmap/icon_round"
+            android:resource="@drawable/chesslogo"
             />
 
         <meta-data
@@ -67,10 +67,6 @@
             android:name="chessbet.services.MatchService"
             android:icon="@drawable/chesslogo"
             android:label="@string/match_service" />
-
-        <service android:name="chessbet.services.ChallengeService"
-            android:icon="@drawable/chesslogo"
-            android:label="@string/challenge_service"/>
 
         <service android:name="chessbet.services.FCMService"
             android:exported="false">

@@ -19,6 +19,16 @@ import chessbet.services.OpponentListener;
 public class GameHandler extends AsyncTask<Integer,Void,Void> {
     private static GameHandler INSTANCE = new GameHandler();
 
+    private NoMoveReactor noMoveReactor; // Stores no move reactor components
+
+    public void setNoMoveReactor(NoMoveReactor noMoveReactor) {
+        this.noMoveReactor = noMoveReactor;
+    }
+
+    public NoMoveReactor getNoMoveReactor() {
+        return noMoveReactor;
+    }
+
     private MatchResult matchResult;
 
     public static final int GAME_INTERRUPTED_FLAG = 18305;

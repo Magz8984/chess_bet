@@ -2,9 +2,6 @@ package chessbet.api;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -13,7 +10,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.Transaction;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,6 +19,7 @@ import java.util.Objects;
 import chessbet.domain.Account;
 import chessbet.domain.Challenge;
 import chessbet.domain.Constants;
+import chessbet.domain.FCMMessage;
 import chessbet.domain.MatchRange;
 import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
@@ -40,8 +37,9 @@ public class ChallengeAPI {
     private MatchRange matchRange;
     private boolean isLoaded = false;
     private boolean isOnChallenge = false;
+    private boolean isChallengeAccepted;
+    private boolean hasAcceptedChallenge;
     private FirebaseFirestore db;
-    private ChallengeAccepted challengeAccepted;
     private FirebaseUser user;
     private int referenceCounter = 0;
     private String currentChallengeId = null;
@@ -134,6 +132,18 @@ public class ChallengeAPI {
         this.currentChallengeId = currentChallengeId;
     }
 
+    public void setHasAcceptedChallenge(boolean hasAcceptedChallenge) {
+        this.hasAcceptedChallenge = hasAcceptedChallenge;
+    }
+
+    public boolean isChallengeAccepted() {
+        return isChallengeAccepted;
+    }
+
+    public boolean hasAcceptedChallenge() {
+        return hasAcceptedChallenge;
+    }
+
     private Challenge createFriendChallenge(){
         Challenge challenge = new Challenge();
         challenge.setTimeStamp(System.currentTimeMillis());
@@ -187,6 +197,7 @@ public class ChallengeAPI {
                 if((selectedAccount != null && (selectedAccount.getCurrent_challenge_timestamp() < (time - Constants.MAX_MATCHING_DURATION) ||
                         (selectedAccount.getCurrent_challenge_timestamp() <= 0)))){ // Timer lapsed or no challenge found
                     if(challengeId != null){ // Make sure we don't send nulls
+                        sendChallengeNotification(challengeId, account.getOwner());
                         selectedAccount.setCurrent_challenge_id(challengeId);
                         selectedAccount.setCurrent_challenge_timestamp(System.currentTimeMillis());
                         // Update account with current challenge data
@@ -207,6 +218,9 @@ public class ChallengeAPI {
         this.lastChallengedUser = lastChallengedUser;
     }
 
+    public void setChallengeAccepted(boolean challengeAccepted) {
+        isChallengeAccepted = challengeAccepted;
+    }
 
     public void getChallenge(String currentChallengeId, ChallengeReceived challengeReceived){
         db.collection(CHALLENGE_COLLECTION).document(currentChallengeId).get().addOnCompleteListener(task -> {
@@ -275,24 +289,20 @@ public class ChallengeAPI {
 
     public void acceptChallenge(String challengeId){
         db.collection(CHALLENGE_COLLECTION).document(challengeId).get().addOnCompleteListener(task -> {
-            if(task.isSuccessful() && task.getResult() != null){
-                Challenge challenge = task.getResult().toObject(Challenge.class);
+            if(task.isSuccessful()){
+                Challenge challenge = Objects.requireNonNull(task.getResult()).toObject(Challenge.class);
                 DocumentReference documentReference = task.getResult().getReference();
                 db.runTransaction(transaction -> {
                     DocumentSnapshot documentSnapshot = transaction.get(documentReference);
                     this.currentChallengeId = documentReference.getId();
                     currentChallenge = challenge;
-
                     transaction.update(documentReference, "accepted", true);
                     transaction.update(documentReference, "requester", AccountAPI.get().getCurrentAccount().getOwner());
                   return documentSnapshot; // For promise completion
-                });
+                }).addOnSuccessListener(documentSnapshot -> hasAcceptedChallenge = true)
+                  .addOnFailureListener(e -> hasAcceptedChallenge = false);
             }
         });
-    }
-
-    public void setChallengeAccepted(ChallengeAccepted challengeAccepted) {
-        this.challengeAccepted = challengeAccepted;
     }
 
     /**
@@ -404,5 +414,22 @@ public class ChallengeAPI {
 
     public boolean isChallengeOwner(Challenge challenge){
         return challenge.getOwner().equals(user.getUid());
+    }
+
+    /**
+     * Sends notification directly to users on challenge creation
+     * @param challengeId
+     * @param uid
+     */
+    public void sendChallengeNotification(String challengeId, String uid){
+        AccountAPI.get().getAUser(uid, user -> {
+            ArrayList<String> token = new ArrayList<>();
+            token.add(user.getFcmToken());
+            if(this.user != null){
+                FCMMessage fcmMessage = FCMMessage.FCMMessageFactory(challengeId, this.user.getDisplayName(),
+                        this.user.getUid(), FCMMessage.FCMMessageType.CHALLENGE, token, "Challenge Creation");
+                NotificationAPI.get().sendFCMMessageImplementation(fcmMessage);
+            }
+        });
     }
 }
