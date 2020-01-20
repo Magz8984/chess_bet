@@ -187,10 +187,11 @@ private FirebaseUser user;
 
 
     private void configureMatch(MatchableAccount matchableAccount){
-        // Remove advantage controls
-        btnHint.setVisibility(View.INVISIBLE);
-        btnForward.setVisibility(View.INVISIBLE);
-        btnBack.setVisibility(View.INVISIBLE);
+        // Disable advantage controls
+        btnHint.setEnabled(false);
+        btnForward.setEnabled(false);
+        btnBack.setEnabled(false);
+
         noMoveReactor = new GameHandler.NoMoveReactor(matchableAccount);
         noMoveReactor.setNoMoveEndMatch(this);
         noMoveReactor.execute();
