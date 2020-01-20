@@ -42,3 +42,4 @@
 
 ### v1.1-beta (Chess MVP)
 
+- Stockfish 10 engine support for game hinting and analysis
