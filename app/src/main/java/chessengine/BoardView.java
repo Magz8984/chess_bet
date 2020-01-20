@@ -354,11 +354,8 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
 
     public void requestHint() {
         isHinting = !isHinting;
-        if (currentStockFishMove == null){
-            internalStockFishHandler.askStockFishMove(FenUtilities.createFEN(chessBoard), 3000, 3);
-        } else {
-            invalidate();
-        }
+        internalStockFishHandler.askStockFishMove(FenUtilities.createFEN(chessBoard), 3000, 3);
+        invalidate();
     }
 
     public boolean isHinting() {
