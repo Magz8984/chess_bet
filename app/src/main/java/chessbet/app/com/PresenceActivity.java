@@ -17,7 +17,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.adapter.OnlineUsersAdapter;
 import chessbet.domain.User;
-import chessbet.services.ChallengeService;
 import chessbet.utils.DatabaseUtil;
 
 public class PresenceActivity extends AppCompatActivity {
@@ -45,13 +44,11 @@ public class PresenceActivity extends AppCompatActivity {
         super.onStart();
         Objects.requireNonNull(getSupportActionBar()).setTitle(R.string.online_users);
         onlineUsersAdapter.startListening();
-        startService(new Intent(this, ChallengeService.class)); // Listen to challenges;
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         onlineUsersAdapter.stopListening();
-        stopService(new Intent(this, ChallengeService.class)); // Listen to challenges;
     }
 }

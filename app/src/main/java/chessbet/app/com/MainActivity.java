@@ -62,7 +62,6 @@ import chessbet.app.com.fragments.TermsOfService;
 import chessbet.domain.Account;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
-import chessbet.services.ChallengeService;
 import chessbet.utils.EventBroadcast;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -149,6 +148,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStart(){
         super.onStart();
+        // Resets this flags to enable challenge acceptance
+        ChallengeAPI.get().setChallengeAccepted(false);
+        ChallengeAPI.get().setHasAcceptedChallenge(false);
     }
 
     @Override
@@ -223,11 +225,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onAccountReceived(Account account) {
-        try {
-            startService(new Intent(this, ChallengeService.class)); // Listen to challenges;
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
         txtRating.setText(getResources().getString(R.string.rating, account.getElo_rating()));
     }
 

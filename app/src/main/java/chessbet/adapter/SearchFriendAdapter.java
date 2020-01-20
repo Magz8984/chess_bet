@@ -65,6 +65,7 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
        holder.getBtnChallenge().setOnClickListener(view -> {
            holder.getBtnChallenge().setEnabled(false);
                if(!ChallengeAPI.get().isCurrentChallengeValid()){
+                   holder.getBtnChallenge().setEnabled(true);
                    ChallengeAPI.get().challengeAccount(users.get(position).getUid(), new ChallengeAPI.ChallengeSent() {
                        @Override
                        public void onChallengeSent() {
@@ -72,13 +73,11 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
                            MatchAPI.get().getAccount(); // Listener for challenge acceptance
                            ChallengeAPI.get().setLastChallengedUser(users.get(position));
                            Toast.makeText(context, "Challenge sent to " + users.get(position).getUser_name(), Toast.LENGTH_LONG).show();
-                           holder.getBtnChallenge().setEnabled(true);
                        }
 
                        @Override
                        public void onChallengeNotSent() {
                            Toast.makeText(context, "Challenge not sent", Toast.LENGTH_LONG).show();
-                           holder.getBtnChallenge().setEnabled(true);
                        }
                    });
                } else {

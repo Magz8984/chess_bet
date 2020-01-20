@@ -180,7 +180,7 @@ public class AccountAPI {
      * Used to get an account on user Id
      * @param owner userId
      */
-    void getAccount(String owner, AccountReceived accountReceived){
+    public void getAccount(String owner, AccountReceived accountReceived){
         Query query = db.collection(AccountAPI.ACCOUNT_COLLECTION).whereEqualTo("owner", owner);
         query.get().addOnCompleteListener(task -> {
             if(task.isSuccessful()){

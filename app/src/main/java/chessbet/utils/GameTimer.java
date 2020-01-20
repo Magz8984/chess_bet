@@ -150,6 +150,9 @@ public class GameTimer {
         whiteCountDownTask.cancel();
     }
 
+    /**
+     * Game timer builder
+     */
     public static class Builder{
         private TextView txtBlackMoveTimer;
         private TextView txtWhiteMoveTimer;

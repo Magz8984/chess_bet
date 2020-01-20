@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import chessbet.services.FCMService;
 
 public class SplashScreen extends AppCompatActivity {
     @BindView (R.id.imageView2) ImageView mLogo;
@@ -75,5 +76,10 @@ public class SplashScreen extends AppCompatActivity {
 
     }
 
-
+    @Override
+    protected void onStart() {
+        FCMService.FCMBackgroundService fcmBackgroundService = new FCMService.FCMBackgroundService(this, getIntent().getExtras());
+        fcmBackgroundService.findDestination();
+        super.onStart();
+    }
 }

@@ -483,6 +483,10 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         this.onMoveDoneListener = onMoveDoneListener;
     }
 
+    /**
+     * Set match parameters
+     * @param matchableAccount user matchable account
+     */
     public void setMatchableAccount(MatchableAccount matchableAccount) {
         // Makes sure to set match api to send and receive moves
         if(matchableAccount != null && matchAPI == null){
