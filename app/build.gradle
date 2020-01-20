@@ -4,6 +4,7 @@ apply plugin: 'io.fabric'
 
 android {
     signingConfigs {
+        // TODO secure creds
         release {
             storeFile file('/home/collins/Documents/Projects/CHESS-BET/chess-bet_docs/admin-docs/key-store.jks')
             keyAlias = 'iconicking_1'
