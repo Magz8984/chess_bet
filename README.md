@@ -44,4 +44,4 @@
 
 #### Features
 
-- Stockfish 10 engine support for game hinting and analysis
+- Stockfish 11 engine support for game hinting and analysis
