@@ -45,3 +45,19 @@
 #### Features
 
 - Stockfish 11 engine support for game hinting and analysis
+
+### Improvement
+- Fix challenge creation
+- Fix initial board setup
+- Push notifications for friendly challenge (FCM)
+- Fix games adapter number format error
+- Replace match evaluation trigger with a http function call
+
+### v1.1.1-beta (Chess MVP)
+
+### Improvements
+
+Android -21 connectivity library incompatibility 
+Fix ECOBuilder end of file error
+Add xhdpi screen support
+
