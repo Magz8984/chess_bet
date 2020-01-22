@@ -4,9 +4,9 @@ import android.content.Context;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public class GameDurationAdapter extends BaseAdapter {
         Button btnTimeDuration = new Button(context);
         btnTimeDuration.setBackground(context.getResources().getDrawable(R.drawable.rounded_button));
         btnTimeDuration.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        btnTimeDuration.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        btnTimeDuration.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         btnTimeDuration.setText(gameDurations.get(position).toString());
 //        btnTimeDuration.setBackgroundColor(context.getResources().getColor(R.color.white));
         btnTimeDuration.setTextColor(context.getResources().getColor(R.color.colorPrimary));

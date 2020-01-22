@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -638,6 +639,8 @@ private FirebaseUser user;
             assert drawable != null;
             drawable.clearColorFilter();
 
+            drawable.setColorFilter(Color.TRANSPARENT, PorterDuff.Mode.DST_OVER);
+
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(35, 35);
 
             imageView.setLayoutParams(params);
@@ -645,7 +648,6 @@ private FirebaseUser user;
             imageView.invalidate();
 
             if (piece.getPieceAlliance().equals(Alliance.BLACK)) {
-//                GameTimer.get().stopAllTimers();
                 blackPieces.addView(imageView);
             } else if (piece.getPieceAlliance().equals(Alliance.WHITE)) {
                 whitePieces.addView(imageView);
