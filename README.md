@@ -57,7 +57,7 @@
 
 ### Improvements
 
-Android -21 connectivity library incompatibility 
-Fix ECOBuilder end of file error
-Add xhdpi screen support
+- Android -21 connectivity library incompatibility 
+- Fix ECOBuilder end of file error
+- Add xhdpi screen support
 
