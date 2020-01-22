@@ -215,9 +215,6 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             while (moveCursor < importMoveLog.getMoves().size()){
                 try {
                     size = boardView.getMoveLog().size();
-                    if(size == importMoveLog.size()){
-                        boardView.requestHint();
-                    }
                     internalStockFishHandler.askStockFishMove(FenUtilities.createFEN(boardView.getChessBoard()), 1000, 20);
                     Thread.sleep(1000);
                     Move move = importMoveLog.getMoves().get(moveCursor);
