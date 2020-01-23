@@ -31,6 +31,7 @@ public class ChallengeAPI {
     private static String CHALLENGE_COLLECTION = "challenges";
     private ChallengeHandler challengeHandler;
     private Challenge currentChallenge = null;
+    private boolean notify = true;
     private User lastChallengedUser;
     private DocumentReference currentChallengeReference;
     private Challenge challenge;
@@ -42,7 +43,7 @@ public class ChallengeAPI {
     private FirebaseFirestore db;
     private FirebaseUser user;
     private int referenceCounter = 0;
-    private String currentChallengeId = null;
+    private String currentChallengeId = "";
     private List<DocumentReference> availableMatches = new ArrayList<>();
     private ChallengeAPI(){
         db = FirebaseFirestore.getInstance();
@@ -70,6 +71,14 @@ public class ChallengeAPI {
 
     public void setChallengeHandler(ChallengeHandler challengeHandler) {
         this.challengeHandler = challengeHandler;
+    }
+
+    public boolean isNotify() {
+        return notify;
+    }
+
+    public void setNotify(boolean notify) {
+        this.notify = notify;
     }
 
     private void sendChallenge(Challenge challenge){
@@ -237,8 +246,17 @@ public class ChallengeAPI {
      */
     public void deleteChallenge(){
         if(currentChallenge != null && currentChallenge.getOwner().equals(AccountAPI.get().getCurrentAccount().getOwner())){
-            db.collection(CHALLENGE_COLLECTION).document(currentChallengeId).delete().addOnFailureListener(Crashlytics::logException);
+            db.collection(CHALLENGE_COLLECTION).document(currentChallengeId).delete()
+                    .addOnSuccessListener(aVoid -> {
+                        currentChallenge = null;
+                        currentChallengeId = null;
+                    })
+                    .addOnFailureListener(Crashlytics::logException);
         }
+    }
+
+    public String getCurrentChallengeId() {
+        return currentChallengeId;
     }
 
     public void getChallenge(){

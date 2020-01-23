@@ -3,23 +3,14 @@ apply plugin: 'io.fabric'
 
 
 android {
-    signingConfigs {
-        // TODO secure creds
-        release {
-            storeFile file('/home/collins/Documents/Projects/CHESS-BET/chess-bet_docs/admin-docs/key-store.jks')
-            keyAlias = 'iconicking_1'
-            storePassword 'chessislife10077'
-            keyPassword 'chessislife10078'
-        }
-    }
     compileSdkVersion 29
     defaultConfig {
         multiDexEnabled true
         applicationId "chessbet.app.com"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.1.1-beta"
+        versionCode 2
+        versionName "1.1.3-beta"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             ndkBuild {

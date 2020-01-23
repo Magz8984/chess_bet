@@ -53,11 +53,12 @@
 - Fix games adapter number format error
 - Replace match evaluation trigger with a http function call
 
-### v1.1.1-beta (Chess MVP)
+### v1.1.3-beta (Chess MVP)
 
 ### Improvements
 
 - Android -21 connectivity library incompatibility 
 - Fix ECOBuilder end of file error
 - Add xhdpi screen support
-
+- Fix challenge messages.
+- Enable one challenge notification on app start up.

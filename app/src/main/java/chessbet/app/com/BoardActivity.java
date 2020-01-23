@@ -1,5 +1,6 @@
 package chessbet.app.com;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -50,6 +51,7 @@ import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
 import chessbet.app.com.fragments.EvaluateGame;
 import chessbet.domain.Account;
+import chessbet.domain.Challenge;
 import chessbet.domain.Constants;
 import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchStatus;
@@ -252,6 +254,7 @@ private FirebaseUser user;
             challengeProgressDialog.show();
             boardView.setEnabled(false);
             ChallengeTaker challengeTaker = new ChallengeTaker(challengeId);
+            challengeProgressDialog.show();
             if(!isChallenger){
                 ChallengeAPI.get().sendChallengeNotification(challengeId, challenger); // Send notification to the challenger
                 ChallengeAPI.get().setChallengeByAccount(challenger, challengeId, new ChallengeAPI.ChallengeSent() {
@@ -577,7 +580,7 @@ private FirebaseUser user;
             storeGameOnCloud();
             // Stop service
             this.stopService(new Intent(this, MatchService.class));
-            GameTimer.get().stopAllTimers();
+            this.stopGameTimers();
 
             // Listens for an elo update
             AccountAPI.get().listenToAccountUpdate();
@@ -613,6 +616,8 @@ private FirebaseUser user;
             // End Game
             // Deletes challenge when the game ends
             ChallengeAPI.get().deleteChallenge();
+            ChallengeAPI.get().setNotify(true);
+
             AccountAPI.get().getAccount();
 //            goToMainActivity();
             MatchAPI.get().removeCurrentMatch();
@@ -809,13 +814,23 @@ private FirebaseUser user;
         PresenceAPI.get().stopListening();
         storeGameOnCloud();
         ChallengeAPI.get().deleteChallenge(); // Delete current challenge
+        ChallengeAPI.get().setNotify(true);
         isGameFinished = true; // Flag Game Has Ended
         evaluateGame = new EvaluateGame();
-        GameTimer.get().stopAllTimers();
+        this.stopGameTimers();
         AccountAPI.get().listenToAccountUpdate();
         evaluateGame.setInitialPoints(AccountAPI.get().getCurrentAccount().getElo_rating());
         evaluateGame.setMatchStatus(matchStatus);
         evaluateGame.show(getSupportFragmentManager(), "EvaluateGame");
+    }
+
+    /**
+     * Ensure we do not get null pointers when stopping timers
+      */
+    private void stopGameTimers(){
+        if(GameTimer.get() != null) {
+            GameTimer.get().stopAllTimers();
+        }
     }
 
     @Override

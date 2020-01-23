@@ -34,7 +34,7 @@ public class AccountAPI {
     private AccountListener accountListener;
     private UserListener userListener;
     private PuzzleListener puzzleListener;
-    public static String ACCOUNT_COLLECTION = "accounts";
+    static String ACCOUNT_COLLECTION = "accounts";
     private static String OWNER_FIELD= "owner";
     private static String TAG = AccountAPI.class.getSimpleName();
     private static AccountAPI INSTANCE = new AccountAPI();
