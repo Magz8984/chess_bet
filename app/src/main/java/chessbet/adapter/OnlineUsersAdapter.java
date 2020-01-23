@@ -55,12 +55,12 @@ public class OnlineUsersAdapter extends FirebaseRecyclerAdapter<User, OnlineUser
 
         holder.getBtnChallenge().setOnClickListener(view -> {
             holder.getBtnChallenge().setEnabled(false); // Disable button
-            Toast.makeText(context, "Sending a challenge  " + user.getUser_name(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Sending a challenge to " + user.getUser_name(), Toast.LENGTH_LONG).show();
             if(!ChallengeAPI.get().isCurrentChallengeValid()){
-                holder.getBtnChallenge().setEnabled(true);
                 ChallengeAPI.get().challengeAccount(user.getUid(), new ChallengeAPI.ChallengeSent() {
                     @Override
                     public void onChallengeSent() {
+                        holder.getBtnChallenge().setEnabled(true);
                         MatchAPI.get().setMatchCreated(true);
                         MatchAPI.get().getAccount(); // Listener for challenge acceptance
                         ChallengeAPI.get().setLastChallengedUser(user);
@@ -69,6 +69,7 @@ public class OnlineUsersAdapter extends FirebaseRecyclerAdapter<User, OnlineUser
 
                     @Override
                     public void onChallengeNotSent() {
+                        holder.getBtnChallenge().setEnabled(true);
                         Toast.makeText(context, "Challenge not sent", Toast.LENGTH_LONG).show();
                     }
                 });

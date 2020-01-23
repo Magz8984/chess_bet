@@ -1,11 +1,10 @@
-[![Build Status](https://travis-ci.com/Magz8984/chess-bet.svg?token=1t1EwrDpq3sLA8yRH7Ea&branch=master)](https://travis-ci.com/Magz8984/chess-bet)
+[![Build Status](https://travis-ci.com/Magz8984/chess-bet.svg?token=1t1EwrDpq3sLA8yRH7Ea&branch=test_env)](https://travis-ci.com/Magz8984/chess-bet)
 
-## Master Environment
-
+## Test Environment
 
 ## Releases 
 
-### v1.0 (Chess MVP)
+### v1.0-beta (Chess MVP)
 
 
 #### Features
@@ -22,7 +21,7 @@
 - Puzzle creation v1 by users.
 - Challenge creation on line play if no challenge was found in the process
 - Challenge acceptance based on metrics such as the game duration min and max elo expected, time etc.
- -Profile image change functionality.
+- Profile image change functionality.
 - User profile  management (change password, change user name and change email)
 - Play AI engine at depth 2 plays at an average rating of 850 (Not bad). Depth 2 is less costly for the algorithm since it evaluates millions of positions while using the standard board evaluator for output
 - Game storage locally on .pgn files.
@@ -40,3 +39,26 @@
 - Send email verification message on sign up.
 - Forgot password feature.
 - Play versus online users
+
+### v1.1-beta (Chess MVP)
+
+#### Features
+
+- Stockfish 11 engine support for game hinting and analysis
+
+### Improvement
+- Fix challenge creation
+- Fix initial board setup
+- Push notifications for friendly challenge (FCM)
+- Fix games adapter number format error
+- Replace match evaluation trigger with a http function call
+
+### v1.1.3-beta (Chess MVP)
+
+### Improvements
+
+- Android -21 connectivity library incompatibility 
+- Fix ECOBuilder end of file error
+- Add xhdpi screen support
+- Fix challenge messages.
+- Enable one challenge notification on app start up.

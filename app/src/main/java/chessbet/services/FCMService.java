@@ -171,6 +171,12 @@ public class FCMService extends FirebaseMessagingService  implements  AccountAPI
 
 
     private void createChallengeNotification(Challenge challenge){
+        // Make sure we do not display two notifications for the same challenge
+        if(!ChallengeAPI.get().isNotify()){
+            return;
+        }
+
+        ChallengeAPI.get().setNotify(false);
         String channel_id;
         Intent intent = new Intent(this, BoardActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

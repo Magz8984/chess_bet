@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -251,6 +252,7 @@ private FirebaseUser user;
             challengeProgressDialog.show();
             boardView.setEnabled(false);
             ChallengeTaker challengeTaker = new ChallengeTaker(challengeId);
+            challengeProgressDialog.show();
             if(!isChallenger){
                 ChallengeAPI.get().sendChallengeNotification(challengeId, challenger); // Send notification to the challenger
                 ChallengeAPI.get().setChallengeByAccount(challenger, challengeId, new ChallengeAPI.ChallengeSent() {
@@ -576,7 +578,7 @@ private FirebaseUser user;
             storeGameOnCloud();
             // Stop service
             this.stopService(new Intent(this, MatchService.class));
-            GameTimer.get().stopAllTimers();
+            this.stopGameTimers();
 
             // Listens for an elo update
             AccountAPI.get().listenToAccountUpdate();
@@ -612,6 +614,8 @@ private FirebaseUser user;
             // End Game
             // Deletes challenge when the game ends
             ChallengeAPI.get().deleteChallenge();
+            ChallengeAPI.get().setNotify(true);
+
             AccountAPI.get().getAccount();
 //            goToMainActivity();
             MatchAPI.get().removeCurrentMatch();
@@ -638,6 +642,8 @@ private FirebaseUser user;
             assert drawable != null;
             drawable.clearColorFilter();
 
+            drawable.setColorFilter(Color.TRANSPARENT, PorterDuff.Mode.DST_OVER);
+
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(35, 35);
 
             imageView.setLayoutParams(params);
@@ -645,7 +651,6 @@ private FirebaseUser user;
             imageView.invalidate();
 
             if (piece.getPieceAlliance().equals(Alliance.BLACK)) {
-//                GameTimer.get().stopAllTimers();
                 blackPieces.addView(imageView);
             } else if (piece.getPieceAlliance().equals(Alliance.WHITE)) {
                 whitePieces.addView(imageView);
@@ -807,13 +812,23 @@ private FirebaseUser user;
         PresenceAPI.get().stopListening();
         storeGameOnCloud();
         ChallengeAPI.get().deleteChallenge(); // Delete current challenge
+        ChallengeAPI.get().setNotify(true);
         isGameFinished = true; // Flag Game Has Ended
         evaluateGame = new EvaluateGame();
-        GameTimer.get().stopAllTimers();
+        this.stopGameTimers();
         AccountAPI.get().listenToAccountUpdate();
         evaluateGame.setInitialPoints(AccountAPI.get().getCurrentAccount().getElo_rating());
         evaluateGame.setMatchStatus(matchStatus);
         evaluateGame.show(getSupportFragmentManager(), "EvaluateGame");
+    }
+
+    /**
+     * Ensure we do not get null pointers when stopping timers
+      */
+    private void stopGameTimers(){
+        if(GameTimer.get() != null) {
+            GameTimer.get().stopAllTimers();
+        }
     }
 
     @Override

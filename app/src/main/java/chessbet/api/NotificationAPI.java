@@ -3,11 +3,11 @@ package chessbet.api;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.firebase.database.annotations.NotNull;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 
 
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Objects;

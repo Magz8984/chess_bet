@@ -6,7 +6,7 @@ package chessbet.utils;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.jetbrains.annotations.NotNull;
+import com.google.firebase.database.annotations.NotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
