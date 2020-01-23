@@ -1,6 +1,5 @@
 package chessbet.app.com;
 
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -51,7 +50,6 @@ import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
 import chessbet.app.com.fragments.EvaluateGame;
 import chessbet.domain.Account;
-import chessbet.domain.Challenge;
 import chessbet.domain.Constants;
 import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchStatus;
