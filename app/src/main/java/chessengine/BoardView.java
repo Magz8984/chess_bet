@@ -204,6 +204,16 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         }
     }
 
+    /**
+     * Removes all flags for cells to be highlighted
+     * @see Cell#handleTouch()
+     */
+    protected void clearTiles(){
+        destinationTile = null;
+        sourceTile = null;
+        movedPiece = null;
+    }
+
     @Override
     public boolean onTouchEvent(final MotionEvent event) {
         performClick();
@@ -531,6 +541,12 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
             final Move move = Move.MoveFactory.createMove(chessBoard,remoteMove.getFrom(),remoteMove.getTo());
             final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
             if(transition.getMoveStatus().isDone()){
+
+                if(move.isCheckMateMove()){
+                    move.setCheckMateMove(true);
+                } else if (move.isCheckMove()) {
+                    move.setCheckMove(true);
+                }
                 moveLog.addMove(move);
 
                 // Listen for book moves from opponent

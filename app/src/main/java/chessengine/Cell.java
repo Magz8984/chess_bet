@@ -67,8 +67,8 @@ public class Cell extends View {
                     .getIdentifier( name.toLowerCase(),"drawable", context.getPackageName()));
         }
 
-        else{
-            drawable=this.context.getResources().getDrawable(R.drawable.select);
+        else {
+            drawable = this.context.getResources().getDrawable(R.drawable.select);
             drawable.setAlpha(0);
         }
 
@@ -99,7 +99,7 @@ public class Cell extends View {
 
     public void handleTouch() {
             if(boardView.destinationTile != null){
-                boardView.destinationTile = null;
+                boardView.clearTiles();
             }
 
             if(boardView.sourceTile == null){
@@ -187,9 +187,9 @@ public class Cell extends View {
                         boardView.engine.execute(boardView.chessBoard);
                     }
                     updateGameStatus();
+                } else {
+                    boardView.clearTiles();
                 }
-                boardView.sourceTile = null;
-                boardView.movedPiece = null;
                 boardView.invalidate();
             }
     }
