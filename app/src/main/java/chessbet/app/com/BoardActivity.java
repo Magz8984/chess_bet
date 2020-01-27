@@ -1,11 +1,13 @@
 package chessbet.app.com;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -34,9 +36,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.Objects;
 import butterknife.BindView;
@@ -76,6 +81,7 @@ import chessengine.ECOBook;
 import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
+import chessengine.PGNHolder;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 
@@ -154,6 +160,7 @@ private FirebaseUser user;
         GameUtil.initialize(R.raw.chess_move, this);
         Intent intent = getIntent();
 
+        setExternalPlayers();
         configureChallenge(intent);
         String matchType = intent.getStringExtra("match_type");
 
@@ -168,7 +175,7 @@ private FirebaseUser user;
             configureMatch(matchableAccount);
         }
         // Try To Reconstruct
-        String pgn = intent.getStringExtra("pgn");
+        String pgn = intent.getStringExtra(Constants.PGN);
         if (pgn != null) {
             boardView.setMode(BoardView.Modes.GAME_REVIEW);
             isStoredGame = true;
@@ -183,6 +190,19 @@ private FirebaseUser user;
             btnBack.setVisibility(View.INVISIBLE);
             btnForward.setVisibility(View.INVISIBLE);
             boardView.setPuzzle(puzzle);
+        }
+    }
+
+    /**
+     * Get players from external activities or apps
+     */
+    private void setExternalPlayers(){
+        Intent intent = getIntent();
+        String white = intent.getStringExtra(Constants.WHITE);
+        String black = intent.getStringExtra(Constants.BLACK);
+        if(black != null && white != null){
+            txtBlack.setText(black);
+            txtWhite.setText(white);
         }
     }
 
@@ -288,8 +308,10 @@ private FirebaseUser user;
                 Toast.makeText(this, "Feature only available in portrait mode", Toast.LENGTH_LONG).show();
             }
         } else if (v.equals(btnBack)) {
+            boardView.switchHintingOff();
             boardView.undoMove();
         } else if (v.equals(btnForward)) {
+            boardView.switchHintingOff();
             boardView.redoMove();
         } else if (v.equals(btnSave)) {
             if (!isGameFinished && matchableAccount == null && !isStoredGame) { // Enable this for none online games
@@ -687,7 +709,7 @@ private FirebaseUser user;
         }
         isGameFinished = true; // Is game on going is false
         MoveLog moveLog = boardView.getMoveLog();
-        String gameText = PGNMainUtils.writeGameAsPGN(moveLog.convertToEngineMoveLog(), "N/A", "N/A", result);
+        String gameText = PGNMainUtils.writeGameAsPGN(moveLog.convertToEngineMoveLog(), txtWhite.getText().toString(), txtBlack.getText().toString(), result);
         FileOutputStream fileOutputStream = null;
 
         try {

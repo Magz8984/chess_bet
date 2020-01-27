@@ -90,7 +90,7 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     implementation 'com.android.support:cardview-v7:29.0.0'
-    implementation 'com.github.Magz8984:chess-engine-dev:b7e1969835'
+    implementation 'com.github.Magz8984:chess-engine-dev:803f5066fb'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.github.erehmi:countdowntask:1.0.1' // Count Down Timer
     implementation 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar' // Fab Progress Bar

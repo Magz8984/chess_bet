@@ -97,11 +97,11 @@ public class Cell extends View {
         canvas.drawBitmap(bitmap, matrix, squareColor);
     }
 
+    // TODO deconstruct method to atomic methods
     public void handleTouch() {
             if(boardView.destinationTile != null){
                 boardView.clearTiles();
             }
-
             if(boardView.sourceTile == null){
                 boardView.sourceTile = boardView.chessBoard.getTile(tileId);
                 boardView.movedPiece = boardView.sourceTile.getPiece();
@@ -172,6 +172,7 @@ public class Cell extends View {
                         boardView.engine = new BoardView.AI_ENGINE();
                         boardView.engine.setEngineMoveHandler(move1 -> {
                             // Highlight the destination tile
+                            boardView.clearTiles();
                             boardView.destinationTile =  boardView.chessBoard.getTile(move1.getDestinationCoordinate());
 
                             boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(move1).getTransitionBoard();
@@ -182,6 +183,8 @@ public class Cell extends View {
                             GameUtil.playSound();
                             updateGameStatus();
                             boardView.isEngineLoading = false;
+                            boardView.destinationTile = boardView.chessBoard.getTile(move1.getDestinationCoordinate());
+                            boardView.sourceTile = boardView.chessBoard.getTile(move1.getCurrentCoordinate());
                             boardView.invalidate();
                         });
                         boardView.engine.execute(boardView.chessBoard);
@@ -220,15 +223,18 @@ public class Cell extends View {
                         try {
                             // Wait for a second before the next move is made
                             Thread.sleep(1000);
-
+                            boardView.clearTiles();
                             Move nextMove = Move.MoveFactory.createMove(boardView.chessBoard ,boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getFromCoordinate(),
                                     boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getToCoordinate());
                             boardView.destinationTile = boardView.chessBoard.getTile(tileId);
                             boardView.nextPuzzleMove = nextMove;
                             boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(nextMove).getTransitionBoard();
+                            boardView.destinationTile = boardView.chessBoard.getTile(nextMove.getDestinationCoordinate());
+                            boardView.sourceTile = boardView.chessBoard.getTile(nextMove.getCurrentCoordinate());
                             boardView.puzzleMoveCounter++;
                             // Ensure board positions are redone
                             boardView.postInvalidate();
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

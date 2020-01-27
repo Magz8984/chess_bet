@@ -15,7 +15,7 @@ public class Constants {
     public static String FORCE_EVALUATE_MATCH = "/forceEvaluateMatch";
     public static String SEND_FCM_MESSAGE_TO_USERS = "/sendFCMMessage";
     public static String TERMS_OF_SERVICE_URL = "https://chess-mvp.com/#/home/tos";
-    public static String GAMES_CLOUD_REFERENCE = "Games";
+    public static String GAMES_CLOUD_REFERENCE = "games";
     public static String UTILITY_PROFILE = "https://firebasestorage.googleapis.com/v0/b/chessbet-app-com-v1.appspot.com/o/utilities%2Fuser.png" +
             "?alt=media&token=887183ec-e95f-443e-9a12-2ff0ab711b96";
     public static String connectionTesterURL = "https://www.google.com/url?sa=i&source=images&cd=&ved=2ahUKEwipr-" +
@@ -31,7 +31,10 @@ public class Constants {
     public static int RESPONSE_OKAY_FLAG = 200;
     public static String MESSAGE_TYPE  = "messageType";
     public static String FROM_USER = "fromUser";
+    public static String WHITE = "WHITE";
+    public static String BLACK = "BLACK";
     public static String DATA = "data";
+    public static String PGN = "pgn";
 
     public static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 

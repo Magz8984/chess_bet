@@ -209,9 +209,9 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
      * @see Cell#handleTouch()
      */
     protected void clearTiles(){
-        destinationTile = null;
-        sourceTile = null;
-        movedPiece = null;
+            destinationTile = null;
+            sourceTile = null;
+            movedPiece = null;
     }
 
     @Override
@@ -366,6 +366,13 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         isHinting = !isHinting;
         internalStockFishHandler.askStockFishMove(FenUtilities.createFEN(chessBoard), 3000, 3);
         invalidate();
+    }
+
+    /**
+     * Disables hinting
+     */
+    public void switchHintingOff(){
+        isHinting = false;
     }
 
     public boolean isHinting() {
