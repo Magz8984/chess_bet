@@ -473,7 +473,6 @@ private FirebaseUser user;
                 textView.setText(move.toString());
                 textView.setTextColor(Color.WHITE);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-                textView.setOnClickListener(v -> Log.d("MOVE", move.toString()));
                 if (move.getMovedPiece().getPieceAlliance() == Alliance.BLACK) {
                     blackMoves.addView(textView);
 

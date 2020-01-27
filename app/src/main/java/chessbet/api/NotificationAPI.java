@@ -47,7 +47,7 @@ public class NotificationAPI {
             AccountAPI.get().updateUser(user1, new AccountAPI.UserUpdated() {
                 @Override
                 public void onUserUpdate() {
-                    Log.d(NotificationAPI.class.getSimpleName(), "Token Updated " + token);
+                    Log.d(NotificationAPI.class.getSimpleName(), "Token Updated ");
                 }
 
                 @Override

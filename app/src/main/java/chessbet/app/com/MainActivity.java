@@ -350,7 +350,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             map.put("profile_photo_url", uri.toString());
             AccountAPI.get().getUserPath().update(map).addOnCompleteListener(task1 -> {
                 Toast.makeText(MainActivity.this,R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
-                Log.d("Done","Is Done");
                 uploadProfileDialog.dismiss();
                 AccountAPI.get().getUser();
             }).addOnCanceledListener(() -> uploadProfileDialog.dismiss());

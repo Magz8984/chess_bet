@@ -125,7 +125,6 @@ public class PGNHolder {
                 if(pgnHolder.getPgn() == null || pgnHolder.getPgn().length() < 4){
                     pgnHolders.remove(pgnHolder);
                 }
-                Log.d(PGNHolder.class.getSimpleName(), "String : " +  pgnHolder.toString());
             }
         }catch (Exception ex){
             Crashlytics.logException(ex);
