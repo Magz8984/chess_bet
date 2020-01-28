@@ -222,21 +222,14 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
             final int y = (int) event.getY();
             for (int i = 0; i < BoardUtils.NUMBER_OF_TILES; i++) {
                 if(boardCells.get(i).isTouched(x,y) && isEnabled){
-                        if(matchableAccount != null  && chessBoard.getTile(i).isOccupied()){
-                            if(chessBoard.getTile(i).getPiece().getPieceAlliance() == localAlliance){
-                                boardCells.get(i).handleTouch();
-                            }
-                            else if(chessBoard.getTile(i).getPiece().getPieceAlliance() != localAlliance && movedPiece!=null){
-                                // Allows user to take a piece in an online game
-                                boardCells.get(i).handleTouch();
-                            }
-                        }
-                        else if(matchableAccount !=null && !chessBoard.getTile(i).isOccupied()){
+                    if(matchableAccount != null){
+                        if(isMyPly()){
                             boardCells.get(i).handleTouch();
                         }
-                        else {
-                            boardCells.get(i).handleTouch();
-                        }
+                    }
+                    else {
+                        boardCells.get(i).handleTouch();
+                    }
                 }
             }
         }
@@ -548,6 +541,9 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
             final Move move = Move.MoveFactory.createMove(chessBoard,remoteMove.getFrom(),remoteMove.getTo());
             final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
             if(transition.getMoveStatus().isDone()){
+                movedPiece = null;
+                sourceTile = chessBoard.getTile(move.getCurrentCoordinate());
+                destinationTile = chessBoard.getTile(move.getDestinationCoordinate());
 
                 if(move.isCheckMateMove()){
                     move.setCheckMateMove(true);
@@ -561,7 +557,6 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
                 this.ecoBook.startListening();
 
                 moveCursor = moveLog.size();
-                destinationTile = chessBoard.getTile(remoteMove.getTo());
                 GameUtil.playSound();
                 if(gameTimer != null){
                     // Reset time from when the move was made from the other device;

@@ -13,7 +13,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import chessbet.domain.Account;
@@ -235,7 +237,9 @@ public class ChallengeAPI {
         db.collection(CHALLENGE_COLLECTION).document(currentChallengeId).get().addOnCompleteListener(task -> {
             if(task.isSuccessful() && task.getResult() != null){
                 Challenge challenge = task.getResult().toObject(Challenge.class); // Challenge From Account
-                challengeReceived.onChallengeReceived(challenge);
+                if(challenge != null && challenge.getOwner()!= null){
+                    challengeReceived.onChallengeReceived(challenge);
+                }
             }
         });
     }
@@ -308,17 +312,27 @@ public class ChallengeAPI {
     public void acceptChallenge(String challengeId){
         db.collection(CHALLENGE_COLLECTION).document(challengeId).get().addOnCompleteListener(task -> {
             if(task.isSuccessful()){
-                Challenge challenge = Objects.requireNonNull(task.getResult()).toObject(Challenge.class);
+                currentChallenge = Objects.requireNonNull(task.getResult()).toObject(Challenge.class);
                 DocumentReference documentReference = task.getResult().getReference();
-                db.runTransaction(transaction -> {
-                    DocumentSnapshot documentSnapshot = transaction.get(documentReference);
-                    this.currentChallengeId = documentReference.getId();
-                    currentChallenge = challenge;
-                    transaction.update(documentReference, "accepted", true);
-                    transaction.update(documentReference, "requester", AccountAPI.get().getCurrentAccount().getOwner());
-                  return documentSnapshot; // For promise completion
-                }).addOnSuccessListener(documentSnapshot -> hasAcceptedChallenge = true)
-                  .addOnFailureListener(e -> hasAcceptedChallenge = false);
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if(user != null){
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("accepted", true);
+                    map.put("requester", user.getUid());
+                    documentReference.update(map).addOnFailureListener(Crashlytics::logException);
+                }
+
+//                db.runTransaction(transaction -> {
+//                    DocumentSnapshot documentSnapshot = transaction.get(documentReference);
+//                    this.currentChallengeId = documentReference.getId();
+//                    currentChallenge = challenge;
+//                    transaction.update(documentReference, "accepted", true);
+//                    transaction.update(documentReference, "requester", AccountAPI.get().getCurrentAccount().getOwner());
+//                  return documentSnapshot; // For promise completion
+//                }).addOnSuccessListener(documentSnapshot -> hasAcceptedChallenge = true)
+//                  .addOnFailureListener(e -> hasAcceptedChallenge = false);
+            } else {
+                Crashlytics.logException(task.getException());
             }
         });
     }

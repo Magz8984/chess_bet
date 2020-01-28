@@ -7,10 +7,14 @@ import androidx.annotation.NonNull;
 import com.crashlytics.android.Crashlytics;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import chessbet.app.com.BoardActivity;
 
 /**
  * @author Collins 27/01/2020
@@ -90,6 +94,10 @@ public class PGNHolder {
                 String string;
                 int nonInfo = 0;
                 PGNHolder pgnHolder = new PGNHolder();
+                String pgn = sanitizePGNText(reader);
+                Log.d(PGNHolder.class.getSimpleName(), pgn);
+
+                reader = new BufferedReader(new StringReader(pgn));
                 while ((string = reader.readLine()) != null) {
                     if (!string.contains("[")){
                         nonInfo++;
@@ -108,12 +116,12 @@ public class PGNHolder {
                         pgnHolder.getPgnBuilder().append(" ");
                         pgnHolder.getPgnBuilder().append(string);
                         pgnHolder.setPgn(pgnHolder.getPgnBuilder().toString());
+
                     }
                     if(string.endsWith("1-0") ||
                             string.endsWith("0-1") ||
                             string.endsWith("1/2-1/2") ||
                             string.endsWith("*")){
-
                         pgnHolders.add(pgnHolder);
                         pgnHolder = new PGNHolder();
                     }
@@ -130,6 +138,31 @@ public class PGNHolder {
             Crashlytics.logException(ex);
         }
         return pgnHolders;
+    }
+
+    private static String sanitizePGNText(BufferedReader bufferedReader) throws IOException {
+        String string;
+        StringBuilder builder = new StringBuilder();
+        while ((string = bufferedReader.readLine())!= null){
+            builder.append(string);
+            builder.append(System.getProperty("line.separator"));
+        }
+
+        StringBuilder pgnBuilder = new StringBuilder();
+        boolean commentFound = false;
+        for (char c: builder.toString().toCharArray()) {
+            if(c == '{'){
+                commentFound = true;
+            }
+            if(!commentFound){
+                pgnBuilder.append(c);
+            }
+
+            if(c == '}'){
+                commentFound = false;
+            }
+        }
+        return pgnBuilder.toString();
     }
 
     private static String filterPGNString(String string, String flag) {

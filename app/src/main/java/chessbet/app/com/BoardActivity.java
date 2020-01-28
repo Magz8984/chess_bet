@@ -1,13 +1,11 @@
 package chessbet.app.com;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -35,13 +33,9 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.Objects;
 import butterknife.BindView;
@@ -81,7 +75,6 @@ import chessengine.ECOBook;
 import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
-import chessengine.PGNHolder;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 
@@ -605,7 +598,7 @@ private FirebaseUser user;
             AccountAPI.get().listenToAccountUpdate();
 
             evaluateGame = new EvaluateGame(); // Game evaluation fragment
-            evaluateGame.setInitialPoints(AccountAPI.get().getCurrentAccount().getElo_rating());
+
             evaluateGame.setOpponent(MatchAPI.get().getCurrentDatabaseMatch().getOpponentUserName());
 
             if (flag == GameHandler.GAME_DRAWN_FLAG) {
@@ -634,7 +627,13 @@ private FirebaseUser user;
             }
             // End Game
             // Deletes challenge when the game ends
-            ChallengeAPI.get().deleteChallenge();
+            if(AccountAPI.get().getCurrentAccount() != null ) {
+                evaluateGame.setInitialPoints(AccountAPI.get().getCurrentAccount().getElo_rating());
+                ChallengeAPI.get().deleteChallenge();
+            } else {
+                evaluateGame.setInitialPoints(0);
+            }
+
             ChallengeAPI.get().setNotify(true);
 
             AccountAPI.get().getAccount();
@@ -645,7 +644,7 @@ private FirebaseUser user;
     }
 
     private void storeGameOnCloud(){
-        if(matchableAccount != null && boardView.getLocalAlliance().equals(Alliance.WHITE)){
+        if(matchableAccount != null && boardView.getLocalAlliance().equals(Alliance.WHITE) && AccountAPI.get().getCurrentUser() != null){
             MatchAPI.get().storeCurrentMatchOnCloud(PGNMainUtils.writeGameAsPGN(boardView.getMoveLog().convertToEngineMoveLog(),
                     AccountAPI.get().getCurrentUser().getUser_name(),
                     MatchAPI.get().getCurrentDatabaseMatch().getOpponentUserName(), "*"),
@@ -900,10 +899,11 @@ private FirebaseUser user;
         void acceptChallenge(){
             if(AccountAPI.get().getCurrentUser() == null) {
                 AccountAPI.get().getAccount(user.getUid(), account -> {
+                    AccountAPI.get().setCurrentAccount(account);
                     createMatchableAccount(account);
                     AccountAPI.get().setAccountListener(this);
                     AccountAPI.get().getAccount();
-                    AccountAPI.get().getUser();
+                    AccountAPI.get().getUserByUid(account.getOwner());
                 });
             } else {
                 createMatchableAccount(AccountAPI.get().getCurrentAccount());
@@ -927,7 +927,7 @@ private FirebaseUser user;
 
         @Override
         public void onMatchableCreatedNotification() {
-           ChallengeAPI.get().acceptChallenge(challengeId);
+            ChallengeAPI.get().acceptChallenge(challengeId);
         }
 
         @Override
@@ -940,11 +940,13 @@ private FirebaseUser user;
         @Override
         public void onAccountReceived(Account account) {
             // Handle Account Received Logic
+            Log.d(BoardActivity.class.getSimpleName(), "Account Received");
         }
 
         @Override
         public void onUserReceived(User user) {
             // Handle User Received Logic
+            Log.d(BoardActivity.class.getSimpleName(), "User Received");
         }
 
         @Override

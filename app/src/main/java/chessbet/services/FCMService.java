@@ -258,7 +258,7 @@ public class FCMService extends FirebaseMessagingService  implements  AccountAPI
         /**
          * Finds destination activity for notification data
          */
-        public void findDestination(){
+        public boolean foundDestination(){
             if(bundle != null){
                 String messageType = bundle.getString(Constants.MESSAGE_TYPE);
                 if(messageType != null){
@@ -272,9 +272,10 @@ public class FCMService extends FirebaseMessagingService  implements  AccountAPI
                             context.startActivity(intent);
                         });
                     }
+                    return true;
                 }
             }
+            return false;
         }
-
     }
 }
