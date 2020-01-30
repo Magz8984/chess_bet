@@ -14,8 +14,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import chessbet.app.com.BoardActivity;
-
 /**
  * @author Collins 27/01/2020
  */
