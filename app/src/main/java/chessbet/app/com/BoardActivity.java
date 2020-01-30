@@ -900,6 +900,7 @@ private FirebaseUser user;
             if(AccountAPI.get().getCurrentUser() == null) {
                 AccountAPI.get().getAccount(user.getUid(), account -> {
                     AccountAPI.get().setCurrentAccount(account);
+                    AccountAPI.get().setUser(FirebaseAuth.getInstance().getCurrentUser());
                     createMatchableAccount(account);
                     AccountAPI.get().setAccountListener(this);
                     AccountAPI.get().getAccount();

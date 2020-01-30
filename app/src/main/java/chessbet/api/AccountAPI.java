@@ -79,17 +79,21 @@ public class AccountAPI {
     }
 
     public void getUser(){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        assert user != null;
-        db.collection(AccountAPI.USER_COLLECTION).document(user.getUid()).get().addOnCompleteListener(task -> {
-           if(task.isSuccessful()){
-               currentUser = Objects.requireNonNull(task.getResult()).toObject(User.class);
-               accountListener.onUserReceived(currentUser);
-           }
-           else {
-               Log.d(TAG, Objects.requireNonNull(Objects.requireNonNull(task.getException()).getMessage()));
-           }
-        });
+        try {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            assert user != null;
+            db.collection(AccountAPI.USER_COLLECTION).document(user.getUid()).get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    currentUser = Objects.requireNonNull(task.getResult()).toObject(User.class);
+                    accountListener.onUserReceived(currentUser);
+                }
+                else {
+                    Log.d(TAG, Objects.requireNonNull(Objects.requireNonNull(task.getException()).getMessage()));
+                }
+            });
+        }catch (Exception ex){
+            Crashlytics.logException(ex);
+        }
     }
 
     /**
