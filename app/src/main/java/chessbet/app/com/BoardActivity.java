@@ -856,13 +856,13 @@ private FirebaseUser user;
         PresenceAPI.get().getUserOnline(user, this); // Listen to user disconnection
         runOnUiThread(() -> {
             if (boardView.getLocalAlliance().isWhite()) {
-                txtWhite.setText(AccountAPI.get().getCurrentUser().getUser_name());
+                txtWhite.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
                 txtBlack.setText(user.getUser_name());
             }
 
             if(boardView.getLocalAlliance().isBlack())  {
                 txtWhite.setText(user.getUser_name());
-                txtBlack.setText(AccountAPI.get().getCurrentUser().getUser_name());
+                txtBlack.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
             }
         });
     }
