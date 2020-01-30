@@ -62,3 +62,13 @@
 - Add xhdpi screen support
 - Fix challenge messages.
 - Enable one challenge notification on app start up.
+
+### v1.1.4-beta (Chess MVP)
+
+#### Features
+
+- PGN files can be viewed from the app
+
+### Improvements
+- Fix challenge creation process when user is requested for a challenge
+
