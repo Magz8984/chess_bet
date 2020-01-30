@@ -3,6 +3,7 @@ package chessbet.api;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -78,6 +79,8 @@ public class AccountAPI {
     }
 
     public void getUser(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        assert user != null;
         db.collection(AccountAPI.USER_COLLECTION).document(user.getUid()).get().addOnCompleteListener(task -> {
            if(task.isSuccessful()){
                currentUser = Objects.requireNonNull(task.getResult()).toObject(User.class);
@@ -86,6 +89,22 @@ public class AccountAPI {
            else {
                Log.d(TAG, Objects.requireNonNull(Objects.requireNonNull(task.getException()).getMessage()));
            }
+        });
+    }
+
+    /**
+     * Gets the current user by unique identifier
+     * @param uid current user uid
+     */
+    public void getUserByUid(String uid){
+        db.collection(AccountAPI.USER_COLLECTION).document(uid).get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                currentUser = Objects.requireNonNull(task.getResult()).toObject(User.class);
+                accountListener.onUserReceived(currentUser);
+            }
+            else {
+                Log.d(TAG, Objects.requireNonNull(Objects.requireNonNull(task.getException()).getMessage()));
+            }
         });
     }
 
@@ -207,25 +226,35 @@ public class AccountAPI {
         });
     }
 
-    public void listenToAccountUpdate(){
+    private void setListenerRegistration(){
         listenerRegistration = accountReference.addSnapshotListener((documentSnapshot, e) -> {
-           if(e !=null){
-               Crashlytics.logException(e);
-           }
+            if(e !=null){
+                Crashlytics.logException(e);
+            }
 
-           if(documentSnapshot != null && documentSnapshot.exists()){
-               Account account = documentSnapshot.toObject(Account.class);
-               if (account!= null){
-                   if(currentAccount.getElo_rating() != account.getElo_rating()){
-                       listenerRegistration.remove();
-                   }
-                   currentAccount = account;
-                   EventBroadcast.get().broadCastAccountUpdate();
-               }
-
+            if(documentSnapshot != null && documentSnapshot.exists()){
+                Account account = documentSnapshot.toObject(Account.class);
+                if (account!= null){
+                    if(currentAccount.getElo_rating() != account.getElo_rating()){
+                        listenerRegistration.remove();
+                    }
+                    currentAccount = account;
+                    EventBroadcast.get().broadCastAccountUpdate();
+                }
 //               listenerRegistration.remove();
-           }
-       });
+            }
+        });
+    }
+
+    public void listenToAccountUpdate(){
+        if(accountReference == null){
+            getAccountReference(documentReference -> {
+                accountReference = documentReference;
+                setListenerRegistration();
+            });
+        } else {
+            setListenerRegistration();
+        }
     }
 
     /**
@@ -283,12 +312,26 @@ public class AccountAPI {
         return (currentUser != null) && currentUser.getUid().equals(uid);
     }
 
-    public DocumentReference getAccountReference() {
-        return accountReference;
+    private void getAccountReference(GetDocumentReference getDocumentReference) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user != null){
+            db.collection(AccountAPI.ACCOUNT_COLLECTION).whereEqualTo(OWNER_FIELD, user.getUid()).get().addOnCompleteListener(task -> {
+                for(QueryDocumentSnapshot documentSnapshot: Objects.requireNonNull(task.getResult())){
+                    currentAccount = documentSnapshot.toObject(Account.class);
+                    currentAccount.setId(documentSnapshot.getReference().getId());
+                    getDocumentReference.onGetDocumentReference(documentSnapshot.getReference());
+                    EventBroadcast.get().broadCastAccountUpdate();
+                }
+            });
+        }
     }
 
     public interface OnUserReceived {
         void onUserReceived(User user);
+    }
+
+    public void setCurrentAccount(Account currentAccount) {
+        this.currentAccount = currentAccount;
     }
 
     public interface UsersReceived {
@@ -299,6 +342,10 @@ public class AccountAPI {
     public interface UserUpdated{
         void onUserUpdate();
         void onUserUpdateFail(Exception ex);
+    }
+
+    public interface GetDocumentReference{
+        void onGetDocumentReference(DocumentReference documentReference);
     }
 
     /**

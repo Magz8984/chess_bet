@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="chessbet.app.com">
     <!-- adds the INTERNET permission as we need to make network calls. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -24,30 +25,84 @@
         android:roundIcon="@mipmap/icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".GameAnalysisActivity"/>
+        <activity android:name=".PgnViewerActivity"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="*"
+                    android:mimeType="text/plain"
+                    android:pathPattern=".*\\.pgn"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="text/plain"
+                    android:pathPattern=".*\\..*\\.pgn"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="text/plain"
+                    android:pathPattern=".*\\..*\\..*\\.pgn"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="text/plain"
+                    android:pathPattern=".*\\..*\\..*\\..*\\.pgn"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="text/plain"
+                    android:pathPattern=".*\\..*\\..*\\..*\\..*\\.pgn"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="text/plain"
+                    android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.pgn"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="text/plain"
+                    android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.pgn"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="text/plain"
+                    android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.pgn"
+                    android:scheme="file" />
+                <data
+                    android:host="*"
+                    android:mimeType="text/plain"
+                    android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.pgn"
+                    android:scheme="file" />
+            </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="application/x-chess-pgn" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".GameAnalysisActivity" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-6366215233867718~5575140942" />
-
-        <!-- FCM SETUP-->
+            android:value="ca-app-pub-6366215233867718~5575140942" /> <!-- FCM SETUP -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/chesslogo"
-            />
-
+            android:resource="@drawable/chesslogo" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
-
         <meta-data
             android:name="firebase_messaging_auto_init_enabled"
             android:value="false" />
         <meta-data
             android:name="firebase_analytics_collection_enabled"
-            android:value="false" />
-        <!-- FCM SETUP-->
-
+            android:value="false" /> <!-- FCM SETUP -->
         <activity android:name=".SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -60,21 +115,20 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".ResetPasswordActivity" />
-        <activity android:name=".BoardActivity" />
-        <activity android:name=".PresenceActivity"/>
+        <activity android:name=".BoardActivity"/>
+        <activity android:name=".PresenceActivity" />
 
         <service
             android:name="chessbet.services.MatchService"
             android:icon="@drawable/chesslogo"
             android:label="@string/match_service" />
-
-        <service android:name="chessbet.services.FCMService"
+        <service
+            android:name="chessbet.services.FCMService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
     </application>
 
 </manifest>

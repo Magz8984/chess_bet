@@ -33,7 +33,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -154,6 +153,7 @@ private FirebaseUser user;
         GameUtil.initialize(R.raw.chess_move, this);
         Intent intent = getIntent();
 
+        setExternalPlayers();
         configureChallenge(intent);
         String matchType = intent.getStringExtra("match_type");
 
@@ -168,7 +168,7 @@ private FirebaseUser user;
             configureMatch(matchableAccount);
         }
         // Try To Reconstruct
-        String pgn = intent.getStringExtra("pgn");
+        String pgn = intent.getStringExtra(Constants.PGN);
         if (pgn != null) {
             boardView.setMode(BoardView.Modes.GAME_REVIEW);
             isStoredGame = true;
@@ -183,6 +183,19 @@ private FirebaseUser user;
             btnBack.setVisibility(View.INVISIBLE);
             btnForward.setVisibility(View.INVISIBLE);
             boardView.setPuzzle(puzzle);
+        }
+    }
+
+    /**
+     * Get players from external activities or apps
+     */
+    private void setExternalPlayers(){
+        Intent intent = getIntent();
+        String white = intent.getStringExtra(Constants.WHITE);
+        String black = intent.getStringExtra(Constants.BLACK);
+        if(black != null && white != null){
+            txtBlack.setText(black);
+            txtWhite.setText(white);
         }
     }
 
@@ -288,8 +301,10 @@ private FirebaseUser user;
                 Toast.makeText(this, "Feature only available in portrait mode", Toast.LENGTH_LONG).show();
             }
         } else if (v.equals(btnBack)) {
+            boardView.switchHintingOff();
             boardView.undoMove();
         } else if (v.equals(btnForward)) {
+            boardView.switchHintingOff();
             boardView.redoMove();
         } else if (v.equals(btnSave)) {
             if (!isGameFinished && matchableAccount == null && !isStoredGame) { // Enable this for none online games
@@ -451,7 +466,6 @@ private FirebaseUser user;
                 textView.setText(move.toString());
                 textView.setTextColor(Color.WHITE);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-                textView.setOnClickListener(v -> Log.d("MOVE", move.toString()));
                 if (move.getMovedPiece().getPieceAlliance() == Alliance.BLACK) {
                     blackMoves.addView(textView);
 
@@ -584,7 +598,7 @@ private FirebaseUser user;
             AccountAPI.get().listenToAccountUpdate();
 
             evaluateGame = new EvaluateGame(); // Game evaluation fragment
-            evaluateGame.setInitialPoints(AccountAPI.get().getCurrentAccount().getElo_rating());
+
             evaluateGame.setOpponent(MatchAPI.get().getCurrentDatabaseMatch().getOpponentUserName());
 
             if (flag == GameHandler.GAME_DRAWN_FLAG) {
@@ -613,7 +627,13 @@ private FirebaseUser user;
             }
             // End Game
             // Deletes challenge when the game ends
-            ChallengeAPI.get().deleteChallenge();
+            if(AccountAPI.get().getCurrentAccount() != null ) {
+                evaluateGame.setInitialPoints(AccountAPI.get().getCurrentAccount().getElo_rating());
+                ChallengeAPI.get().deleteChallenge();
+            } else {
+                evaluateGame.setInitialPoints(0);
+            }
+
             ChallengeAPI.get().setNotify(true);
 
             AccountAPI.get().getAccount();
@@ -624,7 +644,7 @@ private FirebaseUser user;
     }
 
     private void storeGameOnCloud(){
-        if(matchableAccount != null && boardView.getLocalAlliance().equals(Alliance.WHITE)){
+        if(matchableAccount != null && boardView.getLocalAlliance().equals(Alliance.WHITE) && AccountAPI.get().getCurrentUser() != null){
             MatchAPI.get().storeCurrentMatchOnCloud(PGNMainUtils.writeGameAsPGN(boardView.getMoveLog().convertToEngineMoveLog(),
                     AccountAPI.get().getCurrentUser().getUser_name(),
                     MatchAPI.get().getCurrentDatabaseMatch().getOpponentUserName(), "*"),
@@ -687,7 +707,7 @@ private FirebaseUser user;
         }
         isGameFinished = true; // Is game on going is false
         MoveLog moveLog = boardView.getMoveLog();
-        String gameText = PGNMainUtils.writeGameAsPGN(moveLog.convertToEngineMoveLog(), "N/A", "N/A", result);
+        String gameText = PGNMainUtils.writeGameAsPGN(moveLog.convertToEngineMoveLog(), txtWhite.getText().toString(), txtBlack.getText().toString(), result);
         FileOutputStream fileOutputStream = null;
 
         try {
@@ -879,10 +899,11 @@ private FirebaseUser user;
         void acceptChallenge(){
             if(AccountAPI.get().getCurrentUser() == null) {
                 AccountAPI.get().getAccount(user.getUid(), account -> {
+                    AccountAPI.get().setCurrentAccount(account);
                     createMatchableAccount(account);
                     AccountAPI.get().setAccountListener(this);
                     AccountAPI.get().getAccount();
-                    AccountAPI.get().getUser();
+                    AccountAPI.get().getUserByUid(account.getOwner());
                 });
             } else {
                 createMatchableAccount(AccountAPI.get().getCurrentAccount());
@@ -906,7 +927,7 @@ private FirebaseUser user;
 
         @Override
         public void onMatchableCreatedNotification() {
-           ChallengeAPI.get().acceptChallenge(challengeId);
+            ChallengeAPI.get().acceptChallenge(challengeId);
         }
 
         @Override
@@ -919,11 +940,13 @@ private FirebaseUser user;
         @Override
         public void onAccountReceived(Account account) {
             // Handle Account Received Logic
+            Log.d(BoardActivity.class.getSimpleName(), "Account Received");
         }
 
         @Override
         public void onUserReceived(User user) {
             // Handle User Received Logic
+            Log.d(BoardActivity.class.getSimpleName(), "User Received");
         }
 
         @Override

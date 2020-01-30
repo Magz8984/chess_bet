@@ -10,11 +10,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SwitchPreferenceCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Objects;
 
+import chessbet.api.ChallengeAPI;
 import chessbet.app.com.LoginActivity;
 import chessbet.app.com.R;
 
@@ -46,6 +48,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 auth.sendPasswordResetEmail(Objects.requireNonNull(auth.getCurrentUser().getEmail())).addOnCompleteListener(task -> {
                     Toast.makeText(getContext(), "Password Reset Email Has Been Sent", Toast.LENGTH_LONG).show();
                 });
+            }
+        } else if (preference.getKey().equals("notifications")){
+            SwitchPreferenceCompat preferenceCompat = (SwitchPreferenceCompat) preference;
+            if(preferenceCompat.isChecked()){
+                ChallengeAPI.get().setNotify(true);
+            } else {
+                ChallengeAPI.get().setNotify(false);
             }
         }
         return true;

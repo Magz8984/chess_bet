@@ -7,8 +7,9 @@
         app:iconSpaceReserved="false">
 
         <SwitchPreferenceCompat
+            app:defaultValue="true"
             app:key="notifications"
-            app:title="Enable message notifications"
+            app:title="Enable Challenge Notifications"
             app:iconSpaceReserved="false"/>
 
     </PreferenceCategory>

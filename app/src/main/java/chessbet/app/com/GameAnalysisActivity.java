@@ -128,7 +128,6 @@ public class GameAnalysisActivity extends AppCompatActivity implements
     }
     @Override
     public void onEngineResponse(String response) {
-        Log.d(GameAnalysisActivity.class.getSimpleName(), response);
         runOnUiThread(() -> {
             // Ensure the first score is plot on graph
             if(size == boardView.getMoveLog().size()){
@@ -180,7 +179,6 @@ public class GameAnalysisActivity extends AppCompatActivity implements
         int indexOfCP = segments.indexOf("cp");
         try {
             int result = Integer.parseInt(segments.get(indexOfCP + 1));
-            Log.d(GameAnalysisActivity.class.getSimpleName(), result + " " + boardView.getFen());
             return result/100f; // Get Integer
         } catch (Exception ex) {
             ex.printStackTrace();
