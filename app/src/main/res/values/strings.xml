@@ -92,5 +92,6 @@
     <string name="online_users">Online Users</string>
     <string name="default_notification_channel_id">10077</string>
     <string name="accepting_challenge">Accepting Challenge</string>
+    <string name="login_google">Login With Google Account</string>
     <string name="pgn_viewer">Chess MVP PGN Viewer</string>
 </resources>
