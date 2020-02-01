@@ -206,21 +206,18 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     @Override
     public void challengeSent(String id) {
         findMatch.setEnabled(true);
-        Toast.makeText(getContext(), "Challenge sent " + id, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void challengeFound(String id) {
         progressCircle.beginFinalAnimation();
-        Toast.makeText(getContext(), "Challenge found " + id, Toast.LENGTH_LONG).show();
         progressCircle.hide();
     }
 
     @Override
     public void challengeNotFound() {
         findMatch.setEnabled(true);
-        Toast.makeText(getContext(), "Challenge Not Found", Toast.LENGTH_LONG).show();
-        ChallengeAPI.get().deleteSendChallenge(challenge);
+        ChallengeAPI.get().sendChallenge(challenge);
         Log.d("Challenge Found", "Nope");
     }
 }

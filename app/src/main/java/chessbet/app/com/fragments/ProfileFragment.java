@@ -100,12 +100,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
 
     private void updatePassword(){
         if(Util.textViewHasText(txtNewPassword) && Util.textViewHasText(txtOldPassword)){
+            String newPassword = txtNewPassword.getText().toString().trim();
             progressBar.setVisibility(View.VISIBLE);
             firebaseUser.reauthenticate(EmailAuthProvider.getCredential(Objects.requireNonNull(firebaseUser.getEmail()),
                     txtOldPassword.getText().toString())).addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     // Update password only after task is successful
-                    firebaseUser.updatePassword(txtNewPassword.getText().toString()).addOnCompleteListener(task1 -> {
+                    firebaseUser.updatePassword(newPassword).addOnCompleteListener(task1 -> {
                         if(task1.isSuccessful()){
                             Toast.makeText(getContext(), "Successfully updated password", Toast.LENGTH_LONG).show();
                         } else {
@@ -122,10 +123,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
 
     private void updateUserName(){
         if(Util.textViewHasText(txtNewUsername)){
+            String userName = txtNewUsername.getText().toString().trim();
             progressBar.setVisibility(View.VISIBLE);
             UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
-            builder.setDisplayName(txtNewUsername.getText().toString());
-            AccountAPI.get().getCurrentUser().setUser_name(txtNewUsername.getText().toString());
+            builder.setDisplayName(userName);
+            AccountAPI.get().getCurrentUser().setUser_name(userName);
             firebaseUser.updateProfile(builder.build()).addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     AccountAPI.get().updateUser();
@@ -139,12 +141,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
 
     private void updateEmailAddress(){
         if(Util.textViewHasText(txtNewEmail)){
+            String emailAddress = txtNewEmail.getText().toString().trim();
             progressBar.setVisibility(View.VISIBLE);
             firebaseUser.updateEmail(txtNewEmail.getText().toString()).addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
-                    AccountAPI.get().getCurrentUser().setEmail(txtNewEmail.getText().toString());
+                    AccountAPI.get().getCurrentUser().setEmail(emailAddress);
                     AccountAPI.get().updateUser();
-                    txtEmail.setText(txtNewEmail.getText().toString());
+                    txtEmail.setText(emailAddress);
                     EventBroadcast.get().broadcastUserUpdate();
                     Toast.makeText(getContext(),"Email successfully changed", Toast.LENGTH_SHORT).show();
                     // Send email verification once new email has been set

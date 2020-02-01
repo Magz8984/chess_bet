@@ -110,6 +110,7 @@ private ConnectivityManager connectivityManager;
 private boolean isGameFinished = false;
 private boolean isStoredGame = false;
 private EvaluateGame evaluateGame;
+private boolean isSavedState; // Checks if activity has been stopped
 private GameHandler.NoMoveReactor noMoveReactor;
 private boolean isActiveConnectionFlag = false;
 private ProgressDialog challengeProgressDialog;
@@ -392,6 +393,7 @@ private FirebaseUser user;
         super.onSaveInstanceState(outState);
         try {
             runOnUiThread(() -> {
+                isSavedState = true;
                 outState.putBoolean("gameFinished", isGameFinished);
                 outState.putBoolean("isStoredGame", isStoredGame);
                 outState.putString("matchString", boardView.getPortableGameNotation());
@@ -405,6 +407,9 @@ private FirebaseUser user;
     private void goToMainActivity(){
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PresenceAPI.get().stopListening();
+        this.stopGameTimers();
+        this.stopNoMoveReactor();
         startActivity(intent);
         finish();
     }
@@ -593,6 +598,7 @@ private FirebaseUser user;
             // Stop service
             this.stopService(new Intent(this, MatchService.class));
             this.stopGameTimers();
+            this.noMoveReactor.stopTimer();
 
             // Listens for an elo update
             AccountAPI.get().listenToAccountUpdate();
@@ -648,7 +654,7 @@ private FirebaseUser user;
             MatchAPI.get().storeCurrentMatchOnCloud(PGNMainUtils.writeGameAsPGN(boardView.getMoveLog().convertToEngineMoveLog(),
                     AccountAPI.get().getCurrentUser().getUser_name(),
                     MatchAPI.get().getCurrentDatabaseMatch().getOpponentUserName(), "*"),
-                    taskSnapshot -> Log.d(BoardActivity.class.getSimpleName(), "DatabaseMatch Uploaded"));
+                    taskSnapshot -> Log.d(BoardActivity.class.getSimpleName(), "Match Uploaded"));
         }
     }
 
@@ -697,6 +703,12 @@ private FirebaseUser user;
         if(remoteMove.isLastEventDisconnected()){
             Toasty.warning(this,R.string.opponent_disconnected, Toasty.LENGTH_LONG).show();
             noMoveReactor.setOpponentDisconnected(true);
+        }
+    }
+
+    public void stopNoMoveReactor(){
+        if(this.noMoveReactor != null){
+            this.noMoveReactor.stopTimer();
         }
     }
 
@@ -808,6 +820,7 @@ private FirebaseUser user;
     private void notifyGoodInternetConnection() {
         if (matchableAccount != null) {
             boardView.setEnabled(true);
+            sendOnlineEvent();
             if(noMoveReactor != null){
                 noMoveReactor.setDisconnected(false);
             }
@@ -827,6 +840,7 @@ private FirebaseUser user;
     @Override
     public void onMatchEnd(MatchStatus matchStatus) {
         // Stop service
+        this.noMoveReactor.stopTimer();
         this.stopService(new Intent(this, MatchService.class));
         MatchAPI.get().setMatchCreated(false);
         PresenceAPI.get().stopListening();
@@ -839,7 +853,9 @@ private FirebaseUser user;
         AccountAPI.get().listenToAccountUpdate();
         evaluateGame.setInitialPoints(AccountAPI.get().getCurrentAccount().getElo_rating());
         evaluateGame.setMatchStatus(matchStatus);
-        evaluateGame.show(getSupportFragmentManager(), "EvaluateGame");
+        if(!isSavedState){
+            evaluateGame.show(getSupportFragmentManager(), "EvaluateGame");
+        }
     }
 
     /**
@@ -872,6 +888,17 @@ private FirebaseUser user;
         RemoteMove.get().addEvent(MatchEvent.DISCONNECTED);
         RemoteMove.get().setOwner(matchableAccount.getOwner());
         RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
+    }
+
+    /**
+     * If user was disconnected notify opponent user is back online
+     */
+    private void sendOnlineEvent(){
+        if(RemoteMove.get().isLastEventDisconnected()){
+            RemoteMove.get().addEvent(MatchEvent.ONLINE);
+            RemoteMove.get().setOwner(matchableAccount.getOwner());
+            RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
+        }
     }
 
     @Override
@@ -933,7 +960,7 @@ private FirebaseUser user;
 
         @Override
         public void onMatchError() {
-            Crashlytics.logException(new RuntimeException("DatabaseMatch could was not created for "
+            Crashlytics.logException(new RuntimeException("Match could was not created for "
                     + AccountAPI.get().getCurrentUser().getUid()
                     + " " + new Date().toString()));
         }

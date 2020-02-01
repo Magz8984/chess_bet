@@ -14,6 +14,7 @@ public enum MatchEvent {
     FINISHED{
         @NonNull
         @Override
+
         public String toString() {
             return "FINISHED";
         }
@@ -34,13 +35,20 @@ public enum MatchEvent {
     TIMER_LAPSED {
         @Override
         public String toString() {
-            return "TIMER LAPSED";
+            return "TIMER_LAPSED";
         }
     },
     DISCONNECTED{
         @Override
         public String toString() {
             return "DISCONNECTED";
+        }
+    },
+    ONLINE{
+        @NonNull
+        @Override
+        public String toString() {
+            return "ONLINE";
         }
     },
     NO_EVENT{

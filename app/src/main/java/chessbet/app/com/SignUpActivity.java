@@ -64,6 +64,7 @@ public class SignUpActivity extends AppCompatActivity {
             //create user
             auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(SignUpActivity.this, task -> {
+                        btnSignUp.setEnabled(true);
                         Toast.makeText(SignUpActivity.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.GONE);
                         // If sign in fails, display a message to the user. If sign in succeeds
@@ -72,7 +73,6 @@ public class SignUpActivity extends AppCompatActivity {
                         if (!task.isSuccessful()) {
                             Toast.makeText(SignUpActivity.this, "Authentication failed." + task.getException(), Toast.LENGTH_SHORT).show();
                         } else {
-                            btnSignUp.setEnabled(true);
                             sendUserVerificationEmail(auth.getCurrentUser());
                         }
                     });

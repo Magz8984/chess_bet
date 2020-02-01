@@ -83,7 +83,7 @@ public class ChallengeAPI {
         this.notify = notify;
     }
 
-    private void sendChallenge(Challenge challenge){
+    public void sendChallenge(Challenge challenge){
         db.collection(CHALLENGE_COLLECTION).add(challenge).addOnCompleteListener(task -> {
             if(task.isSuccessful()){
                 if(task.getResult() != null){
@@ -118,7 +118,7 @@ public class ChallengeAPI {
                 Challenge challenge = createFriendChallenge();
                 currentChallenge = challenge;
                 // Delete all challenges
-                deleteAllChallenges(() -> db.collection(CHALLENGE_COLLECTION).add(challenge).addOnCompleteListener(task -> {
+                db.collection(CHALLENGE_COLLECTION).add(challenge).addOnCompleteListener(task -> {
                     if (task.isComplete()) {
                         challenge.setId(Objects.requireNonNull(task.getResult()).getId());
                         currentChallengeReference = task.getResult();
@@ -128,7 +128,7 @@ public class ChallengeAPI {
                     } else {
                         challengeSent.onChallengeNotSent();
                     }
-                }));
+                });
             }
 
             @Override
@@ -180,9 +180,6 @@ public class ChallengeAPI {
         MatchAPI.get().createUserMatchableAccountImplementation(matchableAccount);
     }
 
-    public DocumentReference getCurrentChallengeReference() {
-        return currentChallengeReference;
-    }
 
     /**
      * @param accountOwner Account Owner UID
@@ -208,11 +205,10 @@ public class ChallengeAPI {
                 if((selectedAccount != null && (selectedAccount.getCurrent_challenge_timestamp() < (time - Constants.MAX_MATCHING_DURATION) ||
                         (selectedAccount.getCurrent_challenge_timestamp() <= 0)))){ // Timer lapsed or no challenge found
                     if(challengeId != null){ // Make sure we don't send nulls
-                        sendChallengeNotification(challengeId, account.getOwner());
                         selectedAccount.setCurrent_challenge_id(challengeId);
                         selectedAccount.setCurrent_challenge_timestamp(System.currentTimeMillis());
-                        // Update account with current challenge data
-                        AccountAPI.get().updateAccount(selectedAccount);
+                        transaction.set(accountRef, selectedAccount);
+                        sendChallengeNotification(challengeId, account.getOwner()); // Send notification after correct challenge notification
                         challengeSent.onChallengeSent();
                     } else {
                         challengeSent.onChallengeNotSent();
@@ -400,15 +396,7 @@ public class ChallengeAPI {
         void onChallengeDeleted();
     }
 
-    public interface ChallengeAccepted {
-        void onChallengeAccepted(MatchableAccount matchableAccount);
-    }
-
-    public User getLastChallengedUser() {
-        return lastChallengedUser;
-    }
-
-    public void deleteAllChallenges(DeleteChallenge deleteChallange){
+    public void deleteAllChallenges(DeleteChallenge deleteChallenge){
         user = FirebaseAuth.getInstance().getCurrentUser();
         if(user != null){
             db.collection(CHALLENGE_COLLECTION).whereEqualTo("owner", user.getUid()).get().addOnCompleteListener(task -> {
@@ -421,7 +409,7 @@ public class ChallengeAPI {
                        });
                    }
                 }
-                deleteChallange.onChallengeDeleted();
+                deleteChallenge.onChallengeDeleted();
                 isLoaded = true;
             });
         }

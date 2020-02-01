@@ -22,6 +22,8 @@ public class GameDurationAdapter extends BaseAdapter {
     public GameDurationAdapter(Context context){
         this.context = context;
         gameDurations = new ArrayList<>();
+        gameDurations.add(GameTimer.GameDuration.ONE_MINUTE);
+        gameDurations.add(GameTimer.GameDuration.FIVE_MINUTES);
         gameDurations.add(GameTimer.GameDuration.TEN_MINUTES);
         gameDurations.add(GameTimer.GameDuration.FIFTEEN_MINUTES);
         gameDurations.add(GameTimer.GameDuration.TWENTY_MINUTES);

@@ -52,7 +52,6 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
                .into(holder.getImageView());
 
        holder.getTxtUserName().setText(users.get(position).getUser_name());
-       holder.getTxtEmail().setText(users.get(position).getEmail());
 
        // Make sure you cannot challenge yourself
         if(users.get(position).getUid().equals(AccountAPI.get().getCurrentUser().getUid())){
@@ -98,13 +97,11 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
     class ViewHolder extends RecyclerView.ViewHolder{
         private TextView txtUserName;
         private ImageView imageView;
-        private TextView txtEmail;
         private Button btnChallenge;
         private ViewHolder(@NonNull View itemView) {
             super(itemView);
             txtUserName = itemView.findViewById(R.id.txtUserName);
             imageView = itemView.findViewById(R.id.imgProfilePic);
-            txtEmail = itemView.findViewById(R.id.txtEmail);
             btnChallenge = itemView.findViewById(R.id.btnChallenge);
         }
 
@@ -114,10 +111,6 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
 
         TextView getTxtUserName() {
             return txtUserName;
-        }
-
-        TextView getTxtEmail() {
-            return txtEmail;
         }
 
         Button getBtnChallenge() {
