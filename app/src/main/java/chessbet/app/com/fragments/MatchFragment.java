@@ -159,6 +159,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     @Override
     public void onMatchMade(MatchableAccount matchableAccount) {
         try {
+            ChallengeAPI.get().setOnChallenge(true);
             AccountAPI.get().getCurrentAccount().setLast_match_duration(0);
             progressCircle.beginFinalAnimation();
             Objects.requireNonNull(getContext()).startService(new Intent(getContext(), MatchService.class));

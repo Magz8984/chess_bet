@@ -86,6 +86,7 @@
             app:fontFamily="@font/josefinslabsemibold"/>
 
         <RelativeLayout
+            android:id="@+id/btnLoginGoogle"
             android:paddingRight="10dp"
             android:paddingLeft="10dp"
             android:background="@drawable/rounded_button"

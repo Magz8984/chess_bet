@@ -165,7 +165,7 @@ private FirebaseUser user;
         }
 
         matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
-        if (matchableAccount != null) {
+        if (matchableAccount != null && ChallengeAPI.get().isOnChallenge()) {
             configureMatch(matchableAccount);
         }
         // Try To Reconstruct
@@ -594,6 +594,7 @@ private FirebaseUser user;
             if(boardView.getMatchAPI().isRecentMatchEvaluated()){
                 return;
             }
+            ChallengeAPI.get().setOnChallenge(false);
             storeGameOnCloud();
             // Stop service
             this.stopService(new Intent(this, MatchService.class));
@@ -841,6 +842,7 @@ private FirebaseUser user;
     public void onMatchEnd(MatchStatus matchStatus) {
         // Stop service
         this.noMoveReactor.stopTimer();
+        ChallengeAPI.get().setOnChallenge(false);
         this.stopService(new Intent(this, MatchService.class));
         MatchAPI.get().setMatchCreated(false);
         PresenceAPI.get().stopListening();
