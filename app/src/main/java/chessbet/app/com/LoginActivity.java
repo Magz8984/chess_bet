@@ -26,13 +26,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import java.util.List;
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import chessbet.api.AccountAPI;
-import chessbet.domain.User;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
     @BindView(R.id.btnLoginGoogle) RelativeLayout btnLoginGoogle;
@@ -129,8 +126,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onStart() {
         super.onStart();
-//        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-//        goToMainActivity(account);
     }
 
     @Override
@@ -141,9 +136,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 authenticateWithGoogle(Objects.requireNonNull(account));
-                Toast.makeText(this, "Welcome " + Objects.requireNonNull(account).getDisplayName(), Toast.LENGTH_LONG).show();
             } catch (ApiException e) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
                 e.printStackTrace();
                 Crashlytics.logException(e);
             }
@@ -152,7 +145,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
     private void authenticateWithGoogle(GoogleSignInAccount account){
-        Toast.makeText(this, account.getId(), Toast.LENGTH_LONG).show();
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener(this, task -> {
             if(task.isSuccessful()){
@@ -166,7 +158,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void goToMainActivity(GoogleSignInAccount account){
         if(account != null){
             Log.d(LoginActivity.class.getSimpleName(), Objects.requireNonNull(account.getId()));
-            Toast.makeText(this, account.getId(), Toast.LENGTH_LONG).show();
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
         }
