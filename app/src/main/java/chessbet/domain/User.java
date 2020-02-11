@@ -5,8 +5,12 @@ public class User {
     private String date_modified;
     private boolean disabled;
     private String email;
-    private String ui;
+    private String uid;
+    private String user_name;
     private String profile_photo_url;
+    private long lastSeen;
+    private String fcmToken = "";
+    private boolean online;
 
     public String getDate_created() {
         return date_created;
@@ -20,8 +24,16 @@ public class User {
         return email;
     }
 
-    public String getUi() {
-        return ui;
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUser_name(String userName) {
+        this.user_name = userName;
+    }
+
+    public String getUser_name() {
+        return user_name;
     }
 
     public boolean isDisabled() {
@@ -44,16 +56,41 @@ public class User {
         this.email = email;
     }
 
-    public void setUi(String ui) {
-        this.ui = ui;
+    public void setUid(String ui) {
+        this.uid = ui;
     }
+
 
     public void setProfile_photo_url(String profile_photo_url) {
         this.profile_photo_url = profile_photo_url;
     }
 
     public String getProfile_photo_url() {
-        return profile_photo_url;
+        return (profile_photo_url == null) ? Constants.UTILITY_PROFILE : profile_photo_url;
+    }
+
+    public void setLastSeen(long lastSeen) {
+        this.lastSeen = lastSeen;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public long getLastSeen() {
+        return lastSeen;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
+    public String getFcmToken() {
+        return fcmToken;
     }
 }
 

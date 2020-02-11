@@ -1,6 +1,8 @@
 package chessbet.app.com.fragments;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -34,13 +36,21 @@ private  int trigger = 1;
         white.setOnClickListener(this);
         black.setTextColor(Color.WHITE);
         white.setTextColor(Color.BLACK);
-        black.setBackgroundColor(boardPreference.getDark());
-        white.setBackgroundColor(boardPreference.getWhite());
         initColorPicker();
         return  view;
     }
 
     private void initColorPicker(){
+        // Close dialog on orientation to landscape
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            dismiss();
+        }
+
+        if(getActivity() != null){
+            boardPreference = new BoardPreference(getActivity().getPreferences(Context.MODE_PRIVATE));
+            black.setBackgroundColor(boardPreference.getDark());
+            white.setBackgroundColor(boardPreference.getWhite());
+        }
         colorPickerView.addOnColorChangedListener(i -> {
             if(trigger == 1){
                 black.setBackgroundColor(i);

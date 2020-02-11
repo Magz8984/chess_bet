@@ -7,19 +7,19 @@ public class MatchResult {
     private String loss;
     private String pgnText;
 
-    public void setGain(String gain) {
+    private void setGain(String gain) {
         this.gain = gain;
     }
 
-    public void setLoss(String loss) {
+    private void setLoss(String loss) {
         this.loss = loss;
     }
 
-    public void setMatchId(String matchId) {
+    private void setMatchId(String matchId) {
         this.matchId = matchId;
     }
 
-    public void setMatchStatus(MatchStatus matchStatus) {
+    private void setMatchStatus(MatchStatus matchStatus) {
         this.matchStatus = matchStatus;
     }
 
@@ -39,11 +39,48 @@ public class MatchResult {
         return loss;
     }
 
-    public void setPgnText(String pgnText) {
+    private void setPgnText(String pgnText) {
         this.pgnText = pgnText;
     }
 
     public String getPgnText() {
         return pgnText;
+    }
+
+    public static class Builder{
+        private MatchResult matchResult;
+
+        Builder(){
+            matchResult = new MatchResult();
+        }
+
+        Builder setMatchId(String matchId){
+            matchResult.setMatchId(matchId);
+            return this;
+        }
+
+        Builder setMatchStatus(MatchStatus matchStatus){
+            matchResult.setMatchStatus(matchStatus);
+            return this;
+        }
+
+        Builder setGain(String gain){
+            matchResult.setGain(gain);
+            return this;
+        }
+
+        Builder setLoss(String loss){
+            matchResult.setLoss(loss);
+            return this;
+        }
+
+        Builder setPgnText(String pgn){
+            matchResult.setPgnText(pgn);
+            return this;
+        }
+
+        public MatchResult build(){
+            return matchResult;
+        }
     }
 }

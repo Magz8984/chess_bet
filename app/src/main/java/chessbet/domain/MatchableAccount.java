@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import chessbet.app.com.MainActivity;
 import chessbet.utils.DatabaseUtil;
+import chessbet.utils.GameHandler;
 import chessbet.utils.GameManager;
 
 public class MatchableAccount implements Parcelable {
@@ -19,8 +21,10 @@ public class MatchableAccount implements Parcelable {
     private boolean matchable;
     private boolean matched;
     private boolean online;
+    private long duration; // Used by game timer in board view
     private String opponent;
     private String owner;
+    private String opponentId;
 
     public MatchableAccount(Parcel in) {
         elo_rating = in.readInt();
@@ -29,8 +33,10 @@ public class MatchableAccount implements Parcelable {
         matchable = in.readByte() != 0;
         matched = in.readByte() != 0;
         online = in.readByte() != 0;
+        duration = in.readLong();
         opponent = in.readString();
         owner = in.readString();
+        opponentId = in.readString();
     }
 
     public MatchableAccount(){
@@ -76,8 +82,20 @@ public class MatchableAccount implements Parcelable {
         this.opponent = opponent;
     }
 
+    public void setOpponentId(String opponentId) {
+        this.opponentId = opponentId;
+    }
+
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public void setDuration(long duration) {
+        this.duration = duration;
+    }
+
+    public String getOpponentId() {
+        return opponentId;
     }
 
     public int getElo_rating() {
@@ -104,6 +122,10 @@ public class MatchableAccount implements Parcelable {
         return owner;
     }
 
+    public long getDuration() {
+        return duration;
+    }
+
     public boolean isMatchable(){
         return matchable;
     }
@@ -125,8 +147,10 @@ public class MatchableAccount implements Parcelable {
         dest.writeByte((byte) (matchable ? 1 : 0));
         dest.writeByte((byte) (matched ? 1 : 0));
         dest.writeByte((byte) (online ? 1 : 0));
+        dest.writeLong(duration);
         dest.writeString(opponent);
         dest.writeString(owner);
+        dest.writeString(opponentId);
     }
 
     public String getSelf() {
@@ -144,15 +168,31 @@ public class MatchableAccount implements Parcelable {
         matchableAccount.setElo_rating(jsonObject.getInt("elo_rating"));
         matchableAccount.setMatchable(jsonObject.getBoolean("matchable"));
         matchableAccount.setMatched(jsonObject.getBoolean("matched"));
+        matchableAccount.setDuration(jsonObject.getLong("duration"));
+        matchableAccount.setOpponentId(jsonObject.getString("opponentId"));
         return matchableAccount;
     }
 
     public void endMatch(Context context){
-        DatabaseUtil.getAccount(this.owner).removeValue();
+        DatabaseUtil.getAccount(this.owner).removeValue(); // Remove matchable account
         // Remove match from rdb
         GameManager.delayedTask(() -> DatabaseUtil.getMatch(this.matchId).removeValue().addOnSuccessListener(aVoid -> {
             Intent intent=new Intent(context, MainActivity.class);
             context.startActivity(intent);
         }), 3000);
+    }
+
+    // TODO Shift to Database Match API
+    public void endMatch(String pgn, int flag, MatchStatus matchStatus, String gain, String loss){
+        GameHandler.getInstance().resetInstance();
+        MatchResult matchResult = new MatchResult.Builder()
+                .setMatchId(this.getMatchId())
+                .setMatchStatus(matchStatus)
+                .setPgnText(pgn)
+                .setGain(gain)
+                .setLoss(loss)
+                .build();
+        GameHandler.getInstance().setMatchResult(matchResult);
+        GameHandler.getInstance().execute(flag);
     }
 }

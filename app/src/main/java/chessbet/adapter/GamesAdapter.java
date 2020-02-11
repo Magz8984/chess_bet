@@ -24,6 +24,7 @@ import java.util.Scanner;
 
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.R;
+import chessbet.domain.Constants;
 import chessbet.utils.GameManager;
 
 public class GamesAdapter extends RecyclerView.Adapter<ViewHolder>{
@@ -44,7 +45,7 @@ public class GamesAdapter extends RecyclerView.Adapter<ViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String time = files.get(position).getName().replace(GameManager.GAME_FILE_NAME + "_","").replace(".pgn", "");
+        String time = Constants.GetDigitsFromString(files.get(position).getName());
         holder.getTxtName().setText(GameManager.GAME_FILE_NAME);
         long mills = Long.parseLong(time);
         Date date = new Date(mills);

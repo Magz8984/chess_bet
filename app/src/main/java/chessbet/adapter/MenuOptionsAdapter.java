@@ -8,11 +8,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import chessbet.app.com.BoardActivity;
+import chessbet.app.com.PresenceActivity;
 import chessbet.app.com.R;
 import chessbet.domain.MatchType;
 
@@ -48,22 +50,19 @@ public class MenuOptionsAdapter extends BaseAdapter {
         strings.add("Single Player");
 
         // Watch Game
-        listeners.add(v -> {
-            
-        });
+        listeners.add(view -> Toast.makeText(context, context.getResources().getString(R.string.feature_unavailable), Toast.LENGTH_LONG).show());
         drawables.add(R.drawable.eye);
         strings.add("Watch");
 
-        // Bet Online
-        listeners.add(v->{
-            Intent intent=new Intent(context, BoardActivity.class);
-            intent.putExtra("match_type", MatchType.BET_ONLINE.toString());
-            context.startActivity(intent);
+        listeners.add(view -> {
+           Intent intent = new  Intent(context, PresenceActivity.class);
+           context.startActivity(intent);
         });
-        drawables.add(R.drawable.bet_online);
-        strings.add("Bet Online");
-
+        drawables.add(R.drawable.wifi_four_bar);
+        strings.add(context.getResources().getString(R.string.online_users));
     }
+
+
     @Override
     public int getCount() {
         return listeners.size();

@@ -1,0 +1,35 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:layout_gravity="center"
+    android:background="@drawable/homebg"
+    tools:context=".MainActivity">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:layout_centerInParent="true"
+        tools:layout_editor_absoluteX="0sp"
+        tools:layout_editor_absoluteY="0sp">
+
+
+        <GridView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/menuItems"
+            android:columnWidth="100sp"
+            android:numColumns="auto_fit"
+            android:verticalSpacing="10sp"
+            android:horizontalSpacing="15sp"
+            android:stretchMode="columnWidth"
+            android:layout_gravity="center"
+            android:gravity="center">
+
+        </GridView>
+    </LinearLayout>
+</RelativeLayout>

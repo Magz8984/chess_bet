@@ -30,9 +30,12 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -45,18 +48,26 @@ import java.util.Map;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.api.AccountAPI;
+import chessbet.api.ChallengeAPI;
+import chessbet.api.NotificationAPI;
+import chessbet.api.PresenceAPI;
 import chessbet.app.com.fragments.GamesFragment;
 import chessbet.app.com.fragments.MainFragment;
 import chessbet.app.com.fragments.MatchFragment;
+import chessbet.app.com.fragments.PlayFriendFragment;
 import chessbet.app.com.fragments.ProfileFragment;
+import chessbet.app.com.fragments.PuzzleFragment;
 import chessbet.app.com.fragments.SettingsFragment;
+import chessbet.app.com.fragments.TermsOfService;
 import chessbet.domain.Account;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
 import chessbet.utils.EventBroadcast;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountListener, View.OnClickListener, EventBroadcast.UserUpdate {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+        AccountListener, View.OnClickListener, EventBroadcast.UserUpdate, EventBroadcast.AccountUpdated ,
+        ChallengeAPI.DeleteChallenge, PresenceAPI.UserOnline, NotificationAPI.TokenRetrieved {
     private ProgressDialog uploadProfileDialog;
     private StorageReference storageReference;
     private FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
@@ -85,13 +96,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         txtRating = navigationView.getHeaderView(0).findViewById(R.id.rating);
         profileImage = navigationView.getHeaderView(0).findViewById(R.id.profile_photo);
         profileImage.setOnClickListener(this);
+
+        FirebaseFirestore.setLoggingEnabled(true); // Set up logging
+        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+
+
         AccountAPI.get().setUser(FirebaseAuth.getInstance().getCurrentUser());
         AccountAPI.get().setAccountListener(this);
-        AccountAPI.get().getAccount();
         AccountAPI.get().getUser();
+        AccountAPI.get().getAccount();
+
+        ChallengeAPI.get().deleteAllChallenges(this); // Delete previously created challenges;
+
+        EventBroadcast.get().addAccountUpdated(this);
 
         navigationView.setNavigationItemSelectedListener(this);
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,R.string.open,R.string.close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
@@ -103,6 +122,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         EventBroadcast.get().addUserUpdateObserver(this);
         initializeCrashReporter();
+
+        // Initialize Mobile Ads SDK
+        MobileAds.initialize(this, BuildConfig.AD_MOB_APP_ID);
+//        MobileAds.initialize(this, initializationStatus -> Log.d(MainActivity.class.getSimpleName(), "Mobile Ads SDK Initialized"));
     }
 
     private void initializeCrashReporter(){
@@ -125,6 +148,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStart(){
         super.onStart();
+        // Resets this flags to enable challenge acceptance
+        ChallengeAPI.get().setChallengeAccepted(false);
+        ChallengeAPI.get().setHasAcceptedChallenge(false);
+    }
+
+    @Override
+    protected void onDestroy() {
+        PresenceAPI.get().stopListening();
+        super.onDestroy();
     }
 
     @Override
@@ -132,46 +164,60 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onStop();
     }
 
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.itm_play_chess :
                 toolbar.setTitle(getString(R.string.app_name));
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MainFragment())
-                        .addToBackStack(getString(R.string.app_name))
-                        .commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MainFragment()).commit();
                 break;
             case R.id.itm_play_online:
-                // TODO Remove peice of logic from UI.
+                // TODO Remove piece of logic from UI.
                 if(AccountAPI.get().getCurrentAccount() != null){
-                    toolbar.setTitle(getString(R.string.play_online));
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment())
-                            .addToBackStack(getString(R.string.play_online))
-                            .commit();
+                    if(ChallengeAPI.get().isLoaded()){
+                        toolbar.setTitle(getString(R.string.play_online));
+                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment()).commit();
+                    } else {
+                        Toast.makeText(this, "Challenges Loading", Toast.LENGTH_LONG).show();
+                    }
                 }
                 break;
             case R.id.itm_profile:
                 toolbar.setTitle(getString(R.string.profile));
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment())
-                        .addToBackStack(getString(R.string.profile))
-                        .commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ProfileFragment()).commit();
                 break;
             case R.id.itm_account_settings:
                 toolbar.setTitle(getString(R.string.settings));
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment())
-                        .addToBackStack(getString(R.string.settings))
-                        .commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragment()).commit();
 
                 break;
             case R.id.itm_terms:
-                Toast.makeText(this, "Accept Terms", Toast.LENGTH_LONG).show();
+                if(AccountAPI.get().getCurrentAccount() != null) {
+                    if(!AccountAPI.get().getCurrentAccount().isTermsOfServiceAccepted()){
+                        Toast.makeText(this, "Accept Terms", Toast.LENGTH_LONG).show();
+                        TermsOfService termsOfService = new TermsOfService();
+                        termsOfService.show(getSupportFragmentManager(), "Terms Of Service");
+                    } else {
+                        Toast.makeText(this, "Terms Of Service Already Accepted", Toast.LENGTH_LONG).show();
+                    }
+                }
                 break;
             case R.id.games:
                 toolbar.setTitle(getString(R.string.games));
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new GamesFragment())
-                        .addToBackStack(getString(R.string.games))
-                        .commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new GamesFragment()).commit();
+                break;
+            case R.id.puzzles:
+                toolbar.setTitle("Puzzles");
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PuzzleFragment()).commit();
+                break;
+            case R.id.itm_play_friend:
+                if(ChallengeAPI.get().isLoaded()){
+                    toolbar.setTitle(getString(R.string.play_friend));
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PlayFriendFragment()).commit();
+                } else {
+                    Toast.makeText(this, "Challenges Loading", Toast.LENGTH_LONG).show();
+
+                }
                 break;
         }
         return true;
@@ -184,16 +230,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onUserReceived(User user) {
+        NotificationAPI.get().getNotificationToken(this); // Get Instance Token
         if( user != null){
+            PresenceAPI.get().setUser(user);
+            PresenceAPI.get().getAmOnline(this);
             if(user.getProfile_photo_url() != null){
                 try {
                     Glide.with(this).asBitmap().load(user.getProfile_photo_url()).into(profileImage);
                 }catch (Exception ex) {
-                    Log.d(this.getClass().getSimpleName(), ex.getMessage());
+                    Crashlytics.logException(ex);
                 }
             }
             txtEmail.setText(user.getEmail());
             EventBroadcast.get().broadcastUserLoaded();
+        }
+    }
+
+    @Override
+    public void onAccountUpdated(boolean status) {
+        if(status){
+            Toast.makeText(this, "Account Updated", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Account Not Updated", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -228,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         }catch (Exception e){
-            Log.e("FILE ERROR",e.getMessage());
+            Crashlytics.logException(e);
         }
     }
 
@@ -282,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         storageReference = firebaseStorage.getReference(FirebaseAuth.getInstance().getUid() + "/" + "profile_photo");
         uploadProfilePhotoTask(bitmap).addOnFailureListener(e -> {
             uploadProfileDialog.dismiss();
-            Log.d("Upload",e.getMessage());
+            Crashlytics.logException(e);
         });
 
         uploadProfilePhotoTask(bitmap).addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnCompleteListener(task -> {
@@ -290,9 +348,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Map<String,Object> map = new HashMap<>();
             assert uri != null;
             map.put("profile_photo_url", uri.toString());
-            AccountAPI.get().getUserPath().update(map).addOnCompleteListener(task2 -> {
+            AccountAPI.get().getUserPath().update(map).addOnCompleteListener(task1 -> {
                 Toast.makeText(MainActivity.this,R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
-                Log.d("Done","Is Done");
                 uploadProfileDialog.dismiss();
                 AccountAPI.get().getUser();
             }).addOnCanceledListener(() -> uploadProfileDialog.dismiss());
@@ -302,6 +359,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onFirebaseUserUpdate(FirebaseUser user) {
         txtUserName.setText(user.getDisplayName());
+        txtEmail.setText(user.getEmail());
+    }
+
+    @Override
+    public void onAccountUpdated(final Account account) {
+        runOnUiThread(() -> txtRating.setText(getResources().getString(R.string.rating, account.getElo_rating())));
+    }
+
+    @Override
+    public void onChallengeDeleted() {
+        Log.d(MainActivity.class.getSimpleName(), "All challenges deleted");
+    }
+
+    @Override
+    public void onNotificationTokenReceived(String token) {
+        User user = AccountAPI.get().getCurrentUser();
+        if(!user.getFcmToken().equals(token)){
+            NotificationAPI.get().updateUserToken(token, user);
+        }
+    }
+
+    @Override
+    public void onNotificationTokenErrorReceived(Exception e) {
+        Crashlytics.logException(e);
+    }
+
+    /**
+     * Checking user is online
+     * @param user the user being listened to
+     * @param isOnline boolean value
+     */
+    @Override
+    public void onUserOnline(User user, boolean isOnline) {
+        Log.d(MainActivity.class.getSimpleName(), "User Online " + isOnline);
     }
 }
 

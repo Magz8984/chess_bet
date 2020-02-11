@@ -7,6 +7,14 @@
     android:padding="0dp"
     android:background="#262626">
 
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgConnectionStatus"
+        android:layout_alignParentRight="true"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentEnd="true">
+    </de.hdodenhof.circleimageview.CircleImageView>
+
     <LinearLayout
         android:id="@+id/chessBoard"
         android:layout_width="wrap_content"
@@ -46,13 +54,6 @@
             android:textColor="#fff"
             />
 
-        <TextView
-            android:id="@+id/txtCountDown"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5sp"
-            android:textColor="@color/white" />
-
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
@@ -78,6 +79,17 @@
                         android:text="Black"
                         android:textColor="#fff"
                         android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/blackTimer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textColor="@color/colorPrimaryYellow"
+                        android:layout_marginLeft="@dimen/fab_margin"
+                        android:layout_marginStart="@dimen/fab_margin"
+                        android:fontFamily="@font/chakrapetchbold"
+                        />
 
                     <TextView
                         android:id="@+id/txtBlackStatus"
@@ -140,6 +152,17 @@
                         android:fontFamily="@font/chakrapetchbold"/>
 
                     <TextView
+                        android:id="@+id/whiteTimer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textColor="@color/colorPrimaryYellow"
+                        android:layout_marginLeft="@dimen/fab_margin"
+                        android:layout_marginStart="@dimen/fab_margin"
+                        android:fontFamily="@font/chakrapetchbold"
+                        />
+
+                    <TextView
                         android:id="@+id/txtWhiteStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -185,6 +208,27 @@
         android:layout_alignParentBottom="true">
 
         <Button
+            android:id="@+id/btnAnalysis"
+            android:background="@drawable/trend"
+            android:layout_margin="5dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp" />
+
+        <Button
+            android:id="@+id/btnHint"
+            android:background="@drawable/hint"
+            android:layout_margin="5dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp" />
+
+        <Button
+            android:id="@+id/btnRecord"
+            android:background="@drawable/record_game"
+            android:layout_margin="5dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp" />
+
+        <Button
             android:id="@+id/btnSave"
             android:layout_width="35dp"
             android:layout_height="35dp"
@@ -200,11 +244,13 @@
             android:layout_margin="5dp"/>
 
         <Button
+            android:visibility="gone"
             android:id="@+id/btnColorPicker"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:background="@drawable/img_change_board_color"
             android:layout_margin="5dp"/>
+
         <Button
             android:id="@+id/btnBack"
             android:layout_width="35dp"

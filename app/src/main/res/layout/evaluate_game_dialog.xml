@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="@color/white"
+    android:layout_height="wrap_content">
+
+        <customviews.EvalView
+            android:id="@+id/evalView"
+            android:layout_width="match_parent"
+            android:layout_height="180dp" />
+
+        <com.google.android.gms.ads.formats.UnifiedNativeAdView
+            android:id="@+id/addView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/ad_app_icon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp" />
+
+                    <TextView
+                        android:textSize="15sp"
+                        android:fontFamily="@font/chakrapetchbold"
+                        android:id="@+id/ad_headline"
+                        android:layout_margin="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:fontFamily="@font/chakrapetchbold"
+                        android:textAlignment="center"
+                        android:gravity="center"
+                        android:textColor="@color/black"
+                        android:id="@+id/ad_advertiser"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLength="50"
+                        android:textSize="14sp"/>
+
+                    <RatingBar
+                        android:id="@+id/ad_stars"
+                        android:stepSize="0.5"
+                        android:numStars="5"
+                        android:isIndicator="true"
+                        android:layout_gravity="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:textSize="12sp"
+                        android:id="@+id/ad_body"
+                        android:layout_margin="10dp"
+                        android:maxLength="45"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <com.google.android.gms.ads.formats.MediaView
+                        android:id="@+id/ad_media"
+                        android:layout_margin="0dp"
+                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="175dp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:padding="5dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:textSize="14sp"
+                        android:fontFamily="@font/chakrapetchbold"
+                        android:id="@+id/ad_price"
+                        android:padding="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:textSize="14sp"
+                        android:fontFamily="@font/chakrapetchbold"
+                        android:id="@+id/ad_store"
+                        android:padding="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <Button
+                        android:textSize="14sp"
+                        android:fontFamily="@font/chakrapetchbold"
+                        android:id="@+id/ad_call_to_action"
+                        android:padding="2sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.gms.ads.formats.UnifiedNativeAdView>
+</LinearLayout>

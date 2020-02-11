@@ -6,9 +6,10 @@
     android:layout_height="wrap_content">
 
     <com.flask.colorpicker.ColorPickerView
+        android:layout_centerHorizontal="true"
         android:id="@+id/colorPicker"
-        android:layout_width="match_parent"
-        android:layout_height="400sp"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
         app:alphaSlider="true"
         app:density="12"
         app:lightnessSlider="true"

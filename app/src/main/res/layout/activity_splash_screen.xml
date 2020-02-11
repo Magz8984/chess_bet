@@ -46,11 +46,20 @@
                 android:textAlignment="center"
                 android:textColor="@color/colorWhite"
                 android:textSize="16sp"
-                app:fontFamily="@font/reeniebeanie"/>
-
+                app:fontFamily="@font/chakrapetchbold"/>
         </LinearLayout>
     </LinearLayout>
 
+    <TextView
+        android:layout_margin="5dp"
+        android:text="@string/company"
+        android:fontFamily="@font/monotonregular"
+        android:textColor="@color/colorPrimaryYellow"
+        android:textSize="22sp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 
 </RelativeLayout>

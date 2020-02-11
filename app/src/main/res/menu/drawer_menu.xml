@@ -14,7 +14,7 @@
         <item
             android:id="@+id/itm_play_online"
             android:icon="@drawable/online"
-            android:title="Play Online"
+            android:title="Online Chess"
             />
 
         <item
@@ -22,6 +22,11 @@
             android:title="@string/games"
             android:icon="@drawable/games"
             />
+
+        <item
+            android:id="@+id/puzzles"
+            android:icon="@drawable/casino"
+            android:title="@string/puzzles"/>
 
         <item
             android:id="@+id/itm_profile"
@@ -32,6 +37,11 @@
             android:id="@+id/itm_account_settings"
             android:icon="@drawable/settings"
             android:title="@string/settings"
+            />
+        <item
+            android:id="@+id/itm_play_friend"
+            android:icon="@drawable/profile"
+            android:title="@string/play_friend"
             />
     </group>
 

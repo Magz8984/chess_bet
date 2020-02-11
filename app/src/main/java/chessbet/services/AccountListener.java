@@ -6,4 +6,5 @@ import chessbet.domain.User;
 public interface AccountListener {
     void onAccountReceived(Account account);
     void onUserReceived(User user);
+    void onAccountUpdated(boolean status);
 }

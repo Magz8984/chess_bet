@@ -10,6 +10,8 @@ public class RemoteMove {
     private int to;
     private String owner;
     private int from;
+    private String pgn;
+    private long gameTimeLeft;
     private List<String> events;
 
     private RemoteMove(){
@@ -42,8 +44,33 @@ public class RemoteMove {
         }
     }
 
+    public boolean isLastEventDisconnected(){
+        if(events.isEmpty()){
+            return false;
+        } else {
+            int index  = events.size() - 1;
+            return events.get(index).equals(MatchEvent.DISCONNECTED.toString());
+        }
+    }
+
+    public void setGameTimeLeft(long gameTimeLeft) {
+        this.gameTimeLeft = gameTimeLeft;
+    }
+
+    public long getGameTimeLeft() {
+        return gameTimeLeft;
+    }
+
     public String getOwner() {
         return owner;
+    }
+
+    public void setPgn(String pgn) {
+        this.pgn = pgn;
+    }
+
+    public String getPgn() {
+        return pgn;
     }
 
     public int getFrom() {
@@ -57,7 +84,6 @@ public class RemoteMove {
     public void send(String matchId, String self){
         DatabaseUtil.sendRemoteMove(matchId,self)
                 .setValue(this).addOnSuccessListener(aVoid -> {
-
         });
     }
 
@@ -69,5 +95,6 @@ public class RemoteMove {
         this.events.clear();
         this.to = 0;
         this.from = 0;
+        this.pgn = "";
     }
 }

@@ -1,8 +1,10 @@
 package chessbet.domain;
 
+
 import java.util.ArrayList;
 
 public class Account {
+    private String id;
     private double amount;
     private String currency;
     private boolean terms_and_condition_accepted;
@@ -11,13 +13,15 @@ public class Account {
     private String last_date_modified;
     private long last_matchable_time;
     private MatchType last_match_type;
-    private long last_match_duration;
+    private long last_match_duration = 0;
     private Amount last_match_amount;
     private AccountStatus status;
     private String owner;
     private int elo_rating;
     private boolean matched;
     private ArrayList<MatchDetails> matches;
+    private String current_challenge_id;
+    private long current_challenge_timestamp;
 
     public void setElo_rating(int elo_rating) {
         this.elo_rating = elo_rating;
@@ -122,6 +126,22 @@ public class Account {
         return events;
     }
 
+    public void addEvent(AccountEvent accountEvent){
+        if(events == null){
+            events = new ArrayList<>();
+        }
+        events.add(accountEvent);
+    }
+
+    public boolean isTermsOfServiceAccepted(){
+        for (AccountEvent event: events) {
+            if(event.getName().equals(AccountEvent.Event.TERMS_OF_SERVICE_ACCEPTED)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public ArrayList<MatchDetails> getMatches() {
         return matches;
     }
@@ -136,5 +156,29 @@ public class Account {
 
     public String getLast_date_modified() {
         return last_date_modified;
+    }
+
+    public void setCurrent_challenge_id(String current_challenge_id) {
+        this.current_challenge_id = current_challenge_id;
+    }
+
+    public void setCurrent_challenge_timestamp(long current_challenge_timestamp) {
+        this.current_challenge_timestamp = current_challenge_timestamp;
+    }
+
+    public long getCurrent_challenge_timestamp() {
+        return current_challenge_timestamp;
+    }
+
+    public String getCurrent_challenge_id() {
+        return current_challenge_id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 }

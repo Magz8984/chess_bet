@@ -15,7 +15,7 @@ public class MoveLog {
 
     public List<Move> getMoves() {return  this.moves;};
 
-    void addMove(final Move move){
+    public void addMove(final Move move){
         this.moves.add(move);
     }
 
@@ -46,5 +46,10 @@ public class MoveLog {
         com.chess.gui.MoveLog moveLog = new com.chess.gui.MoveLog();
         moveLog.setMoves((ArrayList<Move>) this.moves);
         return moveLog;
+    }
+
+    @Override
+    public String toString() {
+        return convertToEngineMoveLog().toString();
     }
 }
