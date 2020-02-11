@@ -4,6 +4,8 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.util.Log;
 
+import java.util.Objects;
+
 public class GameUtil {
     private static MediaPlayer mp;
 
@@ -17,7 +19,7 @@ public class GameUtil {
             mp.start();
         }
         catch (Exception ex){
-            Log.e("MEDIA_PLAYER",ex.getMessage());
+            Log.e("MEDIA_PLAYER", Objects.requireNonNull(ex.getMessage()));
         }
     }
 

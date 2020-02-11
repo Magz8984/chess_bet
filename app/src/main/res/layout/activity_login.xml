@@ -42,7 +42,8 @@
                 android:maxLines="1"
                 android:textColor="@color/colorWhite"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                app:fontFamily="@font/poiretoneregular" />
+                app:fontFamily="@font/poiretoneregular"
+                android:drawableStart="@drawable/email" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -67,7 +68,8 @@
                 android:maxLines="1"
                 android:textColor="@color/colorWhite"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                app:fontFamily="@font/poiretoneregular" />
+                app:fontFamily="@font/poiretoneregular"
+                android:drawableStart="@drawable/key" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -82,6 +84,32 @@
             android:text="@string/btn_login"
             android:textColor="@color/colorPinkSecond"
             app:fontFamily="@font/josefinslabsemibold"/>
+
+        <RelativeLayout
+            android:id="@+id/btnLoginGoogle"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            android:background="@drawable/rounded_button"
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/google_logo"
+                android:src="@drawable/google_logo"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:contentDescription="logo" />
+            <TextView
+                android:textColor="@color/bootstrap_red"
+                android:textSize="14sp"
+                app:fontFamily="@font/chakrapetchbold"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/google_logo"
+                android:layout_width="wrap_content"
+                android:text="@string/login_google"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/google_logo" />
+        </RelativeLayout>
 
 
         <Button

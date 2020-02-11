@@ -12,11 +12,13 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import chessbet.domain.Account;
+import chessbet.domain.Constants;
 import chessbet.domain.DatabaseMatch;
 import chessbet.domain.MatchDetails;
 import chessbet.domain.MatchStatus;
@@ -85,7 +87,7 @@ public class AccountAPI {
             db.collection(AccountAPI.USER_COLLECTION).document(user.getUid()).get().addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     currentUser = Objects.requireNonNull(task.getResult()).toObject(User.class);
-                    accountListener.onUserReceived(currentUser);
+                    updateCurrentUserProfile();
                 }
                 else {
                     Log.d(TAG, Objects.requireNonNull(Objects.requireNonNull(task.getException()).getMessage()));
@@ -93,6 +95,41 @@ public class AccountAPI {
             });
         }catch (Exception ex){
             Crashlytics.logException(ex);
+        }
+    }
+
+    /**
+     * Used when using a federated sign in authority like google or facebook
+     */
+    private void updateCurrentUserProfile(){
+        boolean isUpdateAble = false;
+        if(currentUser != null){
+            if(user.getPhotoUrl() != null && currentUser.getProfile_photo_url().equals(Constants.UTILITY_PROFILE)){
+                FirebaseUser user = this.user;
+                String path = user.getPhotoUrl().toString();
+                currentUser.setProfile_photo_url(path);
+                isUpdateAble = true;
+            }
+
+            if(user.getDisplayName() != null &&  currentUser.getUser_name().equals("anonymous")){
+                currentUser.setUser_name(user.getDisplayName());
+                isUpdateAble = true;
+            }
+
+            if(isUpdateAble){
+                updateUser(currentUser, new UserUpdated() {
+                    @Override
+                    public void onUserUpdate() {
+                        accountListener.onUserReceived(currentUser);
+                    }
+
+                    @Override
+                    public void onUserUpdateFail(Exception ex) {
+                        Crashlytics.logException(ex);
+                    }
+                });
+            }
+            accountListener.onUserReceived(currentUser);
         }
     }
 
@@ -108,6 +145,18 @@ public class AccountAPI {
             }
             else {
                 Log.d(TAG, Objects.requireNonNull(Objects.requireNonNull(task.getException()).getMessage()));
+            }
+        });
+    }
+
+    public void getUserByEmailAddress(String email, UsersReceived onUserReceived){
+        db.collection(AccountAPI.USER_COLLECTION).whereEqualTo("email", email).get().addOnCompleteListener(task -> {
+            if(task.isSuccessful() && task.getResult() != null){
+                for (QueryDocumentSnapshot document : Objects.requireNonNull(task.getResult())){
+                    onUserReceived.onUserReceived(Collections.singletonList(document.toObject(User.class)));
+                }
+            } else if (task.getResult() == null) {
+                onUserReceived.onUserNotFound();
             }
         });
     }

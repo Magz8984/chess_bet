@@ -19,6 +19,7 @@ public class GameTimer {
     private int blackTimeLeft;
     private int whiteTimeLeft;
     private Player currentPlayer;
+    private boolean isTimerLapsed = false;
 
     private GameTimer(final Builder builder){
         this.builder = builder;
@@ -61,6 +62,7 @@ public class GameTimer {
             @Override
             public void onFinish(View view) {
                 // Black Lost On Time
+                isTimerLapsed = true;
                 builder.onTimerElapsed.playerTimeLapsed(Player.BLACK);
             }
         });
@@ -86,9 +88,16 @@ public class GameTimer {
     public void stopAllTimers(){
         try{
             if(INSTANCE != null){
-                blackCountDownTask.cancel();
-                whiteCountDownTask.cancel();
+                if(!isTimerLapsed){
+                    if(blackCountDownTask != null){
+                        blackCountDownTask.cancel();
+                    }
+                    if(whiteCountDownTask != null){
+                        whiteCountDownTask.cancel();
+                    }
+                }
                 INSTANCE = null;
+
             }
         }catch (Exception ex){
             ex.printStackTrace();
@@ -106,17 +115,18 @@ public class GameTimer {
         whiteCountDownTask.until(builder.txtWhiteMoveTimer, targetMilliseconds, 1000, new CountDownTimers.OnCountDownListener() {
             @Override
             public void onTick(View view, long millisUntilFinished) {
-                TextView txtBlackTimer = (TextView) view;
+                TextView txtWhiteTimer = (TextView) view;
                 whiteTimeLeft = (int) millisUntilFinished;
-                txtBlackTimer.setText(timeConverter(millisUntilFinished/1000));
+                txtWhiteTimer.setText(timeConverter(millisUntilFinished/1000));
                 if(millisUntilFinished / 1000 <= 10 ){
-                    txtBlackTimer.setTextColor(Color.RED);
+                    txtWhiteTimer.setTextColor(Color.RED);
                 }
             }
 
             @Override
             public void onFinish(View view) {
                 // Black Lost On Time
+                isTimerLapsed = true;
                 builder.onTimerElapsed.playerTimeLapsed(Player.WHITE);
             }
         });
@@ -181,6 +191,30 @@ public class GameTimer {
     }
 
     public enum GameDuration{
+        ONE_MINUTE{
+            @Override
+            public int getDuration() {
+                return 1;
+            }
+
+            @NonNull
+            @Override
+            public String toString() {
+                return "1 min";
+            }
+        },
+        FIVE_MINUTES{
+            @Override
+            public int getDuration() {
+                return 5;
+            }
+
+            @NonNull
+            @Override
+            public String toString() {
+                return "5 min";
+            }
+        },
         TEN_MINUTES{
             @Override
             public int getDuration() {

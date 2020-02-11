@@ -44,7 +44,6 @@ public class OnlineUsersAdapter extends FirebaseRecyclerAdapter<User, OnlineUser
         Glide.with(this.context).load(user.getProfile_photo_url() == null ||
                 user.getProfile_photo_url().equals("") ?
                 Constants.UTILITY_PROFILE : user.getProfile_photo_url()).into(holder.getImageView());
-        holder.getTxtEmail().setText(user.getEmail());
         holder.getTxtUserName().setText(user.getUser_name());
         // Make sure you cannot challenge yourself
         if(user.getUid().equals(AccountAPI.get().getCurrentUser().getUid())){
@@ -91,13 +90,11 @@ public class OnlineUsersAdapter extends FirebaseRecyclerAdapter<User, OnlineUser
     static class ViewHolder extends RecyclerView.ViewHolder{
         private TextView txtUserName;
         private ImageView imageView;
-        private TextView txtEmail;
         private Button btnChallenge;
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             txtUserName = itemView.findViewById(R.id.txtUserName);
             imageView = itemView.findViewById(R.id.imgProfilePic);
-            txtEmail = itemView.findViewById(R.id.txtEmail);
             btnChallenge = itemView.findViewById(R.id.btnChallenge);
         }
 
@@ -107,10 +104,6 @@ public class OnlineUsersAdapter extends FirebaseRecyclerAdapter<User, OnlineUser
 
         ImageView getImageView() {
             return imageView;
-        }
-
-        TextView getTxtEmail() {
-            return txtEmail;
         }
 
         TextView getTxtUserName() {
