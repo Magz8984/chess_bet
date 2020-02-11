@@ -1,11 +1,15 @@
 package chessbet.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class User {
     private String date_created;
     private String date_modified;
     private boolean disabled;
     private String email;
     private String uid;
+    private List<UserPermission> permissions = new ArrayList<>();
     private String user_name;
     private String profile_photo_url;
     private long lastSeen;
@@ -60,6 +64,9 @@ public class User {
         this.uid = ui;
     }
 
+    public void addPermission (UserPermission permission){
+        this.permissions.add(permission);
+    }
 
     public void setProfile_photo_url(String profile_photo_url) {
         this.profile_photo_url = profile_photo_url;
@@ -75,6 +82,14 @@ public class User {
 
     public void setOnline(boolean online) {
         this.online = online;
+    }
+
+    public void setPermissions(List<UserPermission> permissions) {
+        this.permissions = permissions;
+    }
+
+    public List<UserPermission> getPermissions() {
+        return permissions;
     }
 
     public boolean isOnline() {
