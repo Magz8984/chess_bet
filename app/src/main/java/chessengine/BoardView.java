@@ -411,7 +411,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     public void setMoveData(int from, int to) {
         if(matchAPI != null){
             // Help regulate time between play
-            long timeLeft = (localAlliance == Alliance.WHITE) ? gameTimer.getWhiteTimeLeft() : gameTimer.getBlackTimeLeft();
+            long timeLeft = (localAlliance == Alliance.WHITE) ? gameTimer.getOwnerTimeLeft() : gameTimer.getOpponentTimeLeft();
             matchAPI.sendMoveData(matchableAccount,from,to, getPortableGameNotation(),timeLeft);
         }
     }
@@ -561,11 +561,11 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
                 if(gameTimer != null){
                     // Reset time from when the move was made from the other device;
                     if(localAlliance == Alliance.WHITE) {
-                        gameTimer.setBlackTimeLeft((int) remoteMove.getGameTimeLeft());
-                        gameTimer.setBlackGameTimer();
+                        gameTimer.setOpponentTimeLeft((int) remoteMove.getGameTimeLeft());
+                        gameTimer.setOpponentTimer();
                     } else {
-                        gameTimer.setWhiteTimeLeft((int) remoteMove.getGameTimeLeft());
-                        gameTimer.setWhiteGameTimer();
+                        gameTimer.setOwnerTimeLeft((int) remoteMove.getGameTimeLeft());
+                        gameTimer.setOwnerTimer();
                     }
                     gameTimer.stopTimer((chessBoard.currentPlayer().getAlliance() == Alliance.WHITE) ? chessbet.domain.Player.WHITE :  chessbet.domain.Player.BLACK);
                 }
@@ -678,21 +678,21 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         this.gameTimer = gameTimer;
         if(gameTimer.getCurrentPlayer() != null){
             // Reset timer to the old time left
-            setGameTimerTime(gameTimer.getWhiteTimeLeft(), gameTimer.getBlackTimeLeft());
+            setGameTimerTime(gameTimer.getOwnerTimeLeft(), gameTimer.getOpponentTimeLeft());
         } else {
-            this.gameTimer.setBlackTimeLeft((int) (this.matchableAccount.getDuration() * 60000));
-            this.gameTimer.setWhiteTimeLeft((int) (this.matchableAccount.getDuration() * 60000));
-            this.gameTimer.setWhiteGameTimer();
+            this.gameTimer.setOpponentTimeLeft((int) (this.matchableAccount.getDuration() * 60000));
+            this.gameTimer.setOwnerTimeLeft((int) (this.matchableAccount.getDuration() * 60000));
+            this.gameTimer.startTimer();
         }
     }
 
     private void setGameTimerTime(int white, int black) {
-        this.gameTimer.setBlackTimeLeft(black);
-        this.gameTimer.setWhiteTimeLeft(white);
-        if(this.gameTimer.getCurrentPlayer().equals(chessbet.domain.Player.BLACK)){
-            this.gameTimer.setBlackGameTimer();
+        this.gameTimer.setOpponentTimeLeft(black);
+        this.gameTimer.setOwnerTimeLeft(white);
+        if(this.gameTimer.getCurrentPlayer().getAlliance().equals(this.gameTimer.getOpponentAlliance())){
+            this.gameTimer.setOpponentTimer();
         } else {
-            this.gameTimer.setWhiteGameTimer();
+            this.gameTimer.setOwnerTimer();
         }
     }
 

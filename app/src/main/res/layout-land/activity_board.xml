@@ -72,7 +72,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/txtBlack"
+                        android:id="@+id/txtOpponent"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/chakrapetchbold"
@@ -81,7 +81,7 @@
                         android:textSize="15sp" />
 
                     <TextView
-                        android:id="@+id/blackTimer"
+                        android:id="@+id/txtOpponentTimer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
@@ -92,7 +92,7 @@
                         />
 
                     <TextView
-                        android:id="@+id/txtBlackStatus"
+                        android:id="@+id/txtOpponentStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/fab_margin"
@@ -111,7 +111,7 @@
                     android:scrollbars="none">
 
                     <LinearLayout
-                        android:id="@+id/blackMoves"
+                        android:id="@+id/opponentMoves"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
@@ -120,7 +120,7 @@
                 </HorizontalScrollView>
 
                 <LinearLayout
-                    android:id="@+id/whitePieces"
+                    android:id="@+id/opponentPieces"
                     android:layout_width="match_parent"
                     android:layout_height="20dp"
                     android:orientation="horizontal" />
@@ -143,7 +143,7 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:id="@+id/txtWhite"
+                        android:id="@+id/txtOwner"
                         android:text="White"
                         android:textColor="#fff"
                         android:layout_width="wrap_content"
@@ -152,7 +152,7 @@
                         android:fontFamily="@font/chakrapetchbold"/>
 
                     <TextView
-                        android:id="@+id/whiteTimer"
+                        android:id="@+id/txtOwnerTimer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
@@ -163,7 +163,7 @@
                         />
 
                     <TextView
-                        android:id="@+id/txtWhiteStatus"
+                        android:id="@+id/txtOwnerStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="15sp"
@@ -182,7 +182,7 @@
                     android:scrollbars="none">
                     <LinearLayout
                         android:orientation="horizontal"
-                        android:id="@+id/whiteMoves"
+                        android:id="@+id/ownerMoves"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
@@ -190,7 +190,7 @@
                 </HorizontalScrollView>
                 <LinearLayout
                     android:orientation="horizontal"
-                    android:id="@+id/blackPieces"
+                    android:id="@+id/ownerPieces"
                     android:layout_width="match_parent"
                     android:layout_height="20dp"/>
             </LinearLayout>
