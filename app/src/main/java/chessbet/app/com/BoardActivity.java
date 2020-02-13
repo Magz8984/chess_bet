@@ -83,27 +83,27 @@ public class BoardActivity extends AppCompatActivity implements View.OnClickList
         ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener, MatchAPI.OnMatchEnd, OpponentListener , GameHandler.NoMoveReactor.NoMoveEndMatch, PresenceAPI.UserOnline {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
-@BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
-@BindView(R.id.txtBlackStatus) TextView txtBlackStatus;
+@BindView(R.id.txtOwnerStatus) TextView txtOwnerStatus;
+@BindView(R.id.txtOpponentStatus) TextView txtOpponentStatus;
 @BindView(R.id.btnColorPicker) Button btnColorPicker;
 @BindView(R.id.btnBack) Button btnBack;
 @BindView(R.id.btnForward) Button btnForward;
-@BindView(R.id.blackMoves) LinearLayout blackMoves;
-@BindView(R.id.whiteMoves) LinearLayout whiteMoves;
+@BindView(R.id.opponentMoves) LinearLayout opponentMoves;
+@BindView(R.id.ownerMoves) LinearLayout ownerMoves;
 @BindView(R.id.blackScrollView) HorizontalScrollView blackScrollView;
 @BindView(R.id.whiteScrollView) HorizontalScrollView whiteScrollView;
-@BindView(R.id.whitePieces) LinearLayout whitePieces;
-@BindView(R.id.blackPieces) LinearLayout blackPieces;
+@BindView(R.id.ownerPieces) LinearLayout ownerPieces;
+@BindView(R.id.opponentPieces) LinearLayout opponentPieces;
 @BindView(R.id.btnSave) Button btnSave;
 @BindView(R.id.btnHint) Button btnHint;
 @BindView(R.id.btnRecord) Button btnRecord;
-@BindView(R.id.blackTimer) TextView txtBlackTimer;
-@BindView(R.id.whiteTimer) TextView txtWhiteTimer;
+@BindView(R.id.txtOpponentTimer) TextView txtOpponentTimer;
+@BindView(R.id.txtOwnerTimer) TextView txtOwnerTimer;
 @BindView(R.id.txtConnectionStatus) TextView txtConnectionStatus;
 @BindView(R.id.imgConnectionStatus) CircleImageView imgConnectionStatus;
-@BindView(R.id.txtWhite) TextView txtWhite;
+@BindView(R.id.txtOwner) TextView txtOwner;
 @BindView(R.id.btnAnalysis) Button btnAnalysis;
-@BindView(R.id.txtBlack) TextView txtBlack;
+@BindView(R.id.txtOpponent) TextView txtOpponent;
 
 private MatchableAccount matchableAccount;
 private ConnectivityManager connectivityManager;
@@ -138,11 +138,25 @@ private FirebaseUser user;
         btnHint.setOnClickListener(this);
         btnRecord.setOnClickListener(this);
         btnAnalysis.setOnClickListener(this);
-        txtWhiteStatus.setTextColor(Color.RED);
-        txtBlackStatus.setTextColor(Color.RED);
+        txtOpponentStatus.setTextColor(Color.RED);
+        txtOwnerStatus.setTextColor(Color.RED);
         connectivityManager.setConnectionStateListener(this);
         connectivityManager.startListening();
         this.onConnectionChanged(ConnectivityReceiver.isConnected());
+    }
+
+    private Alliance getOpponentAlliance(){
+       if(matchableAccount != null){
+        return (this.boardView.getLocalAlliance() == Alliance.WHITE) ? Alliance.BLACK : Alliance.WHITE;
+       }
+       return Alliance.BLACK;
+    }
+
+    private Alliance getOwnerAlliance(){
+        if(matchableAccount != null){
+            return (this.boardView.getLocalAlliance() == Alliance.WHITE) ? Alliance.WHITE : Alliance.BLACK;
+        }
+        return Alliance.WHITE;
     }
 
     @Override
@@ -159,8 +173,8 @@ private FirebaseUser user;
         String matchType = intent.getStringExtra("match_type");
 
         if(matchType != null && matchType.equals(MatchType.SINGLE_PLAYER.toString())){
-            txtWhite.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
-            txtBlack.setText(getResources().getString(R.string.computer));
+            txtOwner.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
+            txtOpponent.setText(getResources().getString(R.string.computer));
             boardView.setMode(BoardView.Modes.PLAY_COMPUTER);
         }
 
@@ -195,8 +209,8 @@ private FirebaseUser user;
         String white = intent.getStringExtra(Constants.WHITE);
         String black = intent.getStringExtra(Constants.BLACK);
         if(black != null && white != null){
-            txtBlack.setText(black);
-            txtWhite.setText(white);
+            txtOpponent.setText(black);
+            txtOwner.setText(white);
         }
     }
 
@@ -237,8 +251,10 @@ private FirebaseUser user;
         // Set timer online game and make sure you do not set two different timers
         if(boardView.getGameTimer() == null){
             GameTimer.Builder builder = new GameTimer.Builder()
-                    .setTxtBlackMoveTimer(txtBlackTimer)
-                    .setTxtWhiteMoveTimer(txtWhiteTimer)
+                    .setTxtOpponent(txtOpponentTimer)
+                    .setTxtOwner(txtOwnerTimer)
+                    .setOpponentAlliance(getOpponentAlliance())
+                    .setOwnerAlliance(getOwnerAlliance())
                     .setOnTimerElapsed(this);
             if(GameTimer.get() == null){
                 boardView.setGameTimer(builder.build());
@@ -458,10 +474,10 @@ private FirebaseUser user;
     @Override
     public void getMoves(MoveLog moveLog) {
         runOnUiThread(() -> {
-            blackMoves.removeAllViews();
-            whiteMoves.removeAllViews();
-            blackPieces.removeAllViews();
-            whitePieces.removeAllViews();
+            opponentMoves.removeAllViews();
+            ownerMoves.removeAllViews();
+            opponentPieces.removeAllViews();
+            ownerPieces.removeAllViews();
             setNoMoveReactorPly();
             for (Move move : moveLog.getMoves()) {
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -471,11 +487,11 @@ private FirebaseUser user;
                 textView.setText(move.toString());
                 textView.setTextColor(Color.WHITE);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-                if (move.getMovedPiece().getPieceAlliance() == Alliance.BLACK) {
-                    blackMoves.addView(textView);
+                if (move.getMovedPiece().getPieceAlliance().equals(getOpponentAlliance())) {
+                    opponentMoves.addView(textView);
 
-                } else if (move.getMovedPiece().getPieceAlliance() == Alliance.WHITE) {
-                    whiteMoves.addView(textView);
+                } else if (move.getMovedPiece().getPieceAlliance().equals(getOwnerAlliance())) {
+                    ownerMoves.addView(textView);
                 }
                 // Get taken pieces
                 this.getTakenPieces(move);
@@ -497,10 +513,10 @@ private FirebaseUser user;
     @Override
     public void isCheckMate(Player player) {
         onGameResume();
-        if (player.getAlliance().isBlack()) {
-            txtBlackStatus.setText(getString(R.string.checkmate));
-        } else if (player.getAlliance().isWhite()) {
-            txtWhiteStatus.setText(getString(R.string.checkmate));
+        if (player.getAlliance().equals(getOpponentAlliance())) {
+            txtOpponentStatus.setText(getString(R.string.checkmate));
+        } else if (player.getAlliance().equals(getOwnerAlliance())) {
+            txtOwnerStatus.setText(getString(R.string.checkmate));
         }
         endGame(GameHandler.GAME_FINISHED_FLAG);
     }
@@ -508,10 +524,10 @@ private FirebaseUser user;
     @Override
     public void isStaleMate(Player player) {
         onGameResume();
-        if (player.getAlliance().isBlack()) {
-            txtBlackStatus.setText(getString(R.string.stalemate));
-        } else if (player.getAlliance().isWhite()) {
-            txtWhiteStatus.setText(getString(R.string.stalemate));
+        if (player.getAlliance().equals(getOpponentAlliance())) {
+            txtOpponentStatus.setText(getString(R.string.stalemate));
+        } else if (player.getAlliance().equals(getOwnerAlliance())) {
+            txtOwnerStatus.setText(getString(R.string.stalemate));
         }
         endGame(GameHandler.GAME_DRAWN_FLAG);
     }
@@ -519,40 +535,40 @@ private FirebaseUser user;
     @Override
     public void isCheck(Player player) {
         onGameResume();
-        if (player.getAlliance().isBlack()) {
-            txtBlackStatus.setText(getString(R.string.check));
-        } else if (player.getAlliance().isWhite()) {
-            txtWhiteStatus.setText(getString(R.string.check));
+        if (player.getAlliance().equals(getOpponentAlliance())) {
+            txtOpponentStatus.setText(getString(R.string.check));
+        } else if (player.getAlliance().equals(getOwnerAlliance())) {
+            txtOwnerStatus.setText(getString(R.string.check));
         }
     }
 
     @Override
     public void isDraw() {
-        txtWhiteStatus.setText(getString(R.string.draw));
-        txtBlackStatus.setText(getString(R.string.draw));
+        txtOwnerStatus.setText(getString(R.string.draw));
+        txtOpponentStatus.setText(getString(R.string.draw));
         endGame(GameHandler.GAME_DRAWN_FLAG);
     }
 
     @Override
     public void onGameResume() {
-        txtWhiteStatus.setText("");
-        txtBlackStatus.setText("");
+        txtOwnerStatus.setText("");
+        txtOpponentStatus.setText("");
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
 
-        final int blackMoveCount = blackMoves.getChildCount();
-        final int whiteMoveCount = whiteMoves.getChildCount();
+        final int blackMoveCount = opponentMoves.getChildCount();
+        final int whiteMoveCount = ownerMoves.getChildCount();
 
         if (blackMoveCount >= 1) {
-            View lastBlackMove = blackMoves.getChildAt(blackMoveCount - 1);
+            View lastBlackMove = opponentMoves.getChildAt(blackMoveCount - 1);
             blackScrollView.scrollTo(lastBlackMove.getLeft(), lastBlackMove.getTop());
         }
 
         if (whiteMoveCount >= 1) {
-            View lastWhiteMove = whiteMoves.getChildAt(whiteMoveCount - 1);
+            View lastWhiteMove = ownerMoves.getChildAt(whiteMoveCount - 1);
             whiteScrollView.scrollTo(lastWhiteMove.getLeft(), lastWhiteMove.getTop());
         }
     }
@@ -677,10 +693,10 @@ private FirebaseUser user;
             imageView.setBackground(drawable);
             imageView.invalidate();
 
-            if (piece.getPieceAlliance().equals(Alliance.BLACK)) {
-                blackPieces.addView(imageView);
-            } else if (piece.getPieceAlliance().equals(Alliance.WHITE)) {
-                whitePieces.addView(imageView);
+            if (piece.getPieceAlliance().equals(getOpponentAlliance())) {
+                ownerPieces.addView(imageView);
+            } else if (piece.getPieceAlliance().equals(getOwnerAlliance())) {
+                opponentPieces.addView(imageView);
             }
         }
     }
@@ -720,7 +736,7 @@ private FirebaseUser user;
         }
         isGameFinished = true; // Is game on going is false
         MoveLog moveLog = boardView.getMoveLog();
-        String gameText = PGNMainUtils.writeGameAsPGN(moveLog.convertToEngineMoveLog(), txtWhite.getText().toString(), txtBlack.getText().toString(), result);
+        String gameText = PGNMainUtils.writeGameAsPGN(moveLog.convertToEngineMoveLog(), txtOwner.getText().toString(), txtOpponent.getText().toString(), result);
         FileOutputStream fileOutputStream = null;
 
         try {
@@ -873,15 +889,8 @@ private FirebaseUser user;
     public void onOpponentReceived(User user) {
         PresenceAPI.get().getUserOnline(user, this); // Listen to user disconnection
         runOnUiThread(() -> {
-            if (boardView.getLocalAlliance().isWhite()) {
-                txtWhite.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
-                txtBlack.setText(user.getUser_name());
-            }
-
-            if(boardView.getLocalAlliance().isBlack())  {
-                txtWhite.setText(user.getUser_name());
-                txtBlack.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
-            }
+            txtOwner.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
+            txtOpponent.setText(user.getUser_name());
         });
     }
 
