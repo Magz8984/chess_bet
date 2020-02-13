@@ -3,7 +3,6 @@ package chessbet.app.com.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -219,6 +218,5 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     public void challengeNotFound() {
         findMatch.setEnabled(true);
         ChallengeAPI.get().sendChallenge(challenge);
-        Log.d("Challenge Found", "Nope");
     }
 }

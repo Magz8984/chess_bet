@@ -253,6 +253,8 @@ private FirebaseUser user;
             GameTimer.Builder builder = new GameTimer.Builder()
                     .setTxtOpponent(txtOpponentTimer)
                     .setTxtOwner(txtOwnerTimer)
+                    .setOpponentAlliance(getOpponentAlliance())
+                    .setOwnerAlliance(getOwnerAlliance())
                     .setOnTimerElapsed(this);
             if(GameTimer.get() == null){
                 boardView.setGameTimer(builder.build());
@@ -887,8 +889,8 @@ private FirebaseUser user;
     public void onOpponentReceived(User user) {
         PresenceAPI.get().getUserOnline(user, this); // Listen to user disconnection
         runOnUiThread(() -> {
-            txtOpponent.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
-            txtOwner.setText(user.getUser_name());
+            txtOwner.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
+            txtOpponent.setText(user.getUser_name());
         });
     }
 

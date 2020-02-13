@@ -1,6 +1,7 @@
 package chessbet.api;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import chessbet.app.com.fragments.MatchFragment;
 import chessbet.domain.Account;
 import chessbet.domain.Challenge;
 import chessbet.domain.Constants;
@@ -91,6 +93,8 @@ public class ChallengeAPI {
                     this.currentChallengeId = task.getResult().getId();
                     this.challengeHandler.challengeSent(task.getResult().getId());
                 }
+            } else {
+                Log.d(MatchFragment.class.getSimpleName(), Objects.requireNonNull(task.getException()).toString() + "Error");
             }
         });
     }
@@ -271,7 +275,7 @@ public class ChallengeAPI {
                      if (task.isSuccessful() && task.getResult() != null){
                          for (QueryDocumentSnapshot documentSnapshot : task.getResult()){
                              Challenge candidateChallenge = documentSnapshot.toObject(Challenge.class);
-                             if(isWithinRange(candidateChallenge) && !candidateChallenge.isFriendly()){
+                             if(isWithinRange(candidateChallenge) && !candidateChallenge.isFriendly()){ // SHOULD NOT MATCH FRIENDLY CHALLENGES
                                  availableMatches.add(documentSnapshot.getReference());
                              }
                          }
@@ -301,6 +305,10 @@ public class ChallengeAPI {
                              throw new FirebaseFirestoreException("Not Found", FirebaseFirestoreException.Code.ABORTED);
                          }).addOnSuccessListener(s -> this.challengeHandler.challengeFound(s))
                            .addOnFailureListener(e -> this.challengeHandler.challengeNotFound());
+                     } else {
+                         // Ensure challenges are sent in the event we get no challenge in the challenge collection
+                         Log.d(ChallengeAPI.class.getSimpleName(), Objects.requireNonNull(task.getException()).toString() + "Error");
+                         this.challengeHandler.challengeNotFound();
                      }
                 });
     }
@@ -317,16 +325,6 @@ public class ChallengeAPI {
                     map.put("requester", user.getUid());
                     documentReference.update(map).addOnFailureListener(Crashlytics::logException);
                 }
-
-//                db.runTransaction(transaction -> {
-//                    DocumentSnapshot documentSnapshot = transaction.get(documentReference);
-//                    this.currentChallengeId = documentReference.getId();
-//                    currentChallenge = challenge;
-//                    transaction.update(documentReference, "accepted", true);
-//                    transaction.update(documentReference, "requester", AccountAPI.get().getCurrentAccount().getOwner());
-//                  return documentSnapshot; // For promise completion
-//                }).addOnSuccessListener(documentSnapshot -> hasAcceptedChallenge = true)
-//                  .addOnFailureListener(e -> hasAcceptedChallenge = false);
             } else {
                 Crashlytics.logException(task.getException());
             }

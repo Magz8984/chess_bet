@@ -50,7 +50,7 @@ public class GameTimer {
         opponentCountDownTask.cancel();
         opponentCountDownTask = CountDownTask.create();
         long targetMilliseconds = CountDownTask.elapsedRealtime() + opponentTimeLeft;
-        opponentCountDownTask.until(builder.txtOppoent, targetMilliseconds, 1000, new CountDownTimers.OnCountDownListener() {
+        opponentCountDownTask.until(builder.txtOpponent, targetMilliseconds, 1000, new CountDownTimers.OnCountDownListener() {
             @Override
             public void onTick(View view, long millisUntilFinished) {
                 TextView txtBlackTimer = (TextView) view;
@@ -191,7 +191,7 @@ public class GameTimer {
      * Game timer builder
      */
     public static class Builder{
-        private TextView txtOppoent;
+        private TextView txtOpponent;
         private Alliance ownerAlliance;
         private Alliance opponentAlliance;
         private TextView txtOwner;
@@ -208,7 +208,7 @@ public class GameTimer {
         }
 
         public Builder setTxtOpponent(TextView txtOpponent) {
-            this.txtOppoent = txtOpponent;
+            this.txtOpponent = txtOpponent;
             return this;
         }
 
