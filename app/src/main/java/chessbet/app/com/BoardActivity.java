@@ -77,6 +77,7 @@ import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
+import stockfish.EngineUtil;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
         OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener, BoardView.PuzzleMove,
@@ -171,10 +172,13 @@ private FirebaseUser user;
         setExternalPlayers();
         configureChallenge(intent);
         String matchType = intent.getStringExtra("match_type");
+        int skillLevel = intent.getIntExtra("skill_level", 20);
+        EngineUtil.setSkillLevel(skillLevel);
 
         if(matchType != null && matchType.equals(MatchType.SINGLE_PLAYER.toString())){
+            btnHint.setVisibility(View.GONE);
             txtOwner.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
-            txtOpponent.setText(getResources().getString(R.string.computer));
+            txtOpponent.setText(getResources().getString(R.string.computer, skillLevel));
             boardView.setMode(BoardView.Modes.PLAY_COMPUTER);
         }
 
@@ -512,47 +516,57 @@ private FirebaseUser user;
 
     @Override
     public void isCheckMate(Player player) {
-        onGameResume();
-        if (player.getAlliance().equals(getOpponentAlliance())) {
-            txtOpponentStatus.setText(getString(R.string.checkmate));
-        } else if (player.getAlliance().equals(getOwnerAlliance())) {
-            txtOwnerStatus.setText(getString(R.string.checkmate));
-        }
-        endGame(GameHandler.GAME_FINISHED_FLAG);
+        runOnUiThread(() -> {
+            onGameResume();
+            if (player.getAlliance().equals(getOpponentAlliance())) {
+                txtOpponentStatus.setText(getString(R.string.checkmate));
+            } else if (player.getAlliance().equals(getOwnerAlliance())) {
+                txtOwnerStatus.setText(getString(R.string.checkmate));
+            }
+            endGame(GameHandler.GAME_FINISHED_FLAG);
+        });
     }
 
     @Override
     public void isStaleMate(Player player) {
-        onGameResume();
-        if (player.getAlliance().equals(getOpponentAlliance())) {
-            txtOpponentStatus.setText(getString(R.string.stalemate));
-        } else if (player.getAlliance().equals(getOwnerAlliance())) {
-            txtOwnerStatus.setText(getString(R.string.stalemate));
-        }
-        endGame(GameHandler.GAME_DRAWN_FLAG);
+        runOnUiThread(() -> {
+            onGameResume();
+            if (player.getAlliance().equals(getOpponentAlliance())) {
+                txtOpponentStatus.setText(getString(R.string.stalemate));
+            } else if (player.getAlliance().equals(getOwnerAlliance())) {
+                txtOwnerStatus.setText(getString(R.string.stalemate));
+            }
+            endGame(GameHandler.GAME_DRAWN_FLAG);
+        });
     }
 
     @Override
     public void isCheck(Player player) {
-        onGameResume();
-        if (player.getAlliance().equals(getOpponentAlliance())) {
-            txtOpponentStatus.setText(getString(R.string.check));
-        } else if (player.getAlliance().equals(getOwnerAlliance())) {
-            txtOwnerStatus.setText(getString(R.string.check));
-        }
+        runOnUiThread(() -> {
+            onGameResume();
+            if (player.getAlliance().equals(getOpponentAlliance())) {
+                txtOpponentStatus.setText(getString(R.string.check));
+            } else if (player.getAlliance().equals(getOwnerAlliance())) {
+                txtOwnerStatus.setText(getString(R.string.check));
+            }
+        });
     }
 
     @Override
     public void isDraw() {
-        txtOwnerStatus.setText(getString(R.string.draw));
-        txtOpponentStatus.setText(getString(R.string.draw));
-        endGame(GameHandler.GAME_DRAWN_FLAG);
+        runOnUiThread(() -> {
+            txtOwnerStatus.setText(getString(R.string.draw));
+            txtOpponentStatus.setText(getString(R.string.draw));
+            endGame(GameHandler.GAME_DRAWN_FLAG);
+        });
     }
 
     @Override
     public void onGameResume() {
-        txtOwnerStatus.setText("");
-        txtOpponentStatus.setText("");
+        runOnUiThread(() -> {
+            txtOwnerStatus.setText("");
+            txtOpponentStatus.setText("");
+        });
     }
 
     @Override

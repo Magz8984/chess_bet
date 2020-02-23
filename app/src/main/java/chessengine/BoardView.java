@@ -42,7 +42,8 @@ import chessbet.services.RemoteViewUpdateListener;
 import chessbet.utils.GameTimer;
 import stockfish.Engine;
 import stockfish.EngineUtil;
-import stockfish.InternalStockFishHandler;
+import stockfish.Query;
+import stockfish.QueryType;
 
 public class BoardView extends View implements RemoteMoveListener, EngineUtil.OnResponseListener {
     private int boardSize; // In dp
@@ -77,7 +78,6 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     protected boolean isEngineLoading = false;
     private List<Rect> tiles = new ArrayList<>();
     private MoveAnimator moveAnimator = new MoveAnimator();
-    private InternalStockFishHandler internalStockFishHandler;
     private EngineResponse engineResponse; // Used To get The Full Response String for Analysis Purpose
     protected volatile Move nextPuzzleMove = null;
 
@@ -96,14 +96,6 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         // Start Stock Fish
         stockfish.start();
 
-        // Start listening to engine data
-        EngineUtil.startListening();
-
-        // Redraw the board once engine responds
-        EngineUtil.setOnResponseListener(this);
-
-        internalStockFishHandler = new InternalStockFishHandler();
-
         setSaveEnabled(true);
         moveLog= new MoveLog();
         chessBoard= Board.createStandardBoard();
@@ -117,10 +109,6 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
 
     public void setEngineResponse(EngineResponse engineResponse) {
         this.engineResponse = engineResponse;
-    }
-
-    public InternalStockFishHandler getInternalStockFishHandler() {
-        return internalStockFishHandler;
     }
 
     public BoardView(Context context, AttributeSet attributeSet){
@@ -357,7 +345,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
 
     public void requestHint() {
         isHinting = !isHinting;
-        internalStockFishHandler.askStockFishMove(FenUtilities.createFEN(chessBoard), 3000, 3);
+        askStockFishBestMove();
         invalidate();
     }
 
@@ -598,12 +586,35 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         invalidate();
     }
 
-    private Move getMoveByPositions(String position){
+    protected Move getMoveByPositions(String position){
         String from = position.substring(0,2);
         String to = position.substring(2,4);
         int fromIndex = BoardUtils.getCoordinateAtPosition(from);
         int toIndex = BoardUtils.getCoordinateAtPosition(to);
         return Move.MoveFactory.createMove(chessBoard, fromIndex, toIndex);
+    }
+
+    /**
+     * Asks stockfish for best move and ponder move
+     */
+    public void askStockFishBestMove() {
+        Query query = new Query.Builder()
+                .setQueryType(QueryType.BEST_MOVE)
+                .setDepth(10)
+                .setFen(getFen())
+                .setThreads(1)
+                .setTime(20).build();
+        EngineUtil.submit(query, response -> {
+            if(response.size() == 1) {
+                ponderedStockFishMove = null;
+                currentStockFishMove = getMoveByPositions(response.get(0));
+                postInvalidate();
+            } else if (response.size() == 2) {
+                currentStockFishMove = getMoveByPositions(response.get(0));
+                ponderedStockFishMove = getMoveByPositions(response.get(1));
+                postInvalidate();
+            }
+        });
     }
 
     public void undoMove(){
@@ -744,6 +755,19 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         PUZZLE_MODE,
         PLAY_COMPUTER,
         ANALYSIS
+    }
+
+    /**
+     * Annotates if move is checkmate or check
+     * @param move made move
+     */
+    protected void setMoveCheckOrMate(Move move) {
+        if (chessBoard.currentPlayer().isInCheckMate()) {
+            move.setCheckMateMove(true);
+        } else if (chessBoard.currentPlayer().isInCheck()) {
+            move.setCheckMove(true);
+        }
+
     }
 
     public Modes getMode() {

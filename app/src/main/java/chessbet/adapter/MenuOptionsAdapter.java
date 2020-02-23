@@ -10,12 +10,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.fragment.app.FragmentManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.PresenceActivity;
 import chessbet.app.com.R;
+import chessbet.app.com.fragments.PlayComputerSettings;
 import chessbet.domain.MatchType;
 
 
@@ -24,12 +27,14 @@ public class MenuOptionsAdapter extends BaseAdapter {
     private Context context;
     private List<Integer> drawables;
     private List<String> strings;
+    private FragmentManager fragmentManager;
 
-    public MenuOptionsAdapter(Context context){
+    public MenuOptionsAdapter(Context context, FragmentManager fragmentManager){
         listeners=new ArrayList<>();
         drawables=new ArrayList<>();
         strings=new ArrayList<>();
-        this.context=context;
+        this.context = context;
+        this.fragmentManager = fragmentManager;
 
         // Two Player
         listeners.add(v -> {
@@ -42,9 +47,9 @@ public class MenuOptionsAdapter extends BaseAdapter {
 
         // Single Player
         listeners.add(v -> {
-            Intent intent=new Intent(context, BoardActivity.class);
-            intent.putExtra("match_type", MatchType.SINGLE_PLAYER.toString());
-            context.startActivity(intent);
+            PlayComputerSettings playComputerSettings = new PlayComputerSettings();
+            playComputerSettings.show(fragmentManager, "PlayComputerSettings");
+
         });
         drawables.add(R.drawable.desktop);
         strings.add("Single Player");
@@ -61,7 +66,6 @@ public class MenuOptionsAdapter extends BaseAdapter {
         drawables.add(R.drawable.wifi_four_bar);
         strings.add(context.getResources().getString(R.string.online_users));
     }
-
 
     @Override
     public int getCount() {
