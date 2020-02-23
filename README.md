@@ -72,3 +72,15 @@
 ### Improvements
 - Fix challenge creation process when user is requested for a challenge
 
+### v1.1.5-beta (Chess MVP)
+
+### Improvements
+
+- Fix Play Online Bugs
+
+### 1.1.6-beta (Chess MVP)
+
+#### Improvements
+
+- Add computer skill levels when playing versus computer
+
