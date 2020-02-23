@@ -79,9 +79,10 @@
     <string name="low_internet_connection">You Have Low Internet Connection</string>
     <string name="opponent_disconnected">Opponent Disconnected</string>
     <string name="opponent_won">%1$s Won</string>
-    <string name="computer">Computer</string>
+    <string name="computer">Computer (Level %1$d)</string>
     <string name="analysis_prompt">Forfeit Match Analyze Game</string>
     <string name="yes">YES</string>
+    <string name="computer_levels">Computer Levels</string>
     <string name="username">Username</string>
     <string name="search">Search</string>
     <string name="play_friend">Play Friend</string>

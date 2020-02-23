@@ -10,7 +10,11 @@ public class GameUtil {
     private static MediaPlayer mp;
 
     public static void  initialize(int resource, Context context){{
-        mp = MediaPlayer.create(context, resource);
+        try{
+            mp = MediaPlayer.create(context, resource);
+        } catch (Exception ex) {
+            Log.e("MEDIA_PLAYER", Objects.requireNonNull(ex.getMessage()));
+        }
     }
 
     }
