@@ -322,11 +322,11 @@ private FirebaseUser user;
                 Toast.makeText(this, "Feature only available in portrait mode", Toast.LENGTH_LONG).show();
             }
         } else if (v.equals(btnBack)) {
-            boardView.switchHintingOff();
             boardView.undoMove();
+            boardView.reHint();
         } else if (v.equals(btnForward)) {
-            boardView.switchHintingOff();
             boardView.redoMove();
+            boardView.reHint();
         } else if (v.equals(btnSave)) {
             if (!isGameFinished && matchableAccount == null && !isStoredGame) { // Enable this for none online games
                 Snackbar snackbar = Snackbar.make(btnSave, R.string.save, Snackbar.LENGTH_LONG)

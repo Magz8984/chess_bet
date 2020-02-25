@@ -173,7 +173,7 @@ public class Cell extends View {
                         boardView.isEngineLoading = true;
                             Query query = new Query.Builder()
                                     .setQueryType(QueryType.BEST_MOVE)
-                                    .setDepth(12)
+                                    .setDepth(EngineUtil.getDepthFromSkillLevel())
                                     .setFen(boardView.getFen())
                                     .setThreads(4)
                                     .setTime(3000).build();
@@ -192,7 +192,7 @@ public class Cell extends View {
                                 boardView.moveCursor = boardView.moveLog.size();
                                 boardView.onMoveDoneListener.getMoves(boardView.moveLog);
                                 boardView.isEngineLoading = false;
-                                boardView.invalidate();
+                                boardView.postInvalidate();
                             }
 
                         });

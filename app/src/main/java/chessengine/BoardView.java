@@ -356,6 +356,16 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         isHinting = false;
     }
 
+    /**
+     * Allows for hinting if user redoes move
+     */
+    public void reHint() {
+        if(isHinting) {
+            askStockFishBestMove();
+            invalidate();
+        }
+    }
+
     public boolean isHinting() {
         return isHinting;
     }
@@ -600,7 +610,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     public void askStockFishBestMove() {
         Query query = new Query.Builder()
                 .setQueryType(QueryType.BEST_MOVE)
-                .setDepth(10)
+                .setDepth(11)
                 .setFen(getFen())
                 .setThreads(1)
                 .setTime(20).build();

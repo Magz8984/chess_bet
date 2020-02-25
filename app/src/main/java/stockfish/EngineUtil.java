@@ -5,7 +5,6 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -18,7 +17,7 @@ import java.util.concurrent.Executors;
 
 public class EngineUtil {
     private static BufferedWriter bufferedWriter;
-    private static ExecutorService executor = Executors.newFixedThreadPool(4); // Manage input handling
+    private static ExecutorService executor = Executors.newFixedThreadPool(2); // Manage input handling
     private static ExecutorService callback = Executors.newSingleThreadExecutor(); // Manage output handling
     private static BufferedReader bufferedReader;
     private static long skillLevel;
@@ -30,6 +29,23 @@ public class EngineUtil {
 
     static void setBufferedReader(BufferedReader bufferedReader) {
         EngineUtil.bufferedReader = bufferedReader;
+    }
+
+    /**
+     * Allows for relatively easy games for easier levels
+     * @return
+     */
+    public static long getDepthFromSkillLevel() {
+        if(skillLevel > 15) {
+            return 13;
+        } else if (skillLevel > 10) {
+            return 6;
+        } else if (skillLevel > 4) {
+            return 3;
+        } else if (skillLevel >= 0) {
+            return 1;
+        }
+        return 13;
     }
 
     static void setBufferedWriter(BufferedWriter bufferedWriter) {
