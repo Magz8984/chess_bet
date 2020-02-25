@@ -113,7 +113,7 @@ public class EngineUtil {
         skillLevel = skill;
         Log.d("UCIOption",UCIOption.SKILL_LEVEL.setValue(skillLevel).toString());
         handleInput(UCIOption.SKILL_LEVEL.setValue(skillLevel).toString());
-        submit("isready\n", "readyok", responses -> Log.d("ISREADY", responses.get(0)));
+        submit("isready\n", "readyok", responses -> Log.d("c", responses.get(0)));
     }
 
     public interface OnResponseListener{
