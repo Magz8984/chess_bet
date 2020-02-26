@@ -614,11 +614,10 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     public void askStockFishBestMove() {
         Query query = new Query.Builder()
                 .setQueryType(QueryType.BEST_MOVE)
-                .setDepth(12)
+                .setDepth(20)
                 .setFen(getFen())
-                .setThreads(3)
-                .setSlowMover(20)
-                .setTime(20).build();
+                .setThreads(1)
+                .setTime(1000).build();
         EngineUtil.submit(query, response -> {
             if(response.size() == 1) {
                 ponderedStockFishMove = null;

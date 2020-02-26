@@ -173,7 +173,7 @@ public class Cell extends View {
                         boardView.isEngineLoading = true;
                             Query query = new Query.Builder()
                                     .setQueryType(QueryType.BEST_MOVE)
-                                    .setDepth(EngineUtil.getDepthFromSkillLevel())
+                                    .setDepth(EngineUtil.getSkillLevel())
                                     .setFen(boardView.getFen())
                                     .setThreads(4)
                                     .setTime(3000).build();

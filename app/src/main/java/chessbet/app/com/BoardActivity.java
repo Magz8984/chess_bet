@@ -174,9 +174,9 @@ private FirebaseUser user;
         String matchType = intent.getStringExtra("match_type");
         int skillLevel = intent.getIntExtra("skill_level", 20);
         EngineUtil.setSkillLevel(skillLevel);
-        EngineUtil.setUCIELORating(EngineUtil.getEloFromSkillLevel());
 
         if(matchType != null && matchType.equals(MatchType.SINGLE_PLAYER.toString())){
+            EngineUtil.setUCIELORating(EngineUtil.getEloFromSkillLevel());
             btnHint.setVisibility(View.GONE);
             txtOwner.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
             txtOpponent.setText(getResources().getString(R.string.computer, skillLevel));

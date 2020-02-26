@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 
 public class EngineUtil {
     private static BufferedWriter bufferedWriter;
-    private static Executor executor = Executors.newFixedThreadPool(3); // Manage input handling
+    private static Executor executor = Executors.newSingleThreadExecutor(); // Manage input handling
     private static Executor callback = Executors.newSingleThreadExecutor(); // Manage output handling
     private static BufferedReader bufferedReader;
     private static long skillLevel;
@@ -31,25 +31,8 @@ public class EngineUtil {
         EngineUtil.bufferedReader = bufferedReader;
     }
 
-    /**
-     * Allows for relatively easy games for easier levels
-     * @return skill level
-     */
-    public static long getDepthFromSkillLevel() {
-        if(skillLevel > 15) {
-            return 13;
-        } else if (skillLevel > 10) {
-            return 6;
-        } else if (skillLevel > 4) {
-            return 3;
-        } else if (skillLevel >= 0) {
-            return 0;
-        }
-        return 13;
-    }
-
     public static long getEloFromSkillLevel() {
-        return (skillLevel * 100 + 500);
+        return (((skillLevel - 1) * 75) + 1350);
     }
 
     static void setBufferedWriter(BufferedWriter bufferedWriter) {
@@ -117,12 +100,14 @@ public class EngineUtil {
         skillLevel = skill;
         Log.d("UCIOption",UCIOption.SKILL_LEVEL.setValue(skillLevel).toString());
         handleInput(UCIOption.SKILL_LEVEL.setValue(skillLevel).toString());
-        submit("isready\n", "readyok", responses -> Log.d("c", responses.get(0)));
+        submit("isready\n", "readyok", responses -> Log.d("RESPONSE", responses.get(0)));
+
     }
 
     public static void setUCIELORating(long rating) {
         handleInput(UCIOption.UCI_LimitStrength.setBool(true).toBoolString());
         handleInput(UCIOption.UCI_Elo.setValue(rating).toString());
+        submit("isready\n", "readyok", responses -> Log.d("RESPONSE", responses.get(0)));
     }
 
     public interface OnResponseListener{
