@@ -84,3 +84,10 @@
 
 - Add computer skill levels when playing versus computer
 
+### 1.1.7-beta (Chess-MVP)
+
+#### Improvements
+
+- Fix stockfish depth on different skill levels
+- Fix UI not being updated after a certain move
+- Fix hints from stockfish not showing up for certain positions
