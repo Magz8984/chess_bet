@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**
@@ -17,8 +17,8 @@ import java.util.concurrent.Executors;
 
 public class EngineUtil {
     private static BufferedWriter bufferedWriter;
-    private static ExecutorService executor = Executors.newFixedThreadPool(2); // Manage input handling
-    private static ExecutorService callback = Executors.newSingleThreadExecutor(); // Manage output handling
+    private static Executor executor = Executors.newFixedThreadPool(3); // Manage input handling
+    private static Executor callback = Executors.newSingleThreadExecutor(); // Manage output handling
     private static BufferedReader bufferedReader;
     private static long skillLevel;
 
@@ -33,7 +33,7 @@ public class EngineUtil {
 
     /**
      * Allows for relatively easy games for easier levels
-     * @return
+     * @return skill level
      */
     public static long getDepthFromSkillLevel() {
         if(skillLevel > 15) {
@@ -43,9 +43,13 @@ public class EngineUtil {
         } else if (skillLevel > 4) {
             return 3;
         } else if (skillLevel >= 0) {
-            return 1;
+            return 0;
         }
         return 13;
+    }
+
+    public static long getEloFromSkillLevel() {
+        return (skillLevel * 100 + 500);
     }
 
     static void setBufferedWriter(BufferedWriter bufferedWriter) {
@@ -87,7 +91,7 @@ public class EngineUtil {
     }
 
     public static void submit(Query query, ResponseCallback responseCallback) {
-        executor.submit(() -> {
+        executor.execute(() -> {
             String output;
             List<String> responses = new ArrayList<>();
             handleInput(query.toString());
@@ -98,14 +102,14 @@ public class EngineUtil {
                 responses = Collections.singletonList(handleOutput("cp"));
             }
             List<String> finalResponses = responses;
-            callback.submit(() -> responseCallback.onResponse(finalResponses));
+            callback.execute(() -> responseCallback.onResponse(finalResponses));
         });
     }
 
     public static void submit(String command, String responseIdentifier, ResponseCallback responseCallback){
-        executor.submit(() -> {
+        executor.execute(() -> {
             handleInput(command);
-            callback.submit(() -> responseCallback.onResponse(Collections.singletonList(handleOutput(responseIdentifier))));
+            callback.execute(() -> responseCallback.onResponse(Collections.singletonList(handleOutput(responseIdentifier))));
         });
     }
 
@@ -114,6 +118,11 @@ public class EngineUtil {
         Log.d("UCIOption",UCIOption.SKILL_LEVEL.setValue(skillLevel).toString());
         handleInput(UCIOption.SKILL_LEVEL.setValue(skillLevel).toString());
         submit("isready\n", "readyok", responses -> Log.d("c", responses.get(0)));
+    }
+
+    public static void setUCIELORating(long rating) {
+        handleInput(UCIOption.UCI_LimitStrength.setBool(true).toBoolString());
+        handleInput(UCIOption.UCI_Elo.setValue(rating).toString());
     }
 
     public interface OnResponseListener{

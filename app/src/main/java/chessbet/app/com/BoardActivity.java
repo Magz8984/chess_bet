@@ -174,6 +174,7 @@ private FirebaseUser user;
         String matchType = intent.getStringExtra("match_type");
         int skillLevel = intent.getIntExtra("skill_level", 20);
         EngineUtil.setSkillLevel(skillLevel);
+        EngineUtil.setUCIELORating(EngineUtil.getEloFromSkillLevel());
 
         if(matchType != null && matchType.equals(MatchType.SINGLE_PLAYER.toString())){
             btnHint.setVisibility(View.GONE);

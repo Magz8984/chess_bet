@@ -32,7 +32,6 @@ import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import chessbet.api.MatchAPI;
 import chessbet.domain.MatchableAccount;
@@ -615,9 +614,10 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     public void askStockFishBestMove() {
         Query query = new Query.Builder()
                 .setQueryType(QueryType.BEST_MOVE)
-                .setDepth(11)
+                .setDepth(12)
                 .setFen(getFen())
-                .setThreads(1)
+                .setThreads(3)
+                .setSlowMover(20)
                 .setTime(20).build();
         EngineUtil.submit(query, response -> {
             if(response.size() == 1) {

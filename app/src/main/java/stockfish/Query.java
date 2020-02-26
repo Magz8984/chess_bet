@@ -14,6 +14,7 @@ public class Query {
     private long depth;
     private long time;
     private long threads;
+    private long slowMover = 20;
 
     public void setDepth(long depth) {
         this.depth = depth;
@@ -21,6 +22,10 @@ public class Query {
 
     private void setFen(String fen) {
         this.fen = fen;
+    }
+
+    private void setSlowMover(long slowMover) {
+        this.slowMover = slowMover;
     }
 
     public void setThreads(long threads) {
@@ -42,8 +47,10 @@ public class Query {
     @NonNull
     @Override
     public String toString() {
-    return String.format(Locale.ENGLISH,"setoption name Threads value %d \n setoption name Minimum Thinking Time value %d \n position fen %s \n" +
-            " go depth %d \n", this.threads, this.time,  this.fen, this.depth);
+    return String.format(Locale.ENGLISH,"setoption name Threads value %d \n " +
+            "setoption name Minimum Thinking Time value %d \n position fen %s \n" +
+            "setoption name Slow Mover value %d \n" +
+            " go depth %d \n", this.threads, this.time,  this.fen, this.slowMover ,this.depth);
     }
 
     public static class Builder {
@@ -65,6 +72,11 @@ public class Query {
 
         public Builder setTime(long ms) {
             this.query.setTime(ms);
+            return this;
+        }
+
+        public Builder setSlowMover(long slowMover){
+            this.query.setSlowMover(slowMover);
             return this;
         }
 
