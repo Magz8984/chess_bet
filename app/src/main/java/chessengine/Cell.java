@@ -178,23 +178,24 @@ public class Cell extends View {
                                     .setThreads(4)
                                     .setTime(3000).build();
                             EngineUtil.submit(query, response -> {
-                            Move sMove = boardView.getMoveByPositions(response.get(0));
-                            MoveTransition moveTransition = boardView.chessBoard.currentPlayer().makeMove(sMove);
-                            if(moveTransition.getMoveStatus().isDone()){
-                                boardView.clearTiles();
-                                boardView.destinationTile =  boardView.chessBoard.getTile(sMove.getDestinationCoordinate());
-                                boardView.sourceTile = boardView.chessBoard.getTile(sMove.getCurrentCoordinate());
-                                boardView.chessBoard = moveTransition.getTransitionBoard();
-                                GameUtil.playSound();
-                                updateGameStatus();
-                                boardView.setMoveCheckOrMate(sMove);
-                                boardView.moveLog.addMove(sMove);
-                                boardView.moveCursor = boardView.moveLog.size();
-                                boardView.onMoveDoneListener.getMoves(boardView.moveLog);
-                                boardView.isEngineLoading = false;
-                                boardView.postInvalidate();
+                            if(!response.isEmpty()){
+                                Move sMove = boardView.getMoveByPositions(response.get(0));
+                                MoveTransition moveTransition = boardView.chessBoard.currentPlayer().makeMove(sMove);
+                                if(moveTransition.getMoveStatus().isDone()){
+                                    boardView.clearTiles();
+                                    boardView.destinationTile =  boardView.chessBoard.getTile(sMove.getDestinationCoordinate());
+                                    boardView.sourceTile = boardView.chessBoard.getTile(sMove.getCurrentCoordinate());
+                                    boardView.chessBoard = moveTransition.getTransitionBoard();
+                                    GameUtil.playSound();
+                                    updateGameStatus();
+                                    boardView.setMoveCheckOrMate(sMove);
+                                    boardView.moveLog.addMove(sMove);
+                                    boardView.moveCursor = boardView.moveLog.size();
+                                    boardView.onMoveDoneListener.getMoves(boardView.moveLog);
+                                    boardView.isEngineLoading = false;
+                                    boardView.postInvalidate();
+                                }
                             }
-
                         });
                     }
                     updateGameStatus();
@@ -324,7 +325,7 @@ public class Cell extends View {
         for(final Move move : pieceLegalMoves(boardView.chessBoard)){
             if(move.getDestinationCoordinate() == this.tileId){
                 if(!boardView.chessBoard.getTile(this.tileId).isOccupied()){
-                    drawable=this.context.getResources().getDrawable(R.drawable.select_light);
+                    drawable = this.context.getResources().getDrawable(R.drawable.select_light);
                     drawable.setColorFilter(color,PorterDuff.Mode.DST_OVER);
                     drawable.draw(canvas);
                     bitmap = ((BitmapDrawable) drawable).getBitmap();

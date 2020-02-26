@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import chessbet.app.com.BoardActivity;
+import chessbet.app.com.PlayComputerSettingsActivity;
 import chessbet.app.com.PresenceActivity;
 import chessbet.app.com.R;
-import chessbet.app.com.fragments.PlayComputerSettings;
 import chessbet.domain.MatchType;
 
 
@@ -27,14 +27,12 @@ public class MenuOptionsAdapter extends BaseAdapter {
     private Context context;
     private List<Integer> drawables;
     private List<String> strings;
-    private FragmentManager fragmentManager;
 
-    public MenuOptionsAdapter(Context context, FragmentManager fragmentManager){
+    public MenuOptionsAdapter(Context context){
         listeners=new ArrayList<>();
         drawables=new ArrayList<>();
         strings=new ArrayList<>();
         this.context = context;
-        this.fragmentManager = fragmentManager;
 
         // Two Player
         listeners.add(v -> {
@@ -47,8 +45,9 @@ public class MenuOptionsAdapter extends BaseAdapter {
 
         // Single Player
         listeners.add(v -> {
-            PlayComputerSettings playComputerSettings = new PlayComputerSettings();
-            playComputerSettings.show(fragmentManager, "PlayComputerSettings");
+            Intent intent=new Intent(context, PlayComputerSettingsActivity.class);
+            intent.putExtra("match_type", MatchType.TWO_PLAYER.toString());
+            context.startActivity(intent);
 
         });
         drawables.add(R.drawable.desktop);
