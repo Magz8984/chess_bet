@@ -91,3 +91,13 @@
 - Fix stockfish depth on different skill levels
 - Fix UI not being updated after a certain move
 - Fix hints from stockfish not showing up for certain positions
+
+### 1.1.8-beta (Chess MVP)
+
+#### Improvements
+
+- Fix bitmap OOM error
+- Replace Play Computer Settings Dialog Fragment with Activity
+
+#### 1.1.9-beta(Chess MVP)
+- Fix skill level intent data
