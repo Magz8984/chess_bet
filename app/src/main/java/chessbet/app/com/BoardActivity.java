@@ -172,7 +172,7 @@ private FirebaseUser user;
         setExternalPlayers();
         configureChallenge(intent);
         String matchType = intent.getStringExtra("match_type");
-        int skillLevel = intent.getIntExtra("skill_level", 20);
+        long skillLevel = intent.getLongExtra("skill_level", 20);
         EngineUtil.setSkillLevel(skillLevel);
 
         if(matchType != null && matchType.equals(MatchType.SINGLE_PLAYER.toString())){

@@ -18,7 +18,7 @@ public class PlayComputerSettingsActivity extends AppCompatActivity implements V
     @BindView(R.id.levels) GridView gridView;
     @BindView(R.id.btnCancel)  Button btnCancel;
     @BindView(R.id.btnPlay) Button btnPlay;
-    private long skillLevel;
+    private long skillLevel = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +38,9 @@ public class PlayComputerSettingsActivity extends AppCompatActivity implements V
             finish();
         } else if (view.equals(btnPlay)) {
             if(skillLevel != 0) {
-                Intent intent=new Intent(this, BoardActivity.class);
+                Intent intent = new Intent(this, BoardActivity.class);
                 intent.putExtra("match_type", MatchType.SINGLE_PLAYER.toString());
-                intent.putExtra("skill_level", skillLevel);
+                intent.putExtra("skill_level", this.skillLevel);
                 startActivity(intent);
                 finish();
             } else {
