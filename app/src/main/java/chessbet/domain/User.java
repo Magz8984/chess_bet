@@ -37,7 +37,7 @@ public class User {
     }
 
     public String getUser_name() {
-        return user_name;
+        return (user_name == null) ? "anyomous" : user_name;
     }
 
     public boolean isDisabled() {
