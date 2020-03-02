@@ -9,8 +9,8 @@ android {
         applicationId "chessbet.app.com"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 10
-        versionName "1.2.0-beta"
+        versionCode 11
+        versionName "1.2.1-beta"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             ndkBuild {
