@@ -32,7 +32,7 @@ public class EngineUtil {
     }
 
     public static long getEloFromSkillLevel() {
-        return (((skillLevel - 1) * 75) + 1350);
+        return (((skillLevel - 1) * 140) + 200);
     }
 
     static void setBufferedWriter(BufferedWriter bufferedWriter) {
