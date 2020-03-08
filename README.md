@@ -101,3 +101,6 @@
 
 #### 1.1.9-beta(Chess MVP)
 - Fix skill level intent data
+
+#### 1.2.1-beta(Chess MVP)
+- Fix error when getting no move from stockfish
