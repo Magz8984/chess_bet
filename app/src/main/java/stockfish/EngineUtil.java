@@ -32,7 +32,7 @@ public class EngineUtil {
     }
 
     public static long getEloFromSkillLevel() {
-        return (((skillLevel - 1) * 140) + 200);
+        return (((skillLevel - 1) * 75) + 1350);
     }
 
     static void setBufferedWriter(BufferedWriter bufferedWriter) {
@@ -60,7 +60,7 @@ public class EngineUtil {
         }catch (Exception ex){
             ex.printStackTrace();
         }
-        return null;
+        return "";
     }
 
     // Hanlde stockfish input

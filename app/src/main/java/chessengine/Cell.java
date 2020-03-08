@@ -175,7 +175,7 @@ public class Cell extends View {
                                     .setQueryType(QueryType.BEST_MOVE)
                                     .setDepth(EngineUtil.getSkillLevel())
                                     .setFen(boardView.getFen())
-                                    .setThreads(4)
+                                    .setThreads(1)
                                     .setTime(3000).build();
                             EngineUtil.submit(query, response -> {
                             if(!response.isEmpty()){
