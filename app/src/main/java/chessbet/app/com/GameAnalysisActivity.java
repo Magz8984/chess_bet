@@ -231,7 +231,7 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             }
 
             Entry entry = new Entry(size, centiPawnEval);
-            if(!boardView.getMoveLog().getMoves().isEmpty()){
+            if(!boardView.getMoveLog().getMoves().isEmpty() && size != 0){
                 entry.setData(boardView.getMoveLog().getMoves().get(size - 1));
             }
 

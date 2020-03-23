@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 29
@@ -37,6 +36,7 @@ android {
         dev {
             dimension 'app'
             applicationId 'com.chessbet.test'
+            resValue "string", "app_name", "Chess MVP Test"
             versionCode 1
             versionName "1.0"
             buildConfigField("String", "CLOUD_FUNCTIONS_URL", cloudFunctionsTestURL)
@@ -47,6 +47,7 @@ android {
         prod {
             dimension 'app'
             applicationId 'chessbet.app.com'
+            resValue "string", "app_name", "Chess MVP"
             versionCode 1
             versionName "1.2.1-beta"
             buildConfigField("String", "CLOUD_FUNCTIONS_URL", cloudFunctionsURL)
@@ -137,3 +138,5 @@ tasks.withType(JavaCompile) {
 }
 
 apply plugin: 'com.google.gms.google-services'
+
+apply plugin: 'com.google.firebase.crashlytics'
