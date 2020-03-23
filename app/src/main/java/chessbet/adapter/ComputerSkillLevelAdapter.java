@@ -43,26 +43,32 @@ public class ComputerSkillLevelAdapter extends BaseAdapter{
         return 0;
     }
 
+    // Re initialize view to avoid te cached position from being displayed
+    private void initializeView(int position, View view) {
+        TextView txtLevel = view.findViewById(R.id.txtLevel);
+        String data = Integer.toString(levels.get(position));
+        txtLevel.setText(data);
+        view.setOnClickListener(view1 -> {
+            if(selectedView != null) {
+                selectedView.setBackgroundColor(this.context.getResources().getColor(R.color.white));
+            }
+            selectedView = view;
+            view.setBackgroundColor(this.context.getResources().getColor(R.color.colorPrimaryYellow));
+            skillLevel.setSkillLevel(levels.get(position));
+        });
+    }
+
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         LayoutInflater layoutInflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View skillView;
+
         if(view == null ) {
             skillView = layoutInflater.inflate(R.layout.computer_skill_level_view, null);
-            TextView txtLevel = skillView.findViewById(R.id.txtLevel);
-            String data = Integer.toString(levels.get(i));
-            txtLevel.setText(data);
-            skillView.setOnClickListener(view1 -> {
-                if(selectedView != null) {
-                    selectedView.setBackgroundColor(this.context.getResources().getColor(R.color.white));
-                }
-                selectedView = skillView;
-                skillView.setBackgroundColor(this.context.getResources().getColor(R.color.colorPrimaryYellow));
-                skillLevel.setSkillLevel(levels.get(i));
-            });
         } else {
             skillView = view;
         }
+        initializeView(i, skillView);
         return skillView;
     }
 
