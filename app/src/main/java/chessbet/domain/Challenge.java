@@ -116,4 +116,9 @@ public class Challenge {
     public static boolean isAccepted(Challenge challenge){
         return challenge.requester != null;
     }
+
+    public enum Type{
+        FRIENDLY,
+        CHALLENGE
+    }
 }

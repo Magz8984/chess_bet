@@ -23,12 +23,9 @@ import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.michaelmuenzer.android.scrollablennumberpicker.ScrollableNumberPicker;
 import com.transitionseverywhere.TransitionManager;
 
-import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -40,8 +37,8 @@ import chessbet.api.MatchAPI;
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.R;
 import chessbet.domain.Challenge;
+import chessbet.domain.ChallengeDTO;
 import chessbet.domain.MatchRange;
-import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.services.MatchListener;
 import chessbet.services.MatchService;
@@ -62,7 +59,6 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     private boolean showRatingView = false;
 
     private MatchAPI matchAPI;
-    private FirebaseUser user;
     private MatchRange matchRange;
     @Nullable
     @Override
@@ -90,7 +86,6 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         gameDurations.setAdapter(new GameDurationAdapter(getContext()));
         progressCircle.attachListener(this);
         btnViewRangeViewHolder.setOnClickListener(this);
-        user = FirebaseAuth.getInstance().getCurrentUser();
         rangeViewHolder.setVisibility(showRatingView ? View.VISIBLE : View.GONE);
         ChallengeAPI.get().setChallengeHandler(this);
         return view;
@@ -110,40 +105,23 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
         endValue.setListener(value -> matchRange.setEndAt(value));
     }
 
-    private void createChallenge(){
-        challenge.setMatchType(MatchType.PLAY_ONLINE);
-        challenge.setEloRating(AccountAPI.get().getCurrentAccount().getElo_rating());
-        challenge.setAccepted(false);
-        challenge.setOwner(AccountAPI.get().getCurrentUser().getUid());
-        challenge.setTimeStamp(System.currentTimeMillis());
-        challenge.setDuration(AccountAPI.get().getCurrentAccount().getLast_match_duration());
-        challenge.setDateCreated(new Date().toString()); // Help us trouble shoot errors;
-        challenge.setMaxRating(AccountAPI.get().getCurrentAccount().getElo_rating() + matchRange.getEndAt());
-        challenge.setMinRating(AccountAPI.get().getCurrentAccount().getElo_rating() - matchRange.getStartAt());
-        ChallengeAPI.get().setChallenge(challenge);
-    }
-
-    private MatchableAccount createMatchableAccount(){
-        MatchableAccount matchableAccount = new MatchableAccount();
-        matchableAccount.setOwner(user.getUid());
-        matchableAccount.setMatch_type(MatchType.PLAY_ONLINE.toString());
-        matchableAccount.setDuration(AccountAPI.get().getCurrentAccount().getLast_match_duration());
-        matchableAccount.setElo_rating(AccountAPI.get().getCurrentAccount().getElo_rating());
-        return matchableAccount;
-    }
-
     @Override
     public void onClick(View v) {
         if(v.equals(findMatch)){
             if(AccountAPI.get().getCurrentAccount().getLast_match_duration() == 0){
-                // DatabaseMatch duration not set
-                Toast.makeText(getContext(), "DatabaseMatch duration not selected", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "DatabaseMatch duration not selected", Toast.LENGTH_LONG).show();
             } else {
                 findMatch.setEnabled(false);
                 progressCircle.show();
-                //DatabaseMatch Service Listener Set
-                createChallenge();
-                matchAPI.createUserMatchableAccountImplementation(createMatchableAccount());
+                ChallengeDTO challengeDTO = new ChallengeDTO.Builder()
+                        .setOwner(AccountAPI.get().getCurrentAccount().getOwner())
+                        .setDuration((int) AccountAPI.get().getCurrentAccount().getLast_match_duration())
+                        .setEloRating(AccountAPI.get().getCurrentAccount().getElo_rating())
+                        .setMaxEloRating(AccountAPI.get().getCurrentAccount().getElo_rating() + matchRange.getEndAt())
+                        .setMinEloRating(AccountAPI.get().getCurrentAccount().getElo_rating() - matchRange.getStartAt())
+                        .setType(Challenge.Type.CHALLENGE)
+                        .build();
+                ChallengeAPI.get().getSetChallengeImplementation(challengeDTO);
             }
         }
 
@@ -177,9 +155,6 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
 
     @Override
     public void onMatchableCreatedNotification() {
-        MatchAPI.get().setMatchCreated(true);
-        ChallengeAPI.get().setMatchRange(matchRange);
-        ChallengeAPI.get().getChallenge();
     }
 
     @Override
@@ -209,14 +184,20 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     }
 
     @Override
-    public void challengeFound(String id) {
-        progressCircle.beginFinalAnimation();
-        progressCircle.hide();
+    public void challengeFound(String response) {
+        Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+            Toast.makeText(getContext(), response, Toast.LENGTH_LONG).show();
+            progressCircle.beginFinalAnimation();
+            progressCircle.hide();
+        });
     }
 
     @Override
     public void challengeNotFound() {
-        findMatch.setEnabled(true);
-        ChallengeAPI.get().sendChallenge(challenge);
+        Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
+            Toast.makeText(getContext(), "ERROR WHILE GETTING CHALLENGE", Toast.LENGTH_LONG).show();
+            findMatch.setEnabled(true);
+            ChallengeAPI.get().sendChallenge(challenge);
+        });
     }
 }

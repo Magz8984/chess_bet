@@ -55,7 +55,7 @@ public class GameTimer {
             public void onTick(View view, long millisUntilFinished) {
                 TextView txtBlackTimer = (TextView) view;
                 opponentTimeLeft = (int) millisUntilFinished;
-                txtBlackTimer.setText(timeConverter(millisUntilFinished/1000));
+                txtBlackTimer.setText(timeConverter(millisUntilFinished / 1000));
                 if(millisUntilFinished / 1000 <= 10 ){
                     txtBlackTimer.setTextColor(Color.RED);
                 }
