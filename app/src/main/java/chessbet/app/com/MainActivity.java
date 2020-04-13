@@ -106,8 +106,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         AccountAPI.get().getUser();
         AccountAPI.get().getAccount();
 
-        ChallengeAPI.get().deleteAllChallenges(this); // Delete previously created challenges;
-
         EventBroadcast.get().addAccountUpdated(this);
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -174,12 +172,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.itm_play_online:
                 // TODO Remove piece of logic from UI.
                 if(AccountAPI.get().getCurrentAccount() != null){
-                    if(ChallengeAPI.get().isLoaded()){
-                        toolbar.setTitle(getString(R.string.play_online));
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment()).commit();
-                    } else {
-                        Toast.makeText(this, "Challenges Loading", Toast.LENGTH_LONG).show();
-                    }
+                    toolbar.setTitle(getString(R.string.play_online));
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment()).commit();
                 }
                 break;
             case R.id.itm_profile:

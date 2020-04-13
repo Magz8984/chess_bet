@@ -14,6 +14,7 @@ public class Constants {
     public static String EVALUATE_AND_STORE_MATCH = "/evaluateMatch";
     public static String FORCE_EVALUATE_MATCH = "/forceEvaluateMatch";
     public static String SEND_FCM_MESSAGE_TO_USERS = "/sendFCMMessage";
+    public static String GET_SET_CHALLENGE = "/challenge/randomChallenge";
     public static String TERMS_OF_SERVICE_URL = "https://chess-mvp.com/#/home/tos";
     public static String GAMES_CLOUD_REFERENCE = "games";
     public static String UTILITY_PROFILE = "https://firebasestorage.googleapis.com/v0/b/chessbet-app-com-v1.appspot.com/o/utilities%2Fuser.png" +
@@ -26,8 +27,8 @@ public class Constants {
     public static String CHALLENGE_ID = "challengeId";
     public static String IS_CHALLENGER = "isChallenger";
     public static String CHALLENGER = "Challenger";
-    public static final int TIME_NO_MOVE_END_MATCH = 120;
-    public static final int TIME_NO_MOVE_CAUTION = 110;
+    public static final int TIME_NO_MOVE_END_MATCH = 90;
+    public static final int TIME_NO_MOVE_CAUTION = 80;
     public static int RESPONSE_OKAY_FLAG = 200;
     public static String MESSAGE_TYPE  = "messageType";
     public static String FROM_USER = "fromUser";

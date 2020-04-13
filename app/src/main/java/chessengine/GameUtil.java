@@ -23,7 +23,11 @@ public class GameUtil {
             mp.start();
         }
         catch (Exception ex){
-            Log.e("MEDIA_PLAYER", Objects.requireNonNull(ex.getMessage()));
+            if(ex.getMessage() != null){
+                Log.e("MEDIA_PLAYER", ex.getMessage());
+            } else {
+                ex.printStackTrace();
+            }
         }
     }
 
