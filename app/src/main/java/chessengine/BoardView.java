@@ -32,7 +32,6 @@ import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import chessbet.api.MatchAPI;
 import chessbet.domain.MatchableAccount;
@@ -411,11 +410,23 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         return darkCellsColor;
     }
 
+    private Alliance getOwnerAlliance(){
+        if(matchableAccount != null){
+            return (localAlliance == Alliance.WHITE) ? Alliance.WHITE : Alliance.BLACK;
+        }
+        return Alliance.WHITE;
+    }
+
+    /**
+     * Sends Move Data To Match
+     * @param from fromCellCoordinate
+     * @param to toCellCoordinate
+     */
     public void setMoveData(int from, int to) {
         if(matchAPI != null){
             // Help regulate time between play
-            long timeLeft = (localAlliance == Alliance.WHITE) ? gameTimer.getOwnerTimeLeft() : gameTimer.getOpponentTimeLeft();
-            matchAPI.sendMoveData(matchableAccount,from,to, getPortableGameNotation(),timeLeft);
+//          long timeLeft = (getOwnerAlliance() == Alliance.WHITE) ? gameTimer.getOwnerTimeLeft() : gameTimer.getOpponentTimeLeft();
+            matchAPI.sendMoveData(matchableAccount,from,to, getPortableGameNotation(), gameTimer.getOwnerTimeLeft());
         }
     }
 
@@ -563,13 +574,13 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
                 GameUtil.playSound();
                 if(gameTimer != null){
                     // Reset time from when the move was made from the other device;
-                    if(localAlliance == Alliance.WHITE) {
-                        gameTimer.setOpponentTimeLeft((int) remoteMove.getGameTimeLeft());
-                        gameTimer.setOpponentTimer();
-                    } else {
-                        gameTimer.setOwnerTimeLeft((int) remoteMove.getGameTimeLeft());
-                        gameTimer.setOwnerTimer();
-                    }
+//                    if(localAlliance == Alliance.WHITE) {
+                    gameTimer.setOpponentTimeLeft((int) remoteMove.getGameTimeLeft());
+                    gameTimer.setOpponentTimer();
+//                    } else {
+//                        gameTimer.setOwnerTimeLeft((int) remoteMove.getGameTimeLeft());
+//                        gameTimer.setOwnerTimer();
+//                    }
                     gameTimer.stopTimer((chessBoard.currentPlayer().getAlliance() == Alliance.WHITE) ? chessbet.domain.Player.WHITE :  chessbet.domain.Player.BLACK);
                 }
                 chessBoard = transition.getTransitionBoard();
