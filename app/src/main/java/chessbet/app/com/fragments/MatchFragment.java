@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -185,19 +186,25 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
 
     @Override
     public void challengeFound(String response) {
-        Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
-            Toast.makeText(getContext(), response, Toast.LENGTH_LONG).show();
-            progressCircle.beginFinalAnimation();
-            progressCircle.hide();
-        });
+        FragmentActivity activity = getActivity();
+        if(activity != null) {
+            activity.runOnUiThread(() -> {
+                Toast.makeText(getContext(), response, Toast.LENGTH_LONG).show();
+                progressCircle.beginFinalAnimation();
+                progressCircle.hide();
+            });
+        }
     }
 
     @Override
     public void challengeNotFound() {
-        Objects.requireNonNull(getActivity()).runOnUiThread(() -> {
-            Toast.makeText(getContext(), "ERROR WHILE GETTING CHALLENGE", Toast.LENGTH_LONG).show();
-            findMatch.setEnabled(true);
-            ChallengeAPI.get().sendChallenge(challenge);
-        });
+        FragmentActivity activity = getActivity();
+        if(activity != null) {
+            activity.runOnUiThread(() -> {
+                Toast.makeText(getContext(), "ERROR WHILE GETTING CHALLENGE", Toast.LENGTH_LONG).show();
+                findMatch.setEnabled(true);
+                ChallengeAPI.get().sendChallenge(challenge);
+            });
+        }
     }
 }
