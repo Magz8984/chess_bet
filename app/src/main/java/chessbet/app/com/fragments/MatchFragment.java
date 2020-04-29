@@ -140,7 +140,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
             ChallengeAPI.get().setOnChallenge(true);
             AccountAPI.get().getCurrentAccount().setLast_match_duration(0);
             progressCircle.beginFinalAnimation();
-            Objects.requireNonNull(getContext()).startService(new Intent(getContext(), MatchService.class));
+            requireContext().startService(new Intent(getContext(), MatchService.class));
             new Handler().postDelayed(() -> {
                 Intent target= new Intent(getContext(), BoardActivity.class);
                 target.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -161,7 +161,7 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
     @Override
     public void onMatchError() {
         try {
-            Objects.requireNonNull(getActivity()).runOnUiThread(() -> new Handler().postDelayed(() -> progressCircle.hide(),40000)); // Waits for 40 seconds before hiding the progress bar
+            requireActivity().runOnUiThread(() -> new Handler().postDelayed(() -> progressCircle.hide(),40000)); // Waits for 40 seconds before hiding the progress bar
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -203,7 +203,6 @@ public class MatchFragment extends Fragment implements MatchListener, View.OnCli
             activity.runOnUiThread(() -> {
                 Toast.makeText(getContext(), "ERROR WHILE GETTING CHALLENGE", Toast.LENGTH_LONG).show();
                 findMatch.setEnabled(true);
-                ChallengeAPI.get().sendChallenge(challenge);
             });
         }
     }

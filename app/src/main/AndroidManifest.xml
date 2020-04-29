@@ -127,6 +127,7 @@
             android:label="@string/match_service" />
         <service
             android:name="chessbet.services.FCMService"
+            android:enabled="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

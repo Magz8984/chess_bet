@@ -84,7 +84,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
     @Override
     public void onStart() {
         // Make sure soft keyboard does not adjust layout
-        Objects.requireNonNull(getActivity()).getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        requireActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         super.onStart();
         init();
     }

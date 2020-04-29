@@ -109,7 +109,12 @@ public class MatchAPI implements Serializable {
                         RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
                         // Confirms a match has been made
                         matchListener.onMatchMade(matchableAccount);
+                    } else {
+                        // TODO Create a match not found interface method in MatchListener
+                        matchListener.onMatchError();
                     }
+                } else {
+                    matchListener.onMatchError();
                 }
             }
             @Override

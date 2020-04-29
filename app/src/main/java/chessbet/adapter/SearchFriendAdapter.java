@@ -19,17 +19,20 @@ import java.util.List;
 
 import chessbet.api.AccountAPI;
 import chessbet.api.ChallengeAPI;
-import chessbet.api.MatchAPI;
 import chessbet.app.com.R;
 import chessbet.domain.Constants;
+import chessbet.domain.MatchType;
+import chessbet.domain.TargetedChallenge;
 import chessbet.domain.User;
 
 public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapter.ViewHolder> {
     private Context context;
     private List<User> users = new ArrayList<>();
+    private ChallengeAPI.TargetedChallengeUpdated targetChallengeListener;
 
-    public SearchFriendAdapter(Context context){
+    public SearchFriendAdapter(Context context, ChallengeAPI.TargetedChallengeUpdated targetChallengeListener){
         this.context = context;
+        this.targetChallengeListener = targetChallengeListener;
     }
 
     public void setUsers(List<User> users) {
@@ -52,9 +55,9 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
                .into(holder.getImageView());
 
        holder.getTxtUserName().setText(users.get(position).getUser_name());
-
+        User user = users.get(position);
        // Make sure you cannot challenge yourself
-        if(users.get(position).getUid().equals(AccountAPI.get().getCurrentUser().getUid())){
+        if(user.getUid().equals(AccountAPI.get().getCurrentUser().getUid())){
             holder.getBtnChallenge().setEnabled(false);
         } else {
             holder.getBtnChallenge().setEnabled(true);
@@ -63,29 +66,10 @@ public class SearchFriendAdapter extends RecyclerView.Adapter<SearchFriendAdapte
        // Challenge creation process
        holder.getBtnChallenge().setOnClickListener(view -> {
            holder.getBtnChallenge().setEnabled(false);
-               if(!ChallengeAPI.get().isCurrentChallengeValid()){
-                   Toast.makeText(context, "Sending a challenge to " + users.get(position).getUser_name(), Toast.LENGTH_LONG).show();
-                   ChallengeAPI.get().challengeAccount(users.get(position).getUid(), new ChallengeAPI.ChallengeSent() {
-                       @Override
-                       public void onChallengeSent() {
-                           MatchAPI.get().setMatchCreated(true);
-                           holder.getBtnChallenge().setEnabled(true);
-                           MatchAPI.get().getAccount(); // Listener for challenge acceptance
-                           ChallengeAPI.get().setLastChallengedUser(users.get(position));
-                           Toast.makeText(context, "Challenge sent to " + users.get(position).getUser_name(), Toast.LENGTH_LONG).show();
-                       }
-
-                       @Override
-                       public void onChallengeNotSent() {
-                           holder.getBtnChallenge().setEnabled(true);
-                           Toast.makeText(context, "Challenge not sent", Toast.LENGTH_LONG).show();
-                       }
-                   });
-               } else {
-                   // If the current challenge is valid no need for another challenge
-                   holder.getBtnChallenge().setEnabled(true);
-                   Toast.makeText(context, "Your current challenge is still valid", Toast.LENGTH_LONG).show();
-               }
+           TargetedChallenge targetedChallenge = TargetedChallenge.targetChallengeFactory(AccountAPI.get().getCurrentUser().getUid(),
+               AccountAPI.get().getCurrentUser().getUser_name(), user.getUid(), user.getUser_name(), MatchType.PLAY_ONLINE);
+           Toast.makeText(context, "Sending Challenge", Toast.LENGTH_LONG).show();
+           ChallengeAPI.get().sendTargetedChallengeImplementation(targetedChallenge,targetChallengeListener);
        });
     }
 

@@ -59,7 +59,9 @@
     <string name="match_exact_rating">Match is set on exact rating</string>
     <string name="end_match">End Match</string>
     <string name="save">Save Match</string>
+    <string name="update">Update</string>
     <string name="games">Games</string>
+    <string name="challenges">Challenges</string>
     <string name="forfeit">Forfeit</string>
     <string name="userVerification">Kindly verify email</string>
     <string name="offline">Offline</string>

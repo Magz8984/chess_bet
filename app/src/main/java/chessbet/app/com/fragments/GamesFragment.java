@@ -35,10 +35,10 @@ public class GamesFragment extends Fragment {
         return view;
     }
     private List<File> loadGamesFromPGN() {
-        String path = Objects.requireNonNull(getContext()).getFilesDir().toString();
+        String path = requireContext().getFilesDir().toString();
         Log.d("Files" ,"Path : " + path);
         File directory = new File(path);
-        List<File> files = Arrays.asList(directory.listFiles());
+        List<File> files = Arrays.asList(Objects.requireNonNull(directory.listFiles()));
         // TODO Find a better way to work this out
         List<File> mutatedList = new ArrayList<>(files);
 
