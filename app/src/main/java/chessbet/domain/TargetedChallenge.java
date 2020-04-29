@@ -1,5 +1,8 @@
 package chessbet.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TargetedChallenge {
     private String id;
     private String owner;
@@ -10,6 +13,7 @@ public class TargetedChallenge {
     private boolean accepted;
     private long timeStamp;
     private String dateCreated;
+    private List<String> users = new ArrayList<>();
 
     public void setOwner(String owner) {
         this.owner = owner;
@@ -57,6 +61,14 @@ public class TargetedChallenge {
 
     public boolean isAccepted() {
         return accepted;
+    }
+
+    public void setUsers(List<String> users) {
+        this.users = users;
+    }
+
+    public List<String> getUsers() {
+        return users;
     }
 
     public MatchType getMatchType() {

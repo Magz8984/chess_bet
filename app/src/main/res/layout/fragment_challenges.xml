@@ -3,30 +3,6 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <LinearLayout
-        android:weightSum="2"
-        android:orientation="horizontal"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/btnAcceptedChallenges"
-            android:background="@drawable/rounded_button"
-            android:padding="2dp"
-            android:layout_margin="5dp"
-            android:text="Accepted Challenges"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <Button
-            android:id="@+id/btnMyChallenges"
-            android:background="@drawable/rounded_button"
-            android:layout_margin="3dp"
-            android:text="My Challenges"
-            android:padding="5dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
     <!--Targeted Challenges List-->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recChallenges"

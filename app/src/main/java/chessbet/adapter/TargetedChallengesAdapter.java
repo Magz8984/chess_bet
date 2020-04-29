@@ -1,9 +1,6 @@
 package chessbet.adapter;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,26 +16,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 
+import chessbet.api.AccountAPI;
 import chessbet.api.ChallengeAPI;
-import chessbet.api.MatchAPI;
-import chessbet.app.com.BoardActivity;
 import chessbet.app.com.R;
-import chessbet.domain.MatchableAccount;
 import chessbet.domain.TargetedChallenge;
-import chessbet.services.MatchListener;
-import chessbet.utils.DatabaseUtil;
+import chessbet.domain.User;
 
 public class TargetedChallengesAdapter extends FirestoreRecyclerAdapter<TargetedChallenge, TargetedChallengesAdapter.ViewHolder> {
     private Context context;
-    private boolean isMyChallenges;
-    private ProgressDialog progressDialog;
     private ChallengeAPI.TargetedChallengeUpdated targetedChallengeListener;
-    public TargetedChallengesAdapter(@NonNull FirestoreRecyclerOptions<TargetedChallenge> options, Context context, boolean isMyChallenges ,ChallengeAPI.TargetedChallengeUpdated targetedChallengeListener) {
+    private User user;
+    public TargetedChallengesAdapter(@NonNull FirestoreRecyclerOptions<TargetedChallenge> options, Context context, ChallengeAPI.TargetedChallengeUpdated targetedChallengeListener) {
         super(options);
-        this.isMyChallenges = isMyChallenges;
         this.context = context;
-        progressDialog = new ProgressDialog(context);
         this.targetedChallengeListener = targetedChallengeListener;
+        this.user = AccountAPI.get().getCurrentUser();
     }
 
     @Override
@@ -59,7 +51,7 @@ public class TargetedChallengesAdapter extends FirestoreRecyclerAdapter<Targeted
             }
         }));
 
-        if(isMyChallenges) {
+        if(model.getTarget().equals(this.user.getUid())) {
             holder.getBtnAccept().setVisibility(View.VISIBLE);
             holder.getBtnPlay().setVisibility(View.GONE);
         } else {
@@ -67,7 +59,26 @@ public class TargetedChallengesAdapter extends FirestoreRecyclerAdapter<Targeted
             holder.getBtnPlay().setVisibility(View.VISIBLE);
         }
 
-        holder.getBtnPlay().setOnClickListener(view -> acceptChallenge(model));
+        if(model.isAccepted()) {
+            holder.getBtnAccept().setVisibility(View.GONE);
+        } else {
+            holder.getBtnPlay().setVisibility(View.GONE);
+        }
+
+        holder.getBtnPlay().setOnClickListener(view -> {
+            ChallengeAPI.get().deleteTargetedChallenge(model.getId(), new ChallengeAPI.TargetChallengeUpdated() {
+                @Override
+                public void onUpdate() {
+                    acceptChallenge(model);
+                }
+
+                @Override
+                public void onUpdateError() {
+                    Toast.makeText(context, "Challenge Deletion Error", Toast.LENGTH_LONG).show();
+                }
+            });
+            acceptChallenge(model);
+        });
         holder.getBtnAccept().setOnClickListener(view -> acceptChallenge(model));
     }
 

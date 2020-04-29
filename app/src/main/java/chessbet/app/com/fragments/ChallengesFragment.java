@@ -22,7 +22,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
-import java.util.Objects;
 
 import chessbet.adapter.TargetedChallengesAdapter;
 import chessbet.api.ChallengeAPI;
@@ -37,8 +36,6 @@ import chessbet.utils.DatabaseUtil;
 public class ChallengesFragment extends Fragment implements View.OnClickListener, ChallengeAPI.TargetedChallengeUpdated {
     private TargetedChallengesAdapter targetedChallengesAdapter;
     private ProgressDialog progressDialog;
-    private Button btnAcceptedChallenges;
-    private Button btnMyChallenges;
     private FirebaseUser user;
     private RecyclerView recyclerView;
     @Nullable
@@ -52,13 +49,9 @@ public class ChallengesFragment extends Fragment implements View.OnClickListener
         recyclerView.setHasFixedSize(true);
 
         if(user != null) {
-           getTargetedChallenges("target", false);
+           getTargetedChallenges();
         }
         progressDialog = new ProgressDialog(getContext());
-        btnMyChallenges = view.findViewById(R.id.btnMyChallenges);
-        btnAcceptedChallenges = view.findViewById(R.id.btnAcceptedChallenges);
-        btnMyChallenges.setOnClickListener(this);
-        btnAcceptedChallenges.setOnClickListener(this);
 
         return view;
     }
@@ -82,35 +75,19 @@ public class ChallengesFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onClick(View view) {
-        if(view.equals(btnAcceptedChallenges)) {
-            btnAcceptedChallenges.setBackground(getResources().getDrawable(R.drawable.rounded_selected_button));
-            btnMyChallenges.setBackground(getResources().getDrawable(R.drawable.rounded_button));
-            if(user != null) {
-                getTargetedChallenges("owner", true);
-                targetedChallengesAdapter.startListening();
-            }
-        } else if (view.equals(btnMyChallenges)){
-            btnAcceptedChallenges.setBackground(getResources().getDrawable(R.drawable.rounded_button));
-            btnMyChallenges.setBackground(getResources().getDrawable(R.drawable.rounded_selected_button));
-            if(user != null) {
-                getTargetedChallenges("target", false);
-                targetedChallengesAdapter.startListening();
-            }
-        }
     }
 
 
-    private void getTargetedChallenges(String side, boolean accepted) {
+    private void getTargetedChallenges() {
         Log.d(ChallengesFragment.class.getSimpleName(), user.getUid());
         Query query = FirebaseFirestore.getInstance().collection("targeted_challenges")
-                .whereEqualTo(side, user.getUid())
-                .whereEqualTo("accepted", false)
+                .whereArrayContains("users", user.getUid())
                 .orderBy("timeStamp", Query.Direction.DESCENDING)
-                .limit(30);
+                .limit(40);
         FirestoreRecyclerOptions<TargetedChallenge> options = new FirestoreRecyclerOptions.Builder<TargetedChallenge>()
                 .setQuery(query, TargetedChallenge.class)
                 .build();
-        targetedChallengesAdapter = new TargetedChallengesAdapter(options, getContext(), accepted, this);
+        targetedChallengesAdapter = new TargetedChallengesAdapter(options, getContext(), this);
         recyclerView.setAdapter(this.targetedChallengesAdapter);
     }
 
@@ -143,6 +120,7 @@ public class ChallengesFragment extends Fragment implements View.OnClickListener
                 }
 
             });
+            MatchAPI.get().getAccount();
         });
     }
 

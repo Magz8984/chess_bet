@@ -112,7 +112,8 @@ public class FCMService extends FirebaseMessagingService implements  AccountAPI.
                     .setSound(defaultSoundUri)
                     .setPriority(1)
                     .build();
-            startForeground(102, notification);
+//            startForeground(102, notification);
+            getNotificationManager().notify(101, notification);
         }
     }
 

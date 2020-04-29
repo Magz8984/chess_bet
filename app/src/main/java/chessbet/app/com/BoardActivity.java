@@ -173,8 +173,14 @@ private boolean isActiveConnectionFlag = false;
             boardView.setMode(BoardView.Modes.PLAY_COMPUTER);
         }
 
+
         matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
-        if (matchableAccount != null && ChallengeAPI.get().isOnChallenge()) {
+        if (matchableAccount != null) {
+            // Set player is on active match
+            getApplicationContext().getSharedPreferences(Constants.IS_ON_MATCH, Context.MODE_PRIVATE)
+                    .edit()
+                    .putBoolean(Constants.IS_ON_MATCH, true)
+                    .apply();
             configureMatch(matchableAccount);
         }
         // Try To Reconstruct
