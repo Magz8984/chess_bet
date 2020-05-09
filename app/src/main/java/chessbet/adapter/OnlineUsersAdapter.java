@@ -18,21 +18,24 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 
 import chessbet.api.AccountAPI;
 import chessbet.api.ChallengeAPI;
-import chessbet.api.MatchAPI;
 import chessbet.app.com.R;
 import chessbet.domain.Constants;
+import chessbet.domain.MatchType;
+import chessbet.domain.TargetedChallenge;
 import chessbet.domain.User;
 
 public class OnlineUsersAdapter extends FirebaseRecyclerAdapter<User, OnlineUsersAdapter.ViewHolder> {
     private Context context;
+    private ChallengeAPI.TargetedChallengeUpdated targetedChallengeListener;
     /**
      * Initialize a {@link RecyclerView.Adapter} that listens to a Firebase query. See
      * {@link FirebaseRecyclerOptions} for configuration options.
      *
      * @param options Adapter options
      */
-    public OnlineUsersAdapter(@NonNull FirebaseRecyclerOptions<User> options) {
+    public OnlineUsersAdapter(@NonNull FirebaseRecyclerOptions<User> options, ChallengeAPI.TargetedChallengeUpdated targetedChallengeListener) {
         super(options);
+        this.targetedChallengeListener = targetedChallengeListener;
     }
 
     public void setContext(Context context) {
@@ -53,30 +56,11 @@ public class OnlineUsersAdapter extends FirebaseRecyclerAdapter<User, OnlineUser
         }
 
         holder.getBtnChallenge().setOnClickListener(view -> {
-            holder.getBtnChallenge().setEnabled(false); // Disable button
-            Toast.makeText(context, "Sending a challenge to " + user.getUser_name(), Toast.LENGTH_LONG).show();
-            if(!ChallengeAPI.get().isCurrentChallengeValid()){
-                ChallengeAPI.get().challengeAccount(user.getUid(), new ChallengeAPI.ChallengeSent() {
-                    @Override
-                    public void onChallengeSent() {
-                        holder.getBtnChallenge().setEnabled(true);
-                        MatchAPI.get().setMatchCreated(true);
-                        MatchAPI.get().getAccount(); // Listener for challenge acceptance
-                        ChallengeAPI.get().setLastChallengedUser(user);
-                        Toast.makeText(context, "Challenge sent to " + user.getUser_name(), Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onChallengeNotSent() {
-                        holder.getBtnChallenge().setEnabled(true);
-                        Toast.makeText(context, "Challenge not sent", Toast.LENGTH_LONG).show();
-                    }
-                });
-            } else {
-                // If the current challenge is valid no need for another challenge
-                holder.getBtnChallenge().setEnabled(true);
-                Toast.makeText(context, "Your current challenge is still valid", Toast.LENGTH_LONG).show();
-            }
+            holder.getBtnChallenge().setEnabled(false);
+            TargetedChallenge targetedChallenge = TargetedChallenge.targetChallengeFactory(AccountAPI.get().getCurrentUser().getUid(),
+                    AccountAPI.get().getCurrentUser().getUser_name(), user.getUid(), user.getUser_name(), MatchType.PLAY_ONLINE);
+            Toast.makeText(context, "Sending Challenge", Toast.LENGTH_LONG).show();
+            ChallengeAPI.get().sendTargetedChallengeImplementation(targetedChallenge, targetedChallengeListener);
         });
     }
 

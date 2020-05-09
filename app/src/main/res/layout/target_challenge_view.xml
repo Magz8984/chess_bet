@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardMaxElevation="4sp"
+    app:cardCornerRadius="5sp"
+    app:cardElevation="4sp">
+
+    <RelativeLayout
+        android:layout_margin="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/txtOwner"
+            android:text = "Owner"
+            android:fontFamily="@font/chakrapetchbold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:id="@+id/call_to_action"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/txtOwner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentEnd="true">
+
+            <TextView
+                android:fontFamily="@font/chakrapetchbold"
+                android:text = "Date Created"
+                android:id="@+id/txtDateCreated"
+                android:layout_marginRight="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp" />
+
+            <Button
+                android:layout_margin="2dp"
+                android:id="@+id/btnAccept"
+                android:text="Accept"
+                android:fontFamily="@font/chakrapetchbold"
+                android:background="@drawable/rounded_selected_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <Button
+                android:layout_margin="2dp"
+                android:id="@+id/btnPlay"
+                android:text="Play"
+                android:fontFamily="@font/chakrapetchbold"
+                android:background="@drawable/rounded_selected_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imgBin"
+            android:layout_margin="5dp"
+            android:layout_below="@+id/txtOwner"
+            android:layout_gravity="center"
+            android:layout_width="25dp"
+            android:src="@drawable/bin"
+            android:layout_height="25dp"
+            android:foregroundGravity="center"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+
+    </RelativeLayout>
+
+
+
+</androidx.cardview.widget.CardView>

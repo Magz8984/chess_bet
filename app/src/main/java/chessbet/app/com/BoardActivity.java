@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.app.ProgressDialog;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,8 +29,6 @@ import com.chess.engine.player.Player;
 import com.chess.pgn.PGNMainUtils;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -48,8 +45,8 @@ import chessbet.api.PresenceAPI;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
 import chessbet.app.com.fragments.EvaluateGame;
-import chessbet.domain.Account;
 import chessbet.domain.Constants;
+import chessbet.domain.DatabaseMatch;
 import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchStatus;
 import chessbet.domain.MatchType;
@@ -58,8 +55,6 @@ import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
 import chessbet.domain.User;
 import chessbet.recievers.ConnectivityReceiver;
-import chessbet.services.AccountListener;
-import chessbet.services.MatchListener;
 import chessbet.services.MatchService;
 import chessbet.services.OpponentListener;
 import chessbet.services.RemoteViewUpdateListener;
@@ -81,7 +76,8 @@ import stockfish.EngineUtil;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
         OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener, BoardView.PuzzleMove,
-        ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener, MatchAPI.OnMatchEnd, OpponentListener , GameHandler.NoMoveReactor.NoMoveEndMatch, PresenceAPI.UserOnline {
+        ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener, MatchAPI.OnMatchEnd, OpponentListener,
+        GameHandler.NoMoveReactor.NoMoveEndMatch, PresenceAPI.UserOnline {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtOwnerStatus) TextView txtOwnerStatus;
@@ -114,8 +110,6 @@ private EvaluateGame evaluateGame;
 private boolean isSavedState; // Checks if activity has been stopped
 private GameHandler.NoMoveReactor noMoveReactor;
 private boolean isActiveConnectionFlag = false;
-private ProgressDialog challengeProgressDialog;
-private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +119,6 @@ private FirebaseUser user;
         setContentView(R.layout.activity_board);
         ButterKnife.bind(this);
         connectivityManager = new ConnectivityManager();
-        challengeProgressDialog = new ProgressDialog(this);
         boardView.setDarkCellsColor(boardPreference.getDark());
         boardView.setWhiteCellsColor(boardPreference.getWhite());
         boardView.setOnMoveDoneListener(this);
@@ -163,14 +156,11 @@ private FirebaseUser user;
     @Override
     protected void onStart() {
         super.onStart();
-        user = FirebaseAuth.getInstance().getCurrentUser();
         isGameFinished = false;
 
         GameUtil.initialize(R.raw.chess_move, this);
         Intent intent = getIntent();
-
         setExternalPlayers();
-        configureChallenge(intent);
         String matchType = intent.getStringExtra("match_type");
         long skillLevel = intent.getLongExtra("skill_level", 20);
         EngineUtil.setSkillLevel(skillLevel);
@@ -183,8 +173,14 @@ private FirebaseUser user;
             boardView.setMode(BoardView.Modes.PLAY_COMPUTER);
         }
 
+
         matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
-        if (matchableAccount != null && ChallengeAPI.get().isOnChallenge()) {
+        if (matchableAccount != null) {
+            // Set player is on active match
+            getApplicationContext().getSharedPreferences(Constants.IS_ON_MATCH, Context.MODE_PRIVATE)
+                    .edit()
+                    .putBoolean(Constants.IS_ON_MATCH, true)
+                    .apply();
             configureMatch(matchableAccount);
         }
         // Try To Reconstruct
@@ -272,41 +268,6 @@ private FirebaseUser user;
         }
     }
 
-    private void configureChallenge(Intent intent){
-        // Disable challenge creation if user has either accepted challenge or has an accepted challenge
-        if(ChallengeAPI.get().isChallengeAccepted() ||  ChallengeAPI.get().hasAcceptedChallenge()){
-            return;
-        }
-        String challengeId = intent.getStringExtra(Constants.CHALLENGE_ID);
-        String challenger = intent.getStringExtra(Constants.CHALLENGER);
-        boolean isChallenger = intent.getBooleanExtra(Constants.IS_CHALLENGER, false);
-        if(challengeId != null){
-            // Start challenge dialog
-            challengeProgressDialog.setMessage(getResources().getString(R.string.accepting_challenge));
-            challengeProgressDialog.setCancelable(false);
-            challengeProgressDialog.show();
-            boardView.setEnabled(false);
-            ChallengeTaker challengeTaker = new ChallengeTaker(challengeId);
-            challengeProgressDialog.show();
-            if(!isChallenger){
-                ChallengeAPI.get().sendChallengeNotification(challengeId, challenger); // Send notification to the challenger
-                ChallengeAPI.get().setChallengeByAccount(challenger, challengeId, new ChallengeAPI.ChallengeSent() {
-                    @Override
-                    public void onChallengeSent() {
-                        Log.d(BoardActivity.class.getSimpleName(), "Challenge sent to sender");
-                    }
-
-                    @Override
-                    public void onChallengeNotSent() {
-                        Crashlytics.logException(new RuntimeException("Challenge not sent back"));
-                    }
-                });
-                challengeTaker.acceptChallenge();
-            } else {
-                ChallengeAPI.get().setChallengeAccepted(true);
-            }
-        }
-    }
 
     @Override
     public void onClick(View v) {
@@ -626,6 +587,7 @@ private FirebaseUser user;
                 return;
             }
             ChallengeAPI.get().setOnChallenge(false);
+            freeUseFromMatch();
             storeGameOnCloud();
             // Stop service
             this.stopService(new Intent(this, MatchService.class));
@@ -636,9 +598,10 @@ private FirebaseUser user;
             AccountAPI.get().listenToAccountUpdate();
 
             evaluateGame = new EvaluateGame(); // Game evaluation fragment
-
-            evaluateGame.setOpponent(MatchAPI.get().getCurrentDatabaseMatch().getOpponentUserName());
-
+            DatabaseMatch match = MatchAPI.get().getCurrentDatabaseMatch();
+            if(match != null) {
+                evaluateGame.setOpponent(match.getOpponentUserName());
+            }
             if (flag == GameHandler.GAME_DRAWN_FLAG) {
                 matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_DRAWN_FLAG, MatchStatus.DRAW, null, null);
                 evaluateGame.setMatchStatus(MatchStatus.DRAW);
@@ -667,18 +630,22 @@ private FirebaseUser user;
             // Deletes challenge when the game ends
             if(AccountAPI.get().getCurrentAccount() != null ) {
                 evaluateGame.setInitialPoints(AccountAPI.get().getCurrentAccount().getElo_rating());
-                ChallengeAPI.get().deleteChallenge();
             } else {
                 evaluateGame.setInitialPoints(0);
             }
-
-            ChallengeAPI.get().setNotify(true);
 
             AccountAPI.get().getAccount();
 //            goToMainActivity();
             MatchAPI.get().removeCurrentMatch();
             evaluateGame.show(getSupportFragmentManager(), "EvaluateGame"); // Span Up Ad
         }
+    }
+
+    private void freeUseFromMatch() {
+        getApplicationContext().getSharedPreferences(Constants.IS_ON_MATCH, Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean(Constants.IS_ON_MATCH, false)
+                .apply();
     }
 
     private void storeGameOnCloud(){
@@ -873,13 +840,12 @@ private FirebaseUser user;
     public void onMatchEnd(MatchStatus matchStatus) {
         // Stop service
         this.noMoveReactor.stopTimer();
+        freeUseFromMatch();
         ChallengeAPI.get().setOnChallenge(false);
         this.stopService(new Intent(this, MatchService.class));
         MatchAPI.get().setMatchCreated(false);
         PresenceAPI.get().stopListening();
         storeGameOnCloud();
-        ChallengeAPI.get().deleteChallenge(); // Delete current challenge
-        ChallengeAPI.get().setNotify(true);
         isGameFinished = true; // Flag Game Has Ended
         evaluateGame = new EvaluateGame();
         this.stopGameTimers();
@@ -932,80 +898,6 @@ private FirebaseUser user;
         // If Listening to another user and the user is offline. Notify me
         if(!AccountAPI.get().isUser(user.getUid()) && !isOnline){
             Toasty.info(this, user.getUser_name() + " is offline").show();
-        }
-    }
-
-    /**
-     * @author Collins Magondu 10/01/2020
-     * Used to accept challenges from notifications
-     */
-    private class ChallengeTaker implements MatchListener, AccountListener  {
-        private String challengeId;
-
-        ChallengeTaker(String challengeId){
-            this.challengeId = challengeId;
-            MatchAPI.get().setMatchListener(this);
-            MatchAPI.get().setMatchCreated(true);
-            MatchAPI.get().getAccount();
-        }
-
-        void acceptChallenge(){
-            if(AccountAPI.get().getCurrentUser() == null) {
-                AccountAPI.get().getAccount(user.getUid(), account -> {
-                    AccountAPI.get().setCurrentAccount(account);
-                    AccountAPI.get().setUser(FirebaseAuth.getInstance().getCurrentUser());
-                    createMatchableAccount(account);
-                    AccountAPI.get().setAccountListener(this);
-                    AccountAPI.get().getAccount();
-                    AccountAPI.get().getUserByUid(account.getOwner());
-                });
-            } else {
-                createMatchableAccount(AccountAPI.get().getCurrentAccount());
-            }
-        }
-
-        private void createMatchableAccount(Account account){
-            MatchableAccount matchableAccount = new MatchableAccount();
-            matchableAccount.setOwner(account.getOwner());
-            matchableAccount.setMatch_type(MatchType.PLAY_ONLINE.toString());
-            matchableAccount.setDuration(Constants.DEFAULT_MATCH_DURATION);
-            matchableAccount.setElo_rating(account.getElo_rating());
-            MatchAPI.get().createUserMatchableAccountImplementation(matchableAccount);
-        }
-
-        @Override
-        public void onMatchMade(MatchableAccount matchableAccount) {
-            challengeProgressDialog.dismiss(); // Close challenge acceptance
-            configureMatch(matchableAccount);
-        }
-
-        @Override
-        public void onMatchableCreatedNotification() {
-            ChallengeAPI.get().acceptChallenge(challengeId);
-        }
-
-        @Override
-        public void onMatchError() {
-            Crashlytics.logException(new RuntimeException("Match could was not created for "
-                    + AccountAPI.get().getCurrentUser().getUid()
-                    + " " + new Date().toString()));
-        }
-
-        @Override
-        public void onAccountReceived(Account account) {
-            // Handle Account Received Logic
-            Log.d(BoardActivity.class.getSimpleName(), "Account Received");
-        }
-
-        @Override
-        public void onUserReceived(User user) {
-            // Handle User Received Logic
-            Log.d(BoardActivity.class.getSimpleName(), "User Received");
-        }
-
-        @Override
-        public void onAccountUpdated(boolean status) {
-            // Handle Account Updated Logic
         }
     }
 
