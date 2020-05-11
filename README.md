@@ -72,3 +72,35 @@
 ### Improvements
 - Fix challenge creation process when user is requested for a challenge
 
+### v1.1.5-beta (Chess MVP)
+
+### Improvements
+
+- Fix Play Online Bugs
+
+### 1.1.6-beta (Chess MVP)
+
+#### Improvements
+
+- Add computer skill levels when playing versus computer
+
+### 1.1.7-beta (Chess-MVP)
+
+#### Improvements
+
+- Fix stockfish depth on different skill levels
+- Fix UI not being updated after a certain move
+- Fix hints from stockfish not showing up for certain positions
+
+### 1.1.8-beta (Chess MVP)
+
+#### Improvements
+
+- Fix bitmap OOM error
+- Replace Play Computer Settings Dialog Fragment with Activity
+
+#### 1.1.9-beta(Chess MVP)
+- Fix skill level intent data
+
+#### 1.2.1-beta(Chess MVP)
+- Fix error when getting no move from stockfish

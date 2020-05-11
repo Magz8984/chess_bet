@@ -26,8 +26,6 @@ public class SplashScreen extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
         ButterKnife.bind(this);
 
-        FCMService.FCMBackgroundService fcmBackgroundService = new FCMService.FCMBackgroundService(this, getIntent().getExtras());
-
         descimage = findViewById(R.id.titleimage);
         desctxt = findViewById(R.id.titletxt);
         uptodown = AnimationUtils.loadAnimation(this,R.anim.uptodown);
@@ -42,7 +40,7 @@ public class SplashScreen extends AppCompatActivity {
         mLogo.startAnimation(rotate);
 
 
-        if(!fcmBackgroundService.foundDestination()){
+        if(!FCMService.startExternalIntentFromFCM(getIntent().getExtras(), this)){
             Thread myThread = new Thread(){
                 @Override
                 public void run(){

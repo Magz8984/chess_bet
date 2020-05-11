@@ -42,7 +42,8 @@ import chessbet.services.RemoteViewUpdateListener;
 import chessbet.utils.GameTimer;
 import stockfish.Engine;
 import stockfish.EngineUtil;
-import stockfish.InternalStockFishHandler;
+import stockfish.Query;
+import stockfish.QueryType;
 
 public class BoardView extends View implements RemoteMoveListener, EngineUtil.OnResponseListener {
     private int boardSize; // In dp
@@ -77,7 +78,6 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     protected boolean isEngineLoading = false;
     private List<Rect> tiles = new ArrayList<>();
     private MoveAnimator moveAnimator = new MoveAnimator();
-    private InternalStockFishHandler internalStockFishHandler;
     private EngineResponse engineResponse; // Used To get The Full Response String for Analysis Purpose
     protected volatile Move nextPuzzleMove = null;
 
@@ -96,14 +96,6 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         // Start Stock Fish
         stockfish.start();
 
-        // Start listening to engine data
-        EngineUtil.startListening();
-
-        // Redraw the board once engine responds
-        EngineUtil.setOnResponseListener(this);
-
-        internalStockFishHandler = new InternalStockFishHandler();
-
         setSaveEnabled(true);
         moveLog= new MoveLog();
         chessBoard= Board.createStandardBoard();
@@ -117,10 +109,6 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
 
     public void setEngineResponse(EngineResponse engineResponse) {
         this.engineResponse = engineResponse;
-    }
-
-    public InternalStockFishHandler getInternalStockFishHandler() {
-        return internalStockFishHandler;
     }
 
     public BoardView(Context context, AttributeSet attributeSet){
@@ -314,7 +302,11 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         if(currentStockFishMove != null && isHinting){
             try {
                 int bto, bfrom, pto = 0, pfrom = 0;
-                if(ponderedStockFishMove.getMovedPiece() == null){
+                if(ponderedStockFishMove != null){
+                    if(ponderedStockFishMove.getMovedPiece() == null) {
+                        ponderedStockFishMove = null;
+                    }
+                } else {
                     ponderedStockFishMove = null;
                 }
 
@@ -357,7 +349,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
 
     public void requestHint() {
         isHinting = !isHinting;
-        internalStockFishHandler.askStockFishMove(FenUtilities.createFEN(chessBoard), 3000, 3);
+        askStockFishBestMove();
         invalidate();
     }
 
@@ -366,6 +358,16 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
      */
     public void switchHintingOff(){
         isHinting = false;
+    }
+
+    /**
+     * Allows for hinting if user redoes move
+     */
+    public void reHint() {
+        if(isHinting) {
+            askStockFishBestMove();
+            invalidate();
+        }
     }
 
     public boolean isHinting() {
@@ -408,11 +410,23 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         return darkCellsColor;
     }
 
+    private Alliance getOwnerAlliance(){
+        if(matchableAccount != null){
+            return (localAlliance == Alliance.WHITE) ? Alliance.WHITE : Alliance.BLACK;
+        }
+        return Alliance.WHITE;
+    }
+
+    /**
+     * Sends Move Data To Match
+     * @param from fromCellCoordinate
+     * @param to toCellCoordinate
+     */
     public void setMoveData(int from, int to) {
         if(matchAPI != null){
             // Help regulate time between play
-            long timeLeft = (localAlliance == Alliance.WHITE) ? gameTimer.getWhiteTimeLeft() : gameTimer.getBlackTimeLeft();
-            matchAPI.sendMoveData(matchableAccount,from,to, getPortableGameNotation(),timeLeft);
+//          long timeLeft = (getOwnerAlliance() == Alliance.WHITE) ? gameTimer.getOwnerTimeLeft() : gameTimer.getOpponentTimeLeft();
+            matchAPI.sendMoveData(matchableAccount,from,to, getPortableGameNotation(), gameTimer.getOwnerTimeLeft());
         }
     }
 
@@ -560,13 +574,13 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
                 GameUtil.playSound();
                 if(gameTimer != null){
                     // Reset time from when the move was made from the other device;
-                    if(localAlliance == Alliance.WHITE) {
-                        gameTimer.setBlackTimeLeft((int) remoteMove.getGameTimeLeft());
-                        gameTimer.setBlackGameTimer();
-                    } else {
-                        gameTimer.setWhiteTimeLeft((int) remoteMove.getGameTimeLeft());
-                        gameTimer.setWhiteGameTimer();
-                    }
+//                    if(localAlliance == Alliance.WHITE) {
+                    gameTimer.setOpponentTimeLeft((int) remoteMove.getGameTimeLeft());
+                    gameTimer.setOpponentTimer();
+//                    } else {
+//                        gameTimer.setOwnerTimeLeft((int) remoteMove.getGameTimeLeft());
+//                        gameTimer.setOwnerTimer();
+//                    }
                     gameTimer.stopTimer((chessBoard.currentPlayer().getAlliance() == Alliance.WHITE) ? chessbet.domain.Player.WHITE :  chessbet.domain.Player.BLACK);
                 }
                 chessBoard = transition.getTransitionBoard();
@@ -598,12 +612,35 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         invalidate();
     }
 
-    private Move getMoveByPositions(String position){
+    protected Move getMoveByPositions(String position){
         String from = position.substring(0,2);
         String to = position.substring(2,4);
         int fromIndex = BoardUtils.getCoordinateAtPosition(from);
         int toIndex = BoardUtils.getCoordinateAtPosition(to);
         return Move.MoveFactory.createMove(chessBoard, fromIndex, toIndex);
+    }
+
+    /**
+     * Asks stockfish for best move and ponder move
+     */
+    public void askStockFishBestMove() {
+        Query query = new Query.Builder()
+                .setQueryType(QueryType.BEST_MOVE)
+                .setDepth(20)
+                .setFen(getFen())
+                .setThreads(1)
+                .setTime(1000).build();
+        EngineUtil.submit(query, response -> {
+            if(response.size() == 1) {
+                ponderedStockFishMove = null;
+                currentStockFishMove = getMoveByPositions(response.get(0));
+                postInvalidate();
+            } else if (response.size() == 2) {
+                currentStockFishMove = getMoveByPositions(response.get(0));
+                ponderedStockFishMove = getMoveByPositions(response.get(1));
+                postInvalidate();
+            }
+        });
     }
 
     public void undoMove(){
@@ -678,21 +715,21 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         this.gameTimer = gameTimer;
         if(gameTimer.getCurrentPlayer() != null){
             // Reset timer to the old time left
-            setGameTimerTime(gameTimer.getWhiteTimeLeft(), gameTimer.getBlackTimeLeft());
+            setGameTimerTime(gameTimer.getOwnerTimeLeft(), gameTimer.getOpponentTimeLeft());
         } else {
-            this.gameTimer.setBlackTimeLeft((int) (this.matchableAccount.getDuration() * 60000));
-            this.gameTimer.setWhiteTimeLeft((int) (this.matchableAccount.getDuration() * 60000));
-            this.gameTimer.setWhiteGameTimer();
+            this.gameTimer.setOpponentTimeLeft((int) (this.matchableAccount.getDuration() * 60000));
+            this.gameTimer.setOwnerTimeLeft((int) (this.matchableAccount.getDuration() * 60000));
+            this.gameTimer.startTimer();
         }
     }
 
     private void setGameTimerTime(int white, int black) {
-        this.gameTimer.setBlackTimeLeft(black);
-        this.gameTimer.setWhiteTimeLeft(white);
-        if(this.gameTimer.getCurrentPlayer().equals(chessbet.domain.Player.BLACK)){
-            this.gameTimer.setBlackGameTimer();
+        this.gameTimer.setOpponentTimeLeft(black);
+        this.gameTimer.setOwnerTimeLeft(white);
+        if(this.gameTimer.getCurrentPlayer().getAlliance().equals(this.gameTimer.getOpponentAlliance())){
+            this.gameTimer.setOpponentTimer();
         } else {
-            this.gameTimer.setWhiteGameTimer();
+            this.gameTimer.setOwnerTimer();
         }
     }
 
@@ -744,6 +781,19 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         PUZZLE_MODE,
         PLAY_COMPUTER,
         ANALYSIS
+    }
+
+    /**
+     * Annotates if move is checkmate or check
+     * @param move made move
+     */
+    protected void setMoveCheckOrMate(Move move) {
+        if (chessBoard.currentPlayer().isInCheckMate()) {
+            move.setCheckMateMove(true);
+        } else if (chessBoard.currentPlayer().isInCheck()) {
+            move.setCheckMove(true);
+        }
+
     }
 
     public Modes getMode() {

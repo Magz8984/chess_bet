@@ -14,7 +14,6 @@ import com.chess.engine.Move;
 import com.chess.engine.board.Board;
 import com.chess.engine.player.MoveTransition;
 import com.chess.engine.player.Player;
-import com.chess.pgn.FenUtilities;
 import com.chess.pgn.PGNMainUtils;
 import com.crashlytics.android.Crashlytics;
 import com.github.mikephil.charting.charts.LineChart;
@@ -29,6 +28,7 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,10 +37,12 @@ import chessengine.ECOBook;
 import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
-import stockfish.InternalStockFishHandler;
+import stockfish.EngineUtil;
+import stockfish.Query;
+import stockfish.QueryType;
 
 public class GameAnalysisActivity extends AppCompatActivity implements
-        OnMoveDoneListener, ECOBook.OnGetECOListener, BoardView.EngineResponse, OnChartValueSelectedListener {
+        OnMoveDoneListener, ECOBook.OnGetECOListener, OnChartValueSelectedListener, EngineUtil.ResponseCallback {
     @BindView(R.id.board) BoardView boardView;
     @BindView(R.id.txtBookMove) TextView txtBookMove;
     @BindView(R.id.chart) LineChart lineChart;
@@ -48,7 +50,6 @@ public class GameAnalysisActivity extends AppCompatActivity implements
 
     private int moveCursor = 0; // Move Log Cursor
     private com.chess.gui.MoveLog importMoveLog; // Move Log From PGN String
-    private InternalStockFishHandler internalStockFishHandler;
 
 
     private List<Entry> whiteEntries = new ArrayList<>();
@@ -64,9 +65,7 @@ public class GameAnalysisActivity extends AppCompatActivity implements
         boardView.setDarkCellsColor(Color.rgb(240, 217, 181));
         boardView.setWhiteCellsColor(Color.rgb(181, 136, 99));
         boardView.setOnMoveDoneListener(this);
-        boardView.setEngineResponse(this);
         boardView.setEcoBookListener(this);
-        internalStockFishHandler = new InternalStockFishHandler();
     }
 
     @Override
@@ -103,7 +102,6 @@ public class GameAnalysisActivity extends AppCompatActivity implements
 
     @Override
     public void isCheckMate(Player player) {
-        runOnUiThread(() -> boardView.requestHint());
     }
 
     @Override
@@ -126,53 +124,6 @@ public class GameAnalysisActivity extends AppCompatActivity implements
     public void onGetECO(ECOBuilder.ECO eco) {
         runOnUiThread(() -> txtBookMove.setText(eco.getOpening()));
     }
-    @Override
-    public void onEngineResponse(String response) {
-        runOnUiThread(() -> {
-            // Ensure the first score is plot on graph
-            if(size == boardView.getMoveLog().size()){
-                return;
-            }
-            size = boardView.getMoveLog().size();
-            float centiPawnEval = getCentiPawnEvaluation(response);
-
-            if(centiPawnEval == -1000f){
-                return;
-            }
-
-            Entry entry = new Entry(size, centiPawnEval);
-            if(!boardView.getMoveLog().getMoves().isEmpty()){
-                entry.setData(boardView.getMoveLog().getMoves().get(size - 1));
-            }
-
-            if(boardView.getCurrentPlayer().getAlliance().isWhite()){
-                blackEntries.add(entry);
-            } else {
-                whiteEntries.add(entry);
-
-            }
-
-            LineDataSet whiteDataSet = new LineDataSet(whiteEntries, "White");
-            LineDataSet blackDataSet = new LineDataSet(blackEntries, "Black");
-
-            whiteDataSet.setCircleColor(Color.WHITE);
-            whiteDataSet.setColor(Color.WHITE);
-
-            blackDataSet.setCircleColor(Color.BLACK);
-            blackDataSet.setColor(Color.BLACK);
-
-            List<ILineDataSet> dataSets = new ArrayList<>();
-            dataSets.add(whiteDataSet);
-            dataSets.add(blackDataSet);
-
-
-            lineChart.removeAllViews();
-            LineData data = new LineData(dataSets);
-
-            lineChart.setData(data);
-            lineChart.invalidate();
-        });
-    }
 
     private float getCentiPawnEvaluation(String response){
         List<String> segments = Arrays.asList(response.split(" "));
@@ -182,6 +133,7 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             return result/100f; // Get Integer
         } catch (Exception ex) {
             ex.printStackTrace();
+            Log.d("centiPawnEval", Objects.requireNonNull(ex.getMessage()));
         }
         return -1000f;
     }
@@ -213,7 +165,14 @@ public class GameAnalysisActivity extends AppCompatActivity implements
             while (moveCursor < importMoveLog.getMoves().size()){
                 try {
                     size = boardView.getMoveLog().size();
-                    internalStockFishHandler.askStockFishMove(FenUtilities.createFEN(boardView.getChessBoard()), 1000, 20);
+                    Query query = new Query.Builder()
+                            .setTime(1000)
+                            .setThreads(4)
+                            .setQueryType(QueryType.CENTI_PAWN_VALUE)
+                            .setFen(boardView.getFen())
+                            .setDepth(10)
+                            .build();
+                    EngineUtil.submit(query, this);
                     Thread.sleep(1000);
                     Move move = importMoveLog.getMoves().get(moveCursor);
 
@@ -232,6 +191,7 @@ public class GameAnalysisActivity extends AppCompatActivity implements
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    Log.d("centiPawnEval", Objects.requireNonNull(e.getMessage()));
                 }
             }
        }).start();
@@ -258,5 +218,49 @@ public class GameAnalysisActivity extends AppCompatActivity implements
     @Override
     public void onNothingSelected() {
 
+    }
+
+    @Override
+    public void onResponse(List<String> responses) {
+        runOnUiThread(() -> {
+            String response = responses.get(0);
+            float centiPawnEval = getCentiPawnEvaluation(response);
+
+            if(centiPawnEval == -1000f){
+                return;
+            }
+
+            Entry entry = new Entry(size, centiPawnEval);
+            if(!boardView.getMoveLog().getMoves().isEmpty() && size != 0){
+                entry.setData(boardView.getMoveLog().getMoves().get(size - 1));
+            }
+
+            if(boardView.getCurrentPlayer().getAlliance().isWhite()){
+                blackEntries.add(entry);
+            } else {
+                whiteEntries.add(entry);
+
+            }
+
+            LineDataSet whiteDataSet = new LineDataSet(whiteEntries, "White");
+            LineDataSet blackDataSet = new LineDataSet(blackEntries, "Black");
+
+            whiteDataSet.setCircleColor(Color.WHITE);
+            whiteDataSet.setColor(Color.WHITE);
+
+            blackDataSet.setCircleColor(Color.BLACK);
+            blackDataSet.setColor(Color.BLACK);
+
+            List<ILineDataSet> dataSets = new ArrayList<>();
+            dataSets.add(whiteDataSet);
+            dataSets.add(blackDataSet);
+
+
+            lineChart.removeAllViews();
+            LineData data = new LineData(dataSets);
+
+            lineChart.setData(data);
+            lineChart.invalidate();
+        });
     }
 }

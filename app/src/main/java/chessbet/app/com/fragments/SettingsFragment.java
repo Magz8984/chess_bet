@@ -16,7 +16,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Objects;
 
-import chessbet.api.ChallengeAPI;
 import chessbet.app.com.LoginActivity;
 import chessbet.app.com.R;
 
@@ -41,7 +40,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 Intent intent = new Intent(getContext(), LoginActivity.class);
                 startActivity(intent);
                 // Close current activity
-                Objects.requireNonNull(getActivity()).finish();
+                requireActivity().finish();
             }
         } else if (preference.getKey().equals("reset_pin")){
             if(auth.getCurrentUser() != null){
@@ -51,11 +50,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
             }
         } else if (preference.getKey().equals("notifications")){
             SwitchPreferenceCompat preferenceCompat = (SwitchPreferenceCompat) preference;
-            if(preferenceCompat.isChecked()){
-                ChallengeAPI.get().setNotify(true);
-            } else {
-                ChallengeAPI.get().setNotify(false);
-            }
         }
         return true;
     }

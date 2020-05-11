@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.app.ProgressDialog;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,8 +29,6 @@ import com.chess.engine.player.Player;
 import com.chess.pgn.PGNMainUtils;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -48,8 +45,8 @@ import chessbet.api.PresenceAPI;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
 import chessbet.app.com.fragments.EvaluateGame;
-import chessbet.domain.Account;
 import chessbet.domain.Constants;
+import chessbet.domain.DatabaseMatch;
 import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchStatus;
 import chessbet.domain.MatchType;
@@ -58,8 +55,6 @@ import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
 import chessbet.domain.User;
 import chessbet.recievers.ConnectivityReceiver;
-import chessbet.services.AccountListener;
-import chessbet.services.MatchListener;
 import chessbet.services.MatchService;
 import chessbet.services.OpponentListener;
 import chessbet.services.RemoteViewUpdateListener;
@@ -77,33 +72,35 @@ import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
+import stockfish.EngineUtil;
 
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
         OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener, BoardView.PuzzleMove,
-        ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener, MatchAPI.OnMatchEnd, OpponentListener , GameHandler.NoMoveReactor.NoMoveEndMatch, PresenceAPI.UserOnline {
+        ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener, MatchAPI.OnMatchEnd, OpponentListener,
+        GameHandler.NoMoveReactor.NoMoveEndMatch, PresenceAPI.UserOnline {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
-@BindView(R.id.txtWhiteStatus) TextView txtWhiteStatus;
-@BindView(R.id.txtBlackStatus) TextView txtBlackStatus;
+@BindView(R.id.txtOwnerStatus) TextView txtOwnerStatus;
+@BindView(R.id.txtOpponentStatus) TextView txtOpponentStatus;
 @BindView(R.id.btnColorPicker) Button btnColorPicker;
 @BindView(R.id.btnBack) Button btnBack;
 @BindView(R.id.btnForward) Button btnForward;
-@BindView(R.id.blackMoves) LinearLayout blackMoves;
-@BindView(R.id.whiteMoves) LinearLayout whiteMoves;
+@BindView(R.id.opponentMoves) LinearLayout opponentMoves;
+@BindView(R.id.ownerMoves) LinearLayout ownerMoves;
 @BindView(R.id.blackScrollView) HorizontalScrollView blackScrollView;
 @BindView(R.id.whiteScrollView) HorizontalScrollView whiteScrollView;
-@BindView(R.id.whitePieces) LinearLayout whitePieces;
-@BindView(R.id.blackPieces) LinearLayout blackPieces;
+@BindView(R.id.ownerPieces) LinearLayout ownerPieces;
+@BindView(R.id.opponentPieces) LinearLayout opponentPieces;
 @BindView(R.id.btnSave) Button btnSave;
 @BindView(R.id.btnHint) Button btnHint;
 @BindView(R.id.btnRecord) Button btnRecord;
-@BindView(R.id.blackTimer) TextView txtBlackTimer;
-@BindView(R.id.whiteTimer) TextView txtWhiteTimer;
+@BindView(R.id.txtOpponentTimer) TextView txtOpponentTimer;
+@BindView(R.id.txtOwnerTimer) TextView txtOwnerTimer;
 @BindView(R.id.txtConnectionStatus) TextView txtConnectionStatus;
 @BindView(R.id.imgConnectionStatus) CircleImageView imgConnectionStatus;
-@BindView(R.id.txtWhite) TextView txtWhite;
+@BindView(R.id.txtOwner) TextView txtOwner;
 @BindView(R.id.btnAnalysis) Button btnAnalysis;
-@BindView(R.id.txtBlack) TextView txtBlack;
+@BindView(R.id.txtOpponent) TextView txtOpponent;
 
 private MatchableAccount matchableAccount;
 private ConnectivityManager connectivityManager;
@@ -113,8 +110,6 @@ private EvaluateGame evaluateGame;
 private boolean isSavedState; // Checks if activity has been stopped
 private GameHandler.NoMoveReactor noMoveReactor;
 private boolean isActiveConnectionFlag = false;
-private ProgressDialog challengeProgressDialog;
-private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +119,6 @@ private FirebaseUser user;
         setContentView(R.layout.activity_board);
         ButterKnife.bind(this);
         connectivityManager = new ConnectivityManager();
-        challengeProgressDialog = new ProgressDialog(this);
         boardView.setDarkCellsColor(boardPreference.getDark());
         boardView.setWhiteCellsColor(boardPreference.getWhite());
         boardView.setOnMoveDoneListener(this);
@@ -138,34 +132,55 @@ private FirebaseUser user;
         btnHint.setOnClickListener(this);
         btnRecord.setOnClickListener(this);
         btnAnalysis.setOnClickListener(this);
-        txtWhiteStatus.setTextColor(Color.RED);
-        txtBlackStatus.setTextColor(Color.RED);
+        txtOpponentStatus.setTextColor(Color.RED);
+        txtOwnerStatus.setTextColor(Color.RED);
         connectivityManager.setConnectionStateListener(this);
         connectivityManager.startListening();
         this.onConnectionChanged(ConnectivityReceiver.isConnected());
     }
 
+    private Alliance getOpponentAlliance(){
+       if(matchableAccount != null){
+        return (this.boardView.getLocalAlliance() == Alliance.WHITE) ? Alliance.BLACK : Alliance.WHITE;
+       }
+       return Alliance.BLACK;
+    }
+
+    private Alliance getOwnerAlliance(){
+        if(matchableAccount != null){
+            return (this.boardView.getLocalAlliance() == Alliance.WHITE) ? Alliance.WHITE : Alliance.BLACK;
+        }
+        return Alliance.WHITE;
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
-        user = FirebaseAuth.getInstance().getCurrentUser();
         isGameFinished = false;
 
         GameUtil.initialize(R.raw.chess_move, this);
         Intent intent = getIntent();
-
         setExternalPlayers();
-        configureChallenge(intent);
         String matchType = intent.getStringExtra("match_type");
+        long skillLevel = intent.getLongExtra("skill_level", 20);
+        EngineUtil.setSkillLevel(skillLevel);
 
         if(matchType != null && matchType.equals(MatchType.SINGLE_PLAYER.toString())){
-            txtWhite.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
-            txtBlack.setText(getResources().getString(R.string.computer));
+            EngineUtil.setUCIELORating(EngineUtil.getEloFromSkillLevel());
+            btnHint.setVisibility(View.GONE);
+            txtOwner.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
+            txtOpponent.setText(getResources().getString(R.string.computer, skillLevel));
             boardView.setMode(BoardView.Modes.PLAY_COMPUTER);
         }
 
+
         matchableAccount = intent.getParcelableExtra(DatabaseUtil.matchables);
-        if (matchableAccount != null && ChallengeAPI.get().isOnChallenge()) {
+        if (matchableAccount != null) {
+            // Set player is on active match
+            getApplicationContext().getSharedPreferences(Constants.IS_ON_MATCH, Context.MODE_PRIVATE)
+                    .edit()
+                    .putBoolean(Constants.IS_ON_MATCH, true)
+                    .apply();
             configureMatch(matchableAccount);
         }
         // Try To Reconstruct
@@ -195,8 +210,8 @@ private FirebaseUser user;
         String white = intent.getStringExtra(Constants.WHITE);
         String black = intent.getStringExtra(Constants.BLACK);
         if(black != null && white != null){
-            txtBlack.setText(black);
-            txtWhite.setText(white);
+            txtOpponent.setText(black);
+            txtOwner.setText(white);
         }
     }
 
@@ -237,8 +252,10 @@ private FirebaseUser user;
         // Set timer online game and make sure you do not set two different timers
         if(boardView.getGameTimer() == null){
             GameTimer.Builder builder = new GameTimer.Builder()
-                    .setTxtBlackMoveTimer(txtBlackTimer)
-                    .setTxtWhiteMoveTimer(txtWhiteTimer)
+                    .setTxtOpponent(txtOpponentTimer)
+                    .setTxtOwner(txtOwnerTimer)
+                    .setOpponentAlliance(getOpponentAlliance())
+                    .setOwnerAlliance(getOwnerAlliance())
                     .setOnTimerElapsed(this);
             if(GameTimer.get() == null){
                 boardView.setGameTimer(builder.build());
@@ -251,41 +268,6 @@ private FirebaseUser user;
         }
     }
 
-    private void configureChallenge(Intent intent){
-        // Disable challenge creation if user has either accepted challenge or has an accepted challenge
-        if(ChallengeAPI.get().isChallengeAccepted() ||  ChallengeAPI.get().hasAcceptedChallenge()){
-            return;
-        }
-        String challengeId = intent.getStringExtra(Constants.CHALLENGE_ID);
-        String challenger = intent.getStringExtra(Constants.CHALLENGER);
-        boolean isChallenger = intent.getBooleanExtra(Constants.IS_CHALLENGER, false);
-        if(challengeId != null){
-            // Start challenge dialog
-            challengeProgressDialog.setMessage(getResources().getString(R.string.accepting_challenge));
-            challengeProgressDialog.setCancelable(false);
-            challengeProgressDialog.show();
-            boardView.setEnabled(false);
-            ChallengeTaker challengeTaker = new ChallengeTaker(challengeId);
-            challengeProgressDialog.show();
-            if(!isChallenger){
-                ChallengeAPI.get().sendChallengeNotification(challengeId, challenger); // Send notification to the challenger
-                ChallengeAPI.get().setChallengeByAccount(challenger, challengeId, new ChallengeAPI.ChallengeSent() {
-                    @Override
-                    public void onChallengeSent() {
-                        Log.d(BoardActivity.class.getSimpleName(), "Challenge sent to sender");
-                    }
-
-                    @Override
-                    public void onChallengeNotSent() {
-                        Crashlytics.logException(new RuntimeException("Challenge not sent back"));
-                    }
-                });
-                challengeTaker.acceptChallenge();
-            } else {
-                ChallengeAPI.get().setChallengeAccepted(true);
-            }
-        }
-    }
 
     @Override
     public void onClick(View v) {
@@ -302,11 +284,11 @@ private FirebaseUser user;
                 Toast.makeText(this, "Feature only available in portrait mode", Toast.LENGTH_LONG).show();
             }
         } else if (v.equals(btnBack)) {
-            boardView.switchHintingOff();
             boardView.undoMove();
+            boardView.reHint();
         } else if (v.equals(btnForward)) {
-            boardView.switchHintingOff();
             boardView.redoMove();
+            boardView.reHint();
         } else if (v.equals(btnSave)) {
             if (!isGameFinished && matchableAccount == null && !isStoredGame) { // Enable this for none online games
                 Snackbar snackbar = Snackbar.make(btnSave, R.string.save, Snackbar.LENGTH_LONG)
@@ -458,10 +440,10 @@ private FirebaseUser user;
     @Override
     public void getMoves(MoveLog moveLog) {
         runOnUiThread(() -> {
-            blackMoves.removeAllViews();
-            whiteMoves.removeAllViews();
-            blackPieces.removeAllViews();
-            whitePieces.removeAllViews();
+            opponentMoves.removeAllViews();
+            ownerMoves.removeAllViews();
+            opponentPieces.removeAllViews();
+            ownerPieces.removeAllViews();
             setNoMoveReactorPly();
             for (Move move : moveLog.getMoves()) {
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -471,11 +453,11 @@ private FirebaseUser user;
                 textView.setText(move.toString());
                 textView.setTextColor(Color.WHITE);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-                if (move.getMovedPiece().getPieceAlliance() == Alliance.BLACK) {
-                    blackMoves.addView(textView);
+                if (move.getMovedPiece().getPieceAlliance().equals(getOpponentAlliance())) {
+                    opponentMoves.addView(textView);
 
-                } else if (move.getMovedPiece().getPieceAlliance() == Alliance.WHITE) {
-                    whiteMoves.addView(textView);
+                } else if (move.getMovedPiece().getPieceAlliance().equals(getOwnerAlliance())) {
+                    ownerMoves.addView(textView);
                 }
                 // Get taken pieces
                 this.getTakenPieces(move);
@@ -496,63 +478,73 @@ private FirebaseUser user;
 
     @Override
     public void isCheckMate(Player player) {
-        onGameResume();
-        if (player.getAlliance().isBlack()) {
-            txtBlackStatus.setText(getString(R.string.checkmate));
-        } else if (player.getAlliance().isWhite()) {
-            txtWhiteStatus.setText(getString(R.string.checkmate));
-        }
-        endGame(GameHandler.GAME_FINISHED_FLAG);
+        runOnUiThread(() -> {
+            onGameResume();
+            if (player.getAlliance().equals(getOpponentAlliance())) {
+                txtOpponentStatus.setText(getString(R.string.checkmate));
+            } else if (player.getAlliance().equals(getOwnerAlliance())) {
+                txtOwnerStatus.setText(getString(R.string.checkmate));
+            }
+            endGame(GameHandler.GAME_FINISHED_FLAG);
+        });
     }
 
     @Override
     public void isStaleMate(Player player) {
-        onGameResume();
-        if (player.getAlliance().isBlack()) {
-            txtBlackStatus.setText(getString(R.string.stalemate));
-        } else if (player.getAlliance().isWhite()) {
-            txtWhiteStatus.setText(getString(R.string.stalemate));
-        }
-        endGame(GameHandler.GAME_DRAWN_FLAG);
+        runOnUiThread(() -> {
+            onGameResume();
+            if (player.getAlliance().equals(getOpponentAlliance())) {
+                txtOpponentStatus.setText(getString(R.string.stalemate));
+            } else if (player.getAlliance().equals(getOwnerAlliance())) {
+                txtOwnerStatus.setText(getString(R.string.stalemate));
+            }
+            endGame(GameHandler.GAME_DRAWN_FLAG);
+        });
     }
 
     @Override
     public void isCheck(Player player) {
-        onGameResume();
-        if (player.getAlliance().isBlack()) {
-            txtBlackStatus.setText(getString(R.string.check));
-        } else if (player.getAlliance().isWhite()) {
-            txtWhiteStatus.setText(getString(R.string.check));
-        }
+        runOnUiThread(() -> {
+            onGameResume();
+            if (player.getAlliance().equals(getOpponentAlliance())) {
+                txtOpponentStatus.setText(getString(R.string.check));
+            } else if (player.getAlliance().equals(getOwnerAlliance())) {
+                txtOwnerStatus.setText(getString(R.string.check));
+            }
+        });
     }
 
     @Override
     public void isDraw() {
-        txtWhiteStatus.setText(getString(R.string.draw));
-        txtBlackStatus.setText(getString(R.string.draw));
-        endGame(GameHandler.GAME_DRAWN_FLAG);
+        runOnUiThread(() -> {
+            txtOwnerStatus.setText(getString(R.string.draw));
+            txtOpponentStatus.setText(getString(R.string.draw));
+            endGame(GameHandler.GAME_DRAWN_FLAG);
+        });
     }
 
     @Override
     public void onGameResume() {
-        txtWhiteStatus.setText("");
-        txtBlackStatus.setText("");
+        runOnUiThread(() -> {
+            txtOwnerStatus.setText("");
+            txtOpponentStatus.setText("");
+        });
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
 
-        final int blackMoveCount = blackMoves.getChildCount();
-        final int whiteMoveCount = whiteMoves.getChildCount();
+        final int blackMoveCount = opponentMoves.getChildCount();
+        final int whiteMoveCount = ownerMoves.getChildCount();
 
         if (blackMoveCount >= 1) {
-            View lastBlackMove = blackMoves.getChildAt(blackMoveCount - 1);
+            View lastBlackMove = opponentMoves.getChildAt(blackMoveCount - 1);
             blackScrollView.scrollTo(lastBlackMove.getLeft(), lastBlackMove.getTop());
         }
 
         if (whiteMoveCount >= 1) {
-            View lastWhiteMove = whiteMoves.getChildAt(whiteMoveCount - 1);
+            View lastWhiteMove = ownerMoves.getChildAt(whiteMoveCount - 1);
             whiteScrollView.scrollTo(lastWhiteMove.getLeft(), lastWhiteMove.getTop());
         }
     }
@@ -595,6 +587,7 @@ private FirebaseUser user;
                 return;
             }
             ChallengeAPI.get().setOnChallenge(false);
+            freeUseFromMatch();
             storeGameOnCloud();
             // Stop service
             this.stopService(new Intent(this, MatchService.class));
@@ -605,9 +598,10 @@ private FirebaseUser user;
             AccountAPI.get().listenToAccountUpdate();
 
             evaluateGame = new EvaluateGame(); // Game evaluation fragment
-
-            evaluateGame.setOpponent(MatchAPI.get().getCurrentDatabaseMatch().getOpponentUserName());
-
+            DatabaseMatch match = MatchAPI.get().getCurrentDatabaseMatch();
+            if(match != null) {
+                evaluateGame.setOpponent(match.getOpponentUserName());
+            }
             if (flag == GameHandler.GAME_DRAWN_FLAG) {
                 matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_DRAWN_FLAG, MatchStatus.DRAW, null, null);
                 evaluateGame.setMatchStatus(MatchStatus.DRAW);
@@ -636,18 +630,22 @@ private FirebaseUser user;
             // Deletes challenge when the game ends
             if(AccountAPI.get().getCurrentAccount() != null ) {
                 evaluateGame.setInitialPoints(AccountAPI.get().getCurrentAccount().getElo_rating());
-                ChallengeAPI.get().deleteChallenge();
             } else {
                 evaluateGame.setInitialPoints(0);
             }
-
-            ChallengeAPI.get().setNotify(true);
 
             AccountAPI.get().getAccount();
 //            goToMainActivity();
             MatchAPI.get().removeCurrentMatch();
             evaluateGame.show(getSupportFragmentManager(), "EvaluateGame"); // Span Up Ad
         }
+    }
+
+    private void freeUseFromMatch() {
+        getApplicationContext().getSharedPreferences(Constants.IS_ON_MATCH, Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean(Constants.IS_ON_MATCH, false)
+                .apply();
     }
 
     private void storeGameOnCloud(){
@@ -677,10 +675,10 @@ private FirebaseUser user;
             imageView.setBackground(drawable);
             imageView.invalidate();
 
-            if (piece.getPieceAlliance().equals(Alliance.BLACK)) {
-                blackPieces.addView(imageView);
-            } else if (piece.getPieceAlliance().equals(Alliance.WHITE)) {
-                whitePieces.addView(imageView);
+            if (piece.getPieceAlliance().equals(getOpponentAlliance())) {
+                ownerPieces.addView(imageView);
+            } else if (piece.getPieceAlliance().equals(getOwnerAlliance())) {
+                opponentPieces.addView(imageView);
             }
         }
     }
@@ -720,7 +718,7 @@ private FirebaseUser user;
         }
         isGameFinished = true; // Is game on going is false
         MoveLog moveLog = boardView.getMoveLog();
-        String gameText = PGNMainUtils.writeGameAsPGN(moveLog.convertToEngineMoveLog(), txtWhite.getText().toString(), txtBlack.getText().toString(), result);
+        String gameText = PGNMainUtils.writeGameAsPGN(moveLog.convertToEngineMoveLog(), txtOwner.getText().toString(), txtOpponent.getText().toString(), result);
         FileOutputStream fileOutputStream = null;
 
         try {
@@ -842,13 +840,12 @@ private FirebaseUser user;
     public void onMatchEnd(MatchStatus matchStatus) {
         // Stop service
         this.noMoveReactor.stopTimer();
+        freeUseFromMatch();
         ChallengeAPI.get().setOnChallenge(false);
         this.stopService(new Intent(this, MatchService.class));
         MatchAPI.get().setMatchCreated(false);
         PresenceAPI.get().stopListening();
         storeGameOnCloud();
-        ChallengeAPI.get().deleteChallenge(); // Delete current challenge
-        ChallengeAPI.get().setNotify(true);
         isGameFinished = true; // Flag Game Has Ended
         evaluateGame = new EvaluateGame();
         this.stopGameTimers();
@@ -873,15 +870,8 @@ private FirebaseUser user;
     public void onOpponentReceived(User user) {
         PresenceAPI.get().getUserOnline(user, this); // Listen to user disconnection
         runOnUiThread(() -> {
-            if (boardView.getLocalAlliance().isWhite()) {
-                txtWhite.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
-                txtBlack.setText(user.getUser_name());
-            }
-
-            if(boardView.getLocalAlliance().isBlack())  {
-                txtWhite.setText(user.getUser_name());
-                txtBlack.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
-            }
+            txtOwner.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
+            txtOpponent.setText(user.getUser_name());
         });
     }
 
@@ -908,80 +898,6 @@ private FirebaseUser user;
         // If Listening to another user and the user is offline. Notify me
         if(!AccountAPI.get().isUser(user.getUid()) && !isOnline){
             Toasty.info(this, user.getUser_name() + " is offline").show();
-        }
-    }
-
-    /**
-     * @author Collins Magondu 10/01/2020
-     * Used to accept challenges from notifications
-     */
-    private class ChallengeTaker implements MatchListener, AccountListener  {
-        private String challengeId;
-
-        ChallengeTaker(String challengeId){
-            this.challengeId = challengeId;
-            MatchAPI.get().setMatchListener(this);
-            MatchAPI.get().setMatchCreated(true);
-            MatchAPI.get().getAccount();
-        }
-
-        void acceptChallenge(){
-            if(AccountAPI.get().getCurrentUser() == null) {
-                AccountAPI.get().getAccount(user.getUid(), account -> {
-                    AccountAPI.get().setCurrentAccount(account);
-                    AccountAPI.get().setUser(FirebaseAuth.getInstance().getCurrentUser());
-                    createMatchableAccount(account);
-                    AccountAPI.get().setAccountListener(this);
-                    AccountAPI.get().getAccount();
-                    AccountAPI.get().getUserByUid(account.getOwner());
-                });
-            } else {
-                createMatchableAccount(AccountAPI.get().getCurrentAccount());
-            }
-        }
-
-        private void createMatchableAccount(Account account){
-            MatchableAccount matchableAccount = new MatchableAccount();
-            matchableAccount.setOwner(account.getOwner());
-            matchableAccount.setMatch_type(MatchType.PLAY_ONLINE.toString());
-            matchableAccount.setDuration(Constants.DEFAULT_MATCH_DURATION);
-            matchableAccount.setElo_rating(account.getElo_rating());
-            MatchAPI.get().createUserMatchableAccountImplementation(matchableAccount);
-        }
-
-        @Override
-        public void onMatchMade(MatchableAccount matchableAccount) {
-            challengeProgressDialog.dismiss(); // Close challenge acceptance
-            configureMatch(matchableAccount);
-        }
-
-        @Override
-        public void onMatchableCreatedNotification() {
-            ChallengeAPI.get().acceptChallenge(challengeId);
-        }
-
-        @Override
-        public void onMatchError() {
-            Crashlytics.logException(new RuntimeException("Match could was not created for "
-                    + AccountAPI.get().getCurrentUser().getUid()
-                    + " " + new Date().toString()));
-        }
-
-        @Override
-        public void onAccountReceived(Account account) {
-            // Handle Account Received Logic
-            Log.d(BoardActivity.class.getSimpleName(), "Account Received");
-        }
-
-        @Override
-        public void onUserReceived(User user) {
-            // Handle User Received Logic
-            Log.d(BoardActivity.class.getSimpleName(), "User Received");
-        }
-
-        @Override
-        public void onAccountUpdated(boolean status) {
-            // Handle Account Updated Logic
         }
     }
 

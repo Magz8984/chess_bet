@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:background="@color/colorPrimary"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:textAlignment="center"
+        android:padding="5dp"
+        android:fontFamily="@font/chakrapetchbold"
+        android:textColor="@color/white"
+        android:text="@string/app_name"
+        android:textSize="20sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:padding="5dp"
+        android:fontFamily="@font/chakrapetchbold"
+        android:textColor="@color/white"
+        android:text="@string/computer_levels"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <GridView
+        android:layout_margin="5dp"
+        android:id="@+id/levels"
+        android:layout_width="match_parent"
+        android:columnWidth="90dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="20dp"
+        android:horizontalSpacing="10dp"
+        android:layout_marginBottom="10dp"
+        android:stretchMode="columnWidth"
+        android:layout_height="200dp"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_margin="5dp"
+            android:text="Cancel"
+            android:background="@color/bootstrap_red"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Button
+            android:id="@+id/btnPlay"
+            android:layout_margin="5dp"
+            android:text="Play"
+            android:layout_weight="1"
+            android:background="@color/bootstrap_green"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+
+
+</LinearLayout>

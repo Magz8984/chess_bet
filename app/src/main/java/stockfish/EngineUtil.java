@@ -4,9 +4,12 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * @author Collins Magondu
@@ -14,17 +17,22 @@ import java.util.Objects;
 
 public class EngineUtil {
     private static BufferedWriter bufferedWriter;
+    private static Executor executor = Executors.newSingleThreadExecutor(); // Manage input handling
+    private static Executor callback = Executors.newSingleThreadExecutor(); // Manage output handling
     private static BufferedReader bufferedReader;
-    private static Thread listenerThread;
-    private static volatile boolean shutDown = false;
-    private volatile static OnResponseListener onResponseListener;
+    private static long skillLevel;
 
-    public static void setOnResponseListener(OnResponseListener onResponseListener) {
-        EngineUtil.onResponseListener = onResponseListener;
+
+    public static long getSkillLevel() {
+        return skillLevel;
     }
 
     static void setBufferedReader(BufferedReader bufferedReader) {
         EngineUtil.bufferedReader = bufferedReader;
+    }
+
+    public static long getEloFromSkillLevel() {
+        return (((skillLevel - 1) * 75) + 1350);
     }
 
     static void setBufferedWriter(BufferedWriter bufferedWriter) {
@@ -40,115 +48,74 @@ public class EngineUtil {
          }
     }
 
-    static void pipe(String line, Response response){
+    // Handle stockfish output
+    private static String handleOutput(String identifier) {
         try {
-            bufferedWriter.write(line + "\n");
-            bufferedWriter.flush();
-            String endResult = "";
-            ensureBufferedReaderIsReady();
-            while (bufferedReader.ready()){
-                endResult =  bufferedReader.readLine();
+            String line;
+            while ((line = bufferedReader.readLine()) != null){
+                if(line.contains(identifier)){
+                    return line;
+                }
             }
-            response.onResponseReceived(endResult);
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return "";
+    }
+
+    // Hanlde stockfish input
+    private static void handleInput(String input) {
+        try {
+            bufferedWriter.write(input);
+            bufferedWriter.flush();
         }catch (Exception ex){
             ex.printStackTrace();
         }
     }
 
-    public static void startListening(){
-        listenerThread = new Thread(() -> {
-             if(bufferedReader != null){
-                 String endResult;
-                 while (!shutDown){
-                     try {
-                         endResult =  bufferedReader.readLine();
-                         if(endResult != null){
-                             onResponseListener.onResponse(movesSearch(endResult));
-                             onResponseListener.onStockfishFullResponse(endResult);
-                         }
-                     } catch (Exception e) {
-                         e.printStackTrace();
-                     }
-                 }
-             }
+    public static void submit(Query query, ResponseCallback responseCallback) {
+        executor.execute(() -> {
+            String output;
+            List<String> responses = new ArrayList<>();
+            handleInput(query.toString());
+            if (query.getType() == QueryType.BEST_MOVE) {
+                output = Objects.requireNonNull(handleOutput("best"));
+                responses = new BestMoveQueryResult(output).filteredResponse();
+            } else if  (query.getType() == QueryType.CENTI_PAWN_VALUE){
+                responses = Collections.singletonList(handleOutput("cp"));
+            }
+            List<String> finalResponses = responses;
+            callback.execute(() -> responseCallback.onResponse(finalResponses));
         });
-        listenerThread.start();
     }
 
-    public Thread getListenerThread() {
-        return listenerThread;
+    public static void submit(String command, String responseIdentifier, ResponseCallback responseCallback){
+        executor.execute(() -> {
+            handleInput(command);
+            callback.execute(() -> responseCallback.onResponse(Collections.singletonList(handleOutput(responseIdentifier))));
+        });
     }
 
-    /**
-     * Should be called during process termination
-     */
-     static void stopCurrentListenerThread(){
-        try {
-            shutDown = true;
-            listenerThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public static void setSkillLevel(long skill) {
+        skillLevel = skill;
+        Log.d("UCIOption",UCIOption.SKILL_LEVEL.setValue(skillLevel).toString());
+        handleInput(UCIOption.SKILL_LEVEL.setValue(skillLevel).toString());
+        submit("isready\n", "readyok", responses -> Log.d("RESPONSE", responses.get(0)));
+
     }
 
-    private static void ensureBufferedReaderIsReady(){
-        for (int i = 0; i < 10; i++){
-            try {
-                if(!bufferedReader.ready()){
-                    if(!Engine.isRunning()){
-                        Thread.sleep(100);
-                    }
-                    else {
-                        Thread.sleep(1000);
-                    }
-                }
-                else {
-                    if(Engine.isRunning()){
-                        Thread.sleep(1100);
-                    }
-                    break;
-                }
-            } catch (Exception e) {
-                Log.e("ERROR_MSG", Objects.requireNonNull(e.getMessage()));
-                e.printStackTrace();
-            }
-        }
-     }
-     public interface Response{
-         void onResponseReceived(String response);
-    }
-
-    /**
-     * Filter through an STOCKFISH engine response tries to find a list of moves
-     * @param response
-     * @return Move String
-     */
-    private static String movesSearch(String response) {
-        Log.d("Move", response);
-        StringBuilder builder = new StringBuilder();
-        // Handle
-        if(response.startsWith("best")){
-            return null;
-        }
-        else if(response.startsWith("info")){
-            List<String> list = Arrays.asList(response.split(" "));
-            // Make sure we have pv recorded
-            if(list.contains("pv")){
-                int index = list.indexOf("pv");
-                index++;
-                while (index < list.size()){
-                   String move = list.get(index);
-                   builder.append(move.substring(0, 4));
-                   builder.append(" ");
-                   index++;
-                }
-            }
-        }
-        return builder.toString();
+    public static void setUCIELORating(long rating) {
+        handleInput(UCIOption.UCI_LimitStrength.setBool(true).toBoolString());
+        handleInput(UCIOption.UCI_Elo.setValue(rating).toString());
+        submit("isready\n", "readyok", responses -> Log.d("RESPONSE", responses.get(0)));
     }
 
     public interface OnResponseListener{
         void onResponse(String moves);
         void onStockfishFullResponse(String response);
+    }
+
+    public interface ResponseCallback {
+        void onResponse(List<String> responses);
     }
 }

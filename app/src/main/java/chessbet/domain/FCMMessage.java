@@ -107,6 +107,13 @@ public class FCMMessage {
             public String toString() {
                 return "CHAT";
             }
+        },
+        TARGET_CHALLENGE {
+            @NonNull
+            @Override
+            public String toString() {
+                return "TARGET_CHALLENGE";
+            }
         }
     }
 }

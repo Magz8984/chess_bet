@@ -105,7 +105,7 @@
         <Button
             android:id="@+id/btnSaveProfile"
             android:textAllCaps="false"
-            android:text="@string/save"
+            android:text="@string/update"
             android:padding="5dp"
             android:layout_margin="10dp"
             android:fontFamily="@font/chakrapetchbold"
