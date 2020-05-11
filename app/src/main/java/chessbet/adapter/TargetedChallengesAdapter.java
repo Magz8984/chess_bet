@@ -15,22 +15,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-import chessbet.api.AccountAPI;
 import chessbet.api.ChallengeAPI;
 import chessbet.app.com.R;
 import chessbet.domain.TargetedChallenge;
-import chessbet.domain.User;
 
 public class TargetedChallengesAdapter extends FirestoreRecyclerAdapter<TargetedChallenge, TargetedChallengesAdapter.ViewHolder> {
     private Context context;
     private ChallengeAPI.TargetedChallengeUpdated targetedChallengeListener;
-    private User user;
+    private FirebaseUser user;
     public TargetedChallengesAdapter(@NonNull FirestoreRecyclerOptions<TargetedChallenge> options, Context context, ChallengeAPI.TargetedChallengeUpdated targetedChallengeListener) {
         super(options);
         this.context = context;
         this.targetedChallengeListener = targetedChallengeListener;
-        this.user = AccountAPI.get().getCurrentUser();
+        this.user = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     @Override
@@ -51,7 +51,7 @@ public class TargetedChallengesAdapter extends FirestoreRecyclerAdapter<Targeted
             }
         }));
 
-        if(model.getTarget().equals(this.user.getUid())) {
+        if(model.getTarget().equals(this.user.getUid())){ p
             holder.getBtnAccept().setVisibility(View.VISIBLE);
             holder.getBtnPlay().setVisibility(View.GONE);
         } else {
