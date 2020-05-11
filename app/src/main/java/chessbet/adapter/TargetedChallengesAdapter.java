@@ -51,7 +51,7 @@ public class TargetedChallengesAdapter extends FirestoreRecyclerAdapter<Targeted
             }
         }));
 
-        if(model.getTarget().equals(this.user.getUid())){ p
+        if(model.getTarget().equals(this.user.getUid())){
             holder.getBtnAccept().setVisibility(View.VISIBLE);
             holder.getBtnPlay().setVisibility(View.GONE);
         } else {
