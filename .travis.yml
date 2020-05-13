@@ -26,7 +26,7 @@ android:
 
 install:
   - echo y | sdkmanager 'ndk-bundle'
-  - echo y | sdkmanager 'lldb;3.0'
+  - echo y | sdkmanager "cmake;3.10.2.4988404"
 
 licenses:
 - '.+'
