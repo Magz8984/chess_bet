@@ -5,6 +5,10 @@ jdk:
 
 sudo: required
 
+branches:
+  only:
+    - master
+    - dev
 env:
   global:
   - ANDROID_API_LEVEL=29  # Compile SDK version
