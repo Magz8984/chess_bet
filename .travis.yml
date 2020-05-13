@@ -44,6 +44,5 @@ before_script:
 dist: trusty
 
 script:
-- ./gradlew assembleRelease
-- ./gradlew test # FIx buy testing this
-- ./gradlew build
+  - ./gradlew assembleDev
+  - ./gradlew test # FIx buy testing this
