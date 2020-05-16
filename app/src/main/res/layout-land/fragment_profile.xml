@@ -15,7 +15,7 @@
            <androidx.cardview.widget.CardView
                android:id="@+id/profile_holder"
                android:layout_width="match_parent"
-               android:layout_height="200dp">
+               android:layout_height="150dp">
 
                <RelativeLayout
                    android:layout_width="match_parent"
@@ -23,11 +23,12 @@
                    android:background="@color/colorPrimary">
 
                    <FrameLayout
+                       android:layout_centerInParent="true"
                        android:id="@+id/profile_pic_wrapper"
                        android:layout_centerHorizontal="true"
                        android:layout_width="wrap_content"
                        android:layout_height="wrap_content"
-                       android:layout_marginTop="10dp">
+                       android:layout_marginTop="5dp">
                        <de.hdodenhof.circleimageview.CircleImageView
                            android:layout_marginTop="20dp"
                            android:id="@+id/profile_photo"
@@ -44,16 +45,13 @@
                android:orientation="vertical"
                android:background="@drawable/rectangle_profile">
                <androidx.cardview.widget.CardView
-                   android:layout_marginTop="30dp"
+                   android:layout_marginTop="20dp"
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content"
                    app:cardCornerRadius="5dp"
-                   app:cardElevation="-10dp"
+                   app:cardElevation="10dp"
                    android:layout_marginRight="30dp"
-                   android:layout_marginLeft="30dp"
-                   app:cardBackgroundColor="@color/colorWhite"
-                   app:cardUseCompatPadding="true"
-                   android:foreground="?android:attr/selectableItemBackground">
+                   android:layout_marginLeft="30dp">
                    <androidx.appcompat.widget.LinearLayoutCompat
                        android:layout_width="match_parent"
                        android:layout_height="wrap_content"
@@ -95,12 +93,9 @@
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content"
                    app:cardCornerRadius="5dp"
-                   app:cardElevation="-10dp"
+                   app:cardElevation="10dp"
                    android:layout_marginRight="30dp"
-                   android:layout_marginLeft="30dp"
-                   app:cardBackgroundColor="@color/colorWhite"
-                   app:cardUseCompatPadding="true"
-                   android:foreground="?android:attr/selectableItemBackground">
+                   android:layout_marginLeft="30dp">
                    <androidx.appcompat.widget.LinearLayoutCompat
                        android:layout_width="match_parent"
                        android:layout_height="wrap_content"
@@ -144,12 +139,9 @@
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content"
                    app:cardCornerRadius="5dp"
-                   app:cardElevation="-10dp"
+                   app:cardElevation="10dp"
                    android:layout_marginRight="30dp"
-                   android:layout_marginLeft="30dp"
-                   app:cardBackgroundColor="@color/colorWhite"
-                   app:cardUseCompatPadding="true"
-                   android:foreground="?android:attr/selectableItemBackground">
+                   android:layout_marginLeft="30dp">
                    <androidx.appcompat.widget.LinearLayoutCompat
                        android:layout_width="match_parent"
                        android:layout_height="wrap_content"
