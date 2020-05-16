@@ -104,6 +104,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
                 if(user.getEmail() != null){
                     emailTv.setText(user.getEmail());
                 }
+
+                if(user.getUser_name() != null) {
+                    usernameTv.setText(user.getUser_name());
+                }
             }catch (Exception ex){
                 Log.d(getClass().getSimpleName(), ex.getMessage());
             }
