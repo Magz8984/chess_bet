@@ -4,7 +4,11 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.util.Log;
 
+import com.chess.engine.Alliance;
+
 import java.util.Objects;
+
+import chessbet.domain.Player;
 
 public class GameUtil {
     private static MediaPlayer mp;
@@ -29,6 +33,10 @@ public class GameUtil {
                 ex.printStackTrace();
             }
         }
+    }
+
+    public static Player getPlayerFromAlliance(Alliance alliance) {
+        return (alliance == Alliance.BLACK) ? Player.BLACK : Player.WHITE;
     }
 
     public static MediaPlayer getMediaPlayer() {
