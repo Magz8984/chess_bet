@@ -104,3 +104,9 @@
 
 #### 1.2.1-beta(Chess MVP)
 - Fix error when getting no move from stockfish
+
+#### 1.2.5 release
+- Retain v1.0 app icon
+- Increase level grid view height
+- Create name profile fragment
+- Fix timer lapsed logic
