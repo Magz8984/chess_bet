@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.chess.engine.Alliance;
 
 import chessbet.domain.Player;
+import chessengine.GameUtil;
 import io.github.erehmi.countdown.CountDownTask;
 import io.github.erehmi.countdown.CountDownTimers;
 
@@ -36,7 +37,6 @@ public class GameTimer {
     public void setOwnerTimeLeft(int ownerTimeLeft) {
         this.ownerTimeLeft = ownerTimeLeft;
     }
-
 
     public static GameTimer get() {
         return INSTANCE;
@@ -65,7 +65,7 @@ public class GameTimer {
             public void onFinish(View view) {
                 // Black Lost On Time
                 isTimerLapsed = true;
-                builder.onTimerElapsed.playerTimeLapsed(Player.BLACK);
+                builder.onTimerElapsed.playerTimeLapsed(GameUtil.getPlayerFromAlliance(builder.opponentAlliance));
             }
         });
     }
@@ -154,7 +154,7 @@ public class GameTimer {
             public void onFinish(View view) {
                 // Black Lost On Time
                 isTimerLapsed = true;
-                builder.onTimerElapsed.playerTimeLapsed(Player.WHITE);
+                builder.onTimerElapsed.playerTimeLapsed(GameUtil.getPlayerFromAlliance(builder.ownerAlliance));
             }
         });
     }
