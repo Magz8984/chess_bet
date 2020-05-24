@@ -9,6 +9,8 @@ import android.widget.GridView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import java.util.Objects;
+
 import javax.annotation.Nullable;
 
 import chessbet.adapter.MenuOptionsAdapter;
@@ -19,7 +21,7 @@ public class MainFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater , ViewGroup viewGroup, @Nullable Bundle bundle){
         View view = inflater.inflate(R.layout.fragment_main, viewGroup, false);
         GridView gridView = view.findViewById(R.id.menuItems);
-        gridView.setAdapter(new MenuOptionsAdapter(getContext()));
+        gridView.setAdapter(new MenuOptionsAdapter(Objects.requireNonNull(getContext())));
         return view;
     }
 }

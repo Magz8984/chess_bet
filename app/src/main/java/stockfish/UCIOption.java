@@ -1,30 +1,37 @@
 package stockfish;
 
+import androidx.annotation.NonNull;
+
 public enum UCIOption {
-    IS_READY{
-        @Override
-        String command(String... strings) {
-            return "isready";
-        }
+    SKILL_LEVEL("Skill Level"),
+    UCI_LimitStrength("UCI_LimitStrength"),
+    UCI_Elo("UCI_Elo");
 
-        @Override
-        String response() {
-            return "readyok";
-        }
-    },
+    private String option;
+    private long value;
+    private boolean bool;
 
-    UCI{
-        @Override
-        String command(String... strings) {
-            return "uci";
-        }
+    UCIOption(String option) {
+        this.option = option;
+    }
 
-        @Override
-        String response() {
-            return "uciok";
-        }
-    };
+    public UCIOption setValue(long value){
+        this.value = value;
+        return this;
+    }
 
-    abstract String command(String... strings);
-    abstract String response();
+    public UCIOption setBool(boolean bool) {
+        this.bool = bool;
+        return this;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "setoption name " + option +  " value " + value + "\n";
+    }
+
+    public String toBoolString() {
+        return "setoption name " + option +  " value " + bool + "\n";
+    }
 }

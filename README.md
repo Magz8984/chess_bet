@@ -62,3 +62,51 @@
 - Add xhdpi screen support
 - Fix challenge messages.
 - Enable one challenge notification on app start up.
+
+### v1.1.4-beta (Chess MVP)
+
+#### Features
+
+- PGN files can be viewed from the app
+
+### Improvements
+- Fix challenge creation process when user is requested for a challenge
+
+### v1.1.5-beta (Chess MVP)
+
+### Improvements
+
+- Fix Play Online Bugs
+
+### 1.1.6-beta (Chess MVP)
+
+#### Improvements
+
+- Add computer skill levels when playing versus computer
+
+### 1.1.7-beta (Chess-MVP)
+
+#### Improvements
+
+- Fix stockfish depth on different skill levels
+- Fix UI not being updated after a certain move
+- Fix hints from stockfish not showing up for certain positions
+
+### 1.1.8-beta (Chess MVP)
+
+#### Improvements
+
+- Fix bitmap OOM error
+- Replace Play Computer Settings Dialog Fragment with Activity
+
+#### 1.1.9-beta(Chess MVP)
+- Fix skill level intent data
+
+#### 1.2.1-beta(Chess MVP)
+- Fix error when getting no move from stockfish
+
+#### 1.2.5 release
+- Retain v1.0 app icon
+- Increase level grid view height
+- Create name profile fragment
+- Fix timer lapsed logic

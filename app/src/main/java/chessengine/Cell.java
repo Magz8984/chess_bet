@@ -20,13 +20,15 @@ import com.chess.engine.Move;
 import com.chess.engine.board.Board;
 import com.chess.engine.board.Tile;
 import com.chess.engine.player.MoveTransition;
-import com.chess.pgn.FenUtilities;
 
 import java.util.Collection;
 import java.util.Collections;
 
 import chessbet.app.com.R;
 import chessbet.domain.Player;
+import stockfish.EngineUtil;
+import stockfish.Query;
+import stockfish.QueryType;
 
 public class Cell extends View {
     private final int tileId;
@@ -67,8 +69,8 @@ public class Cell extends View {
                     .getIdentifier( name.toLowerCase(),"drawable", context.getPackageName()));
         }
 
-        else{
-            drawable=this.context.getResources().getDrawable(R.drawable.select);
+        else {
+            drawable = this.context.getResources().getDrawable(R.drawable.select);
             drawable.setAlpha(0);
         }
 
@@ -97,11 +99,11 @@ public class Cell extends View {
         canvas.drawBitmap(bitmap, matrix, squareColor);
     }
 
+    // TODO deconstruct method to atomic methods
     public void handleTouch() {
             if(boardView.destinationTile != null){
-                boardView.destinationTile = null;
+                boardView.clearTiles();
             }
-
             if(boardView.sourceTile == null){
                 boardView.sourceTile = boardView.chessBoard.getTile(tileId);
                 boardView.movedPiece = boardView.sourceTile.getPiece();
@@ -142,16 +144,16 @@ public class Cell extends View {
                         boardView.chessBoard = transition.getTransitionBoard();
 
                         // Only ask for a move form stockfish if engine is on
-                        if(boardView.isHinting){
-                            boardView.getInternalStockFishHandler().askStockFishMove(FenUtilities.createFEN(boardView.chessBoard), 3000, 10);
-                        }
+//                        if(boardView.isHinting){
+//                            boardView.getInternalStockFishHandler().askStockFishMove(FenUtilities.createFEN(boardView.chessBoard), 3000, 10);
+//                        }
 
                         GameUtil.playSound();  // Play sound once move is made
 
-                        if (boardView.chessBoard.currentPlayer().isInCheckMate()) {
-                            move.setCheckMateMove(true);
-                        } else if (boardView.chessBoard.currentPlayer().isInCheck()) {
-                            move.setCheckMove(true);
+                        boardView.setMoveCheckOrMate(move);
+
+                        if(boardView.isHinting){
+                            boardView.askStockFishBestMove();
                         }
 
                         boardView.moveLog.addMove(move);
@@ -169,27 +171,37 @@ public class Cell extends View {
 
                     if(boardView.mode == BoardView.Modes.PLAY_COMPUTER && boardView.chessBoard.currentPlayer().getAlliance() == Alliance.BLACK){
                         boardView.isEngineLoading = true;
-                        boardView.engine = new BoardView.AI_ENGINE();
-                        boardView.engine.setEngineMoveHandler(move1 -> {
-                            // Highlight the destination tile
-                            boardView.destinationTile =  boardView.chessBoard.getTile(move1.getDestinationCoordinate());
-
-                            boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(move1).getTransitionBoard();
-                            boardView.getInternalStockFishHandler().askStockFishMove(FenUtilities.createFEN(boardView.chessBoard), 4000, 20);
-                            boardView.moveLog.addMove(move1);
-                            boardView.moveCursor = boardView.moveLog.size();
-                            boardView.onMoveDoneListener.getMoves(boardView.moveLog);
-                            GameUtil.playSound();
-                            updateGameStatus();
-                            boardView.isEngineLoading = false;
-                            boardView.invalidate();
+                            Query query = new Query.Builder()
+                                    .setQueryType(QueryType.BEST_MOVE)
+                                    .setDepth(EngineUtil.getSkillLevel())
+                                    .setFen(boardView.getFen())
+                                    .setThreads(1)
+                                    .setTime(3000).build();
+                            EngineUtil.submit(query, response -> {
+                            if(!response.isEmpty()){
+                                Move sMove = boardView.getMoveByPositions(response.get(0));
+                                MoveTransition moveTransition = boardView.chessBoard.currentPlayer().makeMove(sMove);
+                                if(moveTransition.getMoveStatus().isDone()){
+                                    boardView.clearTiles();
+                                    boardView.destinationTile =  boardView.chessBoard.getTile(sMove.getDestinationCoordinate());
+                                    boardView.sourceTile = boardView.chessBoard.getTile(sMove.getCurrentCoordinate());
+                                    boardView.chessBoard = moveTransition.getTransitionBoard();
+                                    GameUtil.playSound();
+                                    updateGameStatus();
+                                    boardView.setMoveCheckOrMate(sMove);
+                                    boardView.moveLog.addMove(sMove);
+                                    boardView.moveCursor = boardView.moveLog.size();
+                                    boardView.onMoveDoneListener.getMoves(boardView.moveLog);
+                                    boardView.isEngineLoading = false;
+                                    boardView.postInvalidate();
+                                }
+                            }
                         });
-                        boardView.engine.execute(boardView.chessBoard);
                     }
                     updateGameStatus();
+                } else {
+                    boardView.clearTiles();
                 }
-                boardView.sourceTile = null;
-                boardView.movedPiece = null;
                 boardView.invalidate();
             }
     }
@@ -206,6 +218,8 @@ public class Cell extends View {
         }
         else if(boardView.chessBoard.isDraw()){
             boardView.onMoveDoneListener.isDraw();
+        } else {
+            boardView.onMoveDoneListener.onGameResume();
         }
     }
 
@@ -220,15 +234,18 @@ public class Cell extends View {
                         try {
                             // Wait for a second before the next move is made
                             Thread.sleep(1000);
-
+                            boardView.clearTiles();
                             Move nextMove = Move.MoveFactory.createMove(boardView.chessBoard ,boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getFromCoordinate(),
                                     boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getToCoordinate());
                             boardView.destinationTile = boardView.chessBoard.getTile(tileId);
                             boardView.nextPuzzleMove = nextMove;
                             boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(nextMove).getTransitionBoard();
+                            boardView.destinationTile = boardView.chessBoard.getTile(nextMove.getDestinationCoordinate());
+                            boardView.sourceTile = boardView.chessBoard.getTile(nextMove.getCurrentCoordinate());
                             boardView.puzzleMoveCounter++;
                             // Ensure board positions are redone
                             boardView.postInvalidate();
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -308,7 +325,7 @@ public class Cell extends View {
         for(final Move move : pieceLegalMoves(boardView.chessBoard)){
             if(move.getDestinationCoordinate() == this.tileId){
                 if(!boardView.chessBoard.getTile(this.tileId).isOccupied()){
-                    drawable=this.context.getResources().getDrawable(R.drawable.select_light);
+                    drawable = this.context.getResources().getDrawable(R.drawable.select_light);
                     drawable.setColorFilter(color,PorterDuff.Mode.DST_OVER);
                     drawable.draw(canvas);
                     bitmap = ((BitmapDrawable) drawable).getBitmap();

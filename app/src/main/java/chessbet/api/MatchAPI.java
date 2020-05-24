@@ -101,20 +101,20 @@ public class MatchAPI implements Serializable {
                 MatchableAccount matchableAccount = matchable[0];
                 if(matchableAccount != null){
                     if(matchableAccount.isMatched()){
-                        if(!isMatchCreated || unevaluatedMatches.contains(matchableAccount.getMatchId())){
-                            unevaluatedMatches.add(matchableAccount.getMatchId());
-                            forceEvaluateMatchImplementation(matchableAccount.getMatchId());
-                        } else {
-                            // Remove listener once the match is made
-                            DatabaseUtil.getAccount(firebaseUser.getUid()).removeEventListener(this);
-                            // Add Started Event
-                            RemoteMove.get().addEvent(MatchEvent.IN_PROGRESS);
-                            RemoteMove.get().setOwner(matchableAccount.getOwner());
-                            RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
-                            // Confirms a match has been made
-                            matchListener.onMatchMade(matchableAccount);
-                        }
+                        // Remove listener once the match is made
+                        DatabaseUtil.getAccount(firebaseUser.getUid()).removeEventListener(this);
+                        // Add Started Event
+                        RemoteMove.get().addEvent(MatchEvent.IN_PROGRESS);
+                        RemoteMove.get().setOwner(matchableAccount.getOwner());
+                        RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
+                        // Confirms a match has been made
+                        matchListener.onMatchMade(matchableAccount);
+                    } else {
+                        // TODO Create a match not found interface method in MatchListener
+                        matchListener.onMatchError();
                     }
+                } else {
+                    matchListener.onMatchError();
                 }
             }
             @Override

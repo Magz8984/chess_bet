@@ -17,9 +17,9 @@ import chessbet.app.com.R;
 
 public class EvalView extends View {
     private Paint textPaint;
-    private String points = "599(+9) 608";
-    private String gameResult = "Match Won";
-    private String winnerInfo = "Collins Won By CheckMate";
+    private String points = "";
+    private String gameResult = "";
+    private String winnerInfo = "";
     private Typeface typeface;
 
     private void initialize(){

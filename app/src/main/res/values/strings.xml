@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Chess MVP</string>
+<!--    <string name="app_name">Chess MVP</string>-->
     <string name="action_sign_in_short">Register</string>
     <string name="email">Email</string>
     <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
@@ -14,7 +14,7 @@
     <string name="hint_password">Password</string>
     <string name="hint_name">Full Name</string>
     <string name="btn_login">LOGIN</string>
-    <string name="btn_link_to_register">Not a member? Get registered in Firebase now!</string>
+    <string name="btn_link_to_register">Not a member? Get registered now!</string>
     <string name="btn_link_to_login">Already registered. Login Me!</string>
     <string name="title_activity_reset_password">ResetPasswordActivity</string>
     <string name="btn_forgot_password">Forgot your password?</string>
@@ -59,7 +59,9 @@
     <string name="match_exact_rating">Match is set on exact rating</string>
     <string name="end_match">End Match</string>
     <string name="save">Save Match</string>
+    <string name="update">Update</string>
     <string name="games">Games</string>
+    <string name="challenges">Challenges</string>
     <string name="forfeit">Forfeit</string>
     <string name="userVerification">Kindly verify email</string>
     <string name="offline">Offline</string>
@@ -79,9 +81,10 @@
     <string name="low_internet_connection">You Have Low Internet Connection</string>
     <string name="opponent_disconnected">Opponent Disconnected</string>
     <string name="opponent_won">%1$s Won</string>
-    <string name="computer">Computer</string>
+    <string name="computer">Computer (Level %1$d)</string>
     <string name="analysis_prompt">Forfeit Match Analyze Game</string>
     <string name="yes">YES</string>
+    <string name="computer_levels">Computer Levels</string>
     <string name="username">Username</string>
     <string name="search">Search</string>
     <string name="play_friend">Play Friend</string>
@@ -92,4 +95,6 @@
     <string name="online_users">Online Users</string>
     <string name="default_notification_channel_id">10077</string>
     <string name="accepting_challenge">Accepting Challenge</string>
+    <string name="login_google">Login With Google Account</string>
+    <string name="pgn_viewer">Chess MVP PGN Viewer</string>
 </resources>

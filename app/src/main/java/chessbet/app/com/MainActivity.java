@@ -2,6 +2,7 @@ package chessbet.app.com;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -58,8 +59,11 @@ import chessbet.app.com.fragments.PlayFriendFragment;
 import chessbet.app.com.fragments.ProfileFragment;
 import chessbet.app.com.fragments.PuzzleFragment;
 import chessbet.app.com.fragments.SettingsFragment;
+import chessbet.app.com.fragments.ChallengesFragment;
 import chessbet.app.com.fragments.TermsOfService;
 import chessbet.domain.Account;
+import chessbet.domain.Constants;
+import chessbet.domain.FCMMessage;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
 import chessbet.utils.EventBroadcast;
@@ -106,8 +110,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         AccountAPI.get().getUser();
         AccountAPI.get().getAccount();
 
-        ChallengeAPI.get().deleteAllChallenges(this); // Delete previously created challenges;
-
         EventBroadcast.get().addAccountUpdated(this);
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -122,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         EventBroadcast.get().addUserUpdateObserver(this);
         initializeCrashReporter();
-
+        freeUseFromMatch();
         // Initialize Mobile Ads SDK
         MobileAds.initialize(this, BuildConfig.AD_MOB_APP_ID);
 //        MobileAds.initialize(this, initializationStatus -> Log.d(MainActivity.class.getSimpleName(), "Mobile Ads SDK Initialized"));
@@ -133,6 +135,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(user != null){
             Crashlytics.setUserIdentifier(user.getUid());
         }
+    }
+
+    /**
+     * Called to check for matches created externally
+     */
+    private void onConfigurationMessage() {
+        String messageType = getIntent().getStringExtra(Constants.MESSAGE_TYPE);
+        if(messageType != null) {
+            if(messageType.equals(FCMMessage.FCMMessageType.TARGET_CHALLENGE.toString())) {
+                toolbar.setTitle(getString(R.string.challenges));
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ChallengesFragment()).commit();
+            }
+        }
+    }
+
+    /**
+     * Used as a flag to notify the app if the user is in a match
+     */
+    private void freeUseFromMatch() {
+        getApplicationContext().getSharedPreferences(Constants.IS_ON_MATCH, Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean(Constants.IS_ON_MATCH, false)
+                .apply();
     }
 
     @Override
@@ -148,9 +173,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStart(){
         super.onStart();
-        // Resets this flags to enable challenge acceptance
-        ChallengeAPI.get().setChallengeAccepted(false);
-        ChallengeAPI.get().setHasAcceptedChallenge(false);
+        onConfigurationMessage();
     }
 
     @Override
@@ -174,12 +197,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.itm_play_online:
                 // TODO Remove piece of logic from UI.
                 if(AccountAPI.get().getCurrentAccount() != null){
-                    if(ChallengeAPI.get().isLoaded()){
-                        toolbar.setTitle(getString(R.string.play_online));
-                        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment()).commit();
-                    } else {
-                        Toast.makeText(this, "Challenges Loading", Toast.LENGTH_LONG).show();
-                    }
+                    toolbar.setTitle(getString(R.string.play_online));
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new MatchFragment()).commit();
                 }
                 break;
             case R.id.itm_profile:
@@ -211,13 +230,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PuzzleFragment()).commit();
                 break;
             case R.id.itm_play_friend:
-                if(ChallengeAPI.get().isLoaded()){
-                    toolbar.setTitle(getString(R.string.play_friend));
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PlayFriendFragment()).commit();
-                } else {
-                    Toast.makeText(this, "Challenges Loading", Toast.LENGTH_LONG).show();
-
-                }
+                toolbar.setTitle(getString(R.string.play_friend));
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PlayFriendFragment()).commit();
+                break;
+            case R.id.challenges:
+                toolbar.setTitle(getString(R.string.challenges));
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ChallengesFragment()).commit();
                 break;
         }
         return true;
@@ -350,7 +368,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             map.put("profile_photo_url", uri.toString());
             AccountAPI.get().getUserPath().update(map).addOnCompleteListener(task1 -> {
                 Toast.makeText(MainActivity.this,R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
-                Log.d("Done","Is Done");
                 uploadProfileDialog.dismiss();
                 AccountAPI.get().getUser();
             }).addOnCanceledListener(() -> uploadProfileDialog.dismiss());

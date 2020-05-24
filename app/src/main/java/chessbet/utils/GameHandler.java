@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -141,28 +143,32 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    noMoveSeconds++;
-                    if(noMoveSeconds == Constants.TIME_NO_MOVE_END_MATCH && isDisconnected){
-                        noMoveEndMatch.onDisconnected(MatchStatus.DISCONNECTED);
-                    }
-                    else if(noMoveSeconds == Constants.TIME_NO_MOVE_END_MATCH && !isMyPly){
-                        if(hasOpponentMoved){
-                            matchableAccount.endMatch(pgn, GameHandler.GAME_ABANDONED_FLAG,MatchStatus.ABANDONMENT, matchableAccount.getOwner(), matchableAccount.getOpponentId());
-                            noMoveEndMatch.onNoMoveEndMatch(MatchStatus.ABANDONMENT);
-                        } else {
-                            matchableAccount.endMatch(pgn, GameHandler.GAME_ABORTED_FLAG ,MatchStatus.GAME_ABORTED, "", "");
-                            noMoveEndMatch.onNoMoveEndMatch(MatchStatus.GAME_ABORTED);
+                    try {
+                        noMoveSeconds++;
+                        if(noMoveSeconds == Constants.TIME_NO_MOVE_END_MATCH && isDisconnected){
+                            noMoveEndMatch.onDisconnected(MatchStatus.DISCONNECTED);
                         }
-                    } else if (noMoveSeconds == Constants.TIME_NO_MOVE_CAUTION && !isMyPly){
-                        noMoveEndMatch.onNoMoveOpponentReacting();
-                    } else if (noMoveSeconds == Constants.TIME_NO_MOVE_CAUTION && isMyPly){
-                        noMoveEndMatch.onNoMoveSelfReacting();
-                    } else if (noMoveSeconds == Constants.TIME_NO_MOVE_END_MATCH && isMyPly && !isOpponentDisconnected){
-                        if(hasMadeMove){
-                            noMoveEndMatch.onLoseNoMove(MatchStatus.ABANDONMENT);
-                        } else {
-                            noMoveEndMatch.onLoseNoMove(MatchStatus.GAME_ABORTED);
+                        else if(noMoveSeconds == Constants.TIME_NO_MOVE_END_MATCH && !isMyPly){
+                            if(hasOpponentMoved){
+                                matchableAccount.endMatch(pgn, GameHandler.GAME_ABANDONED_FLAG,MatchStatus.ABANDONMENT, matchableAccount.getOwner(), matchableAccount.getOpponentId());
+                                noMoveEndMatch.onNoMoveEndMatch(MatchStatus.ABANDONMENT);
+                            } else {
+                                matchableAccount.endMatch(pgn, GameHandler.GAME_ABORTED_FLAG ,MatchStatus.GAME_ABORTED, "", "");
+                                noMoveEndMatch.onNoMoveEndMatch(MatchStatus.GAME_ABORTED);
+                            }
+                        } else if (noMoveSeconds == Constants.TIME_NO_MOVE_CAUTION && !isMyPly){
+                            noMoveEndMatch.onNoMoveOpponentReacting();
+                        } else if (noMoveSeconds == Constants.TIME_NO_MOVE_CAUTION && isMyPly){
+                            noMoveEndMatch.onNoMoveSelfReacting();
+                        } else if (noMoveSeconds == Constants.TIME_NO_MOVE_END_MATCH && isMyPly && !isOpponentDisconnected){
+                            if(hasMadeMove){
+                                noMoveEndMatch.onLoseNoMove(MatchStatus.ABANDONMENT);
+                            } else {
+                                noMoveEndMatch.onLoseNoMove(MatchStatus.GAME_ABORTED);
+                            }
                         }
+                    }catch (Exception ex){
+                        Crashlytics.logException(ex);
                     }
                 }
             },0,1000);

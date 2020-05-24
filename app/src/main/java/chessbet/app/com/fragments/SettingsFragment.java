@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SwitchPreferenceCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -39,7 +40,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                 Intent intent = new Intent(getContext(), LoginActivity.class);
                 startActivity(intent);
                 // Close current activity
-                Objects.requireNonNull(getActivity()).finish();
+                requireActivity().finish();
             }
         } else if (preference.getKey().equals("reset_pin")){
             if(auth.getCurrentUser() != null){
@@ -47,6 +48,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
                     Toast.makeText(getContext(), "Password Reset Email Has Been Sent", Toast.LENGTH_LONG).show();
                 });
             }
+        } else if (preference.getKey().equals("notifications")){
+            SwitchPreferenceCompat preferenceCompat = (SwitchPreferenceCompat) preference;
         }
         return true;
     }

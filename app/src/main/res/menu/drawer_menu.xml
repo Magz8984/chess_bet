@@ -34,14 +34,18 @@
             android:title="Profile"
             />
         <item
-            android:id="@+id/itm_account_settings"
-            android:icon="@drawable/settings"
-            android:title="@string/settings"
-            />
-        <item
             android:id="@+id/itm_play_friend"
             android:icon="@drawable/profile"
             android:title="@string/play_friend"
+            />
+        <item
+            android:id="@+id/challenges"
+            android:title="@string/challenges"
+            />
+        <item
+            android:id="@+id/itm_account_settings"
+            android:icon="@drawable/settings"
+            android:title="@string/settings"
             />
     </group>
 

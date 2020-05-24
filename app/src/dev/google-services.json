@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "888724948448",
+    "firebase_url": "https://chess-bet-test.firebaseio.com",
+    "project_id": "chess-bet-test",
+    "storage_bucket": "chess-bet-test.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:888724948448:android:a7121d01142f0f621c9785",
+        "android_client_info": {
+          "package_name": "com.chessbet.test"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "888724948448-mlols0htsrfp12assmfpnacktlgrqhhb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.chessbet.test",
+            "certificate_hash": "f15e6a1fc9ee436eb01619715bb32b821d0c937d"
+          }
+        },
+        {
+          "client_id": "888724948448-dlmardvdt9gbtk4qj5ijdt20qet1clv1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCREqgyr3emiwWc-kEnQZ0NrTDkl-mSIxc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "888724948448-dlmardvdt9gbtk4qj5ijdt20qet1clv1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -10,10 +10,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.fragment.app.FragmentManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import chessbet.app.com.BoardActivity;
+import chessbet.app.com.PlayComputerSettingsActivity;
 import chessbet.app.com.PresenceActivity;
 import chessbet.app.com.R;
 import chessbet.domain.MatchType;
@@ -29,7 +32,7 @@ public class MenuOptionsAdapter extends BaseAdapter {
         listeners=new ArrayList<>();
         drawables=new ArrayList<>();
         strings=new ArrayList<>();
-        this.context=context;
+        this.context = context;
 
         // Two Player
         listeners.add(v -> {
@@ -42,9 +45,10 @@ public class MenuOptionsAdapter extends BaseAdapter {
 
         // Single Player
         listeners.add(v -> {
-            Intent intent=new Intent(context, BoardActivity.class);
-            intent.putExtra("match_type", MatchType.SINGLE_PLAYER.toString());
+            Intent intent=new Intent(context, PlayComputerSettingsActivity.class);
+            intent.putExtra("match_type", MatchType.TWO_PLAYER.toString());
             context.startActivity(intent);
+
         });
         drawables.add(R.drawable.desktop);
         strings.add("Single Player");
@@ -61,7 +65,6 @@ public class MenuOptionsAdapter extends BaseAdapter {
         drawables.add(R.drawable.wifi_four_bar);
         strings.add(context.getResources().getString(R.string.online_users));
     }
-
 
     @Override
     public int getCount() {

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView android:padding="10dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="@color/colorPrimary"
+    card_view:cardElevation="10sp"
+    android:layout_marginBottom="5sp"
+    android:layout_height="wrap_content"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_alignParentTop="true"
+            android:textAlignment="center"
+            android:id="@+id/txtPlayers"
+            android:fontFamily="@font/chakrapetchbold"
+            android:textSize="15sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:layout_margin="5dp"
+            android:layout_below="@id/txtPlayers"
+            android:id="@+id/txtDate"
+            android:fontFamily="@font/chakrapetchbold"
+            android:textSize="15sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+        <TextView
+            android:layout_margin="5dp"
+            android:layout_below="@id/txtPlayers"
+            android:layout_toRightOf="@+id/txtDate"
+            android:id="@+id/txtEvent"
+            android:fontFamily="@font/chakrapetchbold"
+            android:textSize="15sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/txtDate" />
+
+        <TextView
+            android:id="@+id/txtView"
+            android:textColor="@color/colorPrimaryYellow"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/txtEvent"
+            android:fontFamily="@font/chakrapetchbold"
+            android:text="View"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true" />
+
+    </RelativeLayout>
+
+
+
+</androidx.cardview.widget.CardView>

@@ -17,14 +17,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import java.util.Objects;
 
 import chessbet.adapter.SearchFriendAdapter;
 import chessbet.api.AccountAPI;
+import chessbet.api.ChallengeAPI;
 import chessbet.app.com.R;
 import chessbet.domain.User;
 import chessbet.utils.Util;
 
-public class PlayFriendFragment extends Fragment implements AccountAPI.UsersReceived, View.OnClickListener {
+import static chessbet.Application.getContext;
+
+public class PlayFriendFragment extends Fragment implements AccountAPI.UsersReceived, View.OnClickListener, ChallengeAPI.TargetedChallengeUpdated {
     private TextView txtUserName;
     private RecyclerView recUsers;
     private SearchFriendAdapter searchFriendAdapter;
@@ -65,7 +69,7 @@ public class PlayFriendFragment extends Fragment implements AccountAPI.UsersRece
     public void onStart() {
         super.onStart();
         AccountAPI.get().setUsersRecived(this);
-        searchFriendAdapter = new SearchFriendAdapter(getContext());
+        searchFriendAdapter = new SearchFriendAdapter(getContext(), this);
         recUsers.setLayoutManager(new LinearLayoutManager(getContext()));
         recUsers.setHasFixedSize(true);
         recUsers.setAdapter(searchFriendAdapter);
@@ -88,5 +92,21 @@ public class PlayFriendFragment extends Fragment implements AccountAPI.UsersRece
         if(view.equals(imgSearch)){
             searchUsers();
         }
+    }
+
+    @Override
+    public void onChallengeAccepted() {
+        requireActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Challenge Accepted", Toast.LENGTH_LONG).show());
+    }
+
+    @Override
+    public void onChallengeSent() {
+        requireActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Challenge Sent", Toast.LENGTH_LONG).show());
+
+    }
+
+    @Override
+    public void onUpdateError() {
+        requireActivity().runOnUiThread(() -> Toast.makeText(getContext(), "An error was encountered", Toast.LENGTH_LONG).show());
     }
 }
