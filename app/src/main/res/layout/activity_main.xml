@@ -9,9 +9,6 @@
     android:id="@+id/drawerLayout"
     tools:openDrawer="start"
     tools:context=".MainActivity">
-    
-    
-
 
     <LinearLayout
         android:orientation="vertical"
@@ -29,20 +26,6 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         </androidx.appcompat.widget.Toolbar>
-
-
-        <!--<GridView-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:id="@+id/menuItems"-->
-            <!--android:columnWidth="100sp"-->
-            <!--android:numColumns="auto_fit"-->
-            <!--android:verticalSpacing="10sp"-->
-            <!--android:horizontalSpacing="15sp"-->
-            <!--android:stretchMode="columnWidth"-->
-            <!--android:gravity="center">-->
-
-        <!--</GridView>-->
 
         <FrameLayout
             android:id="@+id/fragment_container"
