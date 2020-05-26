@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.chess.engine.Alliance;
-import com.chess.engine.Move;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class PawnPromotionAdapter extends BaseAdapter{
     private Context context;
     private PromotionPieceListener promotionPieceListener;
 
-    public PawnPromotionAdapter(Alliance alliance, Context context, PromotionPieceListener promotionPieceListener, Move move) {
+    public PawnPromotionAdapter(Alliance alliance, Context context, PromotionPieceListener promotionPieceListener) {
         this.promotionPieces = PromotionPiece.getPromotionPieces(alliance);
         this.context = context;
         this.promotionPieceListener = promotionPieceListener;

@@ -32,6 +32,8 @@ import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import chessbet.api.MatchAPI;
 import chessbet.domain.MatchableAccount;
@@ -81,6 +83,8 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     private EngineResponse engineResponse; // Used To get The Full Response String for Analysis Purpose
     protected volatile Move nextPuzzleMove = null;
     protected PromotionPieceListener promotionPieceListener;
+    protected Piece.PieceType promotionPiece;
+    private Board.PromotionListener promotionListener;
 
     // Stockfish 10
     private Engine stockfish;
@@ -114,6 +118,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
 
     public void setPromotionListener(Board.PromotionListener promotionListener) {
         Board.setPromotionListener(promotionListener);
+        this.promotionListener = promotionListener;
     }
 
     public void setPromotionPieceListener(PromotionPieceListener promotionPieceListener) {
@@ -757,10 +762,29 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         return false;
     }
 
+    public Piece.PieceType getPieceTypeFromPawnPromotion(String string) {
+        String promotionPiece = string.split("=")[1];
+        Log.d("Promotion Piece", promotionPiece);
+        if(promotionPiece.contains("N")){
+            return Piece.PieceType.KNIGHT;
+        } else if (promotionPiece.contains("Q")){
+            return Piece.PieceType.QUEEN;
+        } else if(promotionPiece.contains("R")){
+            return Piece.PieceType.ROOK;
+        } else if (promotionPiece.contains("B")){
+            return Piece.PieceType.BISHOP;
+        }
+        return Piece.PieceType.QUEEN;
+    }
+
     public void reconstructBoardFromPGN(String pgn){
+        Board.setPromotionListener(() -> promotionPiece);
         List<String> strMoves = PGNMainUtils.processMoveText(pgn);
         for (String string : strMoves) {
             Move move = PGNMainUtils.createMove(chessBoard, string);
+            if(move.isPawnPromotionMove()) {
+                this.promotionPiece = getPieceTypeFromPawnPromotion(string);
+            }
             MoveTransition moveTransition = chessBoard.currentPlayer().makeMove(move);
             if (moveTransition.getMoveStatus().isDone()) {
                 chessBoard = moveTransition.getTransitionBoard();
@@ -772,6 +796,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
                 moveLog.addMove(move);
             }
         }
+        Board.setPromotionListener(this.promotionListener);
         onMoveDoneListener.getMoves(moveLog);
         moveCursor = moveLog.size();
         displayGameStates();
