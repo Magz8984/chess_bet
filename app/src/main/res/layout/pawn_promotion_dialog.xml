@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <GridView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/pieces"
+    android:columnWidth="150sp"
+    android:numColumns="auto_fit"
+    android:verticalSpacing="10sp"
+    android:horizontalSpacing="15sp"
+    android:stretchMode="columnWidth"
+    android:gravity="center"/>
+</LinearLayout>

@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat;
 import com.chess.engine.Alliance;
 import com.chess.engine.ECOBuilder;
 import com.chess.engine.Move;
+import com.chess.engine.board.Board;
 import com.chess.engine.pieces.Piece;
 import com.chess.engine.player.Player;
 import com.chess.pgn.PGNMainUtils;
@@ -45,6 +46,7 @@ import chessbet.api.PresenceAPI;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
 import chessbet.app.com.fragments.EvaluateGame;
+import chessbet.app.com.fragments.PawnPromotionDialog;
 import chessbet.domain.Constants;
 import chessbet.domain.DatabaseMatch;
 import chessbet.domain.MatchEvent;
@@ -70,6 +72,7 @@ import chessengine.ECOBook;
 import chessengine.GameUtil;
 import chessengine.MoveLog;
 import chessengine.OnMoveDoneListener;
+import chessengine.PromotionPieceListener;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 import stockfish.EngineUtil;
@@ -77,7 +80,7 @@ import stockfish.EngineUtil;
 public class BoardActivity extends AppCompatActivity implements View.OnClickListener, OnMoveDoneListener ,
         OnTimerElapsed, RemoteViewUpdateListener, ConnectivityReceiver.ConnectivityReceiverListener, BoardView.PuzzleMove,
         ConnectivityManager.ConnectionStateListener, ECOBook.OnGetECOListener, MatchAPI.OnMatchEnd, OpponentListener,
-        GameHandler.NoMoveReactor.NoMoveEndMatch, PresenceAPI.UserOnline {
+        GameHandler.NoMoveReactor.NoMoveEndMatch, PresenceAPI.UserOnline, Board.PromotionListener, PromotionPieceListener {
 @BindView(R.id.chessLayout) BoardView boardView;
 @BindView(R.id.btnFlip)Button btnFlip;
 @BindView(R.id.txtOwnerStatus) TextView txtOwnerStatus;
@@ -110,6 +113,9 @@ private EvaluateGame evaluateGame;
 private boolean isSavedState; // Checks if activity has been stopped
 private GameHandler.NoMoveReactor noMoveReactor;
 private boolean isActiveConnectionFlag = false;
+private Piece.PieceType promotionPiece = Piece.PieceType.QUEEN;
+private PawnPromotionDialog pawnPromotionDialog;
+private Move promotionMove;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +130,7 @@ private boolean isActiveConnectionFlag = false;
         boardView.setOnMoveDoneListener(this);
         boardView.setRemoteViewUpdateListener(this);
         boardView.setEcoBookListener(this);
+        boardView.setPromotionListener(this);
         btnFlip.setOnClickListener(this);
         btnSave.setOnClickListener(this);
         btnColorPicker.setOnClickListener(this);
@@ -136,6 +143,7 @@ private boolean isActiveConnectionFlag = false;
         txtOwnerStatus.setTextColor(Color.RED);
         connectivityManager.setConnectionStateListener(this);
         connectivityManager.startListening();
+        boardView.setPromotionPieceListener(this);
         this.onConnectionChanged(ConnectivityReceiver.isConnected());
     }
 
@@ -927,5 +935,24 @@ private boolean isActiveConnectionFlag = false;
     public void onDisconnected(MatchStatus matchStatus) {
         noMoveReactor.stopTimer();
         onMatchEnd(matchStatus);
+    }
+
+    @Override
+    public Piece.PieceType onPromotion() {
+        return promotionPiece;
+    }
+
+    @Override
+    public void onPromotionPieceTypeSelected(Piece.PieceType pieceType) {
+        this.promotionPiece = pieceType;
+        pawnPromotionDialog.dismiss();
+        boardView.makeMove(this.promotionMove);
+    }
+
+    @Override
+    public void onPromotionMoveMade(Move move) {
+        pawnPromotionDialog = new PawnPromotionDialog(boardView.getCurrentPlayer().getAlliance(), this, move);
+        pawnPromotionDialog.show(getSupportFragmentManager(), "Pawn Promotion");
+        this.promotionMove = move;
     }
 }
