@@ -853,6 +853,11 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
 
     public void redoMove(){
         if (this.moveCursor < moveLog.size()){
+            Board.setPromotionListener(() -> promotionPiece);
+            final Move moveLogMove = moveLog.getMove(moveCursor);
+            if(moveLogMove.isPawnPromotionMove()) {
+                this.promotionPiece = getPieceTypeFromPawnPromotion(moveLog.getMove(moveCursor).toString());
+            }
             Move move = Move.MoveFactory.createMove(chessBoard, moveLog.getMove(moveCursor).getCurrentCoordinate(), moveLog.getMove(moveCursor).getDestinationCoordinate());
             MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
             if(transition.getMoveStatus().isDone()){
@@ -861,6 +866,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
                 this.moveCursor += 1;
                 invalidate();
             }
+            Board.setPromotionListener(this.promotionListener);
         }
     }
 
