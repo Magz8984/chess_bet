@@ -951,7 +951,7 @@ private Move promotionMove;
 
     @Override
     public void onPromotionMoveMade(Move move) {
-        pawnPromotionDialog = new PawnPromotionDialog(boardView.getCurrentPlayer().getAlliance(), this, move);
+        pawnPromotionDialog = new PawnPromotionDialog(boardView.getCurrentPlayer().getAlliance(), this);
         pawnPromotionDialog.show(getSupportFragmentManager(), "Pawn Promotion");
         this.promotionMove = move;
     }
