@@ -168,7 +168,11 @@ private boolean isActiveConnectionFlag = false;
         if(matchType != null && matchType.equals(MatchType.SINGLE_PLAYER.toString())){
             EngineUtil.setUCIELORating(EngineUtil.getEloFromSkillLevel());
             btnHint.setVisibility(View.GONE);
-            txtOwner.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
+            try {
+                txtOwner.setText(AccountAPI.get().getFirebaseUser().getDisplayName());
+            }catch (NullPointerException e){
+                Log.e("NullPointerException", e.toString());
+            }
             txtOpponent.setText(getResources().getString(R.string.computer, skillLevel));
             boardView.setMode(BoardView.Modes.PLAY_COMPUTER);
         }
