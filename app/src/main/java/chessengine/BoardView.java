@@ -28,12 +28,11 @@ import com.chess.engine.player.chess_engine_ai.MoveStategy;
 import com.chess.pgn.FenUtilities;
 import com.chess.pgn.PGNMainUtils;
 import com.chess.pgn.PGNUtilities;
+import com.crashlytics.android.Crashlytics;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import chessbet.api.MatchAPI;
 import chessbet.domain.MatchableAccount;
@@ -93,14 +92,21 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     private volatile Move currentStockFishMove = null;
     private volatile Move ponderedStockFishMove = null;
 
+    // Handles stockfish engine set up
+    private void startStockfish() {
+        try {
+            // Start Stock Fish
+            stockfish = new Engine();
+            stockfish.start();
+        } catch (Exception ex) {
+            Crashlytics.logException(ex);
+        }
+    }
+
     private void initialize(Context context){
-        stockfish = new Engine();
 
         ecoBook = new ECOBook();
-
-        // Start Stock Fish
-        stockfish.start();
-
+        this.startStockfish();
         setSaveEnabled(true);
         moveLog= new MoveLog();
         chessBoard= Board.createStandardBoard();
@@ -110,10 +116,6 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
             final  Cell cell = new Cell(context,this,i);
             this.boardCells.add(cell);
         }
-    }
-
-    public void setEngineResponse(EngineResponse engineResponse) {
-        this.engineResponse = engineResponse;
     }
 
     public void setPromotionListener(Board.PromotionListener promotionListener) {
