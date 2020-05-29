@@ -1,22 +1,20 @@
 package chessbet.app.com;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.Toast;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import chessbet.adapter.ComputerSkillLevelAdapter;
-import chessbet.domain.MatchType;
+import androidx.appcompat.app.AppCompatActivity;
+
+
 
 public class PlayComputerSettingsActivity extends AppCompatActivity implements View.OnClickListener, ComputerSkillLevelAdapter.SkillLevel {
-    @BindView(R.id.levels) GridView gridView;
-    @BindView(R.id.btnCancel)  Button btnCancel;
+    @BindView(R.id.levels)
+    GridView gridView;
+    @BindView(R.id.btnCancel)
+    Button btnCancel;
     @BindView(R.id.btnPlay) Button btnPlay;
     private long skillLevel = 0;
 

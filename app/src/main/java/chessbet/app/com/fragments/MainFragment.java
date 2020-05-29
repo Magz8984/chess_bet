@@ -8,9 +8,6 @@ import android.widget.GridView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
-import java.util.Objects;
-
 import javax.annotation.Nullable;
 
 import chessbet.adapter.MenuOptionsAdapter;
