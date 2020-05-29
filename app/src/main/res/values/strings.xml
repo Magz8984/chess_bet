@@ -1,5 +1,5 @@
 <resources>
-<!--    <string name="app_name">Chess MVP</string>-->
+    <!--    <string name="app_name">Chess MVP</string>-->
     <string name="action_sign_in_short">Register</string>
     <string name="email">Email</string>
     <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
@@ -93,6 +93,7 @@
     <string name="challenge_service">challenge_service</string>
     <string name="disconnected">Disconnected</string>
     <string name="online_users">Online Users</string>
+    <string name="tournaments">Tournaments</string>
     <string name="default_notification_channel_id">10077</string>
     <string name="accepting_challenge">Accepting Challenge</string>
     <string name="login_google">Login With Google Account</string>

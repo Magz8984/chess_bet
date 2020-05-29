@@ -5,9 +5,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import chessbet.adapter.ComputerSkillLevelAdapter;
+import chessbet.domain.MatchType;
 
 
 public class PlayComputerSettingsActivity extends AppCompatActivity implements View.OnClickListener, ComputerSkillLevelAdapter.SkillLevel {
