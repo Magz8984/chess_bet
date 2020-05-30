@@ -98,4 +98,6 @@
     <string name="accepting_challenge">Accepting Challenge</string>
     <string name="login_google">Login With Google Account</string>
     <string name="pgn_viewer">Chess MVP PGN Viewer</string>
+    <string name="join_tournament">Join Tournament</string>
+    <string name="view_tournament">View Tournament</string>
 </resources>
