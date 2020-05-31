@@ -26,6 +26,9 @@
                 android:layout_height="wrap_content"
                 android:text="Chess MVP Friday Night Live"
                 android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                android:layout_marginRight="30dp"
+                android:layout_marginLeft="30dp"
                 android:textSize="22sp"
                 android:textColor="@color/black"/>
             <LinearLayout
@@ -36,11 +39,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Date created: "
+                    android:text="Start Date: "
                     android:textColor="@color/black"
                     android:textSize="18sp"/>
                 <TextView
-                    android:id="@+id/dateTv"
+                    android:id="@+id/start_dateTv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="01/05/2020"
@@ -171,13 +174,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/join_tournament"
+                android:textColor="@color/colorWhite"
                 android:background="@drawable/btn_background"/>
             <Button
                 android:id="@+id/viewBtn"
                 android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/view_tournament"
+                android:textColor="@color/colorWhite"
                 android:background="@drawable/btn_background"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

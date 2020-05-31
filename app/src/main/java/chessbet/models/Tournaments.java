@@ -1,5 +1,7 @@
 package chessbet.models;
 
+import java.util.ArrayList;
+
 /**
  * @author Elias Baya
  */
@@ -14,13 +16,29 @@ public class Tournaments {
     private String name;
     private int numbeOfRoundsScheduled;
     private String paringAlgorithm;
-    private Players players;
-    private String rounds;
-    private Teams teams;
-    private int timeStamp;
+    private ArrayList<Players> playersArrayList;
+    private int rounds;
+//    private Teams teams;
+    private long timeStamp;
     private String typeOfTournament;
 
     public Tournaments() {
+    }
+
+    public Tournaments(Amount amount, String authorUid, String dateOfStart, String id, Boolean isLocked, int matchDuration, String name, int numbeOfRoundsScheduled, String paringAlgorithm, ArrayList<Players> playersArrayList, int rounds, long timeStamp, String typeOfTournament) {
+        this.amount = amount;
+        this.authorUid = authorUid;
+        this.dateOfStart = dateOfStart;
+        this.id = id;
+        this.isLocked = isLocked;
+        this.matchDuration = matchDuration;
+        this.name = name;
+        this.numbeOfRoundsScheduled = numbeOfRoundsScheduled;
+        this.paringAlgorithm = paringAlgorithm;
+        this.playersArrayList = playersArrayList;
+        this.rounds = rounds;
+        this.timeStamp = timeStamp;
+        this.typeOfTournament = typeOfTournament;
     }
 
     public Amount getAmount() {
@@ -95,35 +113,27 @@ public class Tournaments {
         this.paringAlgorithm = paringAlgorithm;
     }
 
-    public Players getPlayers() {
-        return players;
+    public ArrayList<Players> getPlayersArrayList() {
+        return playersArrayList;
     }
 
-    public void setPlayers(Players players) {
-        this.players = players;
+    public void setPlayersArrayList(ArrayList<Players> playersArrayList) {
+        this.playersArrayList = playersArrayList;
     }
 
-    public String getRounds() {
+    public int getRounds() {
         return rounds;
     }
 
-    public void setRounds(String rounds) {
+    public void setRounds(int rounds) {
         this.rounds = rounds;
     }
 
-    public Teams getTeams() {
-        return teams;
-    }
-
-    public void setTeams(Teams teams) {
-        this.teams = teams;
-    }
-
-    public int getTimeStamp() {
+    public long getTimeStamp() {
         return timeStamp;
     }
 
-    public void setTimeStamp(int timeStamp) {
+    public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
     }
 
@@ -147,9 +157,8 @@ public class Tournaments {
                 ", name='" + name + '\'' +
                 ", numbeOfRoundsScheduled=" + numbeOfRoundsScheduled +
                 ", paringAlgorithm='" + paringAlgorithm + '\'' +
-                ", players=" + players +
-                ", rounds='" + rounds + '\'' +
-                ", teams=" + teams +
+                ", playersArrayList=" + playersArrayList +
+                ", rounds=" + rounds +
                 ", timeStamp=" + timeStamp +
                 ", typeOfTournament='" + typeOfTournament + '\'' +
                 '}';

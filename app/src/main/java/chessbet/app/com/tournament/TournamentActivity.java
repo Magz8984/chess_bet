@@ -11,31 +11,21 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Queue;
 
 import chessbet.adapter.TournamentsAdapter;
 import chessbet.app.com.R;
@@ -97,34 +87,32 @@ public class TournamentActivity extends AppCompatActivity {
     }
 
     private void loadTournaments() {
-        //path of all tournaments
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("tournaments");
-        // offline synchronization of data to access them even when offline
-        ref.keepSynced(true);
-
-        //get all data from this ref
-        ref.addValueEventListener(new ValueEventListener() {
+        db.collection("tournaments")
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                tournamentsList.clear();
-                for (DataSnapshot ds: dataSnapshot.getChildren()){
-                    Tournaments tournaments = ds.getValue(Tournaments.class);
-                    tournamentsList.add(tournaments);
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()){
+                    for (QueryDocumentSnapshot ds: Objects.requireNonNull(task.getResult())){
+                        Tournaments tournaments = ds.toObject(Tournaments.class);
+                        tournamentsList.add(tournaments);
 
-                    //adapter
-                    tournamentsAdapter = new TournamentsAdapter(TournamentActivity.this, tournamentsList);
-                    //set adapter to recyclerview
-                    tournaments_recyclerView.setAdapter(tournamentsAdapter);
+                        //adapter
+                        tournamentsAdapter = new TournamentsAdapter(TournamentActivity.this, tournamentsList);
+                        //set adapter to recyclerview
+                        tournaments_recyclerView.setAdapter(tournamentsAdapter);
+                    }
+                    Log.i("Tournaments", tournamentsList.toString());
                 }
-
-                Log.e("Tournaments", tournamentsList.toString());
-
             }
-
+        }).addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // in case of error
-                Log.e("DatabaseError", databaseError.getMessage());
+            public void onFailure(@NonNull Exception e) {
+                Log.e("OnFailureListener", e.getMessage());
+            }
+        }).addOnCanceledListener(new OnCanceledListener() {
+            @Override
+            public void onCanceled() {
+                Log.e("TASK", "Cancelled");
             }
         });
     }
