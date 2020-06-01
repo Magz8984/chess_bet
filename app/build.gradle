@@ -94,7 +94,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation "androidx.annotation:annotation:1.1.0"
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.1'
-    annotationProcessor 'com.jakewharton:butterknife:10.2.1'
+    implementation 'com.jakewharton:butterknife:10.2.1'
     implementation 'androidx.multidex:multidex:2.0.1'
 
     implementation 'com.google.firebase:firebase-auth:19.3.1'
