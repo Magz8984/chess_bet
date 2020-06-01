@@ -168,23 +168,33 @@
                     android:textColor="@color/black"
                     android:textSize="16sp"/>
             </LinearLayout>
-            <Button
-                android:id="@+id/joinBtn"
-                android:layout_marginTop="15dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/join_tournament"
-                android:textColor="@color/colorWhite"
-                android:background="@drawable/btn_background"/>
-            <Button
-                android:id="@+id/viewBtn"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="15dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/view_tournament"
-                android:textColor="@color/colorWhite"
-                android:background="@drawable/btn_background"/>
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="horizontal"
+               android:layout_marginTop="15dp">
+               <Button
+                   android:id="@+id/viewBtn"
+                   android:layout_marginBottom="15dp"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_weight="1"
+                   android:text="@string/view_tournament"
+                   android:textColor="@color/colorWhite"
+                   android:background="@drawable/btn_background"
+                   android:layout_marginRight="5dp"
+                   android:layout_marginEnd="5dp" />
+               <Button
+                   android:id="@+id/joinBtn"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_weight="1"
+                   android:text="@string/join_tournament"
+                   android:textColor="@color/colorWhite"
+                   android:background="@drawable/btn_background"
+                   android:layout_marginLeft="5dp"
+                   android:layout_marginStart="5dp"/>
+           </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </androidx.appcompat.widget.LinearLayoutCompat>
