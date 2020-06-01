@@ -281,13 +281,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
         loading.show();
         firebaseUser.updateEmail(email).addOnCompleteListener(task -> {
             if(task.isSuccessful()){
-                AccountAPI.get().getCurrentUser().setEmail(email);
-                AccountAPI.get().updateUser();
-                emailTv.setText(email);
-                EventBroadcast.get().broadcastUserUpdate();
-                Toast.makeText(getContext(),"Email successfully changed", Toast.LENGTH_SHORT).show();
-                // Send email verification once new email has been set
-                sendEmailVerification();
+               try {
+                   AccountAPI.get().getCurrentUser().setEmail(email);
+                   AccountAPI.get().updateUser();
+                   emailTv.setText(email);
+                   EventBroadcast.get().broadcastUserUpdate();
+                   Toast.makeText(getContext(),"Email successfully changed", Toast.LENGTH_SHORT).show();
+                   // Send email verification once new email has been set
+                   sendEmailVerification();
+               }catch (Exception e){
+                   Log.e("Account API Error", e.toString());
+               }
             } else {
                 Toast.makeText(getContext(), Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
             }
