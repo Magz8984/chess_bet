@@ -20,13 +20,15 @@
         android:name="chessbet.Application"
         android:allowBackup="true"
         android:fullBackupContent="true"
-        android:largeHeap="true"
         android:icon="@mipmap/icon"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PlayComputerSettingsActivity"/>
+        <activity android:name=".tournament.MyTournamentsActivity"></activity>
+        <activity android:name=".tournament.TournamentActivity" />
+        <activity android:name=".PlayComputerSettingsActivity" />
         <activity
             android:name=".PgnViewerActivity"
             android:launchMode="singleTask">
