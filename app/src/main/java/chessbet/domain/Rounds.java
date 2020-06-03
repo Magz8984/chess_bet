@@ -1,4 +1,4 @@
-package chessbet.models;
+package chessbet.domain;
 
 public class Rounds {
     private String matchUrl, playerNumber, result, scheduledColor;

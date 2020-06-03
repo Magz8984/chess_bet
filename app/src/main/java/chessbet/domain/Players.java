@@ -1,4 +1,4 @@
-package chessbet.models;
+package chessbet.domain;
 
 public class Players {
     private int fideNumber;

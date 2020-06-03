@@ -1,4 +1,4 @@
-package chessbet.models;
+package chessbet.domain;
 
 import java.util.ArrayList;
 

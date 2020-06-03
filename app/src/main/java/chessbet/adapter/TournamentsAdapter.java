@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Locale;
 
 import chessbet.app.com.R;
-import chessbet.models.Amount;
-import chessbet.models.Players;
-import chessbet.models.Tournaments;
+import chessbet.domain.Amount;
+import chessbet.domain.Players;
+import chessbet.domain.Tournaments;
 
 public class TournamentsAdapter extends RecyclerView.Adapter<TournamentsAdapter.MyHolder>{
     Context context;
@@ -75,7 +75,7 @@ public class TournamentsAdapter extends RecyclerView.Adapter<TournamentsAdapter.
         myholder.roundsTv.setText(String.valueOf(rounds));
         myholder.durationTv.setText(String.valueOf(matchDuration));
         myholder.typeTv.setText(typeOfTournament);
-        myholder.amountTv.setText(amt);
+        myholder.amountTv.setText(String.valueOf(amt));
 //        myholder.playersTv.setText(String.valueOf(playersArrayList.size()));
 
 
