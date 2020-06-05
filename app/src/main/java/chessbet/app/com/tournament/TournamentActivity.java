@@ -19,7 +19,7 @@ import java.util.List;
 import chessbet.adapter.TournamentsAdapter;
 import chessbet.api.TournamentsAPI;
 import chessbet.app.com.R;
-import chessbet.domain.Tournaments;
+import chessbet.domain.Tournament;
 import chessbet.services.TournamentsListener;
 
 public class TournamentActivity extends AppCompatActivity implements TournamentsListener, View.OnClickListener {
@@ -57,7 +57,7 @@ public class TournamentActivity extends AppCompatActivity implements Tournaments
     }
 
     @Override
-    public void onTournamentDataReceived(List<Tournaments> tournamentsList) {
+    public void onTournamentDataReceived(List<Tournament> tournamentsList) {
         //adapter
         tournamentsAdapter = new TournamentsAdapter(TournamentActivity.this, tournamentsList);
         //set adapter to recyclerview

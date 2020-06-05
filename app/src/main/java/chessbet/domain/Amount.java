@@ -1,23 +1,23 @@
 package chessbet.domain;
 
 public class Amount {
-    private String amount;
+    private double amount;
     private String currency;
 
     public Amount() {
     }
 
-    public Amount(String amount, String currency) {
+    public Amount(double amount, String currency) {
         this.amount = amount;
         this.currency = currency;
     }
 
-    public String getAmount() {
-        return amount;
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 
-    public void setAmount(String amount) {
-        this.amount = amount;
+    public double getAmount() {
+        return amount;
     }
 
     public String getCurrency() {

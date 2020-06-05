@@ -5,7 +5,6 @@ package chessbet.adapter;
  * @author Elias Baya
  */
 
-
 import android.content.Context;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -23,15 +22,14 @@ import java.util.List;
 import java.util.Locale;
 
 import chessbet.app.com.R;
-import chessbet.domain.Amount;
 import chessbet.domain.Players;
-import chessbet.domain.Tournaments;
+import chessbet.domain.Tournament;
 
 public class TournamentsAdapter extends RecyclerView.Adapter<TournamentsAdapter.MyHolder>{
     Context context;
-    List<Tournaments> tournamentsList;
+    private List<Tournament> tournamentsList;
 
-    public TournamentsAdapter(Context context, List<Tournaments> tournamentsList) {
+    public TournamentsAdapter(Context context, List<Tournament> tournamentsList) {
         this.context = context;
         this.tournamentsList = tournamentsList;
     }
@@ -47,7 +45,7 @@ public class TournamentsAdapter extends RecyclerView.Adapter<TournamentsAdapter.
     @Override
     public void onBindViewHolder(@NonNull final MyHolder myholder, int i) {
         //get data
-        Amount amount = tournamentsList.get(i).getAmount();
+        Tournament.Amount amount = tournamentsList.get(i).getAmount();
         String amt = amount.getAmount();
         String authorUid = tournamentsList.get(i).getAuthorUid();
         String id = tournamentsList.get(i).getId();
@@ -76,8 +74,6 @@ public class TournamentsAdapter extends RecyclerView.Adapter<TournamentsAdapter.
         myholder.durationTv.setText(String.valueOf(matchDuration));
         myholder.typeTv.setText(typeOfTournament);
         myholder.amountTv.setText(String.valueOf(amt));
-//        myholder.playersTv.setText(String.valueOf(playersArrayList.size()));
-
 
     }
 

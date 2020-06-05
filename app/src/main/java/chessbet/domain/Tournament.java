@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * @author Elias Baya
  */
 
-public class Tournaments {
+public class Tournament {
     private Amount amount;
     private String authorUid;
     private String dateOfStart;
@@ -22,10 +22,10 @@ public class Tournaments {
     private long timeStamp;
     private String typeOfTournament;
 
-    public Tournaments() {
+    public Tournament() {
     }
 
-    public Tournaments(Amount amount, String authorUid, String dateOfStart, String id, Boolean isLocked, int matchDuration, String name, int numbeOfRoundsScheduled, String paringAlgorithm, ArrayList<Players> playersArrayList, int rounds, long timeStamp, String typeOfTournament) {
+    public Tournament(Amount amount, String authorUid, String dateOfStart, String id, Boolean isLocked, int matchDuration, String name, int numbeOfRoundsScheduled, String paringAlgorithm, ArrayList<Players> playersArrayList, int rounds, long timeStamp, String typeOfTournament) {
         this.amount = amount;
         this.authorUid = authorUid;
         this.dateOfStart = dateOfStart;
@@ -162,5 +162,26 @@ public class Tournaments {
                 ", timeStamp=" + timeStamp +
                 ", typeOfTournament='" + typeOfTournament + '\'' +
                 '}';
+    }
+
+    public static class Amount {
+        String amount;
+        String currency;
+
+        public void setAmount(String amount) {
+            this.amount = amount;
+        }
+
+        public void setCurrency(String currency) {
+            this.currency = currency;
+        }
+
+        public String getAmount() {
+            return amount;
+        }
+
+        public String getCurrency() {
+            return currency;
+        }
     }
 }

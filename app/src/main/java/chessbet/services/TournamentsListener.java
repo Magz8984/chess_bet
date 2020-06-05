@@ -2,9 +2,9 @@ package chessbet.services;
 
 import java.util.List;
 
-import chessbet.domain.Tournaments;
+import chessbet.domain.Tournament;
 
 public interface TournamentsListener {
-    void onTournamentDataReceived(List<Tournaments> tournamentsList);
+    void onTournamentDataReceived(List<Tournament> tournamentsList);
     void onFetchTournamentsListener(Exception e);
 }
