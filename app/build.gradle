@@ -33,7 +33,7 @@ android {
 
     flavorDimensions('app')
     productFlavors {
-        dev {
+        dev { // Chess MVP Test
             dimension 'app'
             applicationId 'com.chessbet.test'
             resValue "string", "app_name", "Chess MVP Test"
@@ -44,7 +44,7 @@ android {
 
         }
 
-        prod {
+        prod { // Chess MVP Prod
             dimension 'app'
             applicationId 'chessbet.app.com'
             resValue "string", "app_name", "Chess MVP"
@@ -53,6 +53,38 @@ android {
             buildConfigField("String", "CLOUD_FUNCTIONS_URL", cloudFunctionsURL)
             buildConfigField("String", "WEB_CLIENT_ID", webClientId)
 
+        }
+
+        chessbet { // Chess Bet
+            dimension 'app'
+            resValue "string", "app_name", "Chess Bet"
+            applicationId 'com.chessbet.app.prod'
+            versionCode 1
+            versionName "1.0"
+            buildConfigField("String", "CLOUD_FUNCTIONS_URL", cloudFunctionsURL)
+            buildConfigField("String", "WEB_CLIENT_ID", webClientId)
+        }
+
+        chessbetdev { // Chess Bet Test
+            dimension 'app'
+            resValue "string", "app_name", "Chess Bet Test"
+            applicationId 'com.chessbet.app.test'
+            versionCode 1
+            versionName "1.0"
+            buildConfigField("String", "CLOUD_FUNCTIONS_URL", cloudFunctionsTestURL)
+            buildConfigField("String", "WEB_CLIENT_ID", webTestClientId)
+        }
+    }
+
+    // Chess Bet Flavour Is Parent to Chess Bet Dev
+    sourceSets {
+        chessbetdev {
+            java.srcDirs = sourceSets.chessbet.java.srcDirs
+            res.srcDirs = sourceSets.chessbet.res.srcDirs
+            resources.srcDirs = sourceSets.chessbet.resources.srcDirs
+            aidl.srcDirs = sourceSets.chessbet.aidl.srcDirs
+            renderscript.srcDirs = sourceSets.chessbet.renderscript.srcDirs
+            assets.srcDirs = sourceSets.chessbet.assets.srcDirs
         }
     }
 
