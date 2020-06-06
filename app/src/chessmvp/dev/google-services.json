@@ -8,20 +8,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:888724948448:android:450f999b5e9ee9391c9785",
+        "mobilesdk_app_id": "1:888724948448:android:a4efb168efda66281c9785",
         "android_client_info": {
-          "package_name": "com.chessbet.app.test"
+          "package_name": "chessbet.app.com.dev"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "888724948448-io0m9dnp94uafncdiff2ohfq2uqlkn0o.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.chessbet.app.test",
-            "certificate_hash": "f15e6a1fc9ee436eb01619715bb32b821d0c937d"
-          }
-        },
         {
           "client_id": "888724948448-dlmardvdt9gbtk4qj5ijdt20qet1clv1.apps.googleusercontent.com",
           "client_type": 3
@@ -45,17 +37,17 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:888724948448:android:a7121d01142f0f621c9785",
+        "mobilesdk_app_id": "1:888724948448:android:8225a2c8b74b35191c9785",
         "android_client_info": {
-          "package_name": "com.chessbet.test"
+          "package_name": "com.chessbet.app.dev"
         }
       },
       "oauth_client": [
         {
-          "client_id": "888724948448-mlols0htsrfp12assmfpnacktlgrqhhb.apps.googleusercontent.com",
+          "client_id": "888724948448-4ikmqa0m4r0813il1dlqqtco9ueqjslr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.chessbet.test",
+            "package_name": "com.chessbet.app.dev",
             "certificate_hash": "f15e6a1fc9ee436eb01619715bb32b821d0c937d"
           }
         },
