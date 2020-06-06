@@ -11,6 +11,11 @@
     <string name="title_activity_profile">Firebase</string>
     <string name="title_activity_login">Sign in</string>
     <string name="hint_email">Email</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="verify_phone_number">Verify Phone Number</string>
+    <string name="verify_code">Verify Code</string>
+    <string name="verification_code">Verification Code</string>
+    <string name="resend_code">Resend Verification Code</string>
     <string name="hint_password">Password</string>
     <string name="hint_name">Full Name</string>
     <string name="btn_login">LOGIN</string>

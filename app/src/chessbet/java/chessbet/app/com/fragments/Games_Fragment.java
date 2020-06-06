@@ -8,13 +8,12 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-
 import chessbet.app.com.R;
 
-public class TermsAndConditionsFragment extends Fragment {
+public class Games_Fragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_terms_conditions, container, false);
+        View root = inflater.inflate(R.layout.fragment_chess_bet_games, container, false);
         return root;
     }
 }

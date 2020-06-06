@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_games"
-        android:name="chessbet.app.com.fragments.ChessBetGamesFragment"
+        android:name="chessbet.app.com.fragments.Games_Fragment"
         android:label="@string/menu_games"
         tools:layout="@layout/fragment_chess_bet_games">
     </fragment>
@@ -15,13 +15,13 @@
 
     <fragment
         android:id="@+id/nav_playOnline"
-        android:name="chessbet.app.com.fragments.PlayOnlineFragment"
+        android:name="chessbet.app.com.fragments.Play_online_Fragment"
         android:label="@string/menu_playOnline"
         tools:layout="@layout/fragment_playonline" />
 
     <fragment
         android:id="@+id/nav_terms_conditions"
-        android:name="chessbet.app.com.fragments.TermsAndConditionsFragment"
+        android:name="chessbet.app.com.fragments.Terms_conditions_Fragment"
         android:label="@string/menu_terms_conditions"
         tools:layout="@layout/fragment_terms_conditions" />
 </navigation>
