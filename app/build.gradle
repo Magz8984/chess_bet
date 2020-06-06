@@ -1,10 +1,11 @@
 apply plugin: 'com.android.application'
 
+
 android {
     compileSdkVersion 29
     defaultConfig {
         multiDexEnabled true
-        applicationId "chessbet.app.com"
+        applicationId "chessbet.chessbet.app.com"
         minSdkVersion 16
         targetSdkVersion 29
         versionCode 16
@@ -31,60 +32,50 @@ android {
         }
     }
 
-    flavorDimensions('app')
+    flavorDimensions('app', 'env')
     productFlavors {
-        dev { // Chess MVP Test
-            dimension 'app'
-            applicationId 'com.chessbet.test'
-            resValue "string", "app_name", "Chess MVP Test"
+        dev {
+            dimension 'env'
             versionCode 1
             versionName "1.0"
+            applicationIdSuffix ".dev"
             buildConfigField("String", "CLOUD_FUNCTIONS_URL", cloudFunctionsTestURL)
             buildConfigField("String", "WEB_CLIENT_ID", webTestClientId)
-
+            manifestPlaceholders = [ env: "Test"]
         }
 
-        prod { // Chess MVP Prod
+        prod {
+            dimension 'env'
+            buildConfigField("String", "CLOUD_FUNCTIONS_URL", cloudFunctionsURL)
+            buildConfigField("String", "WEB_CLIENT_ID", webClientId)
+            manifestPlaceholders = [ env: ""]
+        }
+
+        chessbet {
+            dimension 'app'
+            applicationId 'com.chessbet.app'
+            resValue "string", "app_name", "Chess Bet"
+            versionCode 1
+            versionName "1.0"
+            manifestPlaceholders = [ appNameValue: "Chess Bet"]
+        }
+
+        chessmvp { // Chess Bet Test
             dimension 'app'
             applicationId 'chessbet.app.com'
             resValue "string", "app_name", "Chess MVP"
             versionCode 16
             versionName "1.2.5"
-            buildConfigField("String", "CLOUD_FUNCTIONS_URL", cloudFunctionsURL)
-            buildConfigField("String", "WEB_CLIENT_ID", webClientId)
-
-        }
-
-        chessbet { // Chess Bet
-            dimension 'app'
-            resValue "string", "app_name", "Chess Bet"
-            applicationId 'com.chessbet.app.prod'
-            versionCode 1
-            versionName "1.0"
-            buildConfigField("String", "CLOUD_FUNCTIONS_URL", cloudFunctionsURL)
-            buildConfigField("String", "WEB_CLIENT_ID", webClientId)
-        }
-
-        chessbetdev { // Chess Bet Test
-            dimension 'app'
-            resValue "string", "app_name", "Chess Bet Test"
-            applicationId 'com.chessbet.app.test'
-            versionCode 1
-            versionName "1.0"
-            buildConfigField("String", "CLOUD_FUNCTIONS_URL", cloudFunctionsTestURL)
-            buildConfigField("String", "WEB_CLIENT_ID", webTestClientId)
+            manifestPlaceholders = [ appNameValue: "Chess MVP"]
         }
     }
 
-    // Chess Bet Flavour Is Parent to Chess Bet Dev
     sourceSets {
-        chessbetdev {
-            java.srcDirs = sourceSets.chessbet.java.srcDirs
-            res.srcDirs = sourceSets.chessbet.res.srcDirs
-            resources.srcDirs = sourceSets.chessbet.resources.srcDirs
-            aidl.srcDirs = sourceSets.chessbet.aidl.srcDirs
-            renderscript.srcDirs = sourceSets.chessbet.renderscript.srcDirs
-            assets.srcDirs = sourceSets.chessbet.assets.srcDirs
+        chessmvp {
+            java.srcDirs('src/chessmvp/java')
+        }
+        chessbet {
+            java.srcDirs('src/chessbet/java')
         }
     }
 
@@ -108,6 +99,7 @@ android {
     lintOptions {
         abortOnError false
     }
+    sourceSets { chessmvp { java.srcDirs = ['src/chessmvp/java', 'src/chessmvp/java/'] } }
 }
 
 dependencies {

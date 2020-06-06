@@ -20,9 +20,5 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service
-            android:name="chessbet.services.MatchService"
-            android:icon="@drawable/chesslogo"
-            android:label="@string/match_service" />
     </application>
 </manifest>
