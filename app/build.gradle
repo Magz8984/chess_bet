@@ -72,10 +72,10 @@ android {
 
     sourceSets {
         chessmvp {
-            java.srcDirs('src/chessmvp/java', 'src/main/java')
+            java.srcDirs('src/chessmvp/java')
         }
         chessbet {
-            java.srcDirs('src/chessbet/java', 'src/main/java')
+            java.srcDirs('src/chessbet/java')
         }
     }
 
