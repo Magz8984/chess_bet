@@ -5,11 +5,8 @@ android {
     compileSdkVersion 29
     defaultConfig {
         multiDexEnabled true
-        applicationId "chessbet.chessbet.app.com"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 16
-        versionName "1.2.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             ndkBuild {
@@ -41,14 +38,14 @@ android {
             applicationIdSuffix ".dev"
             buildConfigField("String", "CLOUD_FUNCTIONS_URL", cloudFunctionsTestURL)
             buildConfigField("String", "WEB_CLIENT_ID", webTestClientId)
-            manifestPlaceholders = [ env: "Test"]
+            manifestPlaceholders = [env: "Test"]
         }
 
         prod {
             dimension 'env'
             buildConfigField("String", "CLOUD_FUNCTIONS_URL", cloudFunctionsURL)
             buildConfigField("String", "WEB_CLIENT_ID", webClientId)
-            manifestPlaceholders = [ env: ""]
+            manifestPlaceholders = [env: ""]
         }
 
         chessbet {
@@ -57,7 +54,7 @@ android {
             resValue "string", "app_name", "Chess Bet"
             versionCode 1
             versionName "1.0"
-            manifestPlaceholders = [ appNameValue: "Chess Bet"]
+            manifestPlaceholders = [appNameValue: "Chess Bet"]
         }
 
         chessmvp { // Chess Bet Test
@@ -66,13 +63,13 @@ android {
             resValue "string", "app_name", "Chess MVP"
             versionCode 16
             versionName "1.2.5"
-            manifestPlaceholders = [ appNameValue: "Chess MVP"]
+            manifestPlaceholders = [appNameValue: "Chess MVP"]
         }
     }
 
     sourceSets {
         chessmvp {
-            java.srcDirs('src/chessmvp/java')
+            java.srcDirs('src/chessmvp/java', 'src/main/java')
         }
         chessbet {
             java.srcDirs('src/chessbet/java')
