@@ -5,7 +5,6 @@ android {
     compileSdkVersion 29
     defaultConfig {
         multiDexEnabled true
-//        manifestPlaceholders = [ appName: "Chess Bet", env: ""]
         applicationId "chessbet.chessbet.app.com"
         minSdkVersion 16
         targetSdkVersion 29

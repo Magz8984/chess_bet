@@ -61,13 +61,13 @@
 - Fix ECOBuilder end of file error
 - Add xhdpi screen support
 - Fix challenge messages.
-- Enable one challenge notification on chessbet.app start up.
+- Enable one challenge notification on app start up.
 
 ### v1.1.4-beta (Chess MVP)
 
 #### Features
 
-- PGN files can be viewed from the chessbet.app
+- PGN files can be viewed from the app
 
 ### Improvements
 - Fix challenge creation process when user is requested for a challenge
@@ -106,7 +106,7 @@
 - Fix error when getting no move from stockfish
 
 #### 1.2.5 release
-- Retain v1.0 chessbet.app icon
+- Retain v1.0 app icon
 - Increase level grid view height
 - Create name profile fragment
 - Fix timer lapsed logic

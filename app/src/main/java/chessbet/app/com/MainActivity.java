@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Used as a flag to notify the chessbet.app if the user is in a match
+     * Used as a flag to notify the app if the user is in a match
      */
     private void freeUseFromMatch() {
         getApplicationContext().getSharedPreferences(Constants.IS_ON_MATCH, Context.MODE_PRIVATE)
