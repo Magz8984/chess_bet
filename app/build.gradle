@@ -99,7 +99,6 @@ android {
     lintOptions {
         abortOnError false
     }
-    sourceSets { chessmvp { java.srcDirs = ['src/chessmvp/java', 'src/chessmvp/java/'] } }
 }
 
 dependencies {
