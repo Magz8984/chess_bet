@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "888724948448-2jloi4m7i05dming12622epiaplmal7g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "chessbet.app.com.dev",
+            "certificate_hash": "f15e6a1fc9ee436eb01619715bb32b821d0c937d"
+          }
+        },
+        {
           "client_id": "888724948448-dlmardvdt9gbtk4qj5ijdt20qet1clv1.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -44,7 +52,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "888724948448-4ikmqa0m4r0813il1dlqqtco9ueqjslr.apps.googleusercontent.com",
+          "client_id": "888724948448-hnoc3d30lhvm42jknipf7gtl8hmpfinb.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.chessbet.app.dev",

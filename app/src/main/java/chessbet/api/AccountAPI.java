@@ -175,8 +175,8 @@ public class AccountAPI {
 
     public User getCurrentUser() { return currentUser; }
 
-    public FirebaseUser getFirebaseUser(){
-        return this.user;
+    public FirebaseUser getFirebaseUser() {
+        return FirebaseAuth.getInstance().getCurrentUser();
     }
 
     public void setAccountListener(AccountListener accountListener) {
