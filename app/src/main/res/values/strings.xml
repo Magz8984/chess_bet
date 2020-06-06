@@ -100,4 +100,11 @@
     <string name="pgn_viewer">Chess MVP PGN Viewer</string>
     <string name="join_tournament">Join Tournament</string>
     <string name="view_tournament">View Tournament</string>
+    <string name="deposit">Deposit</string>
+    <string name="play_chess">Play Chess</string>
+    <string name="transactions">Transactions</string>
+    <string name="kes_1000">KES 1000</string>
+    <string name="balance">Balance:</string>
+    <string name="_1000">1000</string>
+    <string name="_254712695820">254712695820</string>
 </resources>
