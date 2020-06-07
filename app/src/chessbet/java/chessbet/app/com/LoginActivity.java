@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
@@ -75,6 +76,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
                     @Override
                     public void onVerificationFailed(@NonNull FirebaseException e) {
+                        Crashlytics.logException(e);
                         if (e instanceof FirebaseAuthInvalidCredentialsException) {
                             Toast.makeText(LoginActivity.this, "Invalid Credentials", Toast.LENGTH_LONG).show();
                         } else if (e instanceof FirebaseTooManyRequestsException) {
