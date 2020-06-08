@@ -3,6 +3,7 @@ package chessbet.app.com;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,6 +28,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.api.AccountAPI;
 import chessbet.utils.Util;
+import es.dmoral.toasty.Toasty;
 
 /**
  * @author Collins Magondu 6/6/2020
@@ -42,6 +44,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private String verificationId;
     private PhoneAuthProvider.ForceResendingToken token;
+    private ProgressDialog loading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnVerifyPhoneNumber.setOnClickListener(this);
         btnVerifyCode.setOnClickListener(this);
         FirebaseAuth.getInstance().setLanguageCode("en");
+        loading = new ProgressDialog(this);
     }
 
     @Override
@@ -67,29 +71,34 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             String phoneNumber  = txtPhoneNumber.getText().toString();
             // TODO Support Other Countries
             if(phoneNumber.startsWith("+254")){
+                loading.setMessage("Wait a moment...");
+                loading.show();
                 PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber, 60, TimeUnit.SECONDS, this, new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     @Override
                     public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-                        Toast.makeText(LoginActivity.this, "Successful Verification", Toast.LENGTH_LONG).show();
+                        loading.dismiss();
+                        Toasty.success(LoginActivity.this, "Successful Verification", Toasty.LENGTH_LONG).show();
                         signInWithCredentials(phoneAuthCredential);
                     }
 
                     @Override
                     public void onVerificationFailed(@NonNull FirebaseException e) {
+                        loading.dismiss();
                         Crashlytics.logException(e);
                         if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                            Toast.makeText(LoginActivity.this, "Invalid Credentials", Toast.LENGTH_LONG).show();
+                            Toasty.error(LoginActivity.this, "Invalid Credentials", Toasty.LENGTH_LONG).show();
                         } else if (e instanceof FirebaseTooManyRequestsException) {
-                            Toast.makeText(LoginActivity.this, "SMS Quota Exceeded", Toast.LENGTH_LONG).show();
+                            Toasty.error(LoginActivity.this, "SMS Quota Exceeded", Toasty.LENGTH_LONG).show();
                         } else {
-                            Log.d("ErrorVerify", Objects.requireNonNull(e.getMessage()));
-                            Toast.makeText(LoginActivity.this, "Verification Failed", Toast.LENGTH_LONG).show();
+                            Log.e("ErrorVerify", Objects.requireNonNull(e.getMessage()));
+                            Toasty.error(LoginActivity.this, "Verification Failed", Toasty.LENGTH_LONG).show();
                         }
                     }
 
                     @Override
                     public void onCodeSent(@NonNull String verificationId, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
-                        Toast.makeText(LoginActivity.this, "Verification Code Has Been Sent Successfully", Toast.LENGTH_LONG).show();
+                        loading.dismiss();
+                        Toasty.success(LoginActivity.this, "Verification Code Has Been Sent Successfully", Toasty.LENGTH_LONG).show();
                         verificationInputLayout.setVisibility(View.VISIBLE);
                         phoneNumberInputLayout.setVisibility(View.GONE);
                         btnVerifyPhoneNumber.setVisibility(View.GONE);
@@ -99,10 +108,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     }
                 });
             } else {
-                Toast.makeText(this, "Phone Number must begin with +254", Toast.LENGTH_LONG).show();
+                Toasty.warning(this, "Phone Number must begin with +254", Toasty.LENGTH_LONG).show();
             }
         } else {
-            Toast.makeText(this, "Phone Number Required", Toast.LENGTH_LONG).show();
+            Toasty.warning(this, "Phone Number Required", Toasty.LENGTH_LONG).show();
         }
     }
 
@@ -118,7 +127,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Toast.makeText(this, "Verification Code Is Required", Toast.LENGTH_LONG).show();
             }
         } catch (Exception ex) {
-            Toast.makeText(this, ex.getMessage(), Toast.LENGTH_LONG).show();
+            Toasty.error(this, ex.getMessage(), Toasty.LENGTH_LONG).show();
         }
     }
 
@@ -127,20 +136,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         try {
             FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener(task -> {
                 if(task.isSuccessful()) {
+                    loading.dismiss();
                     AccountAPI.get().setUser(Objects.requireNonNull(task.getResult()).getUser());
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(intent);
                     finish();
                 } else {
+                    loading.dismiss();
                     if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                        Toast.makeText(this, "Verification Code Entered Was Invalid", Toast.LENGTH_LONG).show();
+                        Toasty.error(this, "Verification Code Entered Was Invalid", Toasty.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(this, "An error occurred while signing in", Toast.LENGTH_LONG).show();
+                        Toasty.error(this, "An error occurred while signing in", Toasty.LENGTH_LONG).show();
                     }
                 }
             });
         } catch (Exception ex) {
-            Toast.makeText(this, ex.getMessage(), Toast.LENGTH_LONG).show();
+            Toasty.error(this, ex.toString(), Toasty.LENGTH_LONG).show();
         }
     }
 }
