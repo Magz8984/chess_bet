@@ -27,6 +27,8 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="@string/_254712695820"
+        android:fontFamily="@font/chakrapetchbold"
+        android:textAlignment="center"
         android:textSize="20sp"
         android:textColor="@color/colorGold"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
@@ -40,12 +42,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Rating: "
+            android:fontFamily="@font/chakrapetchbold"
             android:textColor="@color/colorGold"
             android:textSize="18sp"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/_1000"
+            android:fontFamily="@font/chakrapetchbold"
             android:textColor="@color/colorGold"
             android:textSize="18sp"/>
     </LinearLayout>
@@ -59,12 +63,14 @@
             android:layout_height="wrap_content"
             android:text="@string/balance"
             android:textSize="20sp"
+            android:fontFamily="@font/chakrapetchbold"
             android:textColor="@color/colorGreen"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/kes_1000"
             android:textSize="20sp"
+            android:fontFamily="@font/chakrapetchbold"
             android:textColor="@color/colorGreen"/>
     </LinearLayout>
 

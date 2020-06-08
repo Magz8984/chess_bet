@@ -15,9 +15,9 @@
 
     <fragment
         android:id="@+id/nav_playOnline"
-        android:name="chessbet.app.com.fragments.PlayOnlineFragment"
+        android:name="chessbet.app.com.fragments.MatchFragment"
         android:label="@string/menu_playOnline"
-        tools:layout="@layout/fragment_play_online" />
+        tools:layout="@layout/fragment_match" />
 
     <fragment
         android:id="@+id/nav_terms_conditions"
