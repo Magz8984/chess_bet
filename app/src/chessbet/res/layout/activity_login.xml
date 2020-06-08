@@ -116,6 +116,19 @@
             android:textColor="@color/white"
             android:textSize="15sp"
             app:fontFamily="@font/josefinslabsemibold"/>
+
+        <Button
+            android:visibility="gone"
+            android:id="@+id/btn_resend_code"
+            android:layout_width="fill_parent"
+            android:layout_height="37dp"
+            android:layout_marginTop="10dp"
+            android:background="@null"
+            android:text="@string/resend_code"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:fontFamily="@font/chakrapetchbold"/>
     </LinearLayout>
 
     <ProgressBar
