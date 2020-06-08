@@ -133,16 +133,24 @@
                 android:layout_marginTop="100dp"/>
         </LinearLayout>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/floatingActionButton"
-            android:layout_width="match_parent"
+        <com.github.jorgecastilloprz.FABProgressCircle
+            android:id="@+id/fabProgressCircle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="true"
-            android:src="@drawable/ic_message"
-            android:focusable="true"
             android:layout_gravity="end"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="10dp" />
+            app:arcColor="@color/colorPrimary"
+            app:arcWidth="5dp">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btnFindMatch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/play_button"
+                app:rippleColor="@color/colorPrimary"
+                app:elevation="20dp"
+                app:borderWidth="0dp"
+                android:layout_margin="16dp"
+                />
+        </com.github.jorgecastilloprz.FABProgressCircle>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
