@@ -8,6 +8,7 @@ public class ChallengeDTO {
     private String owner;
     private int duration;
     private int eloRating;
+    private Amount amount;
     private Challenge.Type type;
     private int minEloRating;
     private int maxEloRating;
@@ -40,6 +41,8 @@ public class ChallengeDTO {
         private ChallengeDTO challengeDTO;
         public Builder(){
             challengeDTO = new ChallengeDTO();
+            challengeDTO.amount = new Amount();
+            challengeDTO.amount.setCurrency("KES");
         }
         public Builder setOwner(String owner){
             this.challengeDTO.owner = owner;
@@ -65,6 +68,11 @@ public class ChallengeDTO {
 
         public Builder setMaxEloRating(int maxEloRating){
             this.challengeDTO.maxEloRating = maxEloRating;
+            return this;
+        }
+
+        public Builder setAmount (int amount) {
+            this.challengeDTO.amount.setAmount(amount);
             return this;
         }
 
