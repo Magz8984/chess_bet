@@ -12,6 +12,7 @@
     <string name="_200">+/-200</string>
     <string name="_500">+/-500</string>
     <string name="kes_1000">KES 1000</string>
+    <string name="kes_0">KES 0</string>
     <string name="kes_500">KES 500</string>
     <string name="kes_250">KES 250</string>
     <string name="kes_50">KES 50</string>

@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:background="@drawable/button_bg">
+        android:background="@color/white">
         <de.hdodenhof.circleimageview.CircleImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -44,7 +44,7 @@
             android:layout_marginTop="20dp"
             android:layout_weight="1"
             android:textAllCaps="false"
-            android:background="@drawable/button_btn2"
+            android:background="@drawable/rounded_selected_button"
             android:layout_marginRight="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="5dp"/>

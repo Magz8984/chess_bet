@@ -119,6 +119,7 @@ public class Challenge {
 
     public enum Type{
         FRIENDLY,
-        CHALLENGE
+        CHALLENGE,
+        BET_CHALLENGE
     }
 }

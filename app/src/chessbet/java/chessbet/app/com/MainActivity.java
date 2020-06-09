@@ -10,12 +10,23 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.os.Bundle;
 import android.view.Menu;
+import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.Locale;
+
+import chessbet.api.AccountAPI;
+import chessbet.domain.Account;
+import chessbet.domain.User;
+import chessbet.services.AccountListener;
+
+public class MainActivity extends AppCompatActivity implements AccountListener {
 
     private AppBarConfiguration mAppBarConfiguration;
+    private TextView txtPhoneNumber;
+    private TextView txtRating;
+    private TextView txtBalance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,8 +37,14 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+        this.txtPhoneNumber = navigationView.getHeaderView(0).findViewById(R.id.txtPhoneNumber);
+        this.txtRating = navigationView.getHeaderView(0).findViewById(R.id.txtRating);
+        this.txtBalance = navigationView.getHeaderView(0).findViewById(R.id.txtBalance);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
+        AccountAPI.get().setAccountListener(this);
+        AccountAPI.get().getAccount();
+        AccountAPI.get().getUser();
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_games, R.id.nav_playOnline, R.id.nav_terms_conditions)
                 .setDrawerLayout(drawer)
@@ -50,4 +67,17 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
+    @Override
+    public void onAccountReceived(Account account) {
+        txtRating.setText(String.format(Locale.ENGLISH,"%d", account.getElo_rating()));
+    }
+
+    @Override
+    public void onUserReceived(User user) {
+        txtPhoneNumber.setText(AccountAPI.get().getFirebaseUser().getPhoneNumber());
+    }
+
+    @Override
+    public void onAccountUpdated(boolean status) { }
 }

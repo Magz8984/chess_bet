@@ -23,10 +23,10 @@
         android:paddingLeft="5dp"/>
 
     <TextView
+        android:id="@id/txtPhoneNumber"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="@string/_254712695820"
         android:fontFamily="@font/chakrapetchbold"
         android:textAlignment="center"
         android:textSize="20sp"
@@ -46,6 +46,7 @@
             android:textColor="@color/colorGold"
             android:textSize="18sp"/>
         <TextView
+            android:id="@+id/txtRating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/_1000"
@@ -66,9 +67,10 @@
             android:fontFamily="@font/chakrapetchbold"
             android:textColor="@color/colorGreen"/>
         <TextView
+            android:id="@+id/txtBalance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/kes_1000"
+            android:text="@string/kes_0"
             android:textSize="20sp"
             android:fontFamily="@font/chakrapetchbold"
             android:textColor="@color/colorGreen"/>
