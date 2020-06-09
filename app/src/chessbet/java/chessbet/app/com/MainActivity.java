@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements AccountListener {
         AccountAPI.get().getAccount();
         AccountAPI.get().getUser();
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_games, R.id.nav_playOnline, R.id.nav_terms_conditions)
+                R.id.nav_games,R.id.nav_profile, R.id.nav_playOnline, R.id.nav_terms_conditions)
                 .setDrawerLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);

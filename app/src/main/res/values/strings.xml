@@ -112,4 +112,10 @@
     <string name="balance">Balance:\u0020</string>
     <string name="_1000">1000</string>
     <string name="_254712695820">254712695820</string>
+    <string name="name">Name</string>
+    <string name="phone">Phone</string>
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
+    <string name="remove_photo">Remove photo</string>
+    <string name="remove">Remove</string>
 </resources>
