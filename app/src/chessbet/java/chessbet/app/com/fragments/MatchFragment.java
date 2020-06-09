@@ -144,6 +144,7 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
     @Override
     public void onMatchMade(MatchableAccount matchableAccount) {
         try {
+            progressCircle.beginFinalAnimation();
             ChallengeAPI.get().setOnChallenge(true);
             AccountAPI.get().getCurrentAccount().setLast_match_duration(0);
             progressCircle.beginFinalAnimation();
@@ -186,7 +187,6 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
         if(activity != null) {
             activity.runOnUiThread(() -> {
                 Toasty.success(requireContext(), response).show();
-                progressCircle.beginFinalAnimation();
             });
         }
     }
