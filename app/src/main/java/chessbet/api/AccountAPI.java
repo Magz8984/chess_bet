@@ -1,5 +1,7 @@
 package chessbet.api;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -48,6 +50,8 @@ public class AccountAPI {
     private User currentUser = null;
     private DocumentReference accountReference;
     private UsersReceived usersReceived;
+
+    private ProgressDialog loading;
 
     private AccountAPI() {
          db = FirebaseFirestore.getInstance();
@@ -406,5 +410,16 @@ public class AccountAPI {
      */
     public interface AccountReceived{
         void onAccountReceived(Account account);
+    }
+
+    public void showDialogue(Context context){
+        loading = new ProgressDialog(context);
+        loading.setMessage("Please wait...");
+        loading.show();
+    }
+
+    public void hideDialogue(Context context){
+        loading = new ProgressDialog(context);
+        loading.dismiss();
     }
 }

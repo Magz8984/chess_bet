@@ -13,6 +13,7 @@
         android:theme="@style/AppTheme">
         <activity android:name="chessbet.app.com.MainActivity"/>
         <activity android:name="chessbet.app.com.LoginActivity" />
+        <activity android:name="chessbet.utils.Permissions" />
         <activity android:name="chessbet.app.com.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
