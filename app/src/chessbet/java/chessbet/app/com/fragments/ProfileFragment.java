@@ -3,6 +3,7 @@ package chessbet.app.com.fragments;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -77,11 +78,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
     private static final int STORAGE_REQUEST_CODE = 200;
 
     //arrays of permission to be request
-    String[] cameraPermissions;
-    String[] storagePermissions;
-    Uri image_uri;
-
-    private User user;
+    private String[] cameraPermissions;
+    private String[] storagePermissions;
+    private Uri image_uri;
+    private ProgressDialog loader;
     private FirebaseUser firebaseUser;
     private Permissions permissions;
     private StorageReference storageReference;
@@ -92,8 +92,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_profile, container, false);
         ButterKnife.bind(this ,view);
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
+        firebaseUser = AccountAPI.get().getFirebaseUser();
+        loader = new ProgressDialog(requireContext());
+        loader.setMessage("Please Wait..");
         iv_camera.setOnClickListener(this);
         editIv.setOnClickListener(this);
         gallery_layout.setOnClickListener(this);
@@ -116,16 +117,16 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onClick(View v) {
-        if (v==iv_camera){
+        if (v.equals(iv_camera)){
             bottom_layout.setVisibility(View.VISIBLE);
         }
-        if (v==cancel_layout){
+        if (v.equals(cancel_layout)){
             bottom_layout.setVisibility(View.GONE);
         }
-        if (v==editIv){
+        if (v.equals(editIv)){
             showUsernameDialog();
         }
-        if (v==gallery_layout){
+        if (v.equals(gallery_layout)){
             if (!permissions.checkStoragePermission()){
                 requestStoragePermission();
             }
@@ -133,7 +134,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
                 pickFromGallery();
             }
         }
-        if (v==camera_layout){
+        if (v.equals(camera_layout)){
             if (!permissions.checkCameraPermission()){
                 requestCameraPermission();
             }
@@ -143,7 +144,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
         }
     }
 
-    @SuppressLint("NewApi")
     private void requestCameraPermission() {
         //request runtime storage permission
         requestPermissions(cameraPermissions, CAMERA_REQUEST_CODE);
@@ -155,16 +155,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
         values.put(MediaStore.Images.Media.TITLE, "Temp Pic");
         values.put(MediaStore.Images.Media.DESCRIPTION, "Temp Description");
         //put image uri
-        image_uri = getActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,values);
+        image_uri = requireActivity().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,values);
 
         //intent to start camera
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT,image_uri);
         startActivityForResult(cameraIntent, IMAGE_PICK_CAMERA_CODE);
-
     }
 
-    @SuppressLint("NewApi")
     private void requestStoragePermission() {
         //request runtime storage permission
         requestPermissions(storagePermissions, STORAGE_REQUEST_CODE);
@@ -205,18 +203,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
     }
 
     private void updateUsername(String name) {
-        AccountAPI.get().showDialogue(getActivity());
+        this.loader.show();
         UserProfileChangeRequest.Builder builder = new UserProfileChangeRequest.Builder();
         builder.setDisplayName(name);
         AccountAPI.get().getCurrentUser().setUser_name(name);
         firebaseUser.updateProfile(builder.build()).addOnCompleteListener(task -> {
             if(task.isSuccessful()){
-                AccountAPI.get().hideDialogue(getActivity());
+                this.loader.dismiss();
                 AccountAPI.get().updateUser();
                 EventBroadcast.get().broadcastUserUpdate();
-                Toasty.success(getContext(),"Username successfully changed", Toasty.LENGTH_LONG).show();
+                Toasty.success(requireContext(),"Username successfully changed", Toasty.LENGTH_LONG).show();
             }
-            AccountAPI.get().hideDialogue(getActivity());
+            this.loader.dismiss();
         });
     }
 
@@ -241,7 +239,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
     }
 
     private void init(){
-        user = AccountAPI.get().getCurrentUser();
+        User user = AccountAPI.get().getCurrentUser();
         if(user != null) {
             try{
                 if(user.getProfile_photo_url() != null){
@@ -260,11 +258,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onUserUpdated(boolean status) {
         if(getContext() != null){
+            this.loader.dismiss();
             if(status){
-                AccountAPI.get().hideDialogue(getActivity());
                 Toasty.success(getContext(), "User Updated", Toasty.LENGTH_LONG).show();
             } else {
-                AccountAPI.get().hideDialogue(getActivity());
                 Toasty.error(getContext(), "User Not Updated", Toasty.LENGTH_LONG).show();
             }
         }
@@ -328,7 +325,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
     private UploadTask uploadProfilePhotoTask(Bitmap bitmap){
         byte[] bytes = {};
         try {
-            AccountAPI.get().showDialogue(getActivity());
+            loader.dismiss();
             profile_photo.setDrawingCacheEnabled(true);
             profile_photo.buildDrawingCache();
 //            Bitmap bitmap = ((BitmapDrawable) profileImage.getDrawable()).getBitmap();
@@ -337,7 +334,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
             bytes = byteArrayOutputStream.toByteArray();
         }
         catch (Exception ex){
-            AccountAPI.get().hideDialogue(getActivity());
             ex.printStackTrace();
         }
         return storageReference.putBytes(bytes);
@@ -346,7 +342,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
     private void uploadProfilePhoto(Bitmap bitmap){
         storageReference = firebaseStorage.getReference(FirebaseAuth.getInstance().getUid() + "/" + "profile_photo");
         uploadProfilePhotoTask(bitmap).addOnFailureListener(e -> {
-            AccountAPI.get().hideDialogue(getActivity());
+            loader.dismiss();
             Crashlytics.logException(e);
         });
 
@@ -357,9 +353,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
             map.put("profile_photo_url", uri.toString());
             AccountAPI.get().getUserPath().update(map).addOnCompleteListener(task1 -> {
                 Toast.makeText(getActivity(),R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
-                AccountAPI.get().hideDialogue(getActivity());
+                loader.dismiss();
                 AccountAPI.get().getUser();
-            }).addOnCanceledListener(() ->  AccountAPI.get().hideDialogue(getActivity()));
+            }).addOnCanceledListener(() ->  loader.dismiss());
         }));
     }
 
@@ -379,7 +375,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
                         //Permission enabled
                     } else {
                         //permission denied
-                        Toasty.warning(getActivity(), "Please enable camera && storage permission ", Toasty.LENGTH_LONG).show();
+                        Toasty.warning(requireActivity(), "Please enable camera && storage permission ", Toasty.LENGTH_LONG).show();
                     }
                 }
             }
@@ -394,7 +390,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
                         pickFromGallery();
                     } else {
                         //permission denied
-                        Toasty.warning(getActivity(), "Please enable storage permission ", Toasty.LENGTH_LONG).show();
+                        Toasty.warning(requireActivity(), "Please enable storage permission ", Toasty.LENGTH_LONG).show();
                     }
 
                 }
