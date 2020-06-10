@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="chessbet.app.com.DepositActivity"></activity>
+        <activity
+            android:name="chessbet.app.com.DepositActivity"/>
         <activity android:name="chessbet.app.com.MainActivity" />
         <activity android:name="chessbet.app.com.LoginActivity" />
         <activity android:name="chessbet.app.com.SplashScreen">

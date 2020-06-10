@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="chessbet.app.com.DepositActivity"
-    android:background="@color/colorDarkBlue">
+    android:background="@color/colorPrimary">
 
     <LinearLayout
         android:layout_width="0dp"
