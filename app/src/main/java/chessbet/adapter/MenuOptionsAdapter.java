@@ -65,13 +65,13 @@ public class MenuOptionsAdapter extends BaseAdapter {
         drawables.add(R.drawable.wifi_four_bar);
         strings.add(context.getResources().getString(R.string.online_users));
 
-        // Tournaments
-        listeners.add(view -> {
-            Intent intent = new  Intent(context, TournamentActivity.class);
-            context.startActivity(intent);
-        });
-        drawables.add(R.drawable.tournaments);
-        strings.add(context.getResources().getString(R.string.tournaments));
+//        // Tournaments
+//        listeners.add(view -> {
+//            Intent intent = new  Intent(context, TournamentActivity.class);
+//            context.startActivity(intent);
+//        });
+//        drawables.add(R.drawable.tournaments);
+//        strings.add(context.getResources().getString(R.string.tournaments));
     }
 
     @Override
