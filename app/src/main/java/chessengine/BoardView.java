@@ -438,11 +438,11 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
      * @param from fromCellCoordinate
      * @param to toCellCoordinate
      */
-    public void setMoveData(int from, int to) {
+    public void setMoveData(int from, int to, String promotedPiece) {
         if(matchAPI != null){
             // Help regulate time between play
 //          long timeLeft = (getOwnerAlliance() == Alliance.WHITE) ? gameTimer.getOwnerTimeLeft() : gameTimer.getOpponentTimeLeft();
-            matchAPI.sendMoveData(matchableAccount,from,to, getPortableGameNotation(), gameTimer.getOwnerTimeLeft());
+            matchAPI.sendMoveData(matchableAccount,from,to, getPortableGameNotation(), gameTimer.getOwnerTimeLeft(), promotedPiece);
         }
     }
 
@@ -569,6 +569,10 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     public void translateRemoteMoveOnBoard(RemoteMove remoteMove){
         if(remoteMove != null){
             final Move move = Move.MoveFactory.createMove(chessBoard,remoteMove.getFrom(),remoteMove.getTo());
+            if(move.isPawnPromotionMove()) {
+                // Take Back Control to method useful when making a promotion move
+                Board.setPromotionListener(() -> getPromotedPieceFromString(remoteMove.getPromotedPiece()));
+            }
             final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
             if(transition.getMoveStatus().isDone()){
                 movedPiece = null;
@@ -595,6 +599,8 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
                 }
                 chessBoard = transition.getTransitionBoard();
                 onMoveDoneListener.getMoves(moveLog);
+                // Return Back Control to Activity Implementing The Promotion Interface
+                Board.setPromotionListener(this.promotionListener);
                 displayGameStates();
                 invalidate();
             }
@@ -612,7 +618,14 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
             }
 
             destinationTile = chessBoard.getTile(move.getDestinationCoordinate());
-            setMoveData(movedPiece.getPiecePosition(), move.getDestinationCoordinate()); // Online Play
+
+            // Promotion Piece
+            String strPromotedPiece = ".";
+            if (move.isPawnPromotionMove()) {
+                strPromotedPiece = getPieceTypeFromPawnPromotion(move.toString()).toString();
+            }
+            setMoveData(movedPiece.getPiecePosition(), move.getDestinationCoordinate(),
+                    (chessBoard.currentPlayer().getAlliance().equals(Alliance.BLACK) ? strPromotedPiece.toLowerCase() : strPromotedPiece.toUpperCase())); // Online Play
 
             if(mode != BoardView.Modes.PUZZLE_MODE && !isEngineLoading) {
                 // Stop the current player timer
@@ -764,17 +777,28 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         return false;
     }
 
-    public Piece.PieceType getPieceTypeFromPawnPromotion(String string) {
-        String promotionPiece = string.split("=")[1];
+    /**
+     * Get promoted piece from Move String
+     * @param moveString from Move.toString()
+     * @return PieceType
+     */
+    public Piece.PieceType getPieceTypeFromPawnPromotion(String moveString) {
+        String promotionPiece = moveString.split("=")[1];
         Log.d("Promotion Piece", promotionPiece);
-        if(promotionPiece.contains("N")){
-            return Piece.PieceType.KNIGHT;
-        } else if (promotionPiece.contains("Q")){
-            return Piece.PieceType.QUEEN;
-        } else if(promotionPiece.contains("R")){
-            return Piece.PieceType.ROOK;
-        } else if (promotionPiece.contains("B")){
-            return Piece.PieceType.BISHOP;
+        return this.getPromotedPieceFromString(promotionPiece);
+    }
+
+    public Piece.PieceType getPromotedPieceFromString(String string) {
+        final String upperCaseString = string.toUpperCase();
+        switch (upperCaseString) {
+            case "N":
+                return Piece.PieceType.KNIGHT;
+            case "Q":
+                return Piece.PieceType.QUEEN;
+            case "R":
+                return Piece.PieceType.ROOK;
+            case "B":
+                return Piece.PieceType.BISHOP;
         }
         return Piece.PieceType.QUEEN;
     }
