@@ -40,6 +40,7 @@
             />
         <item
             android:id="@+id/challenges"
+            android:icon="@drawable/casino"
             android:title="@string/challenges"
             />
         <item
