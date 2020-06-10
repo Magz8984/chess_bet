@@ -11,14 +11,13 @@
         android:orientation="vertical"
         android:background="@color/colorPrimary">
         <FrameLayout
-            android:layout_weight="1"
             android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_gravity="center">
             <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_marginTop="30dp"
-                android:id="@+id/profile_photo"
+                android:padding="5dp"
+                android:id="@+id/img_profile_photo"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:src="@drawable/ic_launcher_background"/>

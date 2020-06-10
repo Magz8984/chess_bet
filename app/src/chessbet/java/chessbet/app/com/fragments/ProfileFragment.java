@@ -63,7 +63,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener,
         AccountListener , EventBroadcast.UserLoaded , UserListener {
-    @BindView(R.id.profile_photo) CircleImageView profile_photo;
+    @BindView(R.id.img_profile_photo) CircleImageView profile_photo;
     @BindView(R.id.iv_camera) CircleImageView iv_camera;
     @BindView(R.id.nameTv) TextView nameTv;
     @BindView(R.id.phoneTv) TextView phoneTv;
@@ -288,6 +288,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
         //This method will be called after picking image form camera or gallery
         if (resultCode == RESULT_OK){
             if (requestCode == IMAGE_PICK_GALLERY_CODE){
@@ -306,7 +307,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
                                 return false;
                             }
                         })
-                        .into(profile_photo);
+                        .submit();
 
             }
             if (requestCode == IMAGE_PICK_CAMERA_CODE){
@@ -328,9 +329,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
 
             }
         }
-
-
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private UploadTask uploadProfilePhotoTask(Bitmap bitmap){
@@ -361,6 +359,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
             final Uri uri = task.getResult();
             Map<String,Object> map = new HashMap<>();
             assert uri != null;
+            Glide.with(requireContext()).load(uri).into(profile_photo);
             map.put("profile_photo_url", uri.toString());
             AccountAPI.get().getUserPath().update(map).addOnCompleteListener(task1 -> {
                 Toast.makeText(getActivity(),R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
