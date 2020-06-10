@@ -146,12 +146,13 @@ public class MatchAPI implements Serializable {
         this.currentDatabaseMatch = null;
     }
 
-    public void sendMoveData(MatchableAccount matchableAccount, int source, int destination, String pgn, long gameTimeLeft){
+    public void sendMoveData(MatchableAccount matchableAccount, int source, int destination, String pgn, long gameTimeLeft, String promotedPiece){
         RemoteMove.get().setOwner(matchableAccount.getOwner());
         RemoteMove.get().setFrom(source);
         RemoteMove.get().setGameTimeLeft(gameTimeLeft); // Regulate game play
         RemoteMove.get().setTo(destination);
         RemoteMove.get().setPgn(pgn); // Pgn string of the match
+        RemoteMove.get().setPromotedPiece(promotedPiece);
         RemoteMove.get().send(matchableAccount.getMatchId(),matchableAccount.getSelf());
     }
 

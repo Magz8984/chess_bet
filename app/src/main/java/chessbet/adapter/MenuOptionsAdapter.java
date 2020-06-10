@@ -10,8 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.fragment.app.FragmentManager;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +17,7 @@ import chessbet.app.com.BoardActivity;
 import chessbet.app.com.PlayComputerSettingsActivity;
 import chessbet.app.com.PresenceActivity;
 import chessbet.app.com.R;
+import chessbet.app.com.tournament.TournamentActivity;
 import chessbet.domain.MatchType;
 
 
@@ -58,12 +57,21 @@ public class MenuOptionsAdapter extends BaseAdapter {
         drawables.add(R.drawable.eye);
         strings.add("Watch");
 
+        // Online users
         listeners.add(view -> {
            Intent intent = new  Intent(context, PresenceActivity.class);
            context.startActivity(intent);
         });
         drawables.add(R.drawable.wifi_four_bar);
         strings.add(context.getResources().getString(R.string.online_users));
+
+//        // Tournaments
+//        listeners.add(view -> {
+//            Intent intent = new  Intent(context, TournamentActivity.class);
+//            context.startActivity(intent);
+//        });
+//        drawables.add(R.drawable.tournaments);
+//        strings.add(context.getResources().getString(R.string.tournaments));
     }
 
     @Override

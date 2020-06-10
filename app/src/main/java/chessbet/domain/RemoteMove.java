@@ -12,6 +12,7 @@ public class RemoteMove {
     private int from;
     private String pgn;
     private long gameTimeLeft;
+    private String promotedPiece;
     private List<String> events;
 
     private RemoteMove(){
@@ -42,6 +43,14 @@ public class RemoteMove {
         if(!this.getEvents().contains(matchEvent.toString())){
             this.events.add(matchEvent.toString());
         }
+    }
+
+    public void setPromotedPiece(String promotedPiece) {
+        this.promotedPiece = promotedPiece;
+    }
+
+    public String getPromotedPiece() {
+        return promotedPiece;
     }
 
     public boolean isLastEventDisconnected(){

@@ -51,6 +51,7 @@ public class AccountAPI {
 
     private AccountAPI() {
          db = FirebaseFirestore.getInstance();
+         this.user = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     public static AccountAPI get(){
@@ -82,7 +83,6 @@ public class AccountAPI {
 
     public void getUser(){
         try {
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             assert user != null;
             db.collection(AccountAPI.USER_COLLECTION).document(user.getUid()).get().addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
@@ -175,8 +175,8 @@ public class AccountAPI {
 
     public User getCurrentUser() { return currentUser; }
 
-    public FirebaseUser getFirebaseUser(){
-        return this.user;
+    public FirebaseUser getFirebaseUser() {
+        return FirebaseAuth.getInstance().getCurrentUser();
     }
 
     public void setAccountListener(AccountListener accountListener) {

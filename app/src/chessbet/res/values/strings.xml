@@ -1,0 +1,25 @@
+<resources>
+    <string name="logo">Logo</string>
+    <string name="action_logout">Logout</string>
+
+    <string name="menu_games">Games</string>
+    <string name="menu_profile">Profile</string>
+    <string name="menu_playOnline">Play Online</string>
+    <string name="menu_terms_conditions">Terms and Conditions</string>
+    <string name="won">Won</string>
+    <string name="kes_100">KES 100</string>
+    <string name="view_game">View Game</string>
+    <string name="random">Random</string>
+    <string name="_200">+/-200</string>
+    <string name="_500">+/-500</string>
+    <string name="kes_1000">KES 1000</string>
+    <string name="kes_0">KES 0</string>
+    <string name="kes_500">KES 500</string>
+    <string name="kes_250">KES 250</string>
+    <string name="kes_50">KES 50</string>
+    <string name="advert">Advert</string>
+    <string name="resend_code">Resend Code</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

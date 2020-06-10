@@ -1,5 +1,5 @@
 <resources>
-<!--    <string name="app_name">Chess MVP</string>-->
+    <!--    <string name="app_name">Chess MVP</string>-->
     <string name="action_sign_in_short">Register</string>
     <string name="email">Email</string>
     <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
@@ -11,6 +11,11 @@
     <string name="title_activity_profile">Firebase</string>
     <string name="title_activity_login">Sign in</string>
     <string name="hint_email">Email</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="verify_phone_number">Verify Phone Number</string>
+    <string name="verify_code">Verify Code</string>
+    <string name="verification_code">Verification Code</string>
+    <string name="resend_code">Resend Verification Code</string>
     <string name="hint_password">Password</string>
     <string name="hint_name">Full Name</string>
     <string name="btn_login">LOGIN</string>
@@ -93,8 +98,25 @@
     <string name="challenge_service">challenge_service</string>
     <string name="disconnected">Disconnected</string>
     <string name="online_users">Online Users</string>
+    <string name="tournaments">Tournaments</string>
     <string name="default_notification_channel_id">10077</string>
     <string name="accepting_challenge">Accepting Challenge</string>
     <string name="login_google">Login With Google Account</string>
     <string name="pgn_viewer">Chess MVP PGN Viewer</string>
+    <string name="join_tournament">Join Tournament</string>
+    <string name="view_tournament">View Tournament</string>
+    <string name="deposit">Deposit</string>
+    <string name="play_chess">Play Chess</string>
+    <string name="transactions">Transactions</string>
+    <string name="kes_1000">KES 1000</string>
+    <string name="balance">Balance:\u0020</string>
+    <string name="_1000">1000</string>
+    <string name="_254712695820">254712695820</string>
+    <string name="name">Name</string>
+    <string name="phone">Phone</string>
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
+    <string name="remove_photo">Remove photo</string>
+    <string name="remove">Remove</string>
+    <string name="cancel">Cancel</string>
 </resources>

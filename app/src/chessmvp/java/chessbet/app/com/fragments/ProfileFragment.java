@@ -2,7 +2,6 @@ package chessbet.app.com.fragments;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -11,11 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +33,6 @@ import chessbet.app.com.R;
 import chessbet.domain.User;
 import chessbet.services.UserListener;
 import chessbet.utils.EventBroadcast;
-import chessbet.utils.Util;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener, EventBroadcast.UserLoaded, UserListener {
@@ -68,27 +64,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
         loading.setMessage("Wait a moment...");
         AccountAPI.get().setUserListener(this);
 
+        edit_emailIv.setOnClickListener(v -> showEmailDialog());
 
-        edit_emailIv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showEmailDialog();
-            }
-        });
+        edit_username_Iv.setOnClickListener(v -> showUsernameDialog());
 
-        edit_username_Iv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showUsernameDialog();
-            }
-        });
-
-        edit_password_Iv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showOldPasswordDialog();
-            }
-        });
+        edit_password_Iv.setOnClickListener(v -> showOldPasswordDialog());
 
         return view;
     }
@@ -109,7 +89,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
                     usernameTv.setText(user.getUser_name());
                 }
             }catch (Exception ex){
-                Log.d(getClass().getSimpleName(), ex.getMessage());
+                Log.d(getClass().getSimpleName(), Objects.requireNonNull(ex.getMessage()));
             }
 
         }
@@ -156,23 +136,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
         linearLayout.setPadding(10,10,10,10);
         builder.setView(linearLayout);
 
-        builder.setPositiveButton("Verify", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-               if (!TextUtils.isEmpty(passwordEt.getText().toString())){
-                    reloginUser(passwordEt.getText().toString());
-               }else {
-                   return;
-               }
-            }
+        builder.setPositiveButton("Verify", (dialog, which) -> {
+           if (!TextUtils.isEmpty(passwordEt.getText().toString())){
+                reloginUser(passwordEt.getText().toString());
+           }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
 
         //create and show dialog
         builder.create().show();
@@ -210,24 +180,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
         linearLayout.setPadding(10,10,10,10);
         builder.setView(linearLayout);
 
-        builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (!TextUtils.isEmpty(passwordEt.getText().toString())){
-                    updatePassword(passwordEt.getText().toString());
-                }
-                else {
-                    return;
-                }
+        builder.setPositiveButton("Update", (dialog, which) -> {
+            if (!TextUtils.isEmpty(passwordEt.getText().toString())){
+                updatePassword(passwordEt.getText().toString());
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
 
         //create and show dialog
         builder.create().show();
@@ -262,23 +221,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
         linearLayout.setPadding(10,10,10,10);
         builder.setView(linearLayout);
 
-        builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (!TextUtils.isEmpty(usernameEt.getText().toString())){
-                    updateUsername(usernameEt.getText().toString());
-                }
-                else {
-                    return;
-                }
+        builder.setPositiveButton("Update", (dialog, which) -> {
+            if (!TextUtils.isEmpty(usernameEt.getText().toString())){
+                updateUsername(usernameEt.getText().toString());
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-               dialog.dismiss();
-            }
-        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
 
         //create and show dialog
         builder.create().show();
@@ -317,23 +265,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, E
         linearLayout.setPadding(10,10,10,10);
         builder.setView(linearLayout);
 
-        builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (!TextUtils.isEmpty(emailEt.getText().toString())){
-                    updateEmail(emailEt.getText().toString());
-                }else {
-                    return;
-                }
+        builder.setPositiveButton("Update", (dialog, which) -> {
+            if (!TextUtils.isEmpty(emailEt.getText().toString())){
+                updateEmail(emailEt.getText().toString());
             }
         });
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
 
         //create and show dialog
         builder.create().show();

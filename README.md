@@ -21,7 +21,7 @@
 - Puzzle creation v1 by users.
 - Challenge creation on line play if no challenge was found in the process
 - Challenge acceptance based on metrics such as the game duration min and max elo expected, time etc.
-- Profile image change functionality.
+- Profile image change functionality.Note: Some input files use or override a deprecated API.
 - User profile  management (change password, change user name and change email)
 - Play AI engine at depth 2 plays at an average rating of 850 (Not bad). Depth 2 is less costly for the algorithm since it evaluates millions of positions while using the standard board evaluator for output
 - Game storage locally on .pgn files.
@@ -110,3 +110,9 @@
 - Increase level grid view height
 - Create name profile fragment
 - Fix timer lapsed logic
+
+
+### 1.2.6 release
+- Pawn Promotion
+- Fix Logged Crashes
+- Tournament v1.0

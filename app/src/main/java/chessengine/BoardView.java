@@ -28,6 +28,7 @@ import com.chess.engine.player.chess_engine_ai.MoveStategy;
 import com.chess.pgn.FenUtilities;
 import com.chess.pgn.PGNMainUtils;
 import com.chess.pgn.PGNUtilities;
+import com.crashlytics.android.Crashlytics;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
@@ -80,6 +81,9 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     private MoveAnimator moveAnimator = new MoveAnimator();
     private EngineResponse engineResponse; // Used To get The Full Response String for Analysis Purpose
     protected volatile Move nextPuzzleMove = null;
+    protected PromotionPieceListener promotionPieceListener;
+    protected Piece.PieceType promotionPiece;
+    private Board.PromotionListener promotionListener;
 
     // Stockfish 10
     private Engine stockfish;
@@ -88,14 +92,21 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     private volatile Move currentStockFishMove = null;
     private volatile Move ponderedStockFishMove = null;
 
+    // Handles stockfish engine set up
+    private void startStockfish() {
+        try {
+            // Start Stock Fish
+            stockfish = new Engine();
+            stockfish.start();
+        } catch (Exception ex) {
+            Crashlytics.logException(ex);
+        }
+    }
+
     private void initialize(Context context){
-        stockfish = new Engine();
 
         ecoBook = new ECOBook();
-
-        // Start Stock Fish
-        stockfish.start();
-
+        this.startStockfish();
         setSaveEnabled(true);
         moveLog= new MoveLog();
         chessBoard= Board.createStandardBoard();
@@ -107,8 +118,13 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         }
     }
 
-    public void setEngineResponse(EngineResponse engineResponse) {
-        this.engineResponse = engineResponse;
+    public void setPromotionListener(Board.PromotionListener promotionListener) {
+        Board.setPromotionListener(promotionListener);
+        this.promotionListener = promotionListener;
+    }
+
+    public void setPromotionPieceListener(PromotionPieceListener promotionPieceListener) {
+        this.promotionPieceListener = promotionPieceListener;
     }
 
     public BoardView(Context context, AttributeSet attributeSet){
@@ -422,11 +438,11 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
      * @param from fromCellCoordinate
      * @param to toCellCoordinate
      */
-    public void setMoveData(int from, int to) {
+    public void setMoveData(int from, int to, String promotedPiece) {
         if(matchAPI != null){
             // Help regulate time between play
 //          long timeLeft = (getOwnerAlliance() == Alliance.WHITE) ? gameTimer.getOwnerTimeLeft() : gameTimer.getOpponentTimeLeft();
-            matchAPI.sendMoveData(matchableAccount,from,to, getPortableGameNotation(), gameTimer.getOwnerTimeLeft());
+            matchAPI.sendMoveData(matchableAccount,from,to, getPortableGameNotation(), gameTimer.getOwnerTimeLeft(), promotedPiece);
         }
     }
 
@@ -553,6 +569,10 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     public void translateRemoteMoveOnBoard(RemoteMove remoteMove){
         if(remoteMove != null){
             final Move move = Move.MoveFactory.createMove(chessBoard,remoteMove.getFrom(),remoteMove.getTo());
+            if(move.isPawnPromotionMove()) {
+                // Take Back Control to method useful when making a promotion move
+                Board.setPromotionListener(() -> getPromotedPieceFromString(remoteMove.getPromotedPiece()));
+            }
             final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
             if(transition.getMoveStatus().isDone()){
                 movedPiece = null;
@@ -573,28 +593,224 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
                 moveCursor = moveLog.size();
                 GameUtil.playSound();
                 if(gameTimer != null){
-                    // Reset time from when the move was made from the other device;
-//                    if(localAlliance == Alliance.WHITE) {
                     gameTimer.setOpponentTimeLeft((int) remoteMove.getGameTimeLeft());
                     gameTimer.setOpponentTimer();
-//                    } else {
-//                        gameTimer.setOwnerTimeLeft((int) remoteMove.getGameTimeLeft());
-//                        gameTimer.setOwnerTimer();
-//                    }
                     gameTimer.stopTimer((chessBoard.currentPlayer().getAlliance() == Alliance.WHITE) ? chessbet.domain.Player.WHITE :  chessbet.domain.Player.BLACK);
                 }
                 chessBoard = transition.getTransitionBoard();
                 onMoveDoneListener.getMoves(moveLog);
+                // Return Back Control to Activity Implementing The Promotion Interface
+                Board.setPromotionListener(this.promotionListener);
                 displayGameStates();
                 invalidate();
             }
         }
     }
 
+    public void makeMove(Move move) {
+        final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
+
+        if(transition.getMoveStatus().isDone()){
+            // Undo a move
+            if(moveCursor < moveLog.size()){
+                moveLog.removeMoves(moveCursor -1);
+                onMoveDoneListener.getMoves(moveLog);
+            }
+
+            destinationTile = chessBoard.getTile(move.getDestinationCoordinate());
+
+            // Promotion Piece
+            String strPromotedPiece = ".";
+            if (move.isPawnPromotionMove()) {
+                strPromotedPiece = getPieceTypeFromPawnPromotion(move.toString()).toString();
+            }
+            setMoveData(movedPiece.getPiecePosition(), move.getDestinationCoordinate(),
+                    (chessBoard.currentPlayer().getAlliance().equals(Alliance.BLACK) ? strPromotedPiece.toLowerCase() : strPromotedPiece.toUpperCase())); // Online Play
+
+            if(mode != BoardView.Modes.PUZZLE_MODE && !isEngineLoading) {
+                // Stop the current player timer
+                if(gameTimer != null){
+                    gameTimer.stopTimer((chessBoard.currentPlayer().getAlliance() == Alliance.WHITE) ? chessbet.domain.Player.WHITE :  chessbet.domain.Player.BLACK);
+                }
+
+                // Ask stockfish
+                chessBoard = transition.getTransitionBoard();
+
+                GameUtil.playSound();  // Play sound once move is made
+
+                setMoveCheckOrMate(move);
+
+                if(isHinting){
+                    askStockFishBestMove();
+                }
+
+                moveLog.addMove(move);
+                updateEcoView();
+
+                addMoveToPuzzle(move);
+                moveCursor = moveLog.size();
+                onMoveDoneListener.getMoves(moveLog);
+                onMoveDoneListener.onGameResume();
+            }
+            else if (mode == BoardView.Modes.PUZZLE_MODE){
+                // Check Move Validity
+                puzzleModeAction(move);
+            }
+
+            if(mode == BoardView.Modes.PLAY_COMPUTER && chessBoard.currentPlayer().getAlliance() == Alliance.BLACK){
+                isEngineLoading = true;
+                Query query = new Query.Builder()
+                        .setQueryType(QueryType.BEST_MOVE)
+                        .setDepth(EngineUtil.getSkillLevel())
+                        .setFen(getFen())
+                        .setThreads(1)
+                        .setTime(3000).build();
+                EngineUtil.submit(query, response -> {
+                    if(!response.isEmpty()){
+                        Move sMove = getMoveByPositions(response.get(0));
+                        MoveTransition moveTransition = chessBoard.currentPlayer().makeMove(sMove);
+                        if(moveTransition.getMoveStatus().isDone()){
+                            clearTiles();
+                            destinationTile =  chessBoard.getTile(sMove.getDestinationCoordinate());
+                            sourceTile = chessBoard.getTile(sMove.getCurrentCoordinate());
+                            chessBoard = moveTransition.getTransitionBoard();
+                            GameUtil.playSound();
+                            updateGameStatus();
+                            moveLog.addMove(sMove);
+                            moveCursor = moveLog.size();
+                            onMoveDoneListener.getMoves(moveLog);
+                            isEngineLoading = false;
+                            postInvalidate();
+                        }
+                    }
+                });
+            }
+            updateGameStatus();
+        } else {
+            clearTiles();
+        }
+        invalidate();
+    }
+
+    private void updateGameStatus(){
+        if(chessBoard.currentPlayer().isInCheckMate()){
+            onMoveDoneListener.isCheckMate(chessBoard.currentPlayer());
+        }
+        else if(chessBoard.currentPlayer().isInCheck()){
+            onMoveDoneListener.isCheck(chessBoard.currentPlayer());
+        }
+        else if(chessBoard.currentPlayer().isInStaleMate()){
+            onMoveDoneListener.isStaleMate(chessBoard.currentPlayer());
+        }
+        else if(chessBoard.isDraw()){
+            onMoveDoneListener.isDraw();
+        } else {
+            onMoveDoneListener.onGameResume();
+        }
+    }
+
+    private void puzzleModeAction(Move move){
+        if(puzzleMoveCounter < getPuzzle().getMoves().size() && isCorrectPuzzleMove(move)){
+            puzzleMove.onCorrectMoveMade(true);
+            puzzleMoveCounter++;
+            invalidate();
+
+            if(puzzleMoveCounter < getPuzzle().getMoves().size()){
+                new Thread(() -> {
+                    try {
+                        // Wait for a second before the next move is made
+                        Thread.sleep(1000);
+                        clearTiles();
+                        Move nextMove = Move.MoveFactory.createMove(chessBoard , getPuzzle().getMoves().get(puzzleMoveCounter).getFromCoordinate(),
+                                getPuzzle().getMoves().get(puzzleMoveCounter).getToCoordinate());
+                        destinationTile = chessBoard.getTile(nextMove.getDestinationCoordinate());
+                        nextPuzzleMove = nextMove;
+                        chessBoard = chessBoard.currentPlayer().makeMove(nextMove).getTransitionBoard();
+                        destinationTile = chessBoard.getTile(nextMove.getDestinationCoordinate());
+                        sourceTile = chessBoard.getTile(nextMove.getCurrentCoordinate());
+                        puzzleMoveCounter++;
+                        // Ensure board positions are redone
+                        postInvalidate();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            }
+            else{
+                setMode(BoardView.Modes.LOCAL_PLAY);
+                puzzleMove.onPuzzleFinished();
+            }
+
+            GameUtil.playSound();
+            moveCursor = moveLog.size();
+            onMoveDoneListener.getMoves(moveLog);
+            onMoveDoneListener.onGameResume();
+        } else {
+            puzzleMove.onCorrectMoveMade(false);
+        }
+    }
+
+
+    private boolean isCorrectPuzzleMove(Move move){
+        Board board;
+        if(getPuzzle().getMoves().get(puzzleMoveCounter).getToCoordinate() == move.getDestinationCoordinate()){
+            if(getPuzzle().getMoves().get(puzzleMoveCounter).getFromCoordinate() == move.getCurrentCoordinate()){
+                board = chessBoard.currentPlayer().makeMove(move).getTransitionBoard();
+                if (board.currentPlayer().isInCheckMate()) {
+                    move.setCheckMateMove(true);
+                } else if (board.currentPlayer().isInCheck()) {
+                    move.setCheckMove(true);
+                }
+                boolean correct = move.toString().equals(getPuzzle().getMoves().get(puzzleMoveCounter).getMoveCoordinates());
+                if(correct){
+                    chessBoard = board;
+                    if(nextPuzzleMove != null){
+                        moveLog.addMove(nextPuzzleMove);
+                        nextPuzzleMove = null;
+                    }
+                    moveLog.addMove(move);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get promoted piece from Move String
+     * @param moveString from Move.toString()
+     * @return PieceType
+     */
+    public Piece.PieceType getPieceTypeFromPawnPromotion(String moveString) {
+        String promotionPiece = moveString.split("=")[1];
+        Log.d("Promotion Piece", promotionPiece);
+        return this.getPromotedPieceFromString(promotionPiece);
+    }
+
+    public Piece.PieceType getPromotedPieceFromString(String string) {
+        final String upperCaseString = string.toUpperCase();
+        switch (upperCaseString) {
+            case "N":
+                return Piece.PieceType.KNIGHT;
+            case "Q":
+                return Piece.PieceType.QUEEN;
+            case "R":
+                return Piece.PieceType.ROOK;
+            case "B":
+                return Piece.PieceType.BISHOP;
+        }
+        return Piece.PieceType.QUEEN;
+    }
+
     public void reconstructBoardFromPGN(String pgn){
+        Board.setPromotionListener(() -> promotionPiece);
         List<String> strMoves = PGNMainUtils.processMoveText(pgn);
         for (String string : strMoves) {
             Move move = PGNMainUtils.createMove(chessBoard, string);
+            if(move.isPawnPromotionMove()) {
+                this.promotionPiece = getPieceTypeFromPawnPromotion(string);
+            }
             MoveTransition moveTransition = chessBoard.currentPlayer().makeMove(move);
             if (moveTransition.getMoveStatus().isDone()) {
                 chessBoard = moveTransition.getTransitionBoard();
@@ -606,6 +822,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
                 moveLog.addMove(move);
             }
         }
+        Board.setPromotionListener(this.promotionListener);
         onMoveDoneListener.getMoves(moveLog);
         moveCursor = moveLog.size();
         displayGameStates();
@@ -662,6 +879,11 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
 
     public void redoMove(){
         if (this.moveCursor < moveLog.size()){
+            Board.setPromotionListener(() -> promotionPiece);
+            final Move moveLogMove = moveLog.getMove(moveCursor);
+            if(moveLogMove.isPawnPromotionMove()) {
+                this.promotionPiece = getPieceTypeFromPawnPromotion(moveLog.getMove(moveCursor).toString());
+            }
             Move move = Move.MoveFactory.createMove(chessBoard, moveLog.getMove(moveCursor).getCurrentCoordinate(), moveLog.getMove(moveCursor).getDestinationCoordinate());
             MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
             if(transition.getMoveStatus().isDone()){
@@ -670,6 +892,7 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
                 this.moveCursor += 1;
                 invalidate();
             }
+            Board.setPromotionListener(this.promotionListener);
         }
     }
 

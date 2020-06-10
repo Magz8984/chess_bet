@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_games">
+
+    <fragment
+        android:id="@+id/nav_games"
+        android:name="chessbet.app.com.fragments.GamesFragment"
+        android:label="@string/menu_games"
+        tools:layout="@layout/fragment_games">
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/nav_profile"
+        android:name="chessbet.app.com.fragments.ProfileFragment"
+        android:label="@string/menu_profile"
+        tools:layout="@layout/fragment_profile">
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/nav_playOnline"
+        android:name="chessbet.app.com.fragments.MatchFragment"
+        android:label="@string/menu_playOnline"
+        tools:layout="@layout/fragment_match" />
+
+    <fragment
+        android:id="@+id/nav_terms_conditions"
+        android:name="chessbet.app.com.fragments.TermsConditionsFragment"
+        android:label="@string/menu_terms_conditions"
+        tools:layout="@layout/fragment_terms_conditions" />
+</navigation>

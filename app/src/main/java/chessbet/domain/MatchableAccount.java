@@ -189,6 +189,7 @@ public class MatchableAccount implements Parcelable {
                 .setMatchId(this.getMatchId())
                 .setMatchStatus(matchStatus)
                 .setPgnText(pgn)
+                .setAmount(new Amount(0, "KES")) // Will Be Different For Online Betting games
                 .setGain(gain)
                 .setLoss(loss)
                 .build();

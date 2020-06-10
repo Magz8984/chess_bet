@@ -15,20 +15,14 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.chess.engine.Alliance;
 import com.chess.engine.Move;
 import com.chess.engine.board.Board;
 import com.chess.engine.board.Tile;
-import com.chess.engine.player.MoveTransition;
 
 import java.util.Collection;
 import java.util.Collections;
 
 import chessbet.app.com.R;
-import chessbet.domain.Player;
-import stockfish.EngineUtil;
-import stockfish.Query;
-import stockfish.QueryType;
 
 public class Cell extends View {
     private final int tileId;
@@ -121,174 +115,14 @@ public class Cell extends View {
             else{
                 // Second Click
                 final Move move = Move.MoveFactory.createMove(boardView.chessBoard,boardView.movedPiece.getPiecePosition(), tileId);
-
-                final MoveTransition transition = boardView.chessBoard.currentPlayer().makeMove(move);
-
-                if(transition.getMoveStatus().isDone()){
-                    // Undo a move
-                    if(boardView.moveCursor < boardView.moveLog.size()){
-                        boardView.moveLog.removeMoves(boardView.moveCursor -1);
-                        boardView.onMoveDoneListener.getMoves(boardView.moveLog);
-                    }
-                    boardView.destinationTile = boardView.chessBoard.getTile(tileId);
-                    boardView.setMoveData(boardView.movedPiece.getPiecePosition(), tileId); // Online Play
-
-
-                    if(boardView.mode != BoardView.Modes.PUZZLE_MODE && !boardView.isEngineLoading) {
-                        // Stop the current player timer
-                        if(boardView.gameTimer != null){
-                            boardView.gameTimer.stopTimer((boardView.chessBoard.currentPlayer().getAlliance() == Alliance.WHITE) ? Player.WHITE :  Player.BLACK);
-                        }
-
-                        // Ask stockfish
-                        boardView.chessBoard = transition.getTransitionBoard();
-
-                        // Only ask for a move form stockfish if engine is on
-//                        if(boardView.isHinting){
-//                            boardView.getInternalStockFishHandler().askStockFishMove(FenUtilities.createFEN(boardView.chessBoard), 3000, 10);
-//                        }
-
-                        GameUtil.playSound();  // Play sound once move is made
-
-                        boardView.setMoveCheckOrMate(move);
-
-                        if(boardView.isHinting){
-                            boardView.askStockFishBestMove();
-                        }
-
-                        boardView.moveLog.addMove(move);
-                        boardView.updateEcoView();
-
-                        boardView.addMoveToPuzzle(move);
-                        boardView.moveCursor = boardView.moveLog.size();
-                        boardView.onMoveDoneListener.getMoves(boardView.moveLog);
-                        boardView.onMoveDoneListener.onGameResume();
-                    }
-                    else if (boardView.mode == BoardView.Modes.PUZZLE_MODE){
-                        // Check Move Validity
-                        puzzleModeAction(move);
-                    }
-
-                    if(boardView.mode == BoardView.Modes.PLAY_COMPUTER && boardView.chessBoard.currentPlayer().getAlliance() == Alliance.BLACK){
-                        boardView.isEngineLoading = true;
-                            Query query = new Query.Builder()
-                                    .setQueryType(QueryType.BEST_MOVE)
-                                    .setDepth(EngineUtil.getSkillLevel())
-                                    .setFen(boardView.getFen())
-                                    .setThreads(1)
-                                    .setTime(3000).build();
-                            EngineUtil.submit(query, response -> {
-                            if(!response.isEmpty()){
-                                Move sMove = boardView.getMoveByPositions(response.get(0));
-                                MoveTransition moveTransition = boardView.chessBoard.currentPlayer().makeMove(sMove);
-                                if(moveTransition.getMoveStatus().isDone()){
-                                    boardView.clearTiles();
-                                    boardView.destinationTile =  boardView.chessBoard.getTile(sMove.getDestinationCoordinate());
-                                    boardView.sourceTile = boardView.chessBoard.getTile(sMove.getCurrentCoordinate());
-                                    boardView.chessBoard = moveTransition.getTransitionBoard();
-                                    GameUtil.playSound();
-                                    updateGameStatus();
-                                    boardView.setMoveCheckOrMate(sMove);
-                                    boardView.moveLog.addMove(sMove);
-                                    boardView.moveCursor = boardView.moveLog.size();
-                                    boardView.onMoveDoneListener.getMoves(boardView.moveLog);
-                                    boardView.isEngineLoading = false;
-                                    boardView.postInvalidate();
-                                }
-                            }
-                        });
-                    }
-                    updateGameStatus();
+                if(move.isPawnPromotionMove()) {
+                    boardView.promotionPieceListener.onPromotionMoveMade(move);
                 } else {
-                    boardView.clearTiles();
-                }
-                boardView.invalidate();
-            }
-    }
-
-    private void updateGameStatus(){
-        if(boardView.chessBoard.currentPlayer().isInCheckMate()){
-            boardView.onMoveDoneListener.isCheckMate(boardView.chessBoard.currentPlayer());
-        }
-        else if(boardView.chessBoard.currentPlayer().isInCheck()){
-            boardView.onMoveDoneListener.isCheck(boardView.chessBoard.currentPlayer());
-        }
-        else if(boardView.chessBoard.currentPlayer().isInStaleMate()){
-            boardView.onMoveDoneListener.isStaleMate(boardView.chessBoard.currentPlayer());
-        }
-        else if(boardView.chessBoard.isDraw()){
-            boardView.onMoveDoneListener.isDraw();
-        } else {
-            boardView.onMoveDoneListener.onGameResume();
-        }
-    }
-
-    private void puzzleModeAction(Move move){
-        if(boardView.puzzleMoveCounter < boardView.getPuzzle().getMoves().size() && isCorrectPuzzleMove(move)){
-            boardView.puzzleMove.onCorrectMoveMade(true);
-            boardView.puzzleMoveCounter++;
-            invalidate();
-
-            if(boardView.puzzleMoveCounter < boardView.getPuzzle().getMoves().size()){
-                    new Thread(() -> {
-                        try {
-                            // Wait for a second before the next move is made
-                            Thread.sleep(1000);
-                            boardView.clearTiles();
-                            Move nextMove = Move.MoveFactory.createMove(boardView.chessBoard ,boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getFromCoordinate(),
-                                    boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getToCoordinate());
-                            boardView.destinationTile = boardView.chessBoard.getTile(tileId);
-                            boardView.nextPuzzleMove = nextMove;
-                            boardView.chessBoard = boardView.chessBoard.currentPlayer().makeMove(nextMove).getTransitionBoard();
-                            boardView.destinationTile = boardView.chessBoard.getTile(nextMove.getDestinationCoordinate());
-                            boardView.sourceTile = boardView.chessBoard.getTile(nextMove.getCurrentCoordinate());
-                            boardView.puzzleMoveCounter++;
-                            // Ensure board positions are redone
-                            boardView.postInvalidate();
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }).start();
-            }
-            else{
-                boardView.setMode(BoardView.Modes.LOCAL_PLAY);
-                boardView.puzzleMove.onPuzzleFinished();
-            }
-
-            GameUtil.playSound();
-            boardView.moveCursor = boardView.moveLog.size();
-            boardView.onMoveDoneListener.getMoves(boardView.moveLog);
-            boardView.onMoveDoneListener.onGameResume();
-        } else {
-            boardView.puzzleMove.onCorrectMoveMade(false);
-        }
-    }
-
-    private boolean isCorrectPuzzleMove(Move move){
-        Board board;
-        if(boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getToCoordinate() == move.getDestinationCoordinate()){
-            if(boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getFromCoordinate() == move.getCurrentCoordinate()){
-                board = boardView.chessBoard.currentPlayer().makeMove(move).getTransitionBoard();
-                if (board.currentPlayer().isInCheckMate()) {
-                    move.setCheckMateMove(true);
-                } else if (board.currentPlayer().isInCheck()) {
-                    move.setCheckMove(true);
-                }
-                boolean correct = move.toString().equals(boardView.getPuzzle().getMoves().get(boardView.puzzleMoveCounter).getMoveCoordinates());
-                if(correct){
-                    boardView.chessBoard = board;
-                    if(boardView.nextPuzzleMove != null){
-                        boardView.moveLog.addMove(boardView.nextPuzzleMove);
-                        boardView.nextPuzzleMove = null;
-                    }
-                    boardView.moveLog.addMove(move);
-                    return true;
+                    boardView.makeMove(move);
                 }
             }
-        }
-        return false;
     }
+
 
     public boolean isTouched(final int x, final int y) {
         return tileRect.contains(x, y);

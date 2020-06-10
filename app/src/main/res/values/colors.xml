@@ -3,7 +3,8 @@
 
     <color name="colorPrimary">#262626</color>
     <color name="colorPrimaryDark">#262626</color>
-    <color name="colorAccent">#00bfff</color>
+<!--    <color name="colorAccent">#00bfff</color>-->
+    <color name="colorAccent">#D4AF37</color>
     <color name="colorPrimaryYellow">#ffcc33</color>
 
     <color name="bg_login">#26ae90</color>
@@ -32,5 +33,9 @@
     <color name="colorCoinBackground">#01242b</color>
     <color name="bootstrap_red">#dc3545</color>
     <color name="bootstrap_green">#28a745</color>
+    <color name="mintcream">#f5fffa</color>
+    <color name="colorGold">#D4AF37</color>
+    <color name="colorGreen">#008000</color>
+    <color name="colorBlack">#000000</color>
     <!--Add b-->
 </resources>
