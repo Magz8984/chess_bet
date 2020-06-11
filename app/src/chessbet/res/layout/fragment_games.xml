@@ -38,7 +38,7 @@
             android:layout_marginRight="30dp">
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/btnDeposit"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -49,7 +49,7 @@
                 android:layout_marginEnd="5dp" />
 
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/btnPlay"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
