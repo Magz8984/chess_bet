@@ -19,7 +19,7 @@
     <string name="kes_50">KES 50</string>
     <string name="advert">Advert</string>
     <string name="resend_code">Resend Code</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="enter_amount_text">Enter amount and use your M-Pesa pin to authorize the transaction. Maximum deposit amount 5,000 KSH.</string>
+    <string name="mpesa_charges">M-Pesa charges apply.</string>
+    <string name="stake">Stake</string>
 </resources>
