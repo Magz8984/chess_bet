@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="chessbet.app.com.DepositActivity"
+    tools:context="chessbet.app.com.WithdrawActivity"
     android:background="@color/colorPrimary">
-
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -16,18 +14,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:layout_gravity="center"
-            android:textColor="@color/white"
-            android:textSize="22sp"/>
+         <TextView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="@string/app_name"
+             android:layout_gravity="center"
+             android:textColor="@color/white"
+             android:textSize="22sp"/>
         <LinearLayout
-            android:layout_marginTop="30dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="30dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <TextView
                 android:id="@+id/textView2"
@@ -42,7 +42,7 @@
                 android:gravity="center"/>
 
             <EditText
-                android:id="@+id/editText"
+                android:id="@+id/editTextAmount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="30dp"
@@ -57,35 +57,24 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/textView7"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:text="@string/enter_amount_text"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="20dp"
+            android:text="@string/withdrawal_amount"
             android:textSize="16sp"
             android:textColor="@color/white"
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
             android:layout_marginRight="15dp"
             android:layout_marginLeft="15dp"/>
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/mpesa_charges"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:gravity="center"/>
-
         <Button
-            android:id="@+id/button4"
+            android:id="@+id/button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/stake"
+            android:text="@string/payout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             android:background="@drawable/stakebtn_bg"
             android:textColor="@color/white"
             android:layout_marginTop="30dp"

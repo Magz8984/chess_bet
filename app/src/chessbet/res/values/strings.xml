@@ -22,4 +22,11 @@
     <string name="enter_amount_text">Enter amount and use your M-Pesa pin to authorize the transaction. Maximum deposit amount 5,000 KSH.</string>
     <string name="mpesa_charges">M-Pesa charges apply.</string>
     <string name="stake">Stake</string>
+    <string name="withdraw">withdraw</string>
+    <string name="withdrawal_fee">Withdrawal fee: </string>
+    <string name="withdrawal_fee_15">Withdrawal fee: 15</string>
+    <string name="withdrawal_fee_22">Withdrawal fee: 22</string>
+    <string name="withdrawal_amount">Minimum withdrawal amount via M-Pesa is 10.00 KSH and maximum withdrawal amount via M-Pesa is 70,000.00 KSH.</string>
+    <string name="withdrawal_fee_for_amounts">For withdrawal between 10 and 1000 KSH fee is 15 KSH, and for withdrawal between 1001 and 70,000 KSH fee is 22 KSH.</string>
+    <string name="payout">Payout</string>
 </resources>
