@@ -29,4 +29,5 @@
     <string name="withdrawal_amount">Minimum withdrawal amount via M-Pesa is 10.00 KSH and maximum withdrawal amount via M-Pesa is 70,000.00 KSH.</string>
     <string name="withdrawal_fee_for_amounts">For withdrawal between 10 and 1000 KSH fee is 15 KSH, and for withdrawal between 1001 and 70,000 KSH fee is 22 KSH.</string>
     <string name="payout">Payout</string>
+    <string name="chess_bet">Chess Bet</string>
 </resources>

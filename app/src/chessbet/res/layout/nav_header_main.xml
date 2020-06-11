@@ -28,7 +28,6 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:fontFamily="@font/chakrapetchbold"
-        android:textAlignment="center"
         android:textSize="20sp"
         android:textColor="@color/colorGold"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
