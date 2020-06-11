@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
@@ -36,9 +37,11 @@ public class WithdrawActivity extends AppCompatActivity implements TextWatcher {
 
     @Override
     public void afterTextChanged(Editable s) {
-        double amount = Double.parseDouble(s.toString());
-        if (amount < 10) txtFee.setText(getText(R.string.withdrawal_fee));
-        else if (amount < 1000)txtFee.setText(getText(R.string.withdrawal_fee_15));
-        else txtFee.setText(getText(R.string.withdrawal_fee_22));
+        if(!TextUtils.isEmpty(s.toString())) {
+            double amount = Double.parseDouble(s.toString());
+            if (amount < 10) txtFee.setText(getText(R.string.withdrawal_fee));
+            else if (amount < 1000) txtFee.setText(getText(R.string.withdrawal_fee_15));
+            else txtFee.setText(getText(R.string.withdrawal_fee_22));
+        }
     }
 }
