@@ -74,7 +74,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
     @BindView(R.id.cancel_layout) LinearLayout cancel_layout;
     @BindView(R.id.bottom_sheet_layout) LinearLayout bottom_sheet_layout;
 
-    BottomSheetBehavior bottomSheetBehavior;
+    private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
 
     private static final int IMAGE_PICK_GALLERY_CODE = 300;
     private static final int IMAGE_PICK_CAMERA_CODE = 400;
