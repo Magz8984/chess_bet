@@ -34,6 +34,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.crashlytics.android.Crashlytics;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -71,7 +72,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
     @BindView(R.id.gallery_layout) LinearLayout gallery_layout;
     @BindView(R.id.camera_layout) LinearLayout camera_layout;
     @BindView(R.id.cancel_layout) LinearLayout cancel_layout;
-    @BindView(R.id.bottom_layout) LinearLayout bottom_layout;
+    @BindView(R.id.bottom_sheet_layout) LinearLayout bottom_sheet_layout;
+
+    BottomSheetBehavior bottomSheetBehavior;
 
     private static final int IMAGE_PICK_GALLERY_CODE = 300;
     private static final int IMAGE_PICK_CAMERA_CODE = 400;
@@ -101,7 +104,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
         gallery_layout.setOnClickListener(this);
         camera_layout.setOnClickListener(this);
         cancel_layout.setOnClickListener(this);
-        bottom_layout.setOnClickListener(this);
+
+        bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_layout);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         AccountAPI.get().setAccountListener(this);
         AccountAPI.get().getAccount();
@@ -119,10 +124,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
     @Override
     public void onClick(View v) {
         if (v.equals(iv_camera)){
-            bottom_layout.setVisibility(View.VISIBLE);
+            if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED){
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
         }
         if (v.equals(cancel_layout)){
-            bottom_layout.setVisibility(View.GONE);
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         }
         if (v.equals(editIv)){
             showUsernameDialog();
