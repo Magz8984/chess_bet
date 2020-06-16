@@ -4,17 +4,25 @@
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_games"
-            android:title="@string/menu_games" />
-        <item
-            android:id="@+id/nav_profile"
-            android:title="@string/menu_profile" />
-        <item
-            android:id="@+id/nav_playOnline"
-            android:title="@string/menu_playOnline" />
-        <item
-            android:id="@+id/nav_terms_conditions"
-            android:title="@string/menu_terms_conditions" />
+        <item android:title="@string/app_name">
+            <menu>
+                <item
+                    android:id="@+id/nav_games"
+                    android:title="@string/menu_games" />
+                <item
+                    android:id="@+id/nav_profile"
+                    android:title="@string/menu_profile" />
+                <item
+                    android:id="@+id/nav_playOnline"
+                    android:title="@string/menu_playOnline" />
+            </menu>
+        </item>
+        <item android:title="@string/service_agreement">
+            <menu>
+                <item
+                    android:id="@+id/nav_terms_conditions"
+                    android:title="@string/menu_terms_conditions" />
+            </menu>
+        </item>
     </group>
 </menu>
