@@ -7,6 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RatingBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -15,6 +19,15 @@ import androidx.fragment.app.FragmentActivity;
 import com.crashlytics.android.Crashlytics;
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdLoader;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.VideoController;
+import com.google.android.gms.ads.VideoOptions;
+import com.google.android.gms.ads.formats.MediaView;
+import com.google.android.gms.ads.formats.NativeAdOptions;
+import com.google.android.gms.ads.formats.UnifiedNativeAd;
+import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -25,6 +38,7 @@ import chessbet.api.AccountAPI;
 import chessbet.api.ChallengeAPI;
 import chessbet.api.MatchAPI;
 import chessbet.app.com.BoardActivity;
+import chessbet.app.com.BuildConfig;
 import chessbet.app.com.R;
 import chessbet.domain.Challenge;
 import chessbet.domain.ChallengeDTO;
@@ -45,6 +59,8 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
     private Button btnKes250;
     private Button btnKes100;
     private Button btnKes50;
+    private UnifiedNativeAdView nativeAdView;
+    private UnifiedNativeAd nativeAd = null;
 
     private List<View> rangeButtons;
     private List<View> amountButtons;
@@ -64,6 +80,7 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
         btnKes250 = root.findViewById(R.id.btnKes250);
         btnKes100 = root.findViewById(R.id.btnKes100);
         btnKes50 = root.findViewById(R.id.btnKes50);
+        nativeAdView = root.findViewById(R.id.addView);
 
         btnFindMatch.setOnClickListener(this);
         btnRatingLess.setOnClickListener(this);
@@ -207,5 +224,85 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
         Snackbar.make(progressCircle, "Challenge Found", Snackbar.LENGTH_LONG)
                 .setAction("Action",null)
                 .show();
+    }
+
+    private void populateAdView(UnifiedNativeAd nativeAd){
+        MediaView mediaView = nativeAdView.findViewById(R.id.ad_media);
+        nativeAdView.setMediaView(mediaView);
+
+        nativeAdView.setCallToActionView(nativeAdView.findViewById(R.id.ad_call_to_action));
+
+        if (nativeAd.getCallToAction() == null) {
+            nativeAdView.getCallToActionView().setVisibility(View.INVISIBLE);
+        } else {
+            nativeAdView.getCallToActionView().setVisibility(View.VISIBLE);
+            ((Button) nativeAdView.getCallToActionView()).setText(nativeAd.getCallToAction());
+        }
+
+        nativeAdView.setNativeAd(nativeAd);
+
+        VideoController videoController = nativeAd.getVideoController();
+
+        if(videoController.hasVideoContent()){
+            videoController.setVideoLifecycleCallbacks(new VideoController.VideoLifecycleCallbacks() {
+                @Override
+                public void onVideoEnd() {
+                    super.onVideoEnd();
+                    Toast.makeText(getContext(), "Thanks For Watching This Ad", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
+
+    private void viewAd(){
+        AdLoader.Builder builder = new AdLoader.Builder(requireContext(), BuildConfig.ADD_MOB_UNIT_ID);
+        builder.forUnifiedNativeAd(unifiedNativeAd -> {
+            if(nativeAd != null){
+                nativeAd.destroy();
+            }
+            nativeAd = unifiedNativeAd;
+            populateAdView(nativeAd);
+        });
+
+        VideoOptions videoOptions = new VideoOptions.Builder()
+                .setStartMuted(true)
+                .build();
+
+        NativeAdOptions adOptions = new NativeAdOptions.Builder()
+                .setVideoOptions(videoOptions)
+                .build();
+        builder.withNativeAdOptions(adOptions);
+
+        AdLoader adLoader = builder.withAdListener(new AdListener() {
+            @Override
+            public void onAdFailedToLoad(int i) {
+                switch(i){
+                    case AdRequest.ERROR_CODE_INTERNAL_ERROR:
+                        Toast.makeText(getContext(), "Failed to load due to an internal error", Toast.LENGTH_LONG).show();
+                        break;
+                    case AdRequest.ERROR_CODE_INVALID_REQUEST:
+                        Toast.makeText(getContext(), "Failed to load due to an invalid request", Toast.LENGTH_LONG).show();
+                        break;
+                    case AdRequest.ERROR_CODE_NETWORK_ERROR:
+                        Toast.makeText(getContext(), "Failed to load due to a network error", Toast.LENGTH_LONG).show();
+                        break;
+                    case AdRequest.ERROR_CODE_NO_FILL:
+                        Toast.makeText(getContext(), "Failed to load due to code no fill", Toast.LENGTH_LONG).show();
+                        break;
+                    default:
+                        Toast.makeText(getContext(), "Failed to load with error code " + i, Toast.LENGTH_LONG).show();
+                        break;
+                }
+            }
+        }).build();
+
+        adLoader.loadAd(new AdRequest.Builder().build());
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        this.viewAd();
     }
 }

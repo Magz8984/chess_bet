@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.Locale;
@@ -20,13 +21,16 @@ import chessbet.api.AccountAPI;
 import chessbet.domain.Account;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
+import chessbet.utils.EventBroadcast;
+import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity extends AppCompatActivity implements AccountListener {
+public class MainActivity extends AppCompatActivity implements AccountListener, EventBroadcast.AccountUserUpdate{
 
     private AppBarConfiguration mAppBarConfiguration;
     private TextView txtPhoneNumber;
     private TextView txtRating;
     private TextView txtBalance;
+    private CircleImageView imgProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +44,11 @@ public class MainActivity extends AppCompatActivity implements AccountListener {
         this.txtPhoneNumber = navigationView.getHeaderView(0).findViewById(R.id.txtPhoneNumber);
         this.txtRating = navigationView.getHeaderView(0).findViewById(R.id.txtRating);
         this.txtBalance = navigationView.getHeaderView(0).findViewById(R.id.txtBalance);
+        this.imgProfile = navigationView.getHeaderView(0).findViewById(R.id.imgProfile);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AccountAPI.get().setAccountListener(this);
+        EventBroadcast.get().addAccountUserUpdated(this);
         AccountAPI.get().getAccount();
         AccountAPI.get().getUser();
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -76,8 +82,18 @@ public class MainActivity extends AppCompatActivity implements AccountListener {
     @Override
     public void onUserReceived(User user) {
         txtPhoneNumber.setText(AccountAPI.get().getFirebaseUser().getPhoneNumber());
+        if(user.getProfile_photo_url() != null) {
+            Glide.with(this).load(user.getProfile_photo_url()).into(imgProfile);
+        }
     }
 
     @Override
     public void onAccountUpdated(boolean status) { }
+
+    @Override
+    public void onAccountUserUpdate(User user) {
+        if(user.getProfile_photo_url() != null) {
+                Glide.with(this).load(user.getProfile_photo_url()).into(imgProfile);
+        }
+    }
 }

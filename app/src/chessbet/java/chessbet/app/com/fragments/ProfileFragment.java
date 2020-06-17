@@ -34,6 +34,8 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -270,20 +272,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
             this.loader.dismiss();
             if(status){
                 Toasty.success(getContext(), "User Updated", Toasty.LENGTH_LONG).show();
-                reloadActivity();
             } else {
                 Toasty.error(getContext(), "User Not Updated", Toasty.LENGTH_LONG).show();
             }
         }
-    }
-
-    private void reloadActivity() {
-        assert getFragmentManager() != null;
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        if (Build.VERSION.SDK_INT >= 26){
-            ft.setReorderingAllowed(false);
-        }
-        ft.detach(this).attach(this).commit();
     }
 
     @Override
@@ -301,6 +293,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
         if (resultCode == RESULT_OK){
             if (requestCode == IMAGE_PICK_GALLERY_CODE){
                 // image is picked from gallery, get uri of image
+                loader.show();
                 Uri selectedImageUri = data.getData();
                 Glide.with(this).asBitmap().load(selectedImageUri)
                         .listener(new RequestListener<Bitmap>() {
@@ -342,7 +335,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
     private UploadTask uploadProfilePhotoTask(Bitmap bitmap){
         byte[] bytes = {};
         try {
-            loader.dismiss();
             profile_photo.setDrawingCacheEnabled(true);
             profile_photo.buildDrawingCache();
 //            Bitmap bitmap = ((BitmapDrawable) profileImage.getDrawable()).getBitmap();
@@ -356,24 +348,38 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
         return storageReference.putBytes(bytes);
     }
 
+    /**
+     * Just a callback for when account photo has been updated on the database
+     * @return {OnCompleteListener<Void>}
+     */
+    public OnCompleteListener<Void> onAccountPhotoUrlUpdated() {
+        return task -> {
+            try {
+                Toast.makeText(getActivity(),R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
+                loader.dismiss();
+                AccountAPI.get().getUser();
+            } catch (Exception ex) {
+                Crashlytics.logException(ex);
+            }
+        };
+    }
+
     private void uploadProfilePhoto(Bitmap bitmap){
         storageReference = firebaseStorage.getReference(FirebaseAuth.getInstance().getUid() + "/" + "profile_photo");
         uploadProfilePhotoTask(bitmap).addOnFailureListener(e -> {
             loader.dismiss();
             Crashlytics.logException(e);
-        });
-
-        uploadProfilePhotoTask(bitmap).addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnCompleteListener(task -> {
-            final Uri uri = task.getResult();
-            Map<String,Object> map = new HashMap<>();
-            assert uri != null;
-            Glide.with(requireContext()).load(uri).into(profile_photo);
-            map.put("profile_photo_url", uri.toString());
-            AccountAPI.get().getUserPath().update(map).addOnCompleteListener(task1 -> {
-                Toast.makeText(getActivity(),R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
-                loader.dismiss();
-                AccountAPI.get().getUser();
-            }).addOnCanceledListener(() ->  loader.dismiss());
+        }).addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnCompleteListener(task -> {
+            try {
+                final Uri uri = task.getResult();
+                Map<String,Object> map = new HashMap<>();
+                assert uri != null;
+                Glide.with(requireContext()).asBitmap().load(uri).into(profile_photo);
+                map.put("profile_photo_url", uri.toString());
+                AccountAPI.get().getUserPath().update(map).addOnCompleteListener(onAccountPhotoUrlUpdated()).addOnCanceledListener(() ->  loader.dismiss());
+            } catch (Exception ex) {
+                Crashlytics.logException(ex);
+            }
         }));
     }
 

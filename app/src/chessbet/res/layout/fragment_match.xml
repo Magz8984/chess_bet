@@ -116,21 +116,41 @@
                 android:layout_marginStart="5dp" />
         </LinearLayout>
 
-        <LinearLayout
+        <com.google.android.gms.ads.formats.UnifiedNativeAdView
+            android:id="@+id/addView"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:orientation="vertical"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/advert"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:layout_marginTop="100dp"/>
-        </LinearLayout>
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <com.google.android.gms.ads.formats.MediaView
+                        android:id="@+id/ad_media"
+                        android:layout_margin="0dp"
+                        android:layout_gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:padding="5dp"
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:textSize="14sp"
+                        android:fontFamily="@font/chakrapetchbold"
+                        android:id="@+id/ad_call_to_action"
+                        android:padding="2sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.gms.ads.formats.UnifiedNativeAdView>
 
         <com.github.jorgecastilloprz.FABProgressCircle
             android:id="@+id/fabProgressCircle"

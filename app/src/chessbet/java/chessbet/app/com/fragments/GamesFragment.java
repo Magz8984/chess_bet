@@ -12,11 +12,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import java.util.Objects;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 import chessbet.app.com.DepositActivity;
+
 import chessbet.app.com.R;
 import chessbet.app.com.TransactionsActivity;
 
@@ -24,6 +24,7 @@ public class GamesFragment extends Fragment implements View.OnClickListener{
     @BindView(R.id.btnDeposit) Button btnDeposit;
     @BindView(R.id.btnPlay) Button btnPlay;
     @BindView(R.id.btnTransactions) Button btnTransactions;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_games, container, false);

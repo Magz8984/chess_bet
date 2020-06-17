@@ -25,7 +25,6 @@ import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 
 import java.util.Locale;
-import java.util.Objects;
 
 import chessbet.app.com.BuildConfig;
 import chessbet.app.com.R;
@@ -199,7 +198,7 @@ public class EvaluateGame extends DialogFragment implements EventBroadcast.Accou
     }
 
     private void viewAd(){
-        AdLoader.Builder builder = new AdLoader.Builder(Objects.requireNonNull(getContext()), BuildConfig.ADD_MOB_UNIT_ID);
+        AdLoader.Builder builder = new AdLoader.Builder(requireContext(), BuildConfig.ADD_MOB_UNIT_ID);
         builder.forUnifiedNativeAd(unifiedNativeAd -> {
             if(nativeAd != null){
                 nativeAd.destroy();

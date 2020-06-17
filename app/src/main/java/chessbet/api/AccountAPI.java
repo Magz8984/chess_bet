@@ -87,6 +87,7 @@ public class AccountAPI {
             db.collection(AccountAPI.USER_COLLECTION).document(user.getUid()).get().addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     currentUser = Objects.requireNonNull(task.getResult()).toObject(User.class);
+                    EventBroadcast.get().broadCastAccountUserUpdate();
                     updateCurrentUserProfile();
                 }
                 else {
