@@ -3,6 +3,7 @@ package chessbet.app.com.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
 
 import java.util.Arrays;
 import java.util.List;
@@ -61,7 +63,7 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
 
     private List<View> rangeButtons;
     private List<View> amountButtons;
-    private int amount = 50;
+    private int amount = 1;
     private int range = 1000;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -114,6 +116,7 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
                     .setAmount(amount)
                     .setDuration(5)
                     .build();
+            Log.d("ChallengeDTO", new Gson().toJson(challengeDTO));
             ChallengeAPI.get().getSetChallengeImplementation(challengeDTO);
             btnFindMatch.setEnabled(false);
         } else if(view.equals(btnUSD10)) {
@@ -194,7 +197,7 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
     public void challengeFound(String response) {
         FragmentActivity activity = getActivity();
         if(activity != null) {
-            activity.runOnUiThread(() -> Toasty.success(requireContext(), response).show());
+            activity.runOnUiThread(() -> Toasty.info(requireContext(), response).show());
         }
     }
 
