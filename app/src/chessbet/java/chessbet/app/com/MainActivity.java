@@ -18,13 +18,16 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.Locale;
 
 import chessbet.api.AccountAPI;
+import chessbet.api.PaymentsAPI;
 import chessbet.domain.Account;
+import chessbet.domain.PaymentAccount;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
 import chessbet.utils.EventBroadcast;
 import de.hdodenhof.circleimageview.CircleImageView;
+import es.dmoral.toasty.Toasty;
 
-public class MainActivity extends AppCompatActivity implements AccountListener, EventBroadcast.AccountUserUpdate{
+public class MainActivity extends AppCompatActivity implements AccountListener, EventBroadcast.AccountUserUpdate, PaymentsAPI.PaymentAccountReceived {
 
     private AppBarConfiguration mAppBarConfiguration;
     private TextView txtPhoneNumber;
@@ -45,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements AccountListener, 
         this.txtRating = navigationView.getHeaderView(0).findViewById(R.id.txtRating);
         this.txtBalance = navigationView.getHeaderView(0).findViewById(R.id.txtBalance);
         this.imgProfile = navigationView.getHeaderView(0).findViewById(R.id.imgProfile);
+        PaymentsAPI.get().addPaymentAccountListener(this);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AccountAPI.get().setAccountListener(this);
@@ -82,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements AccountListener, 
     @Override
     public void onUserReceived(User user) {
         txtPhoneNumber.setText(AccountAPI.get().getFirebaseUser().getPhoneNumber());
+        PaymentsAPI.get().getPaymentAccountImplementation(user.getUid());
         if(user.getProfile_photo_url() != null) {
             Glide.with(this).load(user.getProfile_photo_url()).into(imgProfile);
         }
@@ -95,5 +100,15 @@ public class MainActivity extends AppCompatActivity implements AccountListener, 
         if(user.getProfile_photo_url() != null) {
                 Glide.with(this).load(user.getProfile_photo_url()).into(imgProfile);
         }
+    }
+
+    @Override
+    public void onPaymentAccountReceived(PaymentAccount account) {
+        runOnUiThread(() -> this.txtBalance.setText(String.format(Locale.ENGLISH,"%s %.2f", "USD", account.getBalance())));
+    }
+
+    @Override
+    public void onPaymentAccountFailure() {
+        runOnUiThread(() -> Toasty.error(this, "Error occurred while fetching payments account",Toasty.LENGTH_LONG).show());
     }
 }
