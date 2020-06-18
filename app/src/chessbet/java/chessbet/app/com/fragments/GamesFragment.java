@@ -44,6 +44,15 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        PaymentAccount account = PaymentsAPI.get().getCurrentAccount();
+        if(account != null) {
+            this.txtBalance.setText(String.format(Locale.ENGLISH,"%s %.2f", "USD", account.getBalance()));
+        }
+    }
+
+    @Override
     public void onClick(View v) {
        if (v.equals(btnDeposit)){
            gotoDepositActivity();
@@ -79,7 +88,5 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
     }
 
     @Override
-    public void onPaymentAccountFailure() {
-
-    }
+    public void onPaymentAccountFailure() { }
 }
