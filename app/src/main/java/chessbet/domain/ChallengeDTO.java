@@ -73,6 +73,7 @@ public class ChallengeDTO {
 
         public Builder setAmount (int amount) {
             this.challengeDTO.amount.setAmount(amount);
+            this.challengeDTO.amount.setCurrency("USD");
             return this;
         }
 

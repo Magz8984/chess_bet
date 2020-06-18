@@ -3,13 +3,11 @@ package chessbet.app.com.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RatingBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,6 +28,7 @@ import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +36,7 @@ import java.util.List;
 import chessbet.api.AccountAPI;
 import chessbet.api.ChallengeAPI;
 import chessbet.api.MatchAPI;
+import chessbet.api.PaymentsAPI;
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.BuildConfig;
 import chessbet.app.com.R;
@@ -48,23 +48,22 @@ import chessbet.services.MatchService;
 import chessbet.utils.DatabaseUtil;
 import es.dmoral.toasty.Toasty;
 
-public class MatchFragment extends Fragment implements View.OnClickListener, MatchListener, FABProgressListener, ChallengeAPI.ChallengeHandler{
+public class MatchFragment extends Fragment implements View.OnClickListener, MatchListener, FABProgressListener, ChallengeAPI.ChallengeHandler {
     private FloatingActionButton btnFindMatch;
     private FABProgressCircle progressCircle;
     private Button btnRatingLess;
     private Button btnRatingMore;
     private Button btnRandom;
-    private Button btnKes1000;
-    private Button btnKes500;
-    private Button btnKes250;
-    private Button btnKes100;
-    private Button btnKes50;
+    private Button btnUSD10;
+    private Button btnUSD5;
+    private Button btnUSD2;
+    private Button btnUSD1;
     private UnifiedNativeAdView nativeAdView;
     private UnifiedNativeAd nativeAd = null;
 
     private List<View> rangeButtons;
     private List<View> amountButtons;
-    private int amount = 50;
+    private int amount = 1;
     private int range = 1000;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -75,24 +74,22 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
         btnRatingLess = root.findViewById(R.id.btnRatingLess);
         btnRatingMore = root.findViewById(R.id.btnRatingMore);
         btnRandom = root.findViewById(R.id.btnRandomChallenge);
-        btnKes1000 = root.findViewById(R.id.btnKes1000);
-        btnKes500 = root.findViewById(R.id.btnKes500);
-        btnKes250 = root.findViewById(R.id.btnKes250);
-        btnKes100 = root.findViewById(R.id.btnKes100);
-        btnKes50 = root.findViewById(R.id.btnKes50);
+        btnUSD10 = root.findViewById(R.id.btnUSD10);
+        btnUSD5 = root.findViewById(R.id.btnUSD5);
+        btnUSD2 = root.findViewById(R.id.btnUSD2);
+        btnUSD1 = root.findViewById(R.id.btnUSD1);
         nativeAdView = root.findViewById(R.id.addView);
 
         btnFindMatch.setOnClickListener(this);
         btnRatingLess.setOnClickListener(this);
         btnRatingMore.setOnClickListener(this);
         btnRandom.setOnClickListener(this);
-        btnKes1000.setOnClickListener(this);
-        btnKes500.setOnClickListener(this);
-        btnKes250.setOnClickListener(this);
-        btnKes100.setOnClickListener(this);
-        btnKes50.setOnClickListener(this);
+        btnUSD10.setOnClickListener(this);
+        btnUSD5.setOnClickListener(this);
+        btnUSD2.setOnClickListener(this);
+        btnUSD1.setOnClickListener(this);
         MatchAPI.get().setMatchListener(this);
-        amountButtons = Arrays.asList(btnKes50, btnKes100, btnKes250, btnKes1000, btnKes500);
+        amountButtons = Arrays.asList(btnUSD10, btnUSD5, btnUSD2, btnUSD1);
         rangeButtons = Arrays.asList(btnRandom, btnRatingMore, btnRatingLess);
         ChallengeAPI.get().setChallengeHandler(this);
         return root;
@@ -119,23 +116,21 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
                     .setAmount(amount)
                     .setDuration(5)
                     .build();
+            Log.d("ChallengeDTO", new Gson().toJson(challengeDTO));
             ChallengeAPI.get().getSetChallengeImplementation(challengeDTO);
             btnFindMatch.setEnabled(false);
-        } else if(view.equals(btnKes1000)) {
-            this.amount = 1000;
-            this.selectButton(btnKes1000, amountButtons);
-        } else if (view.equals(btnKes500)){
-            this.amount = 500;
-            this.selectButton(btnKes500, amountButtons);
-        } else if(view.equals(btnKes50)) {
-            this.amount = 50;
-            this.selectButton(btnKes50, amountButtons);
-        } else if (view.equals(btnKes250)){
-            this.amount = 250;
-            this.selectButton(btnKes250, amountButtons);
-        } else if (view.equals(btnKes100)) {
-            this.amount = 100;
-            this.selectButton(btnKes100, amountButtons);
+        } else if(view.equals(btnUSD10)) {
+            this.amount = 10;
+            this.selectButton(btnUSD10, amountButtons);
+        } else if (view.equals(btnUSD5)){
+            this.amount = 5;
+            this.selectButton(btnUSD5, amountButtons);
+        } else if(view.equals(btnUSD2)) {
+            this.amount = 2;
+            this.selectButton(btnUSD2, amountButtons);
+        } else if (view.equals(btnUSD1)){
+            this.amount = 1;
+            this.selectButton(btnUSD1, amountButtons);
         } else if(view.equals(btnRandom)) {
             this.range = 1000;
             this.selectButton(btnRandom, rangeButtons);
@@ -202,9 +197,7 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
     public void challengeFound(String response) {
         FragmentActivity activity = getActivity();
         if(activity != null) {
-            activity.runOnUiThread(() -> {
-                Toasty.success(requireContext(), response).show();
-            });
+            activity.runOnUiThread(() -> Toasty.info(requireContext(), response).show());
         }
     }
 

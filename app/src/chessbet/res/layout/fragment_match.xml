@@ -64,26 +64,26 @@
             android:layout_marginTop="30dp">
 
             <Button
-                android:id="@+id/btnKes1000"
+                android:id="@+id/btnUSD10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/kes_1000"
+                android:text="@string/USD10"
                 android:background="@drawable/rounded_button"/>
 
             <Button
-                android:id="@+id/btnKes500"
+                android:id="@+id/btnUSD5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/kes_500"
+                android:text="@string/USD5"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:background="@drawable/rounded_button"/>
 
             <Button
-                android:id="@+id/btnKes250"
+                android:id="@+id/btnUSD2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/kes_250"
+                android:text="@string/USD2"
                 android:background="@drawable/rounded_button"/>
         </LinearLayout>
 
@@ -96,19 +96,10 @@
             android:layout_marginTop="20dp">
 
             <Button
-                android:id="@+id/btnKes100"
+                android:id="@+id/btnUSD1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/kes_100"
-                android:layout_marginRight="5dp"
-                android:background="@drawable/rounded_button"
-                android:layout_marginEnd="5dp" />
-
-            <Button
-                android:id="@+id/btnKes50"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/kes_50"
+                android:text="@string/USD1"
                 android:layout_marginLeft="5dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
