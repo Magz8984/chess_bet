@@ -34,6 +34,7 @@ import java.util.List;
 import chessbet.api.AccountAPI;
 import chessbet.api.ChallengeAPI;
 import chessbet.api.MatchAPI;
+import chessbet.api.PaymentsAPI;
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.BuildConfig;
 import chessbet.app.com.R;
@@ -45,7 +46,7 @@ import chessbet.services.MatchService;
 import chessbet.utils.DatabaseUtil;
 import es.dmoral.toasty.Toasty;
 
-public class MatchFragment extends Fragment implements View.OnClickListener, MatchListener, FABProgressListener, ChallengeAPI.ChallengeHandler{
+public class MatchFragment extends Fragment implements View.OnClickListener, MatchListener, FABProgressListener, ChallengeAPI.ChallengeHandler {
     private FloatingActionButton btnFindMatch;
     private FABProgressCircle progressCircle;
     private Button btnRatingLess;

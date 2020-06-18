@@ -48,13 +48,11 @@ public class MainActivity extends AppCompatActivity implements AccountListener, 
         this.txtRating = navigationView.getHeaderView(0).findViewById(R.id.txtRating);
         this.txtBalance = navigationView.getHeaderView(0).findViewById(R.id.txtBalance);
         this.imgProfile = navigationView.getHeaderView(0).findViewById(R.id.imgProfile);
-        PaymentsAPI.get().addPaymentAccountListener(this);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
+        PaymentsAPI.get().addPaymentAccountListener(this);
         AccountAPI.get().setAccountListener(this);
         EventBroadcast.get().addAccountUserUpdated(this);
-        AccountAPI.get().getAccount();
-        AccountAPI.get().getUser();
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_games,R.id.nav_profile, R.id.nav_playOnline, R.id.nav_terms_conditions)
                 .setDrawerLayout(drawer)
@@ -62,6 +60,13 @@ public class MainActivity extends AppCompatActivity implements AccountListener, 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AccountAPI.get().getAccount();
+        AccountAPI.get().getUser();
     }
 
     @Override
