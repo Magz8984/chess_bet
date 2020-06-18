@@ -14,19 +14,11 @@
 
         <ImageView
             android:layout_gravity="center"
-            android:src="@drawable/chesslogo"
-            android:layout_width="130dp"
-            android:layout_height="130dp"
+            android:src="@drawable/chessbetlogo"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
             android:contentDescription="@string/logo" />
 
-        <TextView
-            android:fontFamily="@font/chakrapetchbold"
-            android:textColor="@color/white"
-            android:layout_gravity="center"
-            android:textSize="30dp"
-            android:text="@string/app_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
     </LinearLayout>
 
     <TextView
