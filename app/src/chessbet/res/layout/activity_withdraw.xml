@@ -53,6 +53,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 android:textColor="@color/white"
                 android:gravity="center"
+                android:backgroundTint="@color/colorPrimaryYellow"
                 android:textSize="18sp"/>
         </LinearLayout>
 

@@ -6,6 +6,7 @@ public class DatabaseMatch {
     private String matchId;
     private MatchStatus matchStatus;
     private MatchResult matchResult;
+    private String matchType;
 
     public void setMatchResult(MatchResult matchResult) {
         this.matchResult = matchResult;
@@ -25,6 +26,14 @@ public class DatabaseMatch {
 
     public void setOpponentUserName(String opponentUserName) {
         this.opponentUserName = opponentUserName;
+    }
+
+    public void setMatchType(String matchType) {
+        this.matchType = matchType;
+    }
+
+    public String getMatchType() {
+        return matchType;
     }
 
     public String getMatchId() {

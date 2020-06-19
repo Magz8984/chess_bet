@@ -6,14 +6,17 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import chessbet.app.com.BuildConfig;
+
 public class SQLDatabaseHelper extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "chess_bet";
+    private static final String DATABASE_NAME = BuildConfig.DATABASE_NAME;
     private static final String MATCHES_TABLE = "matches";
     static final String COLUMN_MATCH_ID = "id";
     static final String COLUMN_OPPONENT_PIC = "opic";
     static final String COLUMN_OPPONENT_USERNAME = "ouname";
     private static final String COLUMN_MATCH_TIMESTAMP = "timestamp";
-    private static final int DATABASE_VERSION = 4;
+    static String COLUMN_MATCH_TYPE = "matchtype";
+    private static final int DATABASE_VERSION = 5;
 
     public SQLDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -36,12 +39,13 @@ public class SQLDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    void addMatch(String matchId, String opponentPic, String opponentUserName){
+    void addMatch(String matchId, String opponentPic, String opponentUserName, String matchType){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_MATCH_ID, matchId);
         contentValues.put(COLUMN_OPPONENT_PIC, opponentPic);
         contentValues.put(COLUMN_OPPONENT_USERNAME, opponentUserName);
+        contentValues.put(COLUMN_MATCH_TYPE, matchType);
         contentValues.put(COLUMN_MATCH_TIMESTAMP, System.currentTimeMillis());
         sqLiteDatabase.insert(MATCHES_TABLE, null, contentValues);
     }

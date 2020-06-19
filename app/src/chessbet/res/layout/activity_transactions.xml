@@ -38,5 +38,9 @@
                 android:layout_marginRight="5dp"
                 android:layout_marginEnd="5dp" />
         </LinearLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recAllTransactions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

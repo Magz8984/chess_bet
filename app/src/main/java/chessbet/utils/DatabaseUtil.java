@@ -69,6 +69,7 @@ public class DatabaseUtil {
                 databaseMatch.setMatchId(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_ID)));
                 databaseMatch.setOpponentPic(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_PIC)));
                 databaseMatch.setOpponentUserName(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_USERNAME)));
+                databaseMatch.setMatchType(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_TYPE)));
                 databaseMatches.add(databaseMatch);
             }while (cursor.moveToNext());
         }

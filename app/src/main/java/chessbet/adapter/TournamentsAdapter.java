@@ -83,7 +83,7 @@ public class TournamentsAdapter extends RecyclerView.Adapter<TournamentsAdapter.
     }
 
     // view holder class
-    class MyHolder extends RecyclerView.ViewHolder{
+    static class MyHolder extends RecyclerView.ViewHolder{
         //views from row_tournament.xml
         TextView nameTv, start_dateTv, roundsTv, durationTv, typeTv, amountTv, playersTv;
         Button joinBtn, viewBtn;
