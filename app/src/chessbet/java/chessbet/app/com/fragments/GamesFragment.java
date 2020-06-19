@@ -12,25 +12,30 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import chessbet.adapter.MatchesAdapter;
 import chessbet.api.PaymentsAPI;
 
 import chessbet.app.com.DepositActivity;
 
 import chessbet.app.com.R;
 import chessbet.app.com.TransactionsActivity;
+import chessbet.domain.MatchType;
 import chessbet.domain.PaymentAccount;
+import es.dmoral.toasty.Toasty;
 
 public class GamesFragment extends Fragment implements View.OnClickListener, PaymentsAPI.PaymentAccountReceived {
     @BindView(R.id.btnDeposit) Button btnDeposit;
     @BindView(R.id.btnPlay) Button btnPlay;
     @BindView(R.id.btnTransactions) Button btnTransactions;
     @BindView(R.id.txtBalance) TextView txtBalance;
+    @BindView(R.id.recBetGames) RecyclerView recBetGames;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,6 +51,7 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
     @Override
     public void onStart() {
         super.onStart();
+        recBetGames.setAdapter(new MatchesAdapter(requireContext(), MatchType.BET_ONLINE));
         PaymentAccount account = PaymentsAPI.get().getCurrentAccount();
         if(account != null) {
             this.txtBalance.setText(String.format(Locale.ENGLISH,"%s %.2f", "USD", account.getBalance()));
@@ -71,7 +77,7 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
 
     private void gotoMatchFragment() {
         MatchFragment matchFragment = new MatchFragment();
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
         FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.nav_host_fragment, matchFragment);
         ft.addToBackStack(null);
@@ -84,9 +90,19 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
 
     @Override
     public void onPaymentAccountReceived(PaymentAccount account) {
-        requireActivity().runOnUiThread(() -> this.txtBalance.setText(String.format(Locale.ENGLISH,"%s %.2f", "USD", account.getBalance())));
+        try {
+            requireActivity().runOnUiThread(() -> this.txtBalance.setText(String.format(Locale.ENGLISH,"%s %.2f", "USD", account.getBalance())));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
-    public void onPaymentAccountFailure() { }
+    public void onPaymentAccountFailure() {
+        try {
+            requireActivity().runOnUiThread(() -> Toasty.error(requireContext(), "Error occurred while fetching payments account" ,Toasty.LENGTH_LONG).show());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 }

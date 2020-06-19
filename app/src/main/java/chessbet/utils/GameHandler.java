@@ -85,7 +85,7 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
             AccountAPI.get().getAUser(matchableAccount.getOpponentId(), user -> {
                 if(user != null){
                    SQLDatabaseHelper sqlDatabaseHelper = new SQLDatabaseHelper(contexts[0]);
-                   sqlDatabaseHelper.addMatch(matchableAccount.getMatchId(), user.getProfile_photo_url(), user.getUser_name());
+                   sqlDatabaseHelper.addMatch(matchableAccount.getMatchId(), user.getProfile_photo_url(), user.getUser_name(), matchableAccount.getMatch_type());
                    DatabaseMatch databaseMatch = DatabaseUtil.getMatchFromLocalDB(sqlDatabaseHelper.getMatch(matchableAccount.getMatchId()));
                    MatchAPI.get().setCurrentDatabaseMatch(databaseMatch);
                     assert databaseMatch != null;

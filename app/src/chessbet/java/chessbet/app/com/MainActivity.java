@@ -1,5 +1,6 @@
 package chessbet.app.com;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -8,12 +9,16 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.crashlytics.android.Crashlytics;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Locale;
 
@@ -73,7 +78,20 @@ public class MainActivity extends AppCompatActivity implements AccountListener, 
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        if (item.getItemId() == R.id.action_logout) {
+            auth.signOut();
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+            // Close current activity
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -86,14 +104,19 @@ public class MainActivity extends AppCompatActivity implements AccountListener, 
     @Override
     public void onAccountReceived(Account account) {
         txtRating.setText(String.format(Locale.ENGLISH,"%d", account.getElo_rating()));
+        EventBroadcast.get().broadCastAccountUpdate();
     }
 
     @Override
     public void onUserReceived(User user) {
-        txtPhoneNumber.setText(AccountAPI.get().getFirebaseUser().getPhoneNumber());
-        PaymentsAPI.get().getPaymentAccountImplementation(user.getUid());
-        if(user.getProfile_photo_url() != null) {
-            Glide.with(this).load(user.getProfile_photo_url()).into(imgProfile);
+        try {
+            txtPhoneNumber.setText(AccountAPI.get().getFirebaseUser().getPhoneNumber());
+            PaymentsAPI.get().getPaymentAccountImplementation(user.getUid());
+            if(user.getProfile_photo_url() != null) {
+                Glide.with(this).load(user.getProfile_photo_url()).into(imgProfile);
+            }
+        } catch (Exception ex) {
+            Crashlytics.logException(ex);
         }
     }
 
@@ -102,8 +125,12 @@ public class MainActivity extends AppCompatActivity implements AccountListener, 
 
     @Override
     public void onAccountUserUpdate(User user) {
-        if(user.getProfile_photo_url() != null) {
+        try {
+            if(user.getProfile_photo_url() != null) {
                 Glide.with(this).load(user.getProfile_photo_url()).into(imgProfile);
+            }
+        } catch (Exception ex) {
+            Crashlytics.logException(ex);
         }
     }
 

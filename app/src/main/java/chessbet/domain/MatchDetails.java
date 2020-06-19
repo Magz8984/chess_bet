@@ -3,6 +3,7 @@ package chessbet.domain;
 import java.util.ArrayList;
 
 public class MatchDetails {
+    private Amount amount;
     private MatchType match_type;
     private MatchResult match_result;
     private ArrayList<OnlinePlayer> players;
@@ -29,5 +30,13 @@ public class MatchDetails {
 
     public MatchResult getMatch_result() {
         return match_result;
+    }
+
+    public Amount getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Amount amount) {
+        this.amount = amount;
     }
 }

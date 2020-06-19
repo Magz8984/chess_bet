@@ -148,6 +148,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         try {
             PhoneAuthProvider.getInstance().verifyPhoneNumber(this.phoneNumber, 60, TimeUnit.SECONDS,
                     this,  this.verificationStateChangedCallbacks, this.token);
+            loading.setMessage("Wait a moment...");
+            loading.show();
         } catch (Exception ex) {
             Toasty.error(this, ex.getMessage(), Toasty.LENGTH_LONG).show();
         }

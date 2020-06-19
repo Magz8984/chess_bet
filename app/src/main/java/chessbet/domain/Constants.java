@@ -18,6 +18,9 @@ public class Constants {
     public static String ACCEPT_TARGETED_CHALLENGE = "/challenge/acceptTargetChallenge";
     public static String TERMS_OF_SERVICE_URL = "https://chess-mvp.com/#/home/tos";
     public static String GET_PAYMENT_ACCOUNT = "/payments/serviceAccount";
+    public static String SAVE_BY_DARAJA = "/daraja/save";
+    public static String WITHDRAW_BY_DARAJA = "/payments/withdraw";
+    public static String GET_TRANSACTIONS = "/transactions";
     public static String GAMES_CLOUD_REFERENCE = "games";
     public static String UTILITY_PROFILE = "https://firebasestorage.googleapis.com/v0/b/chessbet-app-com-v1.appspot.com/o/utilities%2Fuser.png" +
             "?alt=media&token=887183ec-e95f-443e-9a12-2ff0ab711b96";

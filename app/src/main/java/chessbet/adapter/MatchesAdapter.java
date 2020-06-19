@@ -11,11 +11,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import chessbet.api.AccountAPI;
 import chessbet.app.com.R;
 import chessbet.domain.DatabaseMatch;
+import chessbet.domain.MatchType;
 import chessbet.utils.DatabaseUtil;
 import chessbet.utils.SQLDatabaseHelper;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -28,6 +30,21 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHold
         this.context = context;
         this.databaseMatches = DatabaseUtil.getMatchesFromLocalDB(new SQLDatabaseHelper(context).getMatches());
         databaseMatches = AccountAPI.get().assignMatchResults(this.databaseMatches);
+    }
+
+    public MatchesAdapter(Context context, @NonNull MatchType matchType){
+        this.context = context;
+        this.databaseMatches = DatabaseUtil.getMatchesFromLocalDB(new SQLDatabaseHelper(context).getMatches());
+        databaseMatches = AccountAPI.get().assignMatchResults(this.databaseMatches);
+
+        // Filter type specific games
+        List<DatabaseMatch> filteredMatches = new ArrayList<>();
+        for (final DatabaseMatch match: databaseMatches) {
+            if(match.getMatchType().equals(matchType.toString())){
+                filteredMatches.add(match);
+            }
+        }
+        this.databaseMatches = filteredMatches;
     }
 
     @NonNull

@@ -55,6 +55,7 @@ android {
             versionCode 1
             versionName "1.0"
             manifestPlaceholders = [appNameValue: "Chess Bet"]
+            buildConfigField("String", "DATABASE_NAME", chessBetDatabase)
             buildConfigField("String", "ADD_MOB_UNIT_ID", chessBetAdUnitId)
             buildConfigField("String", "ADD_MOB_TEST_UNIT_ID", chessBetTestAdUnitId)
             buildConfigField("String", "AD_MOB_APP_ID", chessBetAdMobAppId)
@@ -67,6 +68,7 @@ android {
             versionCode 17
             versionName "1.2.6"
             manifestPlaceholders = [appNameValue: "Chess MVP"]
+            buildConfigField("String", "DATABASE_NAME", chessMVPDatabase)
             buildConfigField("String", "ADD_MOB_UNIT_ID", adUnitId)
             buildConfigField("String", "ADD_MOB_TEST_UNIT_ID", testAdUnitId)
             buildConfigField("String", "AD_MOB_APP_ID", adMobAppId)
