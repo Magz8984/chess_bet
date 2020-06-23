@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 
@@ -160,11 +162,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         try {
             FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener(task -> {
                 if(task.isSuccessful()) {
-                    loading.dismiss();
-                    AccountAPI.get().setUser(Objects.requireNonNull(task.getResult()).getUser());
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                    goToMainActivity(Objects.requireNonNull(task.getResult()).getUser());
                 } else {
                     loading.dismiss();
                     if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
@@ -181,5 +179,23 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         } catch (Exception ex) {
             Toasty.error(this, ex.toString(), Toasty.LENGTH_LONG).show();
         }
+    }
+
+    /**
+     * Wait for cloud functions to create account within 7 seconds
+     * @param user Firebase User
+     */
+    private void goToMainActivity(FirebaseUser user) {
+        loading.dismiss();
+        loading.setMessage("Accounts Are Begin Created");
+        loading.show();
+
+        new Handler().postDelayed((Runnable) () -> {
+            loading.dismiss();
+            AccountAPI.get().setUser(user);
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+            finish();
+        }, 7000);
     }
 }
