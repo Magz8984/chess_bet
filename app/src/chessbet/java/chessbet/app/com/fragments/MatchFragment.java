@@ -36,7 +36,6 @@ import java.util.List;
 import chessbet.api.AccountAPI;
 import chessbet.api.ChallengeAPI;
 import chessbet.api.MatchAPI;
-import chessbet.api.PaymentsAPI;
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.BuildConfig;
 import chessbet.app.com.R;

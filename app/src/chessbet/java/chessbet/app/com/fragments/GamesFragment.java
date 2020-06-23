@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Locale;
@@ -26,11 +27,13 @@ import chessbet.app.com.DepositActivity;
 
 import chessbet.app.com.R;
 import chessbet.app.com.TransactionsActivity;
+import chessbet.domain.Account;
 import chessbet.domain.MatchType;
 import chessbet.domain.PaymentAccount;
+import chessbet.utils.EventBroadcast;
 import es.dmoral.toasty.Toasty;
 
-public class GamesFragment extends Fragment implements View.OnClickListener, PaymentsAPI.PaymentAccountReceived {
+public class GamesFragment extends Fragment implements View.OnClickListener, PaymentsAPI.PaymentAccountReceived, EventBroadcast.AccountUpdated {
     @BindView(R.id.btnDeposit) Button btnDeposit;
     @BindView(R.id.btnPlay) Button btnPlay;
     @BindView(R.id.btnTransactions) Button btnTransactions;
@@ -45,13 +48,18 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
         btnPlay.setOnClickListener(this);
         btnTransactions.setOnClickListener(this);
         PaymentsAPI.get().addPaymentAccountListener(this);
+        EventBroadcast.get().addAccountUpdated(this);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setReverseLayout(true);
+        recBetGames.setLayoutManager(layoutManager);
         return root;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        recBetGames.setAdapter(new MatchesAdapter(requireContext(), MatchType.BET_ONLINE));
         PaymentAccount account = PaymentsAPI.get().getCurrentAccount();
         if(account != null) {
             this.txtBalance.setText(String.format(Locale.ENGLISH,"%s %.2f", "USD", account.getBalance()));
@@ -102,6 +110,15 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
         try {
             requireActivity().runOnUiThread(() -> Toasty.error(requireContext(), "Error occurred while fetching payments account" ,Toasty.LENGTH_LONG).show());
         } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onAccountUpdated(Account account) {
+        try {
+            recBetGames.setAdapter(new MatchesAdapter(requireContext(), MatchType.BET_ONLINE));
+        } catch (Exception ex)  {
             ex.printStackTrace();
         }
     }

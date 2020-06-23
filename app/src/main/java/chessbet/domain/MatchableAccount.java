@@ -171,8 +171,9 @@ public class MatchableAccount implements Parcelable {
         dest.writeString(opponent);
         dest.writeString(owner);
         dest.writeString(opponentId);
-        dest.writeString(currency);
         dest.writeDouble(amount);
+        dest.writeString(currency);
+
     }
 
     public String getSelf() {
@@ -219,5 +220,23 @@ public class MatchableAccount implements Parcelable {
                 .build();
         GameHandler.getInstance().setMatchResult(matchResult);
         GameHandler.getInstance().execute(flag);
+    }
+
+    @Override
+    public String toString() {
+        return "MatchableAccount{" +
+                "elo_rating=" + elo_rating +
+                ", matchId='" + matchId + '\'' +
+                ", match_type='" + match_type + '\'' +
+                ", matchable=" + matchable +
+                ", matched=" + matched +
+                ", online=" + online +
+                ", duration=" + duration +
+                ", opponent='" + opponent + '\'' +
+                ", owner='" + owner + '\'' +
+                ", opponentId='" + opponentId + '\'' +
+                ", currency='" + currency + '\'' +
+                ", amount=" + amount +
+                '}';
     }
 }

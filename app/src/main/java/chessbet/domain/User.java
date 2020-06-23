@@ -37,7 +37,7 @@ public class User {
     }
 
     public String getUser_name() {
-        return (user_name == null) ? "anyomous" : user_name;
+        return (user_name == null || user_name.length() == 0) ? "anonymous" : user_name;
     }
 
     public boolean isDisabled() {
@@ -73,7 +73,7 @@ public class User {
     }
 
     public String getProfile_photo_url() {
-        return (profile_photo_url == null) ? Constants.UTILITY_PROFILE : profile_photo_url;
+        return (profile_photo_url == null || profile_photo_url.length() == 0) ? Constants.UTILITY_PROFILE : profile_photo_url;
     }
 
     public void setLastSeen(long lastSeen) {

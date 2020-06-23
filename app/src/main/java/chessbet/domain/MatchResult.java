@@ -48,6 +48,10 @@ public class MatchResult {
         return pgnText;
     }
 
+    public Amount getAmount() {
+        return amount;
+    }
+
     public static class Builder{
         private MatchResult matchResult;
 

@@ -1,6 +1,7 @@
 package chessbet.utils;
 
 import android.database.Cursor;
+import android.util.Log;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -8,7 +9,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import chessbet.domain.DatabaseMatch;
+import chessbet.domain.Match;
 import chessbet.domain.MatchResult;
 
 public class DatabaseUtil {
@@ -61,32 +62,32 @@ public class DatabaseUtil {
         return databaseReference.child(DatabaseUtil.evaluationQueue).child(DatabaseUtil.match_task_node);
     }
 
-    public static List<DatabaseMatch> getMatchesFromLocalDB(Cursor cursor){
-        List<DatabaseMatch> databaseMatches = new ArrayList<>();
+    public static List<Match> getMatchesFromLocalDB(Cursor cursor){
+        List<Match> matches = new ArrayList<>();
         if(cursor.moveToFirst()){
             do {
-                DatabaseMatch databaseMatch = new DatabaseMatch();
-                databaseMatch.setMatchId(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_ID)));
-                databaseMatch.setOpponentPic(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_PIC)));
-                databaseMatch.setOpponentUserName(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_USERNAME)));
-                databaseMatch.setMatchType(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_TYPE)));
-                databaseMatches.add(databaseMatch);
+                Match match = new Match(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_USERNAME)),
+                        cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_PIC)),
+                        cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_ID)),
+                        cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_TYPE)));
+                matches.add(match);
             }while (cursor.moveToNext());
+        } else {
+            Log.d(DatabaseUtil.class.getSimpleName(), "Nothing Exists");
         }
-        return databaseMatches;
+        return matches;
     }
 
     public static DatabaseReference getConnected(){
         return databaseReference.child(info).child(connected);
     }
 
-    static DatabaseMatch getMatchFromLocalDB(Cursor cursor){
+    static Match getMatchFromLocalDB(Cursor cursor){
         if(cursor.moveToFirst()){
-            DatabaseMatch databaseMatch = new DatabaseMatch();
-            databaseMatch.setMatchId(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_ID)));
-            databaseMatch.setOpponentPic(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_PIC)));
-            databaseMatch.setOpponentUserName(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_USERNAME)));
-            return databaseMatch;
+            return new Match(cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_USERNAME)),
+                    cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_OPPONENT_PIC)),
+                    cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_ID)),
+                    cursor.getString(cursor.getColumnIndex(SQLDatabaseHelper.COLUMN_MATCH_TYPE)));
         }
         return null;
     }

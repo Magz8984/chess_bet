@@ -170,7 +170,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                         Toasty.error(this, "Verification Code Entered Was Invalid", Toasty.LENGTH_LONG).show();
                     } else {
-                        Toasty.error(this, "An error occurred while signing in", Toasty.LENGTH_LONG).show();
+                        if(task.getException() != null){
+                            String message = task.getException().getMessage();
+                            Crashlytics.logException(new Exception(message));
+                            Toasty.error(this, Objects.requireNonNull(task.getException().getMessage()), Toasty.LENGTH_LONG).show();
+                        }
                     }
                 }
             });

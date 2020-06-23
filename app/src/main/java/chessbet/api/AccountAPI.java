@@ -19,7 +19,7 @@ import java.util.Objects;
 
 import chessbet.domain.Account;
 import chessbet.domain.Constants;
-import chessbet.domain.DatabaseMatch;
+import chessbet.domain.Match;
 import chessbet.domain.MatchDetails;
 import chessbet.domain.MatchStatus;
 import chessbet.domain.Puzzle;
@@ -342,9 +342,9 @@ public class AccountAPI {
     }
 
     /** Results are got from firestore **/
-    public List<DatabaseMatch> assignMatchResults(List<DatabaseMatch> databaseMatches){
-        List<DatabaseMatch> newList = new ArrayList<>();
-        for (DatabaseMatch databaseMatch : databaseMatches){
+    public List<Match> assignMatchResults(List<Match> matches){
+        List<Match> newList = new ArrayList<>();
+        for (Match databaseMatch : matches){
             for (MatchDetails matchDetails: currentAccount.getMatches()) {
                 if(matchDetails.getMatch_result().getMatchId().equals(databaseMatch.getMatchId())){
                     if (matchDetails.getMatch_result().getMatchStatus().equals(MatchStatus.DRAW)){

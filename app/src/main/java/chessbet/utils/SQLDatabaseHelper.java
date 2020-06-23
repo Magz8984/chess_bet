@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import java.util.Objects;
 
 import chessbet.app.com.BuildConfig;
 
@@ -15,8 +18,8 @@ public class SQLDatabaseHelper extends SQLiteOpenHelper {
     static final String COLUMN_OPPONENT_PIC = "opic";
     static final String COLUMN_OPPONENT_USERNAME = "ouname";
     private static final String COLUMN_MATCH_TIMESTAMP = "timestamp";
-    static String COLUMN_MATCH_TYPE = "matchtype";
-    private static final int DATABASE_VERSION = 5;
+    static final String COLUMN_MATCH_TYPE = "matchtype";
+    private static final int DATABASE_VERSION = 6;
 
     public SQLDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -25,7 +28,7 @@ public class SQLDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String sql = " CREATE TABLE IF NOT EXISTS " + MATCHES_TABLE + " (" + COLUMN_MATCH_ID + " VARCHAR PRIMARY KEY, " + COLUMN_OPPONENT_PIC +
-                " VARCHAR(200), " + COLUMN_OPPONENT_USERNAME + " VARCHAR(100), " + COLUMN_MATCH_TIMESTAMP + " INT)";
+                " VARCHAR(200), " + COLUMN_OPPONENT_USERNAME + " VARCHAR(100), " + COLUMN_MATCH_TYPE + " VARCHAR(100)," + COLUMN_MATCH_TIMESTAMP + " INT)";
 
         sqLiteDatabase.execSQL(sql);
 
@@ -40,14 +43,18 @@ public class SQLDatabaseHelper extends SQLiteOpenHelper {
 
 
     void addMatch(String matchId, String opponentPic, String opponentUserName, String matchType){
-        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(COLUMN_MATCH_ID, matchId);
-        contentValues.put(COLUMN_OPPONENT_PIC, opponentPic);
-        contentValues.put(COLUMN_OPPONENT_USERNAME, opponentUserName);
-        contentValues.put(COLUMN_MATCH_TYPE, matchType);
-        contentValues.put(COLUMN_MATCH_TIMESTAMP, System.currentTimeMillis());
-        sqLiteDatabase.insert(MATCHES_TABLE, null, contentValues);
+        try {
+            SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(COLUMN_MATCH_ID, matchId);
+            contentValues.put(COLUMN_OPPONENT_PIC, opponentPic);
+            contentValues.put(COLUMN_OPPONENT_USERNAME, opponentUserName);
+            contentValues.put(COLUMN_MATCH_TYPE, matchType);
+            contentValues.put(COLUMN_MATCH_TIMESTAMP, System.currentTimeMillis());
+            sqLiteDatabase.insert(MATCHES_TABLE, null, contentValues);
+        } catch (Exception ex) {
+            Log.d(SQLDatabaseHelper.class.getSimpleName(), Objects.requireNonNull(ex.getMessage()));
+        }
     }
 
     public Cursor getMatches(){

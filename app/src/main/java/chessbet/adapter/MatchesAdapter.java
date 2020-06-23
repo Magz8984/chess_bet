@@ -16,14 +16,14 @@ import java.util.List;
 
 import chessbet.api.AccountAPI;
 import chessbet.app.com.R;
-import chessbet.domain.DatabaseMatch;
+import chessbet.domain.Match;
 import chessbet.domain.MatchType;
 import chessbet.utils.DatabaseUtil;
 import chessbet.utils.SQLDatabaseHelper;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHolder>{
-    private List<DatabaseMatch> databaseMatches;
+    private List<Match> databaseMatches;
     private Context context;
 
     public MatchesAdapter(Context context){
@@ -38,8 +38,8 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHold
         databaseMatches = AccountAPI.get().assignMatchResults(this.databaseMatches);
 
         // Filter type specific games
-        List<DatabaseMatch> filteredMatches = new ArrayList<>();
-        for (final DatabaseMatch match: databaseMatches) {
+        List<Match> filteredMatches = new ArrayList<>();
+        for (final Match match: databaseMatches) {
             if(match.getMatchType().equals(matchType.toString())){
                 filteredMatches.add(match);
             }

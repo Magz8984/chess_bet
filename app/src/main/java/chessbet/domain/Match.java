@@ -1,12 +1,19 @@
 package chessbet.domain;
 
-public class DatabaseMatch {
+public class Match {
     private String opponentUserName;
     private String opponentPic;
     private String matchId;
     private MatchStatus matchStatus;
     private MatchResult matchResult;
     private String matchType;
+
+    public Match (String opponentUserName, String opponentPic, String matchId, String matchType) {
+        this.opponentUserName = opponentUserName;
+        this.opponentPic = opponentPic;
+        this.matchId = matchId;
+        this.matchType = matchType;
+    }
 
     public void setMatchResult(MatchResult matchResult) {
         this.matchResult = matchResult;
