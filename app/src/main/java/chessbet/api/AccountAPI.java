@@ -249,6 +249,16 @@ public class AccountAPI {
         });
     }
 
+    public void updateAccount(AccountListener accountListener){
+        accountReference.set(currentAccount).addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                accountListener.onAccountUpdated(true);
+            } else {
+                accountListener.onAccountUpdated(false);
+            }
+        });
+    }
+
     /**
      * Used to get an account on user Id
      * @param owner userId

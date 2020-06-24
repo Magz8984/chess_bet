@@ -70,7 +70,7 @@ import chessbet.utils.EventBroadcast;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        AccountListener, View.OnClickListener, EventBroadcast.UserUpdate, EventBroadcast.AccountUpdated ,
+        AccountListener, View.OnClickListener, EventBroadcast.UserUpdate, EventBroadcast.AccountUpdated,
         ChallengeAPI.DeleteChallenge, PresenceAPI.UserOnline, NotificationAPI.TokenRetrieved {
     private ProgressDialog uploadProfileDialog;
     private StorageReference storageReference;
@@ -212,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.itm_terms:
                 if(AccountAPI.get().getCurrentAccount() != null) {
-                    if(!AccountAPI.get().getCurrentAccount().isTermsOfServiceAccepted()){
+                    if(!AccountAPI.get().getCurrentAccount().isTerms_and_condition_accepted()){
                         Toast.makeText(this, "Accept Terms", Toast.LENGTH_LONG).show();
                         TermsOfService termsOfService = new TermsOfService();
                         termsOfService.show(getSupportFragmentManager(), "Terms Of Service");

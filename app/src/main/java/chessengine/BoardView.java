@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import chessbet.api.MatchAPI;
+import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
@@ -603,6 +604,10 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         }
     }
 
+    private boolean isOnOnlineGame() {
+        return matchableAccount != null;
+    }
+
     public void makeMove(Move move) {
         final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
 
@@ -620,8 +625,11 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
             if (move.isPawnPromotionMove()) {
                 strPromotedPiece = getPieceTypeFromPawnPromotion(move.toString()).toString();
             }
-            setMoveData(movedPiece.getPiecePosition(), move.getDestinationCoordinate(),
-                    (chessBoard.currentPlayer().getAlliance().equals(Alliance.BLACK) ? strPromotedPiece.toLowerCase() : strPromotedPiece.toUpperCase())); // Online Play
+
+            if(isOnOnlineGame()) {
+                setMoveData(movedPiece.getPiecePosition(), move.getDestinationCoordinate(),
+                        (chessBoard.currentPlayer().getAlliance().equals(Alliance.BLACK) ? strPromotedPiece.toLowerCase() : strPromotedPiece.toUpperCase())); // Online Play
+            }
 
             if(mode != BoardView.Modes.PUZZLE_MODE && !isEngineLoading) {
                 // Stop the current player timer

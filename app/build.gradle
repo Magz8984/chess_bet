@@ -2,6 +2,14 @@ apply plugin: 'com.android.application'
 
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('/home/collins/Documents/Projects/CHESS-BET/chess-bet-docs/admin-docs/keystore.jks')
+            storePassword 'Colloski8984'
+            keyAlias 'upload'
+            keyPassword 'Colloski8984'
+        }
+    }
     compileSdkVersion 29
     defaultConfig {
         multiDexEnabled true
@@ -22,6 +30,7 @@ android {
         release {
             debuggable false
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {

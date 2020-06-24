@@ -31,8 +31,8 @@ public class Constants {
     public static String CHALLENGE_ID = "challengeId";
     public static String IS_CHALLENGER = "isChallenger";
     public static String CHALLENGER = "Challenger";
-    public static final int TIME_NO_MOVE_END_MATCH = 90;
-    public static final int TIME_NO_MOVE_CAUTION = 80;
+    public static final int TIME_NO_MOVE_END_MATCH = 240;
+    public static final int TIME_NO_MOVE_CAUTION = 230;
     public static int RESPONSE_OKAY_FLAG = 200;
     public static String MESSAGE_TYPE  = "messageType";
     public static String FROM_USER = "fromUser";

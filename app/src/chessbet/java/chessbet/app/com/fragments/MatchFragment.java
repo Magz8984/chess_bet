@@ -39,6 +39,7 @@ import chessbet.api.MatchAPI;
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.BuildConfig;
 import chessbet.app.com.R;
+import chessbet.domain.Account;
 import chessbet.domain.Challenge;
 import chessbet.domain.ChallengeDTO;
 import chessbet.domain.MatchableAccount;
@@ -97,12 +98,17 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
     @Override
     public void onClick(View view) {
         if(view.equals(btnFindMatch)) {
+            Account account = AccountAPI.get().getCurrentAccount();
             MatchAPI.get().getAccount();
-            if(AccountAPI.get().getCurrentAccount() == null) {
+            if(account == null) {
                 Toasty.info(requireContext(), "Account Is Not Yet Loaded").show();
                 return;
             } if (amount == 0 || range == 0) {
                 Toasty.info(requireContext(), "Select amount and range").show();
+                return;
+            }
+            if(!account.isTerms_and_condition_accepted()) {
+                Toasty.info(requireContext(), "Kindly Accept Terms And Conditions. On the navigation menu").show();
                 return;
             }
             progressCircle.show();
@@ -113,7 +119,7 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
                     .setEloRating(AccountAPI.get().getCurrentAccount().getElo_rating())
                     .setOwner(AccountAPI.get().getCurrentAccount().getOwner())
                     .setAmount(amount)
-                    .setDuration(5)
+                    .setDuration(3)
                     .build();
             Log.d("ChallengeDTO", new Gson().toJson(challengeDTO));
             ChallengeAPI.get().getSetChallengeImplementation(challengeDTO);

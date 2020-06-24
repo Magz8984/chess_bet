@@ -18,12 +18,12 @@
             android:id="@+id/txtBalance"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/colorGold"
+            android:textColor="@color/bootstrap_green"
             android:textSize="22sp"
             android:gravity="center_horizontal"
             android:layout_marginTop="20dp"/>
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -32,29 +32,30 @@
             android:layout_marginRight="30dp">
 
             <Button
+                android:layout_centerInParent="true"
                 android:id="@+id/btnDeposit"
-                android:layout_width="100dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/deposit"
-                android:background="@drawable/rounded_button"
-                android:textAllCaps="false"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginEnd="5dp"
                 android:layout_marginRight="5dp"
-                android:layout_marginEnd="5dp" />
-
-            <Button
-                android:id="@+id/btnPlay"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/play_chess"
-                android:layout_marginLeft="5dp"
-                android:textAllCaps="false"
                 android:background="@drawable/rounded_button"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="5dp" />
-        </LinearLayout>
+                android:text="@string/deposit"
+                android:textAllCaps="false" />
+
+            <!--            <Button-->
+<!--                android:id="@+id/btnPlay"-->
+<!--                android:layout_width="100dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="@string/play_chess"-->
+<!--                android:layout_marginLeft="5dp"-->
+<!--                android:textAllCaps="false"-->
+<!--                android:background="@drawable/rounded_button"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                android:layout_marginStart="5dp" />-->
+        </RelativeLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recBetGames"

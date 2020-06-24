@@ -106,9 +106,7 @@
         <meta-data
             android:name="firebase_analytics_collection_enabled"
             android:value="false" /> <!-- FCM SETUP -->
-        <activity android:name=".BoardActivity" />
         <activity android:name=".PresenceActivity" />
-
         <service
             android:name="chessbet.services.MatchService"
             android:icon="@drawable/chesslogo"
