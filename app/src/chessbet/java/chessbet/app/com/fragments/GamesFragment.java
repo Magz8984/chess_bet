@@ -82,6 +82,8 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
        } else if (v.equals(btnRefresh)) {
            btnRefresh.startAnimation();
            AccountAPI.get().getAccount();
+           // Fetch Payment Account
+           PaymentsAPI.get().getPaymentAccountImplementation(AccountAPI.get().getFirebaseUser().getUid());
        }
     }
 
