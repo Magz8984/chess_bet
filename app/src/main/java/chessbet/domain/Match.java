@@ -7,12 +7,21 @@ public class Match {
     private MatchStatus matchStatus;
     private MatchResult matchResult;
     private String matchType;
+    private Amount amount;
 
     public Match (String opponentUserName, String opponentPic, String matchId, String matchType) {
         this.opponentUserName = opponentUserName;
         this.opponentPic = opponentPic;
         this.matchId = matchId;
         this.matchType = matchType;
+    }
+
+    public void setAmount(Amount amount) {
+        this.amount = amount;
+    }
+
+    public Amount getAmount() {
+        return amount;
     }
 
     public void setMatchResult(MatchResult matchResult) {

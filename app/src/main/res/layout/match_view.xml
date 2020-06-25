@@ -33,6 +33,30 @@
             android:layout_toEndOf="@+id/imgOpponentPic" />
 
         <TextView
+            android:layout_marginLeft="5dp"
+            android:fontFamily="@font/chakrapetchbold"
+            android:textSize="20sp"
+            android:id="@+id/txtCurrency"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/txtOpponentName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/txtOpponentName"
+            android:layout_marginStart="5dp" />
+
+        <TextView
+            android:layout_marginStart="5dp"
+            android:fontFamily="@font/chakrapetchbold"
+            android:textSize="20sp"
+            android:id="@+id/txtAmount"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/txtCurrency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/txtCurrency"
+            android:layout_marginLeft="5dp" />
+
+        <TextView
             android:id="@+id/txtResult"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"

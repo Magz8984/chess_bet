@@ -15,10 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Locale;
 
+import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import chessbet.adapter.MatchesAdapter;
+import chessbet.api.AccountAPI;
 import chessbet.api.PaymentsAPI;
 
 import chessbet.app.com.DepositActivity;
@@ -37,6 +39,7 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
     @BindView(R.id.btnTransactions) Button btnTransactions;
     @BindView(R.id.txtBalance) TextView txtBalance;
     @BindView(R.id.recBetGames) RecyclerView recBetGames;
+    @BindView(R.id.btnRefresh) CircularProgressButton btnRefresh;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -45,6 +48,7 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
         btnDeposit.setOnClickListener(this);
 //        btnPlay.setOnClickListener(this);
         btnTransactions.setOnClickListener(this);
+        btnRefresh.setOnClickListener(this);
         PaymentsAPI.get().addPaymentAccountListener(this);
         EventBroadcast.get().addAccountUpdated(this);
 
@@ -58,9 +62,14 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
     @Override
     public void onStart() {
         super.onStart();
-        PaymentAccount account = PaymentsAPI.get().getCurrentAccount();
+        PaymentAccount paymentAccount = PaymentsAPI.get().getCurrentAccount();
+        if(paymentAccount != null) {
+            this.txtBalance.setText(String.format(Locale.ENGLISH,"%s %.2f", "USD", paymentAccount.getBalance()));
+        }
+        // Attempt to fetch current user account
+        Account account = AccountAPI.get().getCurrentAccount();
         if(account != null) {
-            this.txtBalance.setText(String.format(Locale.ENGLISH,"%s %.2f", "USD", account.getBalance()));
+            this.onAccountUpdated(account);
         }
     }
 
@@ -70,10 +79,10 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
            gotoDepositActivity();
        } else if (v.equals(btnTransactions)){
             gotoTransactionsActivity();
+       } else if (v.equals(btnRefresh)) {
+           btnRefresh.startAnimation();
+           AccountAPI.get().getAccount();
        }
-// else if (v.equals(btnPlay)){
-//            gotoMatchFragment();
-//        }
     }
 
     private void gotoTransactionsActivity() {
@@ -114,6 +123,7 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
     @Override
     public void onAccountUpdated(Account account) {
         try {
+            btnRefresh.revertAnimation();
             recBetGames.setAdapter(new MatchesAdapter(requireContext(), MatchType.BET_ONLINE));
         } catch (Exception ex)  {
             ex.printStackTrace();

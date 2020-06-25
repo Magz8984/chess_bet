@@ -354,18 +354,19 @@ public class AccountAPI {
     /** Results are got from firestore **/
     public List<Match> assignMatchResults(List<Match> matches){
         List<Match> newList = new ArrayList<>();
-        for (Match databaseMatch : matches){
+        for (Match match : matches){
             for (MatchDetails matchDetails: currentAccount.getMatches()) {
-                if(matchDetails.getMatch_result().getMatchId().equals(databaseMatch.getMatchId())){
+                if(matchDetails.getMatch_result().getMatchId().equals(match.getMatchId())){
                     if (matchDetails.getMatch_result().getMatchStatus().equals(MatchStatus.DRAW)){
-                        databaseMatch.setMatchStatus(MatchStatus.DRAW);
+                        match.setMatchStatus(MatchStatus.DRAW);
                     } else if(matchDetails.getMatch_result().getLoss().equals(currentAccount.getOwner())){
-                        databaseMatch.setMatchStatus(MatchStatus.LOSS);
+                        match.setMatchStatus(MatchStatus.LOSS);
                     } else if(matchDetails.getMatch_result().getGain().equals(currentAccount.getOwner())) {
-                        databaseMatch.setMatchStatus(MatchStatus.WON);
+                        match.setMatchStatus(MatchStatus.WON);
                     }
-                    databaseMatch.setMatchResult(matchDetails.getMatch_result());
-                    newList.add(databaseMatch);
+                    match.setMatchResult(matchDetails.getMatch_result());
+                    match.setAmount(matchDetails.getAmount());
+                    newList.add(match);
                 }
             }
         }
