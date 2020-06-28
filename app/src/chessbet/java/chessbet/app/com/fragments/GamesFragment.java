@@ -2,6 +2,7 @@ package chessbet.app.com.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.Locale;
 
@@ -33,22 +35,21 @@ import chessbet.domain.PaymentAccount;
 import chessbet.utils.EventBroadcast;
 import es.dmoral.toasty.Toasty;
 
-public class GamesFragment extends Fragment implements View.OnClickListener, PaymentsAPI.PaymentAccountReceived, EventBroadcast.AccountUpdated {
+public class GamesFragment extends Fragment implements View.OnClickListener, PaymentsAPI.PaymentAccountReceived, EventBroadcast.AccountUpdated ,
+SwipeRefreshLayout.OnRefreshListener{
     @BindView(R.id.btnDeposit) Button btnDeposit;
-//    @BindView(R.id.btnPlay) Button btnPlay;
     @BindView(R.id.btnTransactions) Button btnTransactions;
     @BindView(R.id.txtBalance) TextView txtBalance;
     @BindView(R.id.recBetGames) RecyclerView recBetGames;
-    @BindView(R.id.btnRefresh) CircularProgressButton btnRefresh;
+    @BindView(R.id.swiperefresh_layout) SwipeRefreshLayout swiperefresh_layout;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_games, container, false);
         ButterKnife.bind(this, root);
         btnDeposit.setOnClickListener(this);
-//        btnPlay.setOnClickListener(this);
         btnTransactions.setOnClickListener(this);
-        btnRefresh.setOnClickListener(this);
+        swiperefresh_layout.setOnRefreshListener((SwipeRefreshLayout.OnRefreshListener) this);
         PaymentsAPI.get().addPaymentAccountListener(this);
         EventBroadcast.get().addAccountUpdated(this);
 
@@ -79,26 +80,12 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
            gotoDepositActivity();
        } else if (v.equals(btnTransactions)){
             gotoTransactionsActivity();
-       } else if (v.equals(btnRefresh)) {
-           btnRefresh.startAnimation();
-           AccountAPI.get().getAccount();
-           // Fetch Payment Account
-           PaymentsAPI.get().getPaymentAccountImplementation(AccountAPI.get().getFirebaseUser().getUid());
        }
     }
 
     private void gotoTransactionsActivity() {
         startActivity(new Intent(new Intent(getActivity(), TransactionsActivity.class)));
     }
-
-//    private void gotoMatchFragment() {
-//        MatchFragment matchFragment = new MatchFragment();
-//        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-//        FragmentTransaction ft = fragmentManager.beginTransaction();
-//        ft.replace(R.id.nav_host_fragment, matchFragment);
-//        ft.addToBackStack(null);
-//        ft.commit();
-//    }
 
     private void gotoDepositActivity() {
         startActivity(new Intent(new Intent(getActivity(), DepositActivity.class)));
@@ -125,10 +112,27 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
     @Override
     public void onAccountUpdated(Account account) {
         try {
-            btnRefresh.revertAnimation();
+            if(swiperefresh_layout.isRefreshing()) {
+                swiperefresh_layout.setRefreshing(false);
+            }
             recBetGames.setAdapter(new MatchesAdapter(requireContext(), MatchType.BET_ONLINE));
         } catch (Exception ex)  {
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        // Fetch Payment Account
+        PaymentsAPI.get().getPaymentAccountImplementation(AccountAPI.get().getFirebaseUser().getUid());
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(swiperefresh_layout.isRefreshing()) {
+                swiperefresh_layout.setRefreshing(false);
+               }
+            }
+        }, 5000);
     }
 }
