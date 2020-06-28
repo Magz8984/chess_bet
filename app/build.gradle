@@ -147,7 +147,6 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.github.iconic-king:chess-engine-dev:9eb56bdde9'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.github.erehmi:countdowntask:1.0.1' // Count Down Timer
     implementation 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar' // Fab Progress Bar
@@ -163,6 +162,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.2.2'
     implementation 'androidx.navigation:navigation-ui:2.2.2'
     implementation 'br.com.simplepass:loading-button-android:2.2.0'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 task copyToAssets(type: Copy) {
