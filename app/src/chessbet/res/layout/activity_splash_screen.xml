@@ -22,6 +22,17 @@
     </LinearLayout>
 
     <TextView
+        android:textColor="@color/white"
+        android:textSize="17sp"
+        android:fontFamily="@font/chakrapetchbold"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/company"
+        android:text="@string/powered_by"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/company"
         android:layout_margin="5dp"
         android:text="@string/company"
         android:fontFamily="@font/monotonregular"

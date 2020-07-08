@@ -76,6 +76,8 @@
     <string name="create_puzzle_from_recording">Create puzzle from recording</string>
     <string name="create_puzzle">Create Puzzle</string>
     <string name="company">Iconic King</string>
+    <string name="powered_by">Powered By</string>
+    <string name="copyright">&#169; &#32; Iconic King</string>
     <string name="feature_unavailable">Feature Unavailable</string>
     <string name="analysis_board">Analysis Board</string>
     <string name="you_won">You Won</string>
