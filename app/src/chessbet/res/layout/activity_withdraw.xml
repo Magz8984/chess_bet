@@ -42,13 +42,29 @@
                 android:gravity="center"/>
 
             <EditText
-                android:id="@+id/editTextAmount"
+                android:id="@+id/txtAmount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="30dp"
                 android:layout_marginLeft="30dp"
                 android:ems="10"
                 android:inputType="number"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:backgroundTint="@color/colorPrimaryYellow"
+                android:textSize="18sp"/>
+
+            <EditText
+                android:id="@+id/txtPhoneNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="30dp"
+                android:ems="10"
+                android:inputType="number"
+                android:hint="@string/phone_number"
+                android:textColorHint="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 android:textColor="@color/white"
@@ -70,7 +86,7 @@
             android:layout_marginRight="15dp"
             android:layout_marginLeft="15dp"/>
         <Button
-            android:id="@+id/button"
+            android:id="@+id/btnPayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/payout"
