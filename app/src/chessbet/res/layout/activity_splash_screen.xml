@@ -22,7 +22,7 @@
     </LinearLayout>
 
     <TextView
-        android:textColor="@color/white"
+        android:textColor="@color/colorPrimaryYellow"
         android:textSize="17sp"
         android:fontFamily="@font/chakrapetchbold"
         android:layout_centerHorizontal="true"
