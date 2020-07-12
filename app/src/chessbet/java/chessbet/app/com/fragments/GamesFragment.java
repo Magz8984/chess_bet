@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import java.util.List;
 import java.util.Locale;
 
-import br.com.simplepass.loadingbutton.customViews.CircularProgressButton;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -30,9 +30,12 @@ import chessbet.app.com.DepositActivity;
 import chessbet.app.com.R;
 import chessbet.app.com.TransactionsActivity;
 import chessbet.domain.Account;
+import chessbet.domain.Match;
 import chessbet.domain.MatchType;
 import chessbet.domain.PaymentAccount;
+import chessbet.utils.DatabaseUtil;
 import chessbet.utils.EventBroadcast;
+import chessbet.utils.SQLDatabaseHelper;
 import es.dmoral.toasty.Toasty;
 
 public class GamesFragment extends Fragment implements View.OnClickListener, PaymentsAPI.PaymentAccountReceived, EventBroadcast.AccountUpdated ,
@@ -40,6 +43,7 @@ SwipeRefreshLayout.OnRefreshListener{
     @BindView(R.id.btnDeposit) Button btnDeposit;
     @BindView(R.id.btnTransactions) Button btnTransactions;
     @BindView(R.id.txtBalance) TextView txtBalance;
+    @BindView(R.id.txtNoMatches) TextView txtNoMatches;
     @BindView(R.id.recBetGames) RecyclerView recBetGames;
     @BindView(R.id.swiperefresh_layout) SwipeRefreshLayout swiperefresh_layout;
 
@@ -115,7 +119,15 @@ SwipeRefreshLayout.OnRefreshListener{
             if(swiperefresh_layout.isRefreshing()) {
                 swiperefresh_layout.setRefreshing(false);
             }
-            recBetGames.setAdapter(new MatchesAdapter(requireContext(), MatchType.BET_ONLINE));
+            // Fetch Database Matches
+            List<Match> matches = DatabaseUtil.getMatchesFromLocalDB(new SQLDatabaseHelper(requireContext()).getMatches());
+
+            if(!matches.isEmpty()) {
+                txtNoMatches.setVisibility(View.GONE);
+            }
+
+            recBetGames.setAdapter(new MatchesAdapter(requireContext(), MatchType.BET_ONLINE, matches));
+
         } catch (Exception ex)  {
             ex.printStackTrace();
         }

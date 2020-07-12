@@ -108,6 +108,7 @@
     <string name="pgn_viewer">Chess MVP PGN Viewer</string>
     <string name="join_tournament">Join Tournament</string>
     <string name="view_tournament">View Tournament</string>
+    <string name="offline_game_preference">Offline Game Preference</string>
     <string name="deposit">Deposit</string>
     <string name="play_chess">Play Chess</string>
     <string name="transactions">Transactions</string>

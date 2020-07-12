@@ -33,10 +33,9 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHold
         matches = AccountAPI.get().assignMatchResults(this.matches);
     }
 
-    public MatchesAdapter(Context context, @NonNull MatchType matchType){
+    public MatchesAdapter(Context context, @NonNull MatchType matchType, List<Match> matches){
         this.context = context;
-        this.matches = DatabaseUtil.getMatchesFromLocalDB(new SQLDatabaseHelper(context).getMatches());
-        matches = AccountAPI.get().assignMatchResults(this.matches);
+        this.matches = AccountAPI.get().assignMatchResults(matches);
 
         // Filter type specific games
         List<Match> filteredMatches = new ArrayList<>();
