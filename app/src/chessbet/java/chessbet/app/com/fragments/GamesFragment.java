@@ -53,7 +53,7 @@ SwipeRefreshLayout.OnRefreshListener{
         ButterKnife.bind(this, root);
         btnDeposit.setOnClickListener(this);
         btnTransactions.setOnClickListener(this);
-        swiperefresh_layout.setOnRefreshListener((SwipeRefreshLayout.OnRefreshListener) this);
+        swiperefresh_layout.setOnRefreshListener(this);
         PaymentsAPI.get().addPaymentAccountListener(this);
         EventBroadcast.get().addAccountUpdated(this);
 
@@ -122,7 +122,9 @@ SwipeRefreshLayout.OnRefreshListener{
             // Fetch Database Matches
             List<Match> matches = DatabaseUtil.getMatchesFromLocalDB(new SQLDatabaseHelper(requireContext()).getMatches());
 
-            if(!matches.isEmpty()) {
+            if(matches.isEmpty()) {
+                txtNoMatches.setVisibility(View.VISIBLE);
+            } else {
                 txtNoMatches.setVisibility(View.GONE);
             }
 
@@ -138,13 +140,10 @@ SwipeRefreshLayout.OnRefreshListener{
         // Fetch Payment Account
         PaymentsAPI.get().getPaymentAccountImplementation(AccountAPI.get().getFirebaseUser().getUid());
         final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(swiperefresh_layout.isRefreshing()) {
-                swiperefresh_layout.setRefreshing(false);
-               }
-            }
+        handler.postDelayed(() -> {
+            if(swiperefresh_layout.isRefreshing()) {
+            swiperefresh_layout.setRefreshing(false);
+           }
         }, 5000);
     }
 }
