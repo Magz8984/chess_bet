@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context="chessbet.app.com.TransactionsActivity">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:orientation="vertical"
@@ -15,6 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
         <LinearLayout
+            android:id="@+id/withdrawSection"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -39,8 +40,16 @@
                 android:layout_marginEnd="5dp" />
         </LinearLayout>
         <androidx.recyclerview.widget.RecyclerView
+            android:layout_below="@+id/withdrawSection"
             android:id="@+id/recAllTransactions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
-    </LinearLayout>
+
+        <ProgressBar
+            android:visibility="gone"
+            android:id="@+id/progressBar"
+            android:layout_centerInParent="true"
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
+    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
