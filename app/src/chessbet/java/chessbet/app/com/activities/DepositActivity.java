@@ -1,4 +1,4 @@
-package chessbet.app.com;
+package chessbet.app.com.activities;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -16,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.api.AccountAPI;
 import chessbet.api.PaymentsAPI;
+import chessbet.app.com.R;
 import chessbet.domain.MPESASavingDTO;
 import es.dmoral.toasty.Toasty;
 

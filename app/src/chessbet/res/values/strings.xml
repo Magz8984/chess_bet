@@ -6,6 +6,7 @@
     <string name="menu_profile">Profile</string>
     <string name="menu_playOnline">Play Online</string>
     <string name="menu_terms_conditions">Terms and Conditions</string>
+    <string name="menu_logout">Logout</string>
     <string name="won">Won</string>
     <string name="kes_100">KES 100</string>
     <string name="view_game">View Game</string>
@@ -13,7 +14,7 @@
     <string name="_200">+/-200</string>
     <string name="_500">+/-500</string>
     <string name="refresh">Refresh</string>
-    <string name="no_matches">No Matches Played Yet</string>
+    <string name="no_matches">Played matches will be displayed here</string>
     <string name="USD0">USD 0</string>
     <string name="USD10">USD 10</string>
     <string name="USD5">USD 5</string>

@@ -1,4 +1,4 @@
-package chessbet.app.com;
+package chessbet.app.com.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,9 +15,10 @@ import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import chessbet.adapter.TransactionsAdapter;
+import chessbet.app.com.adapter.TransactionsAdapter;
 import chessbet.api.AccountAPI;
 import chessbet.api.PaymentsAPI;
+import chessbet.app.com.R;
 import chessbet.domain.Transaction;
 import es.dmoral.toasty.Toasty;
 

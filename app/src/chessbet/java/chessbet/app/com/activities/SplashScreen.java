@@ -1,4 +1,4 @@
-package chessbet.app.com;
+package chessbet.app.com.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,6 +9,7 @@ import android.os.Handler;
 import com.google.firebase.auth.FirebaseUser;
 
 import chessbet.api.AccountAPI;
+import chessbet.app.com.R;
 
 public class SplashScreen extends AppCompatActivity {
 

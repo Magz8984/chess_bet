@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +19,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,10 +28,11 @@ import chessbet.adapter.MatchesAdapter;
 import chessbet.api.AccountAPI;
 import chessbet.api.PaymentsAPI;
 
-import chessbet.app.com.DepositActivity;
+import chessbet.app.com.activities.DepositActivity;
 
 import chessbet.app.com.R;
-import chessbet.app.com.TransactionsActivity;
+import chessbet.app.com.activities.MainActivity;
+import chessbet.app.com.activities.TransactionsActivity;
 import chessbet.domain.Account;
 import chessbet.domain.Match;
 import chessbet.domain.MatchType;
@@ -36,11 +40,13 @@ import chessbet.domain.PaymentAccount;
 import chessbet.utils.DatabaseUtil;
 import chessbet.utils.EventBroadcast;
 import chessbet.utils.SQLDatabaseHelper;
+import chessbet.utils.Util;
 import es.dmoral.toasty.Toasty;
 
-public class GamesFragment extends Fragment implements View.OnClickListener, PaymentsAPI.PaymentAccountReceived, EventBroadcast.AccountUpdated ,
-SwipeRefreshLayout.OnRefreshListener{
+public class GamesFragment extends Fragment implements View.OnClickListener, PaymentsAPI.PaymentAccountReceived,
+        EventBroadcast.AccountUpdated , SwipeRefreshLayout.OnRefreshListener{
     @BindView(R.id.btnDeposit) Button btnDeposit;
+    @BindView(R.id.btnPlayOnline) Button btnPlayOnline;
     @BindView(R.id.btnTransactions) Button btnTransactions;
     @BindView(R.id.txtBalance) TextView txtBalance;
     @BindView(R.id.txtNoMatches) TextView txtNoMatches;
@@ -51,8 +57,10 @@ SwipeRefreshLayout.OnRefreshListener{
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_games, container, false);
         ButterKnife.bind(this, root);
+        txtNoMatches.setSelected(true);
         btnDeposit.setOnClickListener(this);
         btnTransactions.setOnClickListener(this);
+        btnPlayOnline.setOnClickListener(this);
         swiperefresh_layout.setOnRefreshListener(this);
         PaymentsAPI.get().addPaymentAccountListener(this);
         EventBroadcast.get().addAccountUpdated(this);
@@ -84,6 +92,11 @@ SwipeRefreshLayout.OnRefreshListener{
            gotoDepositActivity();
        } else if (v.equals(btnTransactions)){
             gotoTransactionsActivity();
+       }else if (v.equals(btnPlayOnline)){
+           Util.switchFragmentWithAnimation(R.id.frag_container,
+                   new MatchFragment(),
+                   ((MainActivity) (requireContext())),
+                   Util.PLAY_ONLINE_FRAGMENT, Util.AnimationType.SLIDE_DOWN);
        }
     }
 

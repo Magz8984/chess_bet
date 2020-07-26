@@ -1,8 +1,9 @@
-package chessbet.app.com;
+package chessbet.app.com.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -13,6 +14,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -24,17 +26,23 @@ import java.util.Locale;
 
 import chessbet.api.AccountAPI;
 import chessbet.api.PaymentsAPI;
+import chessbet.app.com.R;
+import chessbet.app.com.fragments.GamesFragment;
 import chessbet.domain.Account;
 import chessbet.domain.PaymentAccount;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
 import chessbet.utils.EventBroadcast;
+import chessbet.utils.Util;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 
-public class MainActivity extends AppCompatActivity implements AccountListener, EventBroadcast.AccountUserUpdate, PaymentsAPI.PaymentAccountReceived {
+public class MainActivity extends AppCompatActivity implements AccountListener,
+        EventBroadcast.AccountUserUpdate, PaymentsAPI.PaymentAccountReceived,
+        NavigationView.OnNavigationItemSelectedListener {
 
-    private AppBarConfiguration mAppBarConfiguration;
+    private DrawerLayout drawer;
+    private NavigationView navigationView;
     private TextView txtPhoneNumber;
     private TextView txtRating;
     private TextView txtBalance;
@@ -44,27 +52,31 @@ public class MainActivity extends AppCompatActivity implements AccountListener, 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        toolbar.setNavigationIcon(R.drawable.ic_drawer);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getDrawerLayout().openDrawer(GravityCompat.START);
+            }
+        });
+        drawer = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
         this.txtPhoneNumber = navigationView.getHeaderView(0).findViewById(R.id.txtPhoneNumber);
         this.txtRating = navigationView.getHeaderView(0).findViewById(R.id.txtRating);
         this.txtBalance = navigationView.getHeaderView(0).findViewById(R.id.txtBalance);
         this.imgProfile = navigationView.getHeaderView(0).findViewById(R.id.imgProfile);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
+
         PaymentsAPI.get().addPaymentAccountListener(this);
         AccountAPI.get().setAccountListener(this);
         EventBroadcast.get().addAccountUserUpdated(this);
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_games,R.id.nav_profile, R.id.nav_playOnline, R.id.nav_terms_conditions)
-                .setDrawerLayout(drawer)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
+
+        navigationView.setNavigationItemSelectedListener(this);
+        Util.switchFragmentWithAnimation(R.id.frag_container,
+                new GamesFragment(), this, Util.GAMES_FRAGMENT,
+                Util.AnimationType.SLIDE_UP);
+
     }
 
     @Override
@@ -72,33 +84,6 @@ public class MainActivity extends AppCompatActivity implements AccountListener, 
         super.onStart();
         AccountAPI.get().getAccount();
         AccountAPI.get().getUser();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        if (item.getItemId() == R.id.action_logout) {
-            auth.signOut();
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-            // Close current activity
-            finish();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        return NavigationUI.navigateUp(navController, mAppBarConfiguration)
-                || super.onSupportNavigateUp();
     }
 
     @Override
@@ -142,5 +127,52 @@ public class MainActivity extends AppCompatActivity implements AccountListener, 
     @Override
     public void onPaymentAccountFailure() {
         runOnUiThread(() -> Toasty.error(this, "Error occurred while fetching payments account",Toasty.LENGTH_LONG).show());
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        item.setChecked(true);
+        switch (item.getItemId()) {
+            case R.id.nav_games:
+                drawer.closeDrawers();
+                Util.switchContent(R.id.frag_container,
+                        Util.GAMES_FRAGMENT,
+                        MainActivity.this,
+                        Util.AnimationType.SLIDE_LEFT);
+                return true;
+            case R.id.nav_profile:
+                drawer.closeDrawers();
+                Util.switchContent(R.id.frag_container,
+                        Util.PROFILE_FRAGMENT,
+                        MainActivity.this,
+                        Util.AnimationType.SLIDE_LEFT);
+                return true;
+            case R.id.nav_playOnline:
+                drawer.closeDrawers();
+                Util.switchContent(R.id.frag_container,
+                        Util.PLAY_ONLINE_FRAGMENT,
+                        MainActivity.this,
+                        Util.AnimationType.SLIDE_LEFT);
+                return true;
+            case R.id.nav_terms_conditions:
+                drawer.closeDrawers();
+                Util.switchContent(R.id.frag_container,
+                        Util.TERMS_FRAGMENT,
+                        MainActivity.this,
+                        Util.AnimationType.SLIDE_LEFT);
+                return true;
+            case R.id.nav_logout:
+                drawer.closeDrawers();
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                auth.signOut();
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                finish();
+                return true;
+        }
+        return false;
+    }
+
+    public DrawerLayout getDrawerLayout() {
+        return drawer;
     }
 }

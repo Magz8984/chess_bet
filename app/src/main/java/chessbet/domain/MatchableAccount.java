@@ -9,7 +9,7 @@ import android.os.Parcelable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import chessbet.app.com.MainActivity;
+import chessbet.app.com.activities.MainActivity;
 import chessbet.utils.DatabaseUtil;
 import chessbet.utils.GameHandler;
 import chessbet.utils.GameManager;

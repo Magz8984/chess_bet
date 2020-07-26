@@ -11,10 +11,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name="chessbet.app.com.SignUpActivity" />
-        <activity android:name="chessbet.app.com.LoginActivity" />
+        <activity android:name="chessbet.app.com.activities.LoginActivity" />
         <activity android:name="chessbet.app.com.BoardActivity"/>
-        <activity android:name="chessbet.app.com.MainActivity"/>
-        <activity android:name="chessbet.app.com.SplashScreen">
+        <activity android:name="chessbet.app.com.activities.MainActivity"/>
+        <activity android:name="chessbet.app.com.activities.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />

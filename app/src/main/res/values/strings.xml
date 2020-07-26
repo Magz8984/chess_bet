@@ -124,4 +124,6 @@
     <string name="remove">Remove</string>
     <string name="cancel">Cancel</string>
     <string name="amount">Amount</string>
+    <string name="chess_bet_user">Chess Bet user</string>
+    <string name="play_chess_online">Play Chess Online</string>
 </resources>

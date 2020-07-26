@@ -16,7 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Objects;
 
-import chessbet.app.com.LoginActivity;
+import chessbet.app.com.activities.LoginActivity;
 import chessbet.app.com.R;
 
 public class SettingsFragment extends PreferenceFragmentCompat {

@@ -2,6 +2,7 @@ package chessbet.app.com.fragments;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.api.AccountAPI;
 import chessbet.app.com.R;
+import chessbet.app.com.activities.MainActivity;
 import chessbet.domain.Account;
 import chessbet.domain.AccountEvent;
 import chessbet.domain.User;
@@ -34,6 +36,25 @@ public class TermsConditionsFragment extends Fragment implements View.OnClickLis
         btnAcceptTerms.setOnClickListener(this);
         loader = new ProgressDialog(requireContext());
         loader.setMessage("Accepting terms and conditions");
+
+        // Handle Back press
+        root.setFocusableInTouchMode(true);
+        root.requestFocus();
+        root.setOnKeyListener(new View.OnKeyListener() {
+
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP
+                        && keyCode == KeyEvent.KEYCODE_BACK) {
+
+                    Util.switchContent(R.id.frag_container,
+                            Util.GAMES_FRAGMENT,
+                            ((MainActivity) (getContext())),
+                            Util.AnimationType.SLIDE_UP);
+                }
+                return true;
+            }
+        });
         return root;
     }
 

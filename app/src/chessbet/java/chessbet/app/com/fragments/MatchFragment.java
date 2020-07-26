@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,7 @@ import chessbet.api.MatchAPI;
 import chessbet.app.com.BoardActivity;
 import chessbet.app.com.BuildConfig;
 import chessbet.app.com.R;
+import chessbet.app.com.activities.MainActivity;
 import chessbet.domain.Account;
 import chessbet.domain.Challenge;
 import chessbet.domain.ChallengeDTO;
@@ -46,6 +48,7 @@ import chessbet.domain.MatchableAccount;
 import chessbet.services.MatchListener;
 import chessbet.services.MatchService;
 import chessbet.utils.DatabaseUtil;
+import chessbet.utils.Util;
 import es.dmoral.toasty.Toasty;
 
 public class MatchFragment extends Fragment implements View.OnClickListener, MatchListener, FABProgressListener, ChallengeAPI.ChallengeHandler {
@@ -92,6 +95,25 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
         amountButtons = Arrays.asList(btnUSD10, btnUSD5, btnUSD2, btnUSD1);
         rangeButtons = Arrays.asList(btnRandom, btnRatingMore, btnRatingLess);
         ChallengeAPI.get().setChallengeHandler(this);
+
+        // Handle Back press
+        root.setFocusableInTouchMode(true);
+        root.requestFocus();
+        root.setOnKeyListener(new View.OnKeyListener() {
+
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP
+                        && keyCode == KeyEvent.KEYCODE_BACK) {
+
+                    Util.switchContent(R.id.frag_container,
+                            Util.GAMES_FRAGMENT,
+                            ((MainActivity) (getContext())),
+                            Util.AnimationType.SLIDE_UP);
+                }
+                return true;
+            }
+        });
         return root;
     }
 
