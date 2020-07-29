@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,12 +54,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.api.AccountAPI;
 import chessbet.app.com.R;
+import chessbet.app.com.activities.MainActivity;
 import chessbet.domain.Account;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
 import chessbet.services.UserListener;
 import chessbet.utils.EventBroadcast;
 import chessbet.utils.Permissions;
+import chessbet.utils.Util;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 
@@ -120,6 +123,24 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
         cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         storagePermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
+        // Handle Back press
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener(new View.OnKeyListener() {
+
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (event.getAction() == KeyEvent.ACTION_UP
+                        && keyCode == KeyEvent.KEYCODE_BACK) {
+
+                    Util.switchContent(R.id.frag_container,
+                            Util.GAMES_FRAGMENT,
+                            ((MainActivity) (getContext())),
+                            Util.AnimationType.SLIDE_UP);
+                }
+                return true;
+            }
+        });
         return view;
     }
 

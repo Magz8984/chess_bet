@@ -1,4 +1,4 @@
-package chessbet.app.com;
+package chessbet.app.com.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.api.AccountAPI;
+import chessbet.app.com.R;
 import chessbet.utils.Util;
 import es.dmoral.toasty.Toasty;
 

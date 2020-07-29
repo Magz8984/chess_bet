@@ -43,6 +43,7 @@ import chessbet.api.AccountAPI;
 import chessbet.api.ChallengeAPI;
 import chessbet.api.MatchAPI;
 import chessbet.api.PresenceAPI;
+import chessbet.app.com.activities.MainActivity;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
 import chessbet.app.com.fragments.EvaluateGame;

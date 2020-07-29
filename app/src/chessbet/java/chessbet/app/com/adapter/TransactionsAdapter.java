@@ -1,4 +1,4 @@
-package chessbet.adapter;
+package chessbet.app.com.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;

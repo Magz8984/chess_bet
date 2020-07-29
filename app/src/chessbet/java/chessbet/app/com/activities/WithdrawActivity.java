@@ -1,4 +1,4 @@
-package chessbet.app.com;
+package chessbet.app.com.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,6 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.api.AccountAPI;
 import chessbet.api.PaymentsAPI;
+import chessbet.app.com.R;
 import chessbet.domain.Amount;
 import chessbet.domain.MPESAPayoutDTO;
 import es.dmoral.toasty.Toasty;

@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.adapter.ComputerSkillLevelAdapter;
+import chessbet.app.com.activities.MainActivity;
 import chessbet.domain.MatchType;
 
 
