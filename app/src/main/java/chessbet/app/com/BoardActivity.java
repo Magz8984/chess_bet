@@ -420,7 +420,11 @@ private Move promotionMove;
                         MatchAPI.get().setMatchCreated(false); // FLAG MatchAPI
                         PresenceAPI.get().stopListening(); // Stop listening to opponent online state
                         if(matchableAccount != null && !isGameFinished){
-                           endGame(GameHandler.GAME_INTERRUPTED_FLAG);
+                            if(!noMoveReactor.hasOpponentMoved()) {
+                                endGame(GameHandler.GAME_ABORTED_FLAG);
+                            } else  {
+                                endGame(GameHandler.GAME_INTERRUPTED_FLAG);
+                            }
                         } else {
                             goToMainActivity();
                         }
@@ -626,7 +630,13 @@ private Move promotionMove;
                 RemoteMove.get().addEvent(MatchEvent.INTERRUPTED);
                 RemoteMove.get().send(matchableAccount.getMatchId(), matchableAccount.getSelf());
                 matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_INTERRUPTED_FLAG, MatchStatus.INTERRUPTED, matchableAccount.getOpponentId(), matchableAccount.getOwner());
-            } else if (flag == GameHandler.GAME_FINISHED_FLAG) {
+            } else if (flag == GameHandler.GAME_ABORTED_FLAG) {
+                evaluateGame.setMatchStatus(MatchStatus.GAME_ABORTED);
+                RemoteMove.get().addEvent(MatchEvent.GAME_ABORTED);
+                RemoteMove.get().send(matchableAccount.getMatchId(), matchableAccount.getSelf());
+                matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_ABORTED_FLAG, MatchStatus.GAME_ABORTED, matchableAccount.getOpponentId(), matchableAccount.getOwner());
+            }
+            else if (flag == GameHandler.GAME_FINISHED_FLAG) {
                 if(boardView.isLocalWinner()){
                     evaluateGame.setMatchStatus(MatchStatus.WON);
                     matchableAccount.endMatch(boardView.getPortableGameNotation(),

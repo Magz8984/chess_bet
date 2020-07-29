@@ -26,6 +26,13 @@ public enum MatchEvent {
             return "INTERRUPTED";
         }
     },
+    GAME_ABORTED {
+        @NonNull
+        @Override
+        public String toString() {
+            return "GAME_ABORTED";
+        }
+    },
     DRAW {
         @Override
         public String toString() {

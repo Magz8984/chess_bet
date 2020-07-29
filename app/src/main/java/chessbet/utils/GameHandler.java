@@ -38,7 +38,7 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
     public static final int GAME_DRAWN_FLAG = 13780;
     public static final int GAME_TIMER_LAPSED = 472489;
     private static final int GAME_ABANDONED_FLAG = 40428;
-    private static final int GAME_ABORTED_FLAG = 10077;
+    public static final int GAME_ABORTED_FLAG = 10077;
 //    private static final int DISCONNECTED_FLAG = 47924;
 
     public void setMatchResult(MatchResult matchResult) {
@@ -114,7 +114,7 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
      * Listen to remote moves being made if none within 30 seconds terminate match
      */
     public static class NoMoveReactor  extends AsyncTask<Void,Void,Void>{
-        private volatile boolean hasOpponentMoved;
+        private volatile boolean hasOpponentMoved = false;
         private volatile boolean hasMadeMove;
         private volatile boolean isOpponentDisconnected = false;
         private volatile boolean isMyPly;
@@ -177,6 +177,10 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
 
         public void setHasOpponentMoved(boolean hasOpponentMoved) {
             this.hasOpponentMoved = hasOpponentMoved;
+        }
+
+        public boolean hasOpponentMoved() {
+            return hasOpponentMoved;
         }
 
         public void clearNoMoveSeconds(){
