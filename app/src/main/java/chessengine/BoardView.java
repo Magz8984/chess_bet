@@ -6,6 +6,7 @@ package chessengine;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.AsyncTask;
@@ -13,7 +14,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.graphics.Canvas;
 
 import com.chess.engine.Alliance;
 import com.chess.engine.Move;
@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import chessbet.api.MatchAPI;
-import chessbet.domain.MatchType;
 import chessbet.domain.MatchableAccount;
 import chessbet.domain.Puzzle;
 import chessbet.domain.RemoteMove;
