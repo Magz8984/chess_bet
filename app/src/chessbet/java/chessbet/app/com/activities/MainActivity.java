@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -71,11 +72,12 @@ public class MainActivity extends AppCompatActivity implements AccountListener,
         PaymentsAPI.get().addPaymentAccountListener(this);
         AccountAPI.get().setAccountListener(this);
         EventBroadcast.get().addAccountUserUpdated(this);
-
         navigationView.setNavigationItemSelectedListener(this);
-        Util.switchFragmentWithAnimation(R.id.frag_container,
-                new GamesFragment(), this, Util.GAMES_FRAGMENT,
-                Util.AnimationType.SLIDE_UP);
+
+        GamesFragment gamesFragment = new GamesFragment();
+        FragmentTransaction ft1 = getSupportFragmentManager().beginTransaction();
+        ft1.replace(R.id.frag_container, gamesFragment,"");
+        ft1.commit();
 
     }
 
