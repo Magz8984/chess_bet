@@ -75,6 +75,7 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
     @Override
     public void onStart() {
         super.onStart();
+        this.swiperefresh_layout.setRefreshing(true);
         PaymentAccount paymentAccount = PaymentsAPI.get().getCurrentAccount();
         if(paymentAccount != null) {
             this.txtBalance.setText(String.format(Locale.ENGLISH,"%s %.2f", "USD", paymentAccount.getBalance()));
@@ -111,7 +112,10 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
     @Override
     public void onPaymentAccountReceived(PaymentAccount account) {
         try {
-            requireActivity().runOnUiThread(() -> this.txtBalance.setText(String.format(Locale.ENGLISH,"%s %.2f", "USD", account.getBalance())));
+            requireActivity().runOnUiThread(() -> {
+                this.txtBalance.setText(String.format(Locale.ENGLISH,"%s %.2f", "USD", account.getBalance()));
+                this.swiperefresh_layout.setRefreshing(false);
+            });
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -120,7 +124,10 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
     @Override
     public void onPaymentAccountFailure() {
         try {
-            requireActivity().runOnUiThread(() -> Toasty.error(requireContext(), "Error occurred while fetching payments account" ,Toasty.LENGTH_LONG).show());
+            requireActivity().runOnUiThread(() -> {
+                Toasty.error(requireContext(), "Error occurred while fetching payments account" ,Toasty.LENGTH_LONG).show();
+                this.swiperefresh_layout.setRefreshing(true);
+            });
         } catch (Exception ex) {
             ex.printStackTrace();
         }

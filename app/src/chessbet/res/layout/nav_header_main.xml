@@ -75,5 +75,12 @@
             android:fontFamily="@font/chakrapetchbold"
             android:textColor="@color/bootstrap_green"/>
     </LinearLayout>
-
+    <TextView
+        android:textSize="15sp"
+        android:fontFamily="@font/chakrapetchbold"
+        android:textColor="@color/colorPrimaryYellow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/support_email"
+        android:layout_gravity="end"/>
 </LinearLayout>
