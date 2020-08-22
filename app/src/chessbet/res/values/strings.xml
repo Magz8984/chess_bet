@@ -33,4 +33,5 @@
     <string name="withdrawal_fee_for_amounts">For withdrawal between 10 and 1000 KSH fee is 15 KSH, and for withdrawal between 1001 and 70,000 KSH fee is 22 KSH.</string>
     <string name="payout">Payout</string>
     <string name="service_agreement">Service Agreement</string>
+    <string name="support_email">support@chess-bet.com</string>
 </resources>
