@@ -24,6 +24,17 @@
                 android:textColor="@color/bootstrap_green"
                 android:textSize="22sp"
                 android:layout_marginTop="20dp"/>
+            <Button
+                android:id="@+id/btnPlayOnline"
+                android:layout_marginTop="20dp"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:background="@drawable/rounded_button"
+                android:text="@string/bet_online"
+                android:textAllCaps="false"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:padding="15dp"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -52,17 +63,6 @@
                     android:background="@drawable/rounded_button"
                     android:layout_marginLeft="5dp" />
             </LinearLayout>
-            <Button
-                android:id="@+id/btnPlayOnline"
-                android:layout_marginTop="20dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/rounded_button"
-                android:text="@string/bet_online"
-                android:textAllCaps="false"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center"
-                android:padding="15dp"/>
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recBetGames"
                 android:layout_marginTop="30dp"
@@ -76,7 +76,7 @@
         android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:singleLine="true"
-        android:text="@string/no_matches"
+        android:text="@string/no_bets"
         android:fontFamily="@font/chakrapetchbold"
         android:textColor="@color/colorPrimaryYellow"
         android:textSize="20sp"
