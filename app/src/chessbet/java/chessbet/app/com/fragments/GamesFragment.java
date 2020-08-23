@@ -10,8 +10,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,7 +17,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -97,7 +94,7 @@ public class GamesFragment extends Fragment implements View.OnClickListener, Pay
            Util.switchFragmentWithAnimation(R.id.frag_container,
                    new MatchFragment(),
                    ((MainActivity) (requireContext())),
-                   Util.PLAY_ONLINE_FRAGMENT, Util.AnimationType.SLIDE_DOWN);
+                   Util.PLAY_ONLINE_FRAGMENT, Util.AnimationType.SLIDE_RIGHT);
        }
     }
 

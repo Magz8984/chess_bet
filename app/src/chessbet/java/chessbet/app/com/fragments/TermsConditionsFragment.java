@@ -40,20 +40,16 @@ public class TermsConditionsFragment extends Fragment implements View.OnClickLis
         // Handle Back press
         root.setFocusableInTouchMode(true);
         root.requestFocus();
-        root.setOnKeyListener(new View.OnKeyListener() {
+        root.setOnKeyListener((v, keyCode, event) -> {
+            if (event.getAction() == KeyEvent.ACTION_UP
+                    && keyCode == KeyEvent.KEYCODE_BACK) {
 
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_UP
-                        && keyCode == KeyEvent.KEYCODE_BACK) {
-
-                    Util.switchContent(R.id.frag_container,
-                            Util.GAMES_FRAGMENT,
-                            ((MainActivity) (getContext())),
-                            Util.AnimationType.SLIDE_UP);
-                }
-                return true;
+                Util.switchContent(R.id.frag_container,
+                        Util.GAMES_FRAGMENT,
+                        ((MainActivity) (requireContext())),
+                        Util.AnimationType.SLIDE_LEFT);
             }
+            return true;
         });
         return root;
     }
