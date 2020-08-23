@@ -58,7 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_button"
-                android:text="@string/play_chess_online"
+                android:text="@string/bet_online"
                 android:textAllCaps="false"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center"
