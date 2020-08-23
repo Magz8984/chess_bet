@@ -240,6 +240,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
                 this.loader.dismiss();
                 AccountAPI.get().updateUser();
                 EventBroadcast.get().broadcastUserUpdate();
+                this.nameTv.setText(name);
                 Toasty.success(requireContext(),"Username successfully changed", Toasty.LENGTH_LONG).show();
             }
             this.loader.dismiss();
