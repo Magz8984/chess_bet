@@ -58,9 +58,7 @@ public class OnBoardingActivity extends AppCompatActivity implements View.OnClic
     protected void onStart() {
         super.onStart();
         if(!isNewUser()) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-            finish();
+            getUserPath();
         }
     }
 
@@ -123,6 +121,11 @@ public class OnBoardingActivity extends AppCompatActivity implements View.OnClic
     void finishInfo() {
         editor.putBoolean("isNewUser", false);
         editor.commit();
+        btnNext.setVisibility(GONE);
+        getUserPath();
+    }
+
+    void getUserPath() {
         FirebaseUser user = AccountAPI.get().getFirebaseUser();
         if(user == null) {
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
@@ -133,8 +136,6 @@ public class OnBoardingActivity extends AppCompatActivity implements View.OnClic
             startActivity(intent);
             finish();
         }
-        btnNext.setVisibility(GONE);
-        finish();
     }
 
     @Override
