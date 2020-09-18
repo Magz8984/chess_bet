@@ -101,7 +101,7 @@ public class OnBoardingActivity extends AppCompatActivity implements View.OnClic
     }
 
     public void addDotsIndicator(int position) {
-        mDots = new TextView[5];
+        mDots = new TextView[4];
         controlLayout.removeAllViews();
         for(int i = 0; i < mDots.length; i++) {
             mDots[i] = new TextView(this);

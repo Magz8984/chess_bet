@@ -21,7 +21,6 @@ public class OnBoardingSliderAdapter extends PagerAdapter {
             R.drawable.chessbetlogo,
             R.drawable.purse,
             R.drawable.chess,
-            R.drawable.success,
             R.drawable.withdrawal
     };
 
@@ -30,7 +29,6 @@ public class OnBoardingSliderAdapter extends PagerAdapter {
             R.string.step_one,
             R.string.step_two,
             R.string.step_three,
-            R.string.step_four
     };
 
     int[] slide_descriptions = {
@@ -38,7 +36,6 @@ public class OnBoardingSliderAdapter extends PagerAdapter {
             R.string.step_one_description,
             R.string.step_two_description,
             R.string.step_three_description,
-            R.string.step_four_description
     };
 
     public OnBoardingSliderAdapter(Context context) {

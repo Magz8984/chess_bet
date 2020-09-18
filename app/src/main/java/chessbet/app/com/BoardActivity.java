@@ -416,7 +416,7 @@ private Move promotionMove;
     public void onBackPressed() {
         if (!isStoredGame) {
             Snackbar snackbar = Snackbar.make(btnSave, R.string.end_match, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.forfeit, v1 -> {
+                    .setAction((isGameFinished) ? R.string.go_to_dashboard : R.string.forfeit, v1 -> {
                         MatchAPI.get().setMatchCreated(false); // FLAG MatchAPI
                         PresenceAPI.get().stopListening(); // Stop listening to opponent online state
                         if(matchableAccount != null && !isGameFinished){

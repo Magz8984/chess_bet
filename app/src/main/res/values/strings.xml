@@ -68,6 +68,7 @@
     <string name="games">Games</string>
     <string name="challenges">Challenges</string>
     <string name="forfeit">Forfeit</string>
+    <string name="go_to_dashboard">Go To Dashboard</string>
     <string name="userVerification">Kindly verify email</string>
     <string name="offline">Offline</string>
     <string name="online">Online</string>

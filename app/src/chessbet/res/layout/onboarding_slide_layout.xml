@@ -32,9 +32,10 @@
         android:textSize="15sp"
         android:textColor="@color/colorTransparentWhite"
         android:layout_below="@+id/txtTitle"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
         android:text="Slide Layout"
+        android:padding="15dp"
         android:layout_centerInParent="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
