@@ -35,4 +35,21 @@
     <string name="service_agreement">Service Agreement</string>
     <string name="support_email">support@chess-bet.com</string>
     <string name="bet_online">Bet Online</string>
+    <string name="back">Back</string>
+    <string name="next">Next</string>
+    <string name="finish">Finish</string>
+
+    <!--Slider Details-->
+    <string name="welcome_to_chess_bet">Welcome To Chess Bet</string>
+    <string name="welcome_to_chess_bet_description">Welcome to Chessbet! Let\'s get you set up in three easy steps</string>
+
+    <string name="step_one">Deposit</string>
+    <string name="step_one_description"> Follow the prompts to deposit the amount you wish to have in your e-wallet.
+        Remember, if you intend on playing multiple games to deposit the required amount.</string>
+
+    <string name="step_two">Bet Online</string>
+    <string name="step_two_description">Select the amount you wish to use as a bet.</string>
+
+    <string name="step_three">Cash Out</string>
+    <string name="step_three_description">Chess Bet offers real time payment options making sure you cash out as soon as you win.</string>
 </resources>
