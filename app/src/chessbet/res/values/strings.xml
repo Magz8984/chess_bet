@@ -35,4 +35,27 @@
     <string name="service_agreement">Service Agreement</string>
     <string name="support_email">support@chess-bet.com</string>
     <string name="bet_online">Bet Online</string>
+    <string name="back">Back</string>
+    <string name="next">Next</string>
+    <string name="finish">Finish</string>
+
+    <!--Slider Details-->
+    <string name="welcome_to_chess_bet">Welcome To Chess Bet</string>
+    <string name="welcome_to_chess_bet_description">Chess Bet is a P2P Chess Betting Platform. Chess Bet gives chess players of all skill levels
+    a chance to earn money from chess by staking and wining money after a chess game</string>
+
+    <string name="step_one">Deposit</string>
+    <string name="step_one_description">Deposit money in your e-wallet on chess bet</string>
+
+    <string name="step_two">Play Chess Online</string>
+    <string name="step_two_description">After depositing you can stake a minimum of $1. After game play winner takes 80% of the total game value.
+    If it was a $10 game the final winner will get $18 deposited in the e-wallet</string>
+
+    <string name="step_three">Remember To Win</string>
+    <string name="step_three_description">We recommend downloading chess learning apps such as Chess MVP to brush up on you chess playing skills.
+    Remember this is a game of skill not chance</string>
+
+    <string name="step_four">Cash Out</string>
+    <string name="step_four_description">There is not a better feeling when you get to cash out your hard earned money. Chess Bet offers
+    real time payment options making sure you can cash out as soon as you win that extra game.</string>
 </resources>

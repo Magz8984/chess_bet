@@ -6,9 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
-import com.google.firebase.auth.FirebaseUser;
-
-import chessbet.api.AccountAPI;
 import chessbet.app.com.R;
 
 public class SplashScreen extends AppCompatActivity {
@@ -19,16 +16,8 @@ public class SplashScreen extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
 
         new Handler().postDelayed(() -> {
-            FirebaseUser user = AccountAPI.get().getFirebaseUser();
-            if(user == null) {
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(intent);
-                finish();
-            } else {
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
+            Intent intent = new Intent(getApplicationContext(), OnBoardingActivity.class);
+            startActivity(intent);
         }, 3000);
     }
 }
