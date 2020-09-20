@@ -3,10 +3,13 @@ package chessbet.app.com.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -15,8 +18,18 @@ import androidx.fragment.app.FragmentActivity;
 import com.crashlytics.android.Crashlytics;
 import com.github.jorgecastilloprz.FABProgressCircle;
 import com.github.jorgecastilloprz.listeners.FABProgressListener;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdLoader;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.VideoController;
+import com.google.android.gms.ads.VideoOptions;
+import com.google.android.gms.ads.formats.MediaView;
+import com.google.android.gms.ads.formats.NativeAdOptions;
+import com.google.android.gms.ads.formats.UnifiedNativeAd;
+import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,30 +38,35 @@ import chessbet.api.AccountAPI;
 import chessbet.api.ChallengeAPI;
 import chessbet.api.MatchAPI;
 import chessbet.app.com.BoardActivity;
+import chessbet.app.com.BuildConfig;
 import chessbet.app.com.R;
+import chessbet.app.com.activities.MainActivity;
+import chessbet.domain.Account;
 import chessbet.domain.Challenge;
 import chessbet.domain.ChallengeDTO;
 import chessbet.domain.MatchableAccount;
 import chessbet.services.MatchListener;
 import chessbet.services.MatchService;
 import chessbet.utils.DatabaseUtil;
+import chessbet.utils.Util;
 import es.dmoral.toasty.Toasty;
 
-public class MatchFragment extends Fragment implements View.OnClickListener, MatchListener, FABProgressListener, ChallengeAPI.ChallengeHandler{
+public class MatchFragment extends Fragment implements View.OnClickListener, MatchListener, FABProgressListener, ChallengeAPI.ChallengeHandler {
     private FloatingActionButton btnFindMatch;
     private FABProgressCircle progressCircle;
     private Button btnRatingLess;
     private Button btnRatingMore;
     private Button btnRandom;
-    private Button btnKes1000;
-    private Button btnKes500;
-    private Button btnKes250;
-    private Button btnKes100;
-    private Button btnKes50;
+    private Button btnUSD10;
+    private Button btnUSD5;
+    private Button btnUSD2;
+    private Button btnUSD1;
+    private UnifiedNativeAdView nativeAdView;
+    private UnifiedNativeAd nativeAd = null;
 
     private List<View> rangeButtons;
     private List<View> amountButtons;
-    private int amount = 50;
+    private int amount = 1;
     private int range = 1000;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -59,37 +77,56 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
         btnRatingLess = root.findViewById(R.id.btnRatingLess);
         btnRatingMore = root.findViewById(R.id.btnRatingMore);
         btnRandom = root.findViewById(R.id.btnRandomChallenge);
-        btnKes1000 = root.findViewById(R.id.btnKes1000);
-        btnKes500 = root.findViewById(R.id.btnKes500);
-        btnKes250 = root.findViewById(R.id.btnKes250);
-        btnKes100 = root.findViewById(R.id.btnKes100);
-        btnKes50 = root.findViewById(R.id.btnKes50);
+        btnUSD10 = root.findViewById(R.id.btnUSD10);
+        btnUSD5 = root.findViewById(R.id.btnUSD5);
+        btnUSD2 = root.findViewById(R.id.btnUSD2);
+        btnUSD1 = root.findViewById(R.id.btnUSD1);
+        nativeAdView = root.findViewById(R.id.addView);
 
         btnFindMatch.setOnClickListener(this);
         btnRatingLess.setOnClickListener(this);
         btnRatingMore.setOnClickListener(this);
         btnRandom.setOnClickListener(this);
-        btnKes1000.setOnClickListener(this);
-        btnKes500.setOnClickListener(this);
-        btnKes250.setOnClickListener(this);
-        btnKes100.setOnClickListener(this);
-        btnKes50.setOnClickListener(this);
+        btnUSD10.setOnClickListener(this);
+        btnUSD5.setOnClickListener(this);
+        btnUSD2.setOnClickListener(this);
+        btnUSD1.setOnClickListener(this);
         MatchAPI.get().setMatchListener(this);
-        amountButtons = Arrays.asList(btnKes50, btnKes100, btnKes250, btnKes1000, btnKes500);
+        amountButtons = Arrays.asList(btnUSD10, btnUSD5, btnUSD2, btnUSD1);
         rangeButtons = Arrays.asList(btnRandom, btnRatingMore, btnRatingLess);
         ChallengeAPI.get().setChallengeHandler(this);
+
+        // Handle Back press
+        root.setFocusableInTouchMode(true);
+        root.requestFocus();
+        root.setOnKeyListener((v, keyCode, event) -> {
+            if (event.getAction() == KeyEvent.ACTION_UP
+                    && keyCode == KeyEvent.KEYCODE_BACK) {
+
+                Util.switchContent(R.id.frag_container,
+                        Util.GAMES_FRAGMENT,
+                        ((MainActivity) (requireContext())),
+                        Util.AnimationType.SLIDE_LEFT);
+            }
+            return true;
+        });
         return root;
     }
 
     @Override
     public void onClick(View view) {
         if(view.equals(btnFindMatch)) {
+            Account account = AccountAPI.get().getCurrentAccount();
             MatchAPI.get().getAccount();
-            if(AccountAPI.get().getCurrentAccount() == null) {
+            if(account == null) {
                 Toasty.info(requireContext(), "Account Is Not Yet Loaded").show();
                 return;
             } if (amount == 0 || range == 0) {
                 Toasty.info(requireContext(), "Select amount and range").show();
+                return;
+            }
+            if(!account.isTerms_and_condition_accepted()) {
+                Toasty.info(requireContext(), "Kindly Accept Terms And Conditions. On the navigation menu").show();
                 return;
             }
             progressCircle.show();
@@ -100,25 +137,23 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
                     .setEloRating(AccountAPI.get().getCurrentAccount().getElo_rating())
                     .setOwner(AccountAPI.get().getCurrentAccount().getOwner())
                     .setAmount(amount)
-                    .setDuration(5)
+                    .setDuration(3)
                     .build();
+            Log.d("ChallengeDTO", new Gson().toJson(challengeDTO));
             ChallengeAPI.get().getSetChallengeImplementation(challengeDTO);
             btnFindMatch.setEnabled(false);
-        } else if(view.equals(btnKes1000)) {
-            this.amount = 1000;
-            this.selectButton(btnKes1000, amountButtons);
-        } else if (view.equals(btnKes500)){
-            this.amount = 500;
-            this.selectButton(btnKes500, amountButtons);
-        } else if(view.equals(btnKes50)) {
-            this.amount = 50;
-            this.selectButton(btnKes50, amountButtons);
-        } else if (view.equals(btnKes250)){
-            this.amount = 250;
-            this.selectButton(btnKes250, amountButtons);
-        } else if (view.equals(btnKes100)) {
-            this.amount = 100;
-            this.selectButton(btnKes100, amountButtons);
+        } else if(view.equals(btnUSD10)) {
+            this.amount = 10;
+            this.selectButton(btnUSD10, amountButtons);
+        } else if (view.equals(btnUSD5)){
+            this.amount = 5;
+            this.selectButton(btnUSD5, amountButtons);
+        } else if(view.equals(btnUSD2)) {
+            this.amount = 2;
+            this.selectButton(btnUSD2, amountButtons);
+        } else if (view.equals(btnUSD1)){
+            this.amount = 1;
+            this.selectButton(btnUSD1, amountButtons);
         } else if(view.equals(btnRandom)) {
             this.range = 1000;
             this.selectButton(btnRandom, rangeButtons);
@@ -185,9 +220,7 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
     public void challengeFound(String response) {
         FragmentActivity activity = getActivity();
         if(activity != null) {
-            activity.runOnUiThread(() -> {
-                Toasty.success(requireContext(), response).show();
-            });
+            activity.runOnUiThread(() -> Toasty.info(requireContext(), response).show());
         }
     }
 
@@ -207,5 +240,91 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
         Snackbar.make(progressCircle, "Challenge Found", Snackbar.LENGTH_LONG)
                 .setAction("Action",null)
                 .show();
+    }
+
+    private void populateAdView(UnifiedNativeAd nativeAd){
+        MediaView mediaView = nativeAdView.findViewById(R.id.ad_media);
+        nativeAdView.setMediaView(mediaView);
+
+        nativeAdView.setCallToActionView(nativeAdView.findViewById(R.id.ad_call_to_action));
+
+        if (nativeAd.getCallToAction() == null) {
+            nativeAdView.getCallToActionView().setVisibility(View.INVISIBLE);
+        } else {
+            nativeAdView.getCallToActionView().setVisibility(View.VISIBLE);
+            ((Button) nativeAdView.getCallToActionView()).setText(nativeAd.getCallToAction());
+        }
+
+        nativeAdView.setNativeAd(nativeAd);
+
+        VideoController videoController = nativeAd.getVideoController();
+
+        if(videoController.hasVideoContent()){
+            videoController.setVideoLifecycleCallbacks(new VideoController.VideoLifecycleCallbacks() {
+                @Override
+                public void onVideoEnd() {
+                    super.onVideoEnd();
+                    Toast.makeText(getContext(), "Thanks For Watching This Ad", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
+
+    private void viewAd(){
+        AdLoader.Builder builder = new AdLoader.Builder(requireContext(), BuildConfig.ADD_MOB_UNIT_ID);
+        builder.forUnifiedNativeAd(unifiedNativeAd -> {
+            if(nativeAd != null){
+                nativeAd.destroy();
+            }
+            nativeAd = unifiedNativeAd;
+            populateAdView(nativeAd);
+        });
+
+        VideoOptions videoOptions = new VideoOptions.Builder()
+                .setStartMuted(true)
+                .build();
+
+        NativeAdOptions adOptions = new NativeAdOptions.Builder()
+                .setVideoOptions(videoOptions)
+                .build();
+        builder.withNativeAdOptions(adOptions);
+
+        AdLoader adLoader = builder.withAdListener(new AdListener() {
+            @Override
+            public void onAdFailedToLoad(int i) {
+                switch(i){
+                    case AdRequest.ERROR_CODE_INTERNAL_ERROR:
+                        Toast.makeText(getContext(), "Failed to load due to an internal error", Toast.LENGTH_LONG).show();
+                        break;
+                    case AdRequest.ERROR_CODE_INVALID_REQUEST:
+                        Toast.makeText(getContext(), "Failed to load due to an invalid request", Toast.LENGTH_LONG).show();
+                        break;
+                    case AdRequest.ERROR_CODE_NETWORK_ERROR:
+                        Toast.makeText(getContext(), "Failed to load due to a network error", Toast.LENGTH_LONG).show();
+                        break;
+                    case AdRequest.ERROR_CODE_NO_FILL:
+                        Toast.makeText(getContext(), "Failed to load due to code no fill", Toast.LENGTH_LONG).show();
+                        break;
+                    default:
+                        Toast.makeText(getContext(), "Failed to load with error code " + i, Toast.LENGTH_LONG).show();
+                        break;
+                }
+            }
+        }).build();
+
+        adLoader.loadAd(new AdRequest.Builder().build());
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Start Add Viewing after views are interactive
+        this.viewAd();
     }
 }

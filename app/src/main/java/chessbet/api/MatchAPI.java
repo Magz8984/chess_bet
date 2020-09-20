@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 import chessbet.domain.Constants;
-import chessbet.domain.DatabaseMatch;
+import chessbet.domain.Match;
 import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchResult;
 import chessbet.domain.MatchStatus;
@@ -56,7 +56,7 @@ public class MatchAPI implements Serializable {
     private FirebaseUser firebaseUser;
     private MatchListener matchListener;
     private RemoteMoveListener remoteMoveListener;
-    private DatabaseMatch currentDatabaseMatch;
+    private Match match;
     private static MatchAPI INSTANCE = new MatchAPI();
     private static int RESPONSE_OKAY_FLAG = 200;
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
@@ -74,8 +74,8 @@ public class MatchAPI implements Serializable {
         this.matchListener = matchListener;
     }
 
-    public DatabaseMatch getCurrentDatabaseMatch() {
-        return currentDatabaseMatch;
+    public Match getMatch() {
+        return match;
     }
 
     public void setRemoteMoveListener(RemoteMoveListener remoteMoveListener) {
@@ -133,17 +133,17 @@ public class MatchAPI implements Serializable {
 
     /**
      * This match is the current match being played
-     * @param currentDatabaseMatch Current match being played
+     * @param match Current match being played
      */
-    public void setCurrentDatabaseMatch(DatabaseMatch currentDatabaseMatch) {
-        this.currentDatabaseMatch = currentDatabaseMatch;
+    public void setMatch(Match match) {
+        this.match = match;
     }
 
     /**
      * Used during end game
      */
     public void removeCurrentMatch(){
-        this.currentDatabaseMatch = null;
+        this.match = null;
     }
 
     public void sendMoveData(MatchableAccount matchableAccount, int source, int destination, String pgn, long gameTimeLeft, String promotedPiece){
@@ -190,7 +190,7 @@ public class MatchAPI implements Serializable {
 
     public void storeCurrentMatchOnCloud(String gameText, OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener){
         MatchStorageTask matchStorageTask = new MatchStorageTask();
-        matchStorageTask.setCurrentDatabaseMatch(currentDatabaseMatch);
+        matchStorageTask.setCurrentDatabaseMatch(match);
         matchStorageTask.setOnSuccessListener(onSuccessListener);
         matchStorageTask.execute(gameText);
     }
@@ -224,7 +224,7 @@ public class MatchAPI implements Serializable {
      */
     public static class MatchStorageTask extends AsyncTask<String,Void,Void>{
         private OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener;
-        private DatabaseMatch currentDatabaseMatch;
+        private Match currentDatabaseMatch;
         @Override
         protected Void doInBackground(String... strings) {
             StorageReference storageReference = FirebaseStorage.getInstance().getReference(Constants.GAMES_CLOUD_REFERENCE + "/" + currentDatabaseMatch.getMatchId() + ".pgn" );
@@ -232,7 +232,7 @@ public class MatchAPI implements Serializable {
             return null;
         }
 
-        void setCurrentDatabaseMatch(DatabaseMatch currentDatabaseMatch) {
+        void setCurrentDatabaseMatch(Match currentDatabaseMatch) {
             this.currentDatabaseMatch = currentDatabaseMatch;
         }
 

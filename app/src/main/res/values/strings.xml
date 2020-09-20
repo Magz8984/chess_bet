@@ -68,6 +68,7 @@
     <string name="games">Games</string>
     <string name="challenges">Challenges</string>
     <string name="forfeit">Forfeit</string>
+    <string name="go_to_dashboard">Go To Dashboard</string>
     <string name="userVerification">Kindly verify email</string>
     <string name="offline">Offline</string>
     <string name="online">Online</string>
@@ -76,6 +77,8 @@
     <string name="create_puzzle_from_recording">Create puzzle from recording</string>
     <string name="create_puzzle">Create Puzzle</string>
     <string name="company">Iconic King</string>
+    <string name="powered_by">Powered By</string>
+    <string name="copyright">&#169; &#32; Iconic King</string>
     <string name="feature_unavailable">Feature Unavailable</string>
     <string name="analysis_board">Analysis Board</string>
     <string name="you_won">You Won</string>
@@ -92,6 +95,7 @@
     <string name="computer_levels">Computer Levels</string>
     <string name="username">Username</string>
     <string name="search">Search</string>
+    <string name="accept_terms">Accept Terms</string>
     <string name="play_friend">Play Friend</string>
     <string name="user_not_found">No user found</string>
     <string name="challenge">Challenge</string>
@@ -105,6 +109,7 @@
     <string name="pgn_viewer">Chess MVP PGN Viewer</string>
     <string name="join_tournament">Join Tournament</string>
     <string name="view_tournament">View Tournament</string>
+    <string name="offline_game_preference">Offline Game Preference</string>
     <string name="deposit">Deposit</string>
     <string name="play_chess">Play Chess</string>
     <string name="transactions">Transactions</string>
@@ -119,4 +124,7 @@
     <string name="remove_photo">Remove photo</string>
     <string name="remove">Remove</string>
     <string name="cancel">Cancel</string>
+    <string name="amount">Amount</string>
+    <string name="chess_bet_user">Chess Bet user</string>
+    <string name="play_chess_online">Play Chess Online</string>
 </resources>

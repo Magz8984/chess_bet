@@ -19,7 +19,7 @@ import java.util.Objects;
 
 import chessbet.domain.Account;
 import chessbet.domain.Constants;
-import chessbet.domain.DatabaseMatch;
+import chessbet.domain.Match;
 import chessbet.domain.MatchDetails;
 import chessbet.domain.MatchStatus;
 import chessbet.domain.Puzzle;
@@ -87,6 +87,7 @@ public class AccountAPI {
             db.collection(AccountAPI.USER_COLLECTION).document(user.getUid()).get().addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     currentUser = Objects.requireNonNull(task.getResult()).toObject(User.class);
+                    EventBroadcast.get().broadCastAccountUserUpdate();
                     updateCurrentUserProfile();
                 }
                 else {
@@ -248,6 +249,16 @@ public class AccountAPI {
         });
     }
 
+    public void updateAccount(AccountListener accountListener){
+        accountReference.set(currentAccount).addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                accountListener.onAccountUpdated(true);
+            } else {
+                accountListener.onAccountUpdated(false);
+            }
+        });
+    }
+
     /**
      * Used to get an account on user Id
      * @param owner userId
@@ -341,20 +352,21 @@ public class AccountAPI {
     }
 
     /** Results are got from firestore **/
-    public List<DatabaseMatch> assignMatchResults(List<DatabaseMatch> databaseMatches){
-        List<DatabaseMatch> newList = new ArrayList<>();
-        for (DatabaseMatch databaseMatch : databaseMatches){
+    public List<Match> assignMatchResults(List<Match> matches){
+        List<Match> newList = new ArrayList<>();
+        for (Match match : matches){
             for (MatchDetails matchDetails: currentAccount.getMatches()) {
-                if(matchDetails.getMatch_result().getMatchId().equals(databaseMatch.getMatchId())){
+                if(matchDetails.getMatch_result().getMatchId().equals(match.getMatchId())){
                     if (matchDetails.getMatch_result().getMatchStatus().equals(MatchStatus.DRAW)){
-                        databaseMatch.setMatchStatus(MatchStatus.DRAW);
+                        match.setMatchStatus(MatchStatus.DRAW);
                     } else if(matchDetails.getMatch_result().getLoss().equals(currentAccount.getOwner())){
-                        databaseMatch.setMatchStatus(MatchStatus.LOSS);
+                        match.setMatchStatus(MatchStatus.LOSS);
                     } else if(matchDetails.getMatch_result().getGain().equals(currentAccount.getOwner())) {
-                        databaseMatch.setMatchStatus(MatchStatus.WON);
+                        match.setMatchStatus(MatchStatus.WON);
                     }
-                    databaseMatch.setMatchResult(matchDetails.getMatch_result());
-                    newList.add(databaseMatch);
+                    match.setMatchResult(matchDetails.getMatch_result());
+                    match.setAmount(matchDetails.getAmount());
+                    newList.add(match);
                 }
             }
         }

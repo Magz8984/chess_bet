@@ -2,6 +2,14 @@ apply plugin: 'com.android.application'
 
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('/home/collins/Documents/Projects/CHESS-BET/chess-bet-docs/admin-docs/keystore.jks')
+            storePassword 'Colloski8984'
+            keyAlias 'upload'
+            keyPassword 'Colloski8984'
+        }
+    }
     compileSdkVersion 29
     defaultConfig {
         multiDexEnabled true
@@ -15,13 +23,14 @@ android {
         }
     }
     packagingOptions {
-        pickFirst 'META-INF/*'
+        pickFirst '**/META-INFMANIFEST.MF'
     }
 
     buildTypes {
         release {
             debuggable false
             minifyEnabled false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
@@ -52,9 +61,13 @@ android {
             dimension 'app'
             applicationId 'com.chessbet.app'
             resValue "string", "app_name", "Chess Bet"
-            versionCode 1
-            versionName "1.0"
+            versionCode 5
+            versionName "1.4"
             manifestPlaceholders = [appNameValue: "Chess Bet"]
+            buildConfigField("String", "DATABASE_NAME", chessBetDatabase)
+            buildConfigField("String", "ADD_MOB_UNIT_ID", chessBetAdUnitId)
+            buildConfigField("String", "ADD_MOB_TEST_UNIT_ID", chessBetTestAdUnitId)
+            buildConfigField("String", "AD_MOB_APP_ID", chessBetAdMobAppId)
         }
 
         chessmvp { // Chess Bet Test
@@ -64,6 +77,10 @@ android {
             versionCode 17
             versionName "1.2.6"
             manifestPlaceholders = [appNameValue: "Chess MVP"]
+            buildConfigField("String", "DATABASE_NAME", chessMVPDatabase)
+            buildConfigField("String", "ADD_MOB_UNIT_ID", adUnitId)
+            buildConfigField("String", "ADD_MOB_TEST_UNIT_ID", testAdUnitId)
+            buildConfigField("String", "AD_MOB_APP_ID", adMobAppId)
         }
     }
 
@@ -88,9 +105,7 @@ android {
     }
 
     buildTypes.each {
-        it.buildConfigField("String", "ADD_MOB_UNIT_ID", adUnitId)
-        it.buildConfigField("String", "ADD_MOB_TEST_UNIT_ID", testAdUnitId)
-        it.buildConfigField("String", "AD_MOB_APP_ID", adMobAppId)
+
     }
 
     lintOptions {
@@ -132,7 +147,6 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.github.iconic-king:chess-engine-dev:9eb56bdde9'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.github.erehmi:countdowntask:1.0.1' // Count Down Timer
     implementation 'com.github.jorgecastilloprz:fabprogresscircle:1.01@aar' // Fab Progress Bar
@@ -147,6 +161,8 @@ dependencies {
     implementation 'com.github.GrenderG:Toasty:1.4.2'
     implementation 'androidx.navigation:navigation-fragment:2.2.2'
     implementation 'androidx.navigation:navigation-ui:2.2.2'
+    implementation 'br.com.simplepass:loading-button-android:2.2.0'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
 
 task copyToAssets(type: Copy) {

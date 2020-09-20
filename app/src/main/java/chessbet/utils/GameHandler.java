@@ -12,7 +12,7 @@ import java.util.TimerTask;
 import chessbet.api.AccountAPI;
 import chessbet.api.MatchAPI;
 import chessbet.domain.Constants;
-import chessbet.domain.DatabaseMatch;
+import chessbet.domain.Match;
 import chessbet.domain.MatchResult;
 import chessbet.domain.MatchStatus;
 import chessbet.domain.MatchableAccount;
@@ -38,7 +38,7 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
     public static final int GAME_DRAWN_FLAG = 13780;
     public static final int GAME_TIMER_LAPSED = 472489;
     private static final int GAME_ABANDONED_FLAG = 40428;
-    private static final int GAME_ABORTED_FLAG = 10077;
+    public static final int GAME_ABORTED_FLAG = 10077;
 //    private static final int DISCONNECTED_FLAG = 47924;
 
     public void setMatchResult(MatchResult matchResult) {
@@ -82,13 +82,13 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
 
         @Override
         protected Void doInBackground(Context... contexts) {
+            Log.d("OpId", matchableAccount.getOpponentId());
             AccountAPI.get().getAUser(matchableAccount.getOpponentId(), user -> {
                 if(user != null){
                    SQLDatabaseHelper sqlDatabaseHelper = new SQLDatabaseHelper(contexts[0]);
-                   sqlDatabaseHelper.addMatch(matchableAccount.getMatchId(), user.getProfile_photo_url(), user.getUser_name());
-                   DatabaseMatch databaseMatch = DatabaseUtil.getMatchFromLocalDB(sqlDatabaseHelper.getMatch(matchableAccount.getMatchId()));
-                   MatchAPI.get().setCurrentDatabaseMatch(databaseMatch);
-                    assert databaseMatch != null;
+                   sqlDatabaseHelper.addMatch(matchableAccount.getMatchId(), user.getProfile_photo_url(), user.getUser_name(), matchableAccount.getMatch_type());
+                   Match match = new Match(user.getUser_name(), user.getProfile_photo_url(), matchableAccount.getMatchId(), matchableAccount.getMatch_type());
+                   MatchAPI.get().setMatch(match);
                     opponentListener.onOpponentReceived(user);
                 }
             });
@@ -114,7 +114,7 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
      * Listen to remote moves being made if none within 30 seconds terminate match
      */
     public static class NoMoveReactor  extends AsyncTask<Void,Void,Void>{
-        private volatile boolean hasOpponentMoved;
+        private volatile boolean hasOpponentMoved = false;
         private volatile boolean hasMadeMove;
         private volatile boolean isOpponentDisconnected = false;
         private volatile boolean isMyPly;
@@ -177,6 +177,10 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
 
         public void setHasOpponentMoved(boolean hasOpponentMoved) {
             this.hasOpponentMoved = hasOpponentMoved;
+        }
+
+        public boolean hasOpponentMoved() {
+            return hasOpponentMoved;
         }
 
         public void clearNoMoveSeconds(){

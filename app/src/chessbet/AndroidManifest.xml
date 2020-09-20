@@ -7,15 +7,24 @@
         android:name="chessbet.Application"
         android:allowBackup="true"
         android:fullBackupContent="true"
-        android:icon="@mipmap/icon"
+        android:icon="@mipmap/chess_bet_logo"
         android:label="${appNameValue} ${env}"
         android:largeHeap="true"
-        android:roundIcon="@mipmap/icon_round"
+        android:roundIcon="@mipmap/chess_bet_logo_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="chessbet.app.com.MainActivity"/>
-        <activity android:name="chessbet.app.com.LoginActivity" />
-        <activity android:name="chessbet.app.com.SplashScreen">
+        <activity android:name="chessbet.app.com.activities.OnBoardingActivity"/>
+        <activity android:name="chessbet.app.com.activities.WithdrawActivity" />
+        <activity android:name="chessbet.app.com.activities.TransactionsActivity" />
+        <activity android:name="chessbet.app.com.activities.DepositActivity" />
+        <activity
+            android:name="chessbet.app.com.BoardActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="chessbet.app.com.activities.MainActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name="chessbet.app.com.activities.LoginActivity" />
+        <activity android:name="chessbet.app.com.activities.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
@@ -23,6 +32,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-6366215233867718~7929924007" />
 
         <service
             android:name="chessbet.services.MatchService"

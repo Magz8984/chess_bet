@@ -20,7 +20,7 @@ public class GameTimer {
     private CountDownTask opponentCountDownTask;
     private CountDownTask ownerCountDownTask;
     private int opponentTimeLeft;
-    private int ownerTimeLeft;
+    private volatile int ownerTimeLeft;
     private Player currentPlayer;
     private boolean isTimerLapsed = false;
 
@@ -164,7 +164,8 @@ public class GameTimer {
     }
 
     public int getOwnerTimeLeft() {
-        return ownerTimeLeft;
+        //Add a 1 second delay
+        return ownerTimeLeft - 1000;
     }
 
     private static String timeConverter(long seconds){

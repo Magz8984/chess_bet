@@ -11,23 +11,40 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import chessbet.api.AccountAPI;
 import chessbet.app.com.R;
-import chessbet.domain.DatabaseMatch;
+import chessbet.domain.Match;
+import chessbet.domain.MatchType;
 import chessbet.utils.DatabaseUtil;
 import chessbet.utils.SQLDatabaseHelper;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHolder>{
-    private List<DatabaseMatch> databaseMatches;
+    private List<Match> matches;
     private Context context;
 
     public MatchesAdapter(Context context){
         this.context = context;
-        this.databaseMatches = DatabaseUtil.getMatchesFromLocalDB(new SQLDatabaseHelper(context).getMatches());
-        databaseMatches = AccountAPI.get().assignMatchResults(this.databaseMatches);
+        this.matches = DatabaseUtil.getMatchesFromLocalDB(new SQLDatabaseHelper(context).getMatches());
+        matches = AccountAPI.get().assignMatchResults(this.matches);
+    }
+
+    public MatchesAdapter(Context context, @NonNull MatchType matchType, List<Match> matches){
+        this.context = context;
+        this.matches = AccountAPI.get().assignMatchResults(matches);
+
+        // Filter type specific games
+        List<Match> filteredMatches = new ArrayList<>();
+        for (final Match match: matches) {
+            if(match.getMatchType().equals(matchType.toString())){
+                filteredMatches.add(match);
+            }
+        }
+        this.matches = filteredMatches;
     }
 
     @NonNull
@@ -40,9 +57,16 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         try{
-            Glide.with(context).asBitmap().load(databaseMatches.get(position).getOpponentPic()).into(holder.getImgOpponentPic());
-            holder.getOpponentUserName().setText(databaseMatches.get(position).getOpponentUserName());
-            holder.getTxtMatchStatus().setText(databaseMatches.get(position).getMatchStatus().toString());
+            Match match = matches.get(position);
+            Glide.with(context).asBitmap().load(match.getOpponentPic()).into(holder.getImgOpponentPic());
+            holder.getOpponentUserName().setText(match.getOpponentUserName());
+            holder.getTxtMatchStatus().setText(match.getMatchStatus().toString());
+
+            if(match.getAmount() != null) {
+                holder.getTxtAmount().setText(String.format(Locale.ENGLISH,"%.2f", match.getAmount().getAmount() / 2));
+                holder.getTxtCurrency().setText(match.getAmount().getCurrency());
+            }
+
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -50,20 +74,25 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return databaseMatches.size();
+        return matches.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder{
         private CircleImageView imgOpponentPic;
         private TextView txtMatchStatus;
         private TextView opponentUserName;
+        private TextView txtCurrency;
+        private TextView txtAmount;
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             imgOpponentPic = itemView.findViewById(R.id.imgOpponentPic);
             txtMatchStatus = itemView.findViewById(R.id.txtResult);
             opponentUserName = itemView.findViewById(R.id.txtOpponentName);
+            txtAmount = itemView.findViewById(R.id.txtAmount);
+            txtCurrency = itemView.findViewById(R.id.txtCurrency);
         }
-         TextView getTxtMatchStatus() {
+
+        TextView getTxtMatchStatus() {
             return txtMatchStatus;
         }
 
@@ -73,6 +102,14 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHold
 
         TextView getOpponentUserName() {
             return opponentUserName;
+        }
+
+        public TextView getTxtAmount() {
+            return txtAmount;
+        }
+
+        public TextView getTxtCurrency() {
+            return txtCurrency;
         }
     }
 }

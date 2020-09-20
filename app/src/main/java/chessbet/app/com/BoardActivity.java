@@ -43,12 +43,13 @@ import chessbet.api.AccountAPI;
 import chessbet.api.ChallengeAPI;
 import chessbet.api.MatchAPI;
 import chessbet.api.PresenceAPI;
+import chessbet.app.com.activities.MainActivity;
 import chessbet.app.com.fragments.ColorPicker;
 import chessbet.app.com.fragments.CreatePuzzle;
 import chessbet.app.com.fragments.EvaluateGame;
 import chessbet.app.com.fragments.PawnPromotionDialog;
 import chessbet.domain.Constants;
-import chessbet.domain.DatabaseMatch;
+import chessbet.domain.Match;
 import chessbet.domain.MatchEvent;
 import chessbet.domain.MatchStatus;
 import chessbet.domain.MatchType;
@@ -243,9 +244,10 @@ private Move promotionMove;
         this.matchableAccount = matchableAccount;
         boardView.setMode(BoardView.Modes.PLAY_ONLINE);
         boardView.setMatchableAccount(matchableAccount);
+
         boardView.setOnlineBoardDirection();
-        boardView.getMatchAPI().setOnMatchEnd(this);
-        boardView.getMatchAPI().setRecentMatchEvaluated(false);
+        MatchAPI.get().setOnMatchEnd(this);
+        MatchAPI.get().setRecentMatchEvaluated(false);
         setNoMoveReactorPly();
 
         // Get opponent details and place in SQLiteDB
@@ -254,6 +256,8 @@ private Move promotionMove;
         backgroundMatchBuilder.setMatchableAccount(matchableAccount);
         backgroundMatchBuilder.execute(this);
         setBoardViewGameTimer();
+
+        Log.d("MatchableAccount", this.matchableAccount.toString());
     }
 
     /**
@@ -412,11 +416,15 @@ private Move promotionMove;
     public void onBackPressed() {
         if (!isStoredGame) {
             Snackbar snackbar = Snackbar.make(btnSave, R.string.end_match, Snackbar.LENGTH_LONG)
-                    .setAction(R.string.forfeit, v1 -> {
+                    .setAction((isGameFinished) ? R.string.go_to_dashboard : R.string.forfeit, v1 -> {
                         MatchAPI.get().setMatchCreated(false); // FLAG MatchAPI
                         PresenceAPI.get().stopListening(); // Stop listening to opponent online state
                         if(matchableAccount != null && !isGameFinished){
-                           endGame(GameHandler.GAME_INTERRUPTED_FLAG);
+                            if(!noMoveReactor.hasOpponentMoved()) {
+                                endGame(GameHandler.GAME_ABORTED_FLAG);
+                            } else  {
+                                endGame(GameHandler.GAME_INTERRUPTED_FLAG);
+                            }
                         } else {
                             goToMainActivity();
                         }
@@ -595,7 +603,7 @@ private Move promotionMove;
     private void endGame(int flag) {
         this.isGameFinished = true;
         if (this.matchableAccount != null) {
-            if(boardView.getMatchAPI().isRecentMatchEvaluated()){
+            if(MatchAPI.get().isRecentMatchEvaluated()){
                 return;
             }
             ChallengeAPI.get().setOnChallenge(false);
@@ -610,7 +618,7 @@ private Move promotionMove;
             AccountAPI.get().listenToAccountUpdate();
 
             evaluateGame = new EvaluateGame(); // Game evaluation fragment
-            DatabaseMatch match = MatchAPI.get().getCurrentDatabaseMatch();
+            Match match = MatchAPI.get().getMatch();
             if(match != null) {
                 evaluateGame.setOpponent(match.getOpponentUserName());
             }
@@ -622,7 +630,13 @@ private Move promotionMove;
                 RemoteMove.get().addEvent(MatchEvent.INTERRUPTED);
                 RemoteMove.get().send(matchableAccount.getMatchId(), matchableAccount.getSelf());
                 matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_INTERRUPTED_FLAG, MatchStatus.INTERRUPTED, matchableAccount.getOpponentId(), matchableAccount.getOwner());
-            } else if (flag == GameHandler.GAME_FINISHED_FLAG) {
+            } else if (flag == GameHandler.GAME_ABORTED_FLAG) {
+                evaluateGame.setMatchStatus(MatchStatus.GAME_ABORTED);
+                RemoteMove.get().addEvent(MatchEvent.GAME_ABORTED);
+                RemoteMove.get().send(matchableAccount.getMatchId(), matchableAccount.getSelf());
+                matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_ABORTED_FLAG, MatchStatus.GAME_ABORTED, matchableAccount.getOpponentId(), matchableAccount.getOwner());
+            }
+            else if (flag == GameHandler.GAME_FINISHED_FLAG) {
                 if(boardView.isLocalWinner()){
                     evaluateGame.setMatchStatus(MatchStatus.WON);
                     matchableAccount.endMatch(boardView.getPortableGameNotation(),
@@ -662,10 +676,14 @@ private Move promotionMove;
 
     private void storeGameOnCloud(){
         if(matchableAccount != null && boardView.getLocalAlliance().equals(Alliance.WHITE) && AccountAPI.get().getCurrentUser() != null){
-            MatchAPI.get().storeCurrentMatchOnCloud(PGNMainUtils.writeGameAsPGN(boardView.getMoveLog().convertToEngineMoveLog(),
-                    AccountAPI.get().getCurrentUser().getUser_name(),
-                    MatchAPI.get().getCurrentDatabaseMatch().getOpponentUserName(), "*"),
-                    taskSnapshot -> Log.d(BoardActivity.class.getSimpleName(), "Match Uploaded"));
+            try {
+                MatchAPI.get().storeCurrentMatchOnCloud(PGNMainUtils.writeGameAsPGN(boardView.getMoveLog().convertToEngineMoveLog(),
+                        AccountAPI.get().getCurrentUser().getUser_name(),
+                        MatchAPI.get().getMatch().getOpponentUserName(), "*"),
+                        taskSnapshot -> Log.d(BoardActivity.class.getSimpleName(), "Match Uploaded"));
+            } catch (Exception ex) {
+                Crashlytics.logException(ex);
+            }
         }
     }
 

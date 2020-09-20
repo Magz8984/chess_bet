@@ -11,9 +11,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name="chessbet.app.com.SignUpActivity" />
-        <activity android:name="chessbet.app.com.LoginActivity" />
-        <activity android:name="chessbet.app.com.MainActivity"/>
-        <activity android:name="chessbet.app.com.SplashScreen">
+        <activity android:name="chessbet.app.com.activities.LoginActivity" />
+        <activity android:name="chessbet.app.com.BoardActivity"/>
+        <activity android:name="chessbet.app.com.activities.MainActivity"/>
+        <activity android:name="chessbet.app.com.activities.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />
@@ -21,5 +22,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-6366215233867718~5575140942" /> <!-- FCM SETUP -->
     </application>
 </manifest>

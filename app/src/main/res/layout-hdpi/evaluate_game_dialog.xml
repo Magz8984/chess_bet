@@ -106,6 +106,13 @@
                         android:padding="2sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
+                    <Button
+                        android:id="@+id/btnCancel"
+                        android:layout_marginLeft="5dp"
+                        android:gravity="end"
+                        android:text="Cancel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.gms.ads.formats.UnifiedNativeAdView>

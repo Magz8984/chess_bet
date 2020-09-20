@@ -1,4 +1,4 @@
-package chessbet.app.com;
+package chessbet.app.com.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 
@@ -27,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.api.AccountAPI;
+import chessbet.app.com.R;
 import chessbet.utils.Util;
 import es.dmoral.toasty.Toasty;
 
@@ -148,6 +151,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         try {
             PhoneAuthProvider.getInstance().verifyPhoneNumber(this.phoneNumber, 60, TimeUnit.SECONDS,
                     this,  this.verificationStateChangedCallbacks, this.token);
+            loading.setMessage("Wait a moment...");
+            loading.show();
         } catch (Exception ex) {
             Toasty.error(this, ex.getMessage(), Toasty.LENGTH_LONG).show();
         }
@@ -158,22 +163,40 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         try {
             FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener(task -> {
                 if(task.isSuccessful()) {
-                    loading.dismiss();
-                    AccountAPI.get().setUser(Objects.requireNonNull(task.getResult()).getUser());
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                    goToMainActivity(Objects.requireNonNull(task.getResult()).getUser());
                 } else {
                     loading.dismiss();
                     if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                         Toasty.error(this, "Verification Code Entered Was Invalid", Toasty.LENGTH_LONG).show();
                     } else {
-                        Toasty.error(this, "An error occurred while signing in", Toasty.LENGTH_LONG).show();
+                        if(task.getException() != null){
+                            String message = task.getException().getMessage();
+                            Crashlytics.logException(new Exception(message));
+                            Toasty.error(this, Objects.requireNonNull(task.getException().getMessage()), Toasty.LENGTH_LONG).show();
+                        }
                     }
                 }
             });
         } catch (Exception ex) {
             Toasty.error(this, ex.toString(), Toasty.LENGTH_LONG).show();
         }
+    }
+
+    /**
+     * Wait for cloud functions to create account within 7 seconds
+     * @param user Firebase User
+     */
+    private void goToMainActivity(FirebaseUser user) {
+        loading.dismiss();
+        loading.setMessage("Accounts Are Begin Created");
+        loading.show();
+
+        new Handler().postDelayed((Runnable) () -> {
+            loading.dismiss();
+            AccountAPI.get().setUser(user);
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+            finish();
+        }, 7000);
     }
 }

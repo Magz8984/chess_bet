@@ -1,83 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.GamesFragment"
-    android:background="@drawable/homebg">
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="KES 1000"
-            android:textColor="@color/colorGold"
-            android:textSize="22sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="20dp"/>
-
+    tools:context=".fragments.GamesFragment">
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/swiperefresh_layout"
+        android:background="@drawable/homebg">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp">
-
-            <Button
-                android:id="@+id/button"
-                android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:fontFamily="@font/chakrapetchbold"
+                android:id="@+id/txtBalance"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/deposit"
-                android:background="@drawable/rounded_button"
-                android:textAllCaps="false"
-                android:layout_marginRight="5dp"
-                android:layout_marginEnd="5dp" />
-
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/bootstrap_green"
+                android:textSize="22sp"
+                android:layout_marginTop="20dp"/>
             <Button
-                android:id="@+id/button2"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/play_chess"
-                android:layout_marginLeft="5dp"
-                android:textAllCaps="false"
+                android:id="@+id/btnPlayOnline"
+                android:layout_marginTop="20dp"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
                 android:background="@drawable/rounded_button"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="5dp" />
+                android:text="@string/bet_online"
+                android:textAllCaps="false"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:padding="15dp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp">
+                <Button
+                    android:id="@+id/btnDeposit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_button"
+                    android:text="@string/deposit"
+                    android:textAllCaps="false"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginRight="5dp" />
+                <Button
+                    android:id="@+id/btnTransactions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAllCaps="false"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/transactions"
+                    android:background="@drawable/rounded_button"
+                    android:layout_marginLeft="5dp" />
+            </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recBetGames"
+                android:layout_marginTop="30dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </LinearLayout>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_marginTop="30dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/button3"
-            android:layout_marginTop="30dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/transactions"
-            android:background="@drawable/rounded_button"
-            android:layout_gravity="center"
-            android:textAllCaps="false"
-            android:padding="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-    </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    <TextView
+        android:layout_centerInParent="true"
+        android:id="@+id/txtNoMatches"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:singleLine="true"
+        android:text="@string/no_bets"
+        android:fontFamily="@font/chakrapetchbold"
+        android:textColor="@color/colorPrimaryYellow"
+        android:textSize="20sp"
+        android:visibility="gone" />
+</RelativeLayout>

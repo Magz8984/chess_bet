@@ -9,7 +9,7 @@ import android.os.Parcelable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import chessbet.app.com.MainActivity;
+import chessbet.app.com.activities.MainActivity;
 import chessbet.utils.DatabaseUtil;
 import chessbet.utils.GameHandler;
 import chessbet.utils.GameManager;
@@ -25,6 +25,8 @@ public class MatchableAccount implements Parcelable {
     private String opponent;
     private String owner;
     private String opponentId;
+    private String currency;
+    private double amount;
 
     public MatchableAccount(Parcel in) {
         elo_rating = in.readInt();
@@ -37,6 +39,8 @@ public class MatchableAccount implements Parcelable {
         opponent = in.readString();
         owner = in.readString();
         opponentId = in.readString();
+        amount = in.readDouble();
+        currency = in.readString();
     }
 
     public MatchableAccount(){
@@ -92,6 +96,22 @@ public class MatchableAccount implements Parcelable {
 
     public void setDuration(long duration) {
         this.duration = duration;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public String getCurrency() {
+        return currency;
     }
 
     public String getOpponentId() {
@@ -151,6 +171,9 @@ public class MatchableAccount implements Parcelable {
         dest.writeString(opponent);
         dest.writeString(owner);
         dest.writeString(opponentId);
+        dest.writeDouble(amount);
+        dest.writeString(currency);
+
     }
 
     public String getSelf() {
@@ -170,6 +193,8 @@ public class MatchableAccount implements Parcelable {
         matchableAccount.setMatched(jsonObject.getBoolean("matched"));
         matchableAccount.setDuration(jsonObject.getLong("duration"));
         matchableAccount.setOpponentId(jsonObject.getString("opponentId"));
+        matchableAccount.setAmount(jsonObject.getDouble("amount"));
+        matchableAccount.setCurrency(jsonObject.getString("currency"));
         return matchableAccount;
     }
 
@@ -189,11 +214,29 @@ public class MatchableAccount implements Parcelable {
                 .setMatchId(this.getMatchId())
                 .setMatchStatus(matchStatus)
                 .setPgnText(pgn)
-                .setAmount(new Amount(0, "KES")) // Will Be Different For Online Betting games
+                .setAmount(new Amount(amount, currency)) // Will Be Different For Online Betting games
                 .setGain(gain)
                 .setLoss(loss)
                 .build();
         GameHandler.getInstance().setMatchResult(matchResult);
         GameHandler.getInstance().execute(flag);
+    }
+
+    @Override
+    public String toString() {
+        return "MatchableAccount{" +
+                "elo_rating=" + elo_rating +
+                ", matchId='" + matchId + '\'' +
+                ", match_type='" + match_type + '\'' +
+                ", matchable=" + matchable +
+                ", matched=" + matched +
+                ", online=" + online +
+                ", duration=" + duration +
+                ", opponent='" + opponent + '\'' +
+                ", owner='" + owner + '\'' +
+                ", opponentId='" + opponentId + '\'' +
+                ", currency='" + currency + '\'' +
+                ", amount=" + amount +
+                '}';
     }
 }

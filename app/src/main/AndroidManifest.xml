@@ -21,10 +21,8 @@
         android:name="chessbet.Application"
         android:allowBackup="true"
         android:fullBackupContent="true"
-        android:icon="@mipmap/icon"
         android:label="${appNameValue} ${env}"
         android:largeHeap="true"
-        android:roundIcon="@mipmap/icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".tournament.MyTournamentsActivity"/>
@@ -95,9 +93,6 @@
         <activity android:name=".GameAnalysisActivity" />
 
         <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-6366215233867718~5575140942" /> <!-- FCM SETUP -->
-        <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/chesslogo" />
         <meta-data
@@ -109,9 +104,7 @@
         <meta-data
             android:name="firebase_analytics_collection_enabled"
             android:value="false" /> <!-- FCM SETUP -->
-        <activity android:name=".BoardActivity" />
         <activity android:name=".PresenceActivity" />
-
         <service
             android:name="chessbet.services.MatchService"
             android:icon="@drawable/chesslogo"

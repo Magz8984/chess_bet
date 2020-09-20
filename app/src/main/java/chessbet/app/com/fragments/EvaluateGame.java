@@ -25,7 +25,6 @@ import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 
 import java.util.Locale;
-import java.util.Objects;
 
 import chessbet.app.com.BuildConfig;
 import chessbet.app.com.R;
@@ -34,13 +33,14 @@ import chessbet.domain.MatchStatus;
 import chessbet.utils.EventBroadcast;
 import customviews.EvalView;
 
-public class EvaluateGame extends DialogFragment implements EventBroadcast.AccountUpdated {
+public class EvaluateGame extends DialogFragment implements EventBroadcast.AccountUpdated, View.OnClickListener {
     private UnifiedNativeAdView nativeAdView;
     private UnifiedNativeAd nativeAd = null;
     private EvalView evalView;
     private int initialPoints;
     private MatchStatus matchStatus;
     private String opponent;
+    private Button btnCancel;
 
     @Nullable
     @Override
@@ -48,6 +48,8 @@ public class EvaluateGame extends DialogFragment implements EventBroadcast.Accou
         View view = inflater.inflate(R.layout.evaluate_game_dialog, container, false);
         nativeAdView = view.findViewById(R.id.addView);
         evalView = view.findViewById(R.id.evalView);
+        btnCancel = view.findViewById(R.id.btnCancel);
+        btnCancel.setOnClickListener(this);
         EventBroadcast.get().addAccountUpdated(this);
         return view;
     }
@@ -199,7 +201,7 @@ public class EvaluateGame extends DialogFragment implements EventBroadcast.Accou
     }
 
     private void viewAd(){
-        AdLoader.Builder builder = new AdLoader.Builder(Objects.requireNonNull(getContext()), BuildConfig.ADD_MOB_UNIT_ID);
+        AdLoader.Builder builder = new AdLoader.Builder(requireContext(), BuildConfig.ADD_MOB_UNIT_ID);
         builder.forUnifiedNativeAd(unifiedNativeAd -> {
             if(nativeAd != null){
                 nativeAd.destroy();
@@ -256,5 +258,12 @@ public class EvaluateGame extends DialogFragment implements EventBroadcast.Accou
         int pointDifference = account.getElo_rating() - initialPoints;
         String points = String.format(Locale.US,"%d(%d) -> %d ", initialPoints, pointDifference, account.getElo_rating());
         evalView.setPoints(points);
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view.equals(btnCancel)){
+            this.dismiss();
+        }
     }
 }

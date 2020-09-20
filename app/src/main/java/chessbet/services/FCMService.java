@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import chessbet.api.AccountAPI;
-import chessbet.app.com.MainActivity;
+import chessbet.app.com.activities.MainActivity;
 import chessbet.app.com.R;
 import chessbet.domain.Constants;
 import chessbet.domain.FCMMessage;

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    tools:context="chessbet.app.com.SplashScreen">
+    tools:context="chessbet.app.com.activities.SplashScreen">
 
     <LinearLayout
         android:layout_centerInParent="true"
@@ -14,22 +14,25 @@
 
         <ImageView
             android:layout_gravity="center"
-            android:src="@drawable/chesslogo"
-            android:layout_width="130dp"
-            android:layout_height="130dp"
+            android:src="@drawable/chessbetlogo"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
             android:contentDescription="@string/logo" />
 
-        <TextView
-            android:fontFamily="@font/chakrapetchbold"
-            android:textColor="@color/white"
-            android:layout_gravity="center"
-            android:textSize="30dp"
-            android:text="@string/app_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
     </LinearLayout>
 
     <TextView
+        android:textColor="@color/colorPrimaryYellow"
+        android:textSize="17sp"
+        android:fontFamily="@font/chakrapetchbold"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/company"
+        android:text="@string/powered_by"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/company"
         android:layout_margin="5dp"
         android:text="@string/company"
         android:fontFamily="@font/monotonregular"

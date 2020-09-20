@@ -8,11 +8,11 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +26,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -34,6 +33,8 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -50,12 +51,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import chessbet.api.AccountAPI;
 import chessbet.app.com.R;
+import chessbet.app.com.activities.MainActivity;
 import chessbet.domain.Account;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
 import chessbet.services.UserListener;
 import chessbet.utils.EventBroadcast;
 import chessbet.utils.Permissions;
+import chessbet.utils.Util;
 import de.hdodenhof.circleimageview.CircleImageView;
 import es.dmoral.toasty.Toasty;
 
@@ -71,7 +74,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
     @BindView(R.id.gallery_layout) LinearLayout gallery_layout;
     @BindView(R.id.camera_layout) LinearLayout camera_layout;
     @BindView(R.id.cancel_layout) LinearLayout cancel_layout;
-    @BindView(R.id.bottom_layout) LinearLayout bottom_layout;
+    @BindView(R.id.bottom_sheet_layout) LinearLayout bottom_sheet_layout;
+
+    private BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
 
     private static final int IMAGE_PICK_GALLERY_CODE = 300;
     private static final int IMAGE_PICK_CAMERA_CODE = 400;
@@ -101,7 +106,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
         gallery_layout.setOnClickListener(this);
         camera_layout.setOnClickListener(this);
         cancel_layout.setOnClickListener(this);
-        bottom_layout.setOnClickListener(this);
+
+        bottomSheetBehavior = BottomSheetBehavior.from(bottom_sheet_layout);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
         AccountAPI.get().setAccountListener(this);
         AccountAPI.get().getAccount();
@@ -113,16 +120,33 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
         cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
         storagePermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
+        // Handle Back press
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener((v, keyCode, event) -> {
+            if (event.getAction() == KeyEvent.ACTION_UP
+                    && keyCode == KeyEvent.KEYCODE_BACK) {
+
+                Util.switchContent(R.id.frag_container,
+                        Util.GAMES_FRAGMENT,
+                        ((MainActivity) (requireContext())),
+                        Util.AnimationType.SLIDE_LEFT);
+            }
+            return true;
+        });
         return view;
     }
 
     @Override
     public void onClick(View v) {
         if (v.equals(iv_camera)){
-            bottom_layout.setVisibility(View.VISIBLE);
+            if (bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED){
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
         }
         if (v.equals(cancel_layout)){
-            bottom_layout.setVisibility(View.GONE);
+                bottomSheetBehavior.setHideable(true);
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         }
         if (v.equals(editIv)){
             showUsernameDialog();
@@ -213,6 +237,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
                 this.loader.dismiss();
                 AccountAPI.get().updateUser();
                 EventBroadcast.get().broadcastUserUpdate();
+                this.nameTv.setText(name);
                 Toasty.success(requireContext(),"Username successfully changed", Toasty.LENGTH_LONG).show();
             }
             this.loader.dismiss();
@@ -262,20 +287,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
             this.loader.dismiss();
             if(status){
                 Toasty.success(getContext(), "User Updated", Toasty.LENGTH_LONG).show();
-                reloadActivity();
             } else {
                 Toasty.error(getContext(), "User Not Updated", Toasty.LENGTH_LONG).show();
             }
         }
-    }
-
-    private void reloadActivity() {
-        assert getFragmentManager() != null;
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        if (Build.VERSION.SDK_INT >= 26){
-            ft.setReorderingAllowed(false);
-        }
-        ft.detach(this).attach(this).commit();
     }
 
     @Override
@@ -293,6 +308,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
         if (resultCode == RESULT_OK){
             if (requestCode == IMAGE_PICK_GALLERY_CODE){
                 // image is picked from gallery, get uri of image
+                loader.show();
                 Uri selectedImageUri = data.getData();
                 Glide.with(this).asBitmap().load(selectedImageUri)
                         .listener(new RequestListener<Bitmap>() {
@@ -334,7 +350,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
     private UploadTask uploadProfilePhotoTask(Bitmap bitmap){
         byte[] bytes = {};
         try {
-            loader.dismiss();
             profile_photo.setDrawingCacheEnabled(true);
             profile_photo.buildDrawingCache();
 //            Bitmap bitmap = ((BitmapDrawable) profileImage.getDrawable()).getBitmap();
@@ -348,24 +363,38 @@ public class ProfileFragment extends Fragment implements View.OnClickListener,
         return storageReference.putBytes(bytes);
     }
 
+    /**
+     * Just a callback for when account photo has been updated on the database
+     * @return {OnCompleteListener<Void>}
+     */
+    public OnCompleteListener<Void> onAccountPhotoUrlUpdated() {
+        return task -> {
+            try {
+                Toast.makeText(getActivity(),R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
+                loader.dismiss();
+                AccountAPI.get().getUser();
+            } catch (Exception ex) {
+                Crashlytics.logException(ex);
+            }
+        };
+    }
+
     private void uploadProfilePhoto(Bitmap bitmap){
         storageReference = firebaseStorage.getReference(FirebaseAuth.getInstance().getUid() + "/" + "profile_photo");
         uploadProfilePhotoTask(bitmap).addOnFailureListener(e -> {
             loader.dismiss();
             Crashlytics.logException(e);
-        });
-
-        uploadProfilePhotoTask(bitmap).addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnCompleteListener(task -> {
-            final Uri uri = task.getResult();
-            Map<String,Object> map = new HashMap<>();
-            assert uri != null;
-            Glide.with(requireContext()).load(uri).into(profile_photo);
-            map.put("profile_photo_url", uri.toString());
-            AccountAPI.get().getUserPath().update(map).addOnCompleteListener(task1 -> {
-                Toast.makeText(getActivity(),R.string.upload_profile_photo,Toast.LENGTH_LONG).show();
-                loader.dismiss();
-                AccountAPI.get().getUser();
-            }).addOnCanceledListener(() ->  loader.dismiss());
+        }).addOnSuccessListener(taskSnapshot -> storageReference.getDownloadUrl().addOnCompleteListener(task -> {
+            try {
+                final Uri uri = task.getResult();
+                Map<String,Object> map = new HashMap<>();
+                assert uri != null;
+                Glide.with(requireContext()).asBitmap().load(uri).into(profile_photo);
+                map.put("profile_photo_url", uri.toString());
+                AccountAPI.get().getUserPath().update(map).addOnCompleteListener(onAccountPhotoUrlUpdated()).addOnCanceledListener(() ->  loader.dismiss());
+            } catch (Exception ex) {
+                Crashlytics.logException(ex);
+            }
         }));
     }
 

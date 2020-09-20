@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item android:title="@string/app_name">
+            <menu>
+                <item
+                    android:id="@+id/nav_games"
+                    android:title="@string/menu_games"
+                    android:icon="@drawable/ic_game"/>
+                <item
+                    android:id="@+id/nav_profile"
+                    android:title="@string/menu_profile"
+                    android:icon="@drawable/ic_person_green"/>
+                <item
+                    android:id="@+id/nav_playOnline"
+                    android:title="@string/bet_online"
+                    android:icon="@drawable/ic_play"/>
+            </menu>
+        </item>
+        <item android:title="@string/service_agreement">
+            <menu>
+                <item
+                    android:id="@+id/nav_terms_conditions"
+                    android:title="@string/menu_terms_conditions"
+                    android:icon="@drawable/ic_security"/>
+            </menu>
+        </item>
+        <item android:title="@string/chess_bet_user">
+            <menu>
+                <item
+                    android:id="@+id/nav_logout"
+                    android:title="@string/menu_logout"
+                    android:icon="@drawable/ic_lock"/>
+            </menu>
+        </item>
+    </group>
+</menu>

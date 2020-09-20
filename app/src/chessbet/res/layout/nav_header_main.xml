@@ -13,23 +13,19 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:id="@+id/imgProfile"
+        android:layout_width="78dp"
+        android:layout_height="78dp"
         android:src="@drawable/profile"
         android:layout_gravity="center"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:paddingRight="5dp"
-        android:paddingLeft="5dp"/>
+        android:layout_margin="5dp"/>
 
     <TextView
         android:id="@id/txtPhoneNumber"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:fontFamily="@font/chakrapetchbold"
-        android:textAlignment="center"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textColor="@color/colorGold"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
@@ -37,7 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="5dp">
+        android:layout_marginTop="2dp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -63,17 +59,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/balance"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:fontFamily="@font/chakrapetchbold"
-            android:textColor="@color/colorGreen"/>
+            android:textColor="@color/bootstrap_green"/>
         <TextView
             android:id="@+id/txtBalance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/kes_0"
+            android:text="@string/USD0"
             android:textSize="20sp"
             android:fontFamily="@font/chakrapetchbold"
-            android:textColor="@color/colorGreen"/>
+            android:textColor="@color/bootstrap_green"/>
     </LinearLayout>
-
+    <TextView
+        android:textSize="15sp"
+        android:fontFamily="@font/chakrapetchbold"
+        android:textColor="@color/colorPrimaryYellow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/support_email"
+        android:layout_gravity="end"/>
 </LinearLayout>

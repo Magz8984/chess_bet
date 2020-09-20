@@ -6,6 +6,7 @@ package chessengine;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.AsyncTask;
@@ -13,7 +14,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.graphics.Canvas;
 
 import com.chess.engine.Alliance;
 import com.chess.engine.Move;
@@ -68,7 +68,6 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
     protected GameTimer gameTimer;
     protected OnMoveDoneListener onMoveDoneListener;
     private MatchableAccount matchableAccount;
-    private MatchAPI matchAPI;
     private Alliance localAlliance;
     protected ECOBook ecoBook;
     private RemoteViewUpdateListener remoteViewUpdateListener;
@@ -439,11 +438,9 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
      * @param to toCellCoordinate
      */
     public void setMoveData(int from, int to, String promotedPiece) {
-        if(matchAPI != null){
             // Help regulate time between play
 //          long timeLeft = (getOwnerAlliance() == Alliance.WHITE) ? gameTimer.getOwnerTimeLeft() : gameTimer.getOpponentTimeLeft();
-            matchAPI.sendMoveData(matchableAccount,from,to, getPortableGameNotation(), gameTimer.getOwnerTimeLeft(), promotedPiece);
-        }
+            MatchAPI.get().sendMoveData(matchableAccount,from,to, getPortableGameNotation(), gameTimer.getOwnerTimeLeft(), promotedPiece);
     }
 
     public void setRemoteViewUpdateListener(RemoteViewUpdateListener remoteViewUpdateListener) {
@@ -526,11 +523,10 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
      */
     public void setMatchableAccount(MatchableAccount matchableAccount) {
         // Makes sure to set match api to send and receive moves
-        if(matchableAccount != null && matchAPI == null){
+        if(matchableAccount != null){
             this.matchableAccount = matchableAccount;
-            matchAPI = MatchAPI.get();
-            matchAPI.setRemoteMoveListener(this);
-            matchAPI.getRemoteMoveData(matchableAccount);
+            MatchAPI.get().setRemoteMoveListener(this);
+            MatchAPI.get().getRemoteMoveData(matchableAccount);
             if(matchableAccount.getOpponent().equals("WHITE")){
                 this.localAlliance = Alliance.BLACK;
             }
@@ -607,6 +603,10 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
         }
     }
 
+    private boolean isOnOnlineGame() {
+        return matchableAccount != null;
+    }
+
     public void makeMove(Move move) {
         final MoveTransition transition = chessBoard.currentPlayer().makeMove(move);
 
@@ -624,8 +624,11 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
             if (move.isPawnPromotionMove()) {
                 strPromotedPiece = getPieceTypeFromPawnPromotion(move.toString()).toString();
             }
-            setMoveData(movedPiece.getPiecePosition(), move.getDestinationCoordinate(),
-                    (chessBoard.currentPlayer().getAlliance().equals(Alliance.BLACK) ? strPromotedPiece.toLowerCase() : strPromotedPiece.toUpperCase())); // Online Play
+
+            if(isOnOnlineGame()) {
+                setMoveData(movedPiece.getPiecePosition(), move.getDestinationCoordinate(),
+                        (chessBoard.currentPlayer().getAlliance().equals(Alliance.BLACK) ? strPromotedPiece.toLowerCase() : strPromotedPiece.toUpperCase())); // Online Play
+            }
 
             if(mode != BoardView.Modes.PUZZLE_MODE && !isEngineLoading) {
                 // Stop the current player timer
@@ -924,14 +927,6 @@ public class BoardView extends View implements RemoteMoveListener, EngineUtil.On
 
     public MatchableAccount getMatchableAccount() {
         return matchableAccount;
-    }
-
-    public MatchAPI getMatchAPI() {
-        return matchAPI;
-    }
-
-    public void setMatchAPI(MatchAPI matchAPI) {
-        this.matchAPI = matchAPI;
     }
 
     public void setGameTimer(GameTimer gameTimer) {
