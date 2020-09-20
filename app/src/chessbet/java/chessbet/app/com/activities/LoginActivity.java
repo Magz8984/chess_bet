@@ -188,7 +188,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
      */
     private void goToMainActivity(FirebaseUser user) {
         loading.dismiss();
-        loading.setMessage("Accounts Are Begin Created");
+        loading.setMessage("Accounts Are Being Created");
         loading.show();
 
         new Handler().postDelayed((Runnable) () -> {
