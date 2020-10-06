@@ -83,7 +83,7 @@ public class WithdrawActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onPayoutRequestReceived() {
         loader.dismiss();
-        runOnUiThread(() -> Toasty.success(this, "Withdrawal Request Sent Successfully", Toasty.LENGTH_LONG).show());
+        runOnUiThread(() -> Toasty.success(this, "Withdrawal Request Sent Successfully And Will be Processed within 3 hours", Toasty.LENGTH_LONG).show());
     }
 
     @Override
