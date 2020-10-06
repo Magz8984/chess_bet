@@ -80,12 +80,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if(Util.textViewHasText(txtPhoneNumber)) {
             String phoneNumber  = txtPhoneNumber.getText().toString();
             // TODO Support Other Countries
-            if(phoneNumber.startsWith("+254")){
+            if(phoneNumber.startsWith("+254") || phoneNumber.startsWith("+256")){
                 loading.setMessage("Wait a moment...");
                 loading.show();
                 PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber, 60, TimeUnit.SECONDS, this, this.verificationStateChangedCallbacks);
             } else {
-                Toasty.warning(this, "Phone Number must begin with +254", Toasty.LENGTH_LONG).show();
+                Toasty.warning(this, "Phone Number must begin with +254 or +256", Toasty.LENGTH_LONG).show();
             }
         } else {
             Toasty.warning(this, "Phone Number Required", Toasty.LENGTH_LONG).show();
