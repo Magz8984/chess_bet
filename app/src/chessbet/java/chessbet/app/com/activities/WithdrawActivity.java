@@ -47,8 +47,11 @@ public class WithdrawActivity extends AppCompatActivity implements View.OnClickL
             try {
                 final String recipient = txtPhoneNumber.getText().toString();
                 // TODO Add Support for other countries
-                if(recipient.startsWith("254")) {
-                    final long amount = Long.parseLong(txtAmount.getText().toString());
+                final long amount = Long.parseLong(txtAmount.getText().toString());
+                // Check withdrawal amounts are within the limits
+                if (amount < 200) {
+                    runOnUiThread(() -> Toasty.error(this, "Minimum withdrawal amount is Ksh 200", Toasty.LENGTH_LONG).show());
+                } else if (recipient.startsWith("254")) {
                     Amount payoutAmount = new Amount();
                     payoutAmount.setAmount(amount);
                     payoutAmount.setCurrency("KES");
