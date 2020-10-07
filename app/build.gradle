@@ -61,8 +61,8 @@ android {
             dimension 'app'
             applicationId 'com.chessbet.app'
             resValue "string", "app_name", "Chess Bet"
-            versionCode 5
-            versionName "1.4"
+            versionCode 6
+            versionName "1.5"
             manifestPlaceholders = [appNameValue: "Chess Bet"]
             buildConfigField("String", "DATABASE_NAME", chessBetDatabase)
             buildConfigField("String", "ADD_MOB_UNIT_ID", chessBetAdUnitId)
