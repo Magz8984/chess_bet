@@ -95,6 +95,8 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
         btnUSD5.setOnClickListener(this);
         btnUSD2.setOnClickListener(this);
         btnUSD1.setOnClickListener(this);
+        btnKSH50.setOnClickListener(this);
+        btnKSH10.setOnClickListener(this);
         MatchAPI.get().setMatchListener(this);
         amountButtons = Arrays.asList(btnUSD10, btnUSD5, btnUSD2, btnUSD1, btnKSH50, btnKSH10);
         rangeButtons = Arrays.asList(btnRandom, btnRatingMore, btnRatingLess);
