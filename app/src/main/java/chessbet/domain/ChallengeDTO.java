@@ -71,7 +71,7 @@ public class ChallengeDTO {
             return this;
         }
 
-        public Builder setAmount (int amount) {
+        public Builder setAmount (float amount) {
             this.challengeDTO.amount.setAmount(amount);
             this.challengeDTO.amount.setCurrency("USD");
             return this;

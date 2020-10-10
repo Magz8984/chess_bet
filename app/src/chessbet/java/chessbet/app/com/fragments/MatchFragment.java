@@ -61,12 +61,14 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
     private Button btnUSD5;
     private Button btnUSD2;
     private Button btnUSD1;
+    private Button btnKSH50;
+    private Button btnKSH10;
     private UnifiedNativeAdView nativeAdView;
     private UnifiedNativeAd nativeAd = null;
 
     private List<View> rangeButtons;
     private List<View> amountButtons;
-    private int amount = 1;
+    private float amount = 0.1f;
     private int range = 1000;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -81,6 +83,8 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
         btnUSD5 = root.findViewById(R.id.btnUSD5);
         btnUSD2 = root.findViewById(R.id.btnUSD2);
         btnUSD1 = root.findViewById(R.id.btnUSD1);
+        btnKSH10 = root.findViewById(R.id.btnKSH10);
+        btnKSH50 = root.findViewById(R.id.btnKSH50);
         nativeAdView = root.findViewById(R.id.addView);
 
         btnFindMatch.setOnClickListener(this);
@@ -92,7 +96,7 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
         btnUSD2.setOnClickListener(this);
         btnUSD1.setOnClickListener(this);
         MatchAPI.get().setMatchListener(this);
-        amountButtons = Arrays.asList(btnUSD10, btnUSD5, btnUSD2, btnUSD1);
+        amountButtons = Arrays.asList(btnUSD10, btnUSD5, btnUSD2, btnUSD1, btnKSH50, btnKSH10);
         rangeButtons = Arrays.asList(btnRandom, btnRatingMore, btnRatingLess);
         ChallengeAPI.get().setChallengeHandler(this);
 
@@ -154,7 +158,14 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
         } else if (view.equals(btnUSD1)){
             this.amount = 1;
             this.selectButton(btnUSD1, amountButtons);
-        } else if(view.equals(btnRandom)) {
+        } else  if (view.equals(btnKSH50)) {
+            this.amount = 0.5f;
+            this.selectButton(btnKSH50, amountButtons);
+        } else  if (view.equals(btnKSH10)) {
+            this.amount = 0.1f;
+            this.selectButton(btnKSH10, amountButtons);
+        }
+        else if(view.equals(btnRandom)) {
             this.range = 1000;
             this.selectButton(btnRandom, rangeButtons);
         } else if (view.equals(btnRatingLess)){

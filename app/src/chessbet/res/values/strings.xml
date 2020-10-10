@@ -20,6 +20,8 @@
     <string name="USD5">USD 5</string>
     <string name="USD2">USD 2</string>
     <string name="USD1">USD 1</string>
+    <string name="KSH50">KSH 50</string>
+    <string name="KSH10">KSH 10</string>
     <string name="advert">Advert</string>
     <string name="resend_code">Resend Code</string>
     <string name="enter_amount_text">Enter amount and use your M-Pesa pin to authorize the transaction. Maximum deposit amount 5,000 KSH.</string>

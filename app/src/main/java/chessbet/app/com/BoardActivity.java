@@ -623,7 +623,7 @@ private Move promotionMove;
                 evaluateGame.setOpponent(match.getOpponentUserName());
             }
             if (flag == GameHandler.GAME_DRAWN_FLAG) {
-                matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_DRAWN_FLAG, MatchStatus.DRAW, null, null);
+                matchableAccount.endMatch(boardView.getPortableGameNotation(), GameHandler.GAME_DRAWN_FLAG, MatchStatus.DRAW, matchableAccount.getOpponentId(), matchableAccount.getOwner());
                 evaluateGame.setMatchStatus(MatchStatus.DRAW);
             } else if (flag == GameHandler.GAME_INTERRUPTED_FLAG) {
                 evaluateGame.setMatchStatus(MatchStatus.INTERRUPTED);
