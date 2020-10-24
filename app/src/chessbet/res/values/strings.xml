@@ -40,6 +40,7 @@
     <string name="back">Back</string>
     <string name="next">Next</string>
     <string name="finish">Finish</string>
+    <string name="challenges">Challenges</string>
 
     <!--Slider Details-->
     <string name="welcome_to_chess_bet">Welcome To Chess Bet</string>
@@ -54,4 +55,5 @@
 
     <string name="step_three">Cash Out</string>
     <string name="step_three_description">Chess Bet offers real time payment options making sure you cash out as soon as you win.</string>
+    <string name="default_notification_channel_id">10077</string>
 </resources>

@@ -87,11 +87,18 @@ public class FCMMessage {
     }
 
     public enum FCMMessageType{
-        CHALLENGE {
+        NEW_CHALLENGE {
             @NonNull
             @Override
             public String toString() {
-                return "CHALLENGE";
+                return "NEW_CHALLENGE";
+            }
+        },
+        ACCEPT_CHALLENGE {
+            @NonNull
+            @Override
+            public String toString() {
+                return "ACCEPT_CHALLENGE";
             }
         },
         INFORMATION {

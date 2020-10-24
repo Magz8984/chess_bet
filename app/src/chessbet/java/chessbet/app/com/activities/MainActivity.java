@@ -6,14 +6,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -24,12 +19,16 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Locale;
+import java.util.Objects;
 
 import chessbet.api.AccountAPI;
+import chessbet.api.NotificationAPI;
 import chessbet.api.PaymentsAPI;
 import chessbet.app.com.R;
 import chessbet.app.com.fragments.GamesFragment;
 import chessbet.domain.Account;
+import chessbet.domain.Constants;
+import chessbet.domain.FCMMessage;
 import chessbet.domain.PaymentAccount;
 import chessbet.domain.User;
 import chessbet.services.AccountListener;
@@ -40,7 +39,7 @@ import es.dmoral.toasty.Toasty;
 
 public class MainActivity extends AppCompatActivity implements AccountListener,
         EventBroadcast.AccountUserUpdate, PaymentsAPI.PaymentAccountReceived,
-        NavigationView.OnNavigationItemSelectedListener {
+        NavigationView.OnNavigationItemSelectedListener, NotificationAPI.TokenRetrieved {
 
     private DrawerLayout drawer;
     private NavigationView navigationView;
@@ -86,6 +85,21 @@ public class MainActivity extends AppCompatActivity implements AccountListener,
         super.onStart();
         AccountAPI.get().getAccount();
         AccountAPI.get().getUser();
+        onConfigurationMessage();
+        NotificationAPI.get().getNotificationToken(this);
+    }
+
+    /**
+     * Navigates to appropriate fragment on new challenge notification
+     */
+    private void onConfigurationMessage() {
+        String messageType = getIntent().getStringExtra(Constants.MESSAGE_TYPE);
+        if(messageType != null) {
+            if(messageType.equals(FCMMessage.FCMMessageType.NEW_CHALLENGE.toString())) {
+                // New Challenges fragment
+
+            }
+        }
     }
 
     @Override
@@ -176,5 +190,18 @@ public class MainActivity extends AppCompatActivity implements AccountListener,
 
     public DrawerLayout getDrawerLayout() {
         return drawer;
+    }
+
+    @Override
+    public void onNotificationTokenReceived(String token) {
+        User user = AccountAPI.get().getCurrentUser();
+        if(!user.getFcmToken().equals(token)){
+            NotificationAPI.get().updateUserToken(token, user);
+        }
+    }
+
+    @Override
+    public void onNotificationTokenErrorReceived(Exception e) {
+        Toasty.error(this, Objects.requireNonNull(e.getMessage()), Toasty.LENGTH_LONG).show();
     }
 }

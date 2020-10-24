@@ -143,6 +143,9 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
                     .setEloRating(AccountAPI.get().getCurrentAccount().getElo_rating())
                     .setOwner(AccountAPI.get().getCurrentAccount().getOwner())
                     .setAmount(amount)
+                    .setUserName(AccountAPI.get().getCurrentUser().getUser_name())
+                    .setPhotoUrl(AccountAPI.get().getCurrentUser().getProfile_photo_url())
+                    .setFcmToken(AccountAPI.get().getCurrentUser().getFcmToken())
                     .setDuration(3)
                     .build();
             Log.d("ChallengeDTO", new Gson().toJson(challengeDTO));

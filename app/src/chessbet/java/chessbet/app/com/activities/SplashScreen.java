@@ -8,6 +8,7 @@ import android.os.Handler;
 
 import chessbet.app.com.R;
 
+
 public class SplashScreen extends AppCompatActivity {
 
     @Override

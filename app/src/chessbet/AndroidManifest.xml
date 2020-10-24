@@ -34,13 +34,21 @@
         </activity>
 
         <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:name="com.google.androiHA8ZXwQV8OY6taoRCsY3cMQqWu22d.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-6366215233867718~7929924007" />
 
         <service
             android:name="chessbet.services.MatchService"
             android:icon="@drawable/chesslogo"
             android:label="@string/match_service" />
+
+        <service
+            android:name="chessbet.services.MessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
