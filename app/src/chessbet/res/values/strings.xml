@@ -41,6 +41,7 @@
     <string name="next">Next</string>
     <string name="finish">Finish</string>
     <string name="challenges">Challenges</string>
+    <string name="new_challenges">New Challenges</string>
 
     <!--Slider Details-->
     <string name="welcome_to_chess_bet">Welcome To Chess Bet</string>

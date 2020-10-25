@@ -310,19 +310,19 @@ public class MatchFragment extends Fragment implements View.OnClickListener, Mat
             public void onAdFailedToLoad(int i) {
                 switch(i){
                     case AdRequest.ERROR_CODE_INTERNAL_ERROR:
-                        Toast.makeText(getContext(), "Failed to load due to an internal error", Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireContext(), "Failed to load due to an internal error", Toast.LENGTH_LONG).show();
                         break;
                     case AdRequest.ERROR_CODE_INVALID_REQUEST:
-                        Toast.makeText(getContext(), "Failed to load due to an invalid request", Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireContext(), "Failed to load due to an invalid request", Toast.LENGTH_LONG).show();
                         break;
                     case AdRequest.ERROR_CODE_NETWORK_ERROR:
-                        Toast.makeText(getContext(), "Failed to load due to a network error", Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireContext(), "Failed to load due to a network error", Toast.LENGTH_LONG).show();
                         break;
                     case AdRequest.ERROR_CODE_NO_FILL:
-                        Toast.makeText(getContext(), "Failed to load due to code no fill", Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireContext(), "Failed to load due to code no fill", Toast.LENGTH_LONG).show();
                         break;
                     default:
-                        Toast.makeText(getContext(), "Failed to load with error code " + i, Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireContext(), "Failed to load with error code " + i, Toast.LENGTH_LONG).show();
                         break;
                 }
             }

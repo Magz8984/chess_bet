@@ -490,8 +490,12 @@ private Move promotionMove;
             noMoveReactor.clearNoMoveSeconds();
             noMoveReactor.setMyPly(boardView.isMyPly());
             // Notify NoMoveReactor You Have Made A Move
-            if(boardView.isMyPly() && !boardView.getMoveLog().getMoves().isEmpty()){
-                noMoveReactor.setHasMadeMove(true);
+            if(!boardView.getMoveLog().getMoves().isEmpty()){
+                if(boardView.isMyPly()) {
+                    noMoveReactor.setHasMadeMove(true);
+                } else {
+                    noMoveReactor.setHasOpponentMoved(true);
+                }
             }
         }
     }
@@ -718,8 +722,6 @@ private Move promotionMove;
         runOnUiThread(() -> {
             checkIfOpponentIsOnline(remoteMove);
             boardView.translateRemoteMoveOnBoard(remoteMove);
-            noMoveReactor.clearNoMoveSeconds();
-            noMoveReactor.setHasOpponentMoved(true);
             noMoveReactor.setPgn(boardView.getPortableGameNotation()); // Set current game status
         });
     }
@@ -939,12 +941,12 @@ private Move promotionMove;
 
     @Override
     public void onNoMoveOpponentReacting() {
-        runOnUiThread(() -> Toasty.warning(this, "10 seconds left for opponent", Toasty.LENGTH_LONG).show());
+        runOnUiThread(() -> Toasty.warning(this, "A couple of seconds left for opponent", Toasty.LENGTH_LONG).show());
     }
 
     @Override
     public void onNoMoveSelfReacting() {
-        runOnUiThread(() -> Toasty.warning(this, "10 seconds left to make move", Toasty.LENGTH_LONG).show());
+        runOnUiThread(() -> Toasty.warning(this, "A couple of seconds left to make move", Toasty.LENGTH_LONG).show());
     }
 
     @Override

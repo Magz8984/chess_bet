@@ -14,6 +14,7 @@ import java.util.Date;
 import chessbet.app.com.R;
 import chessbet.app.com.fragments.GamesFragment;
 import chessbet.app.com.fragments.MatchFragment;
+import chessbet.app.com.fragments.NewChallengeFragment;
 import chessbet.app.com.fragments.ProfileFragment;
 import chessbet.app.com.fragments.TermsConditionsFragment;
 
@@ -26,6 +27,7 @@ public class Util {
     public final static String PROFILE_FRAGMENT = "ProfileFragment";
     public final static String PLAY_ONLINE_FRAGMENT = "PlayOnlineFragment";
     public static final String TERMS_FRAGMENT = "TermsFragment";
+    public static final String NEW_CHALLENGES_FRAGMENT = "NewChallengesFragment";
     private static String CURRENT_TAG = null;
 
     /** Get current time*/
@@ -157,7 +159,6 @@ public class Util {
             // If the new fragment can't be found in the manager, create a new
             // one
             if (fragment == null) {
-
                 if (TAG.equals(GAMES_FRAGMENT)) {
                     fragmentToReplace = new GamesFragment();
                 } else if (TAG.equals(PROFILE_FRAGMENT)) {
@@ -168,11 +169,10 @@ public class Util {
                 }
                 else if (TAG.equals(TERMS_FRAGMENT)) {
                     fragmentToReplace = new TermsConditionsFragment();
+                } else if (TAG.equals(NEW_CHALLENGES_FRAGMENT)) {
+                    fragmentToReplace = new NewChallengeFragment();
                 }
-
-            } else
-
-            {
+            } else {
                 if (TAG.equals(GAMES_FRAGMENT)) {
                     fragmentToReplace = fragment;
                 } else if (TAG.equals(PROFILE_FRAGMENT)) {
@@ -182,6 +182,8 @@ public class Util {
                     fragmentToReplace = fragment;
                 }else if (TAG.equals(TERMS_FRAGMENT)) {
                     fragmentToReplace = fragment;
+                }else if(TAG.equals(NEW_CHALLENGES_FRAGMENT)){
+                    fragmentToReplace = fragment;
                 }
             }
             CURRENT_TAG = TAG;
@@ -190,10 +192,6 @@ public class Util {
             transaction.replace(id, fragmentToReplace, TAG);
             transaction.commit();
 
-        } else
-
-        {
-            // Do nothing since we are already on the fragment being changed to
         }
     }
 

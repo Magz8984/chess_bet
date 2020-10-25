@@ -25,6 +25,7 @@
             android:layout_centerVertical="true"
             android:textSize="20sp"
             android:layout_margin="5dp"
+            android:maxLength="10"
             android:fontFamily="@font/chakrapetchbold"
             android:layout_toRightOf="@+id/imgOpponentPic"
             android:text="Opponent"

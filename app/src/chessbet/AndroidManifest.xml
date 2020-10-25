@@ -34,7 +34,7 @@
         </activity>
 
         <meta-data
-            android:name="com.google.androiHA8ZXwQV8OY6taoRCsY3cMQqWu22d.gms.ads.APPLICATION_ID"
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-6366215233867718~7929924007" />
 
         <service

@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.util.Objects;
 
+import chessbet.domain.AcceptChallengeDTO;
 import chessbet.domain.Challenge;
 import chessbet.domain.ChallengeDTO;
 import chessbet.domain.Constants;
@@ -181,6 +182,27 @@ public class ChallengeAPI {
         });
     }
 
+    private void acceptBetChallenge(AcceptChallengeDTO acceptChallengeDTO, Callback callback) {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .cache(null)
+                .build();
+
+        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(Constants.CLOUD_FUNCTIONS_URL.concat(Constants.ACCEPT_BET_CHALLENGE))).newBuilder();
+        String url = builder.build().toString();
+
+        RequestBody requestBody = RequestBody.create(JSON,new Gson().toJson(acceptChallengeDTO));
+        // Generate token for cloud functions to verify user
+        TokenGenerator.generateToken(token -> {
+            Request request = new Request.Builder()
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Authorization", "Bearer " + token)
+                    .url(url)
+                    .post(requestBody)
+                    .build();
+            Call call = okHttpClient.newCall(request);
+            call.enqueue(callback);
+        });
+    }
 
     private void sendTargetedChallenge(TargetedChallenge challenge, Callback  callback) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -228,6 +250,22 @@ public class ChallengeAPI {
 
     public void getSetChallengeImplementation(ChallengeDTO challengeDTO){
         this.getSetChallenge(challengeDTO, new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                challengeHandler.challengeNotFound();
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                assert response.body() != null;
+                String responseString = response.body().string();
+                challengeHandler.challengeFound(responseString);
+            }
+        });
+    }
+
+    public void acceptBetChallengeImplementation (AcceptChallengeDTO acceptChallengeDTO) {
+        this.acceptBetChallenge(acceptChallengeDTO, new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 challengeHandler.challengeNotFound();
