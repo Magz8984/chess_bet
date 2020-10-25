@@ -100,6 +100,8 @@ public class MessagingService extends FirebaseMessagingService implements  Accou
 
     private void  showNotification(@NotNull String title, @NotNull String message, PendingIntent pendingIntent) {
         String channelId = getResources().getString(R.string.default_notification_channel_id);
+        // Cancel All Notification
+        getNotificationManager().cancelAll();
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         int randomNotificationId = new Random().nextInt(10000);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){

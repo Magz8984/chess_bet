@@ -422,7 +422,7 @@ private Move promotionMove;
                         if(matchableAccount != null && !isGameFinished){
                             if(!noMoveReactor.hasOpponentMoved()) {
                                 endGame(GameHandler.GAME_ABORTED_FLAG);
-                            } else  {
+                            } else {
                                 endGame(GameHandler.GAME_INTERRUPTED_FLAG);
                             }
                         } else {
@@ -492,9 +492,10 @@ private Move promotionMove;
             // Notify NoMoveReactor You Have Made A Move
             if(!boardView.getMoveLog().getMoves().isEmpty()){
                 if(boardView.isMyPly()) {
-                    noMoveReactor.setHasMadeMove(true);
-                } else {
+                    // Flag opponent has moved if its my play and the board has just noticed a change on the MoveLog
                     noMoveReactor.setHasOpponentMoved(true);
+                } else {
+                    noMoveReactor.setHasMadeMove(true);
                 }
             }
         }

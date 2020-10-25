@@ -201,6 +201,11 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
 
         public void stopTimer(){
             timer.cancel();
+            // Reset No Move Reactor
+            setHasOpponentMoved(false);
+            setHasMadeMove(false);
+            noMoveSeconds = 0;
+            isMyPly = false;
         }
 
         public void setMyPly(boolean myPly) {
