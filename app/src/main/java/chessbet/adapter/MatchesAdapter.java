@@ -18,6 +18,7 @@ import java.util.Locale;
 import chessbet.api.AccountAPI;
 import chessbet.app.com.R;
 import chessbet.domain.Match;
+import chessbet.domain.MatchStatus;
 import chessbet.domain.MatchType;
 import chessbet.utils.DatabaseUtil;
 import chessbet.utils.SQLDatabaseHelper;
@@ -60,7 +61,8 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHold
             Match match = matches.get(position);
             Glide.with(context).asBitmap().load(match.getOpponentPic()).into(holder.getImgOpponentPic());
             holder.getOpponentUserName().setText(match.getOpponentUserName());
-            holder.getTxtMatchStatus().setText(match.getMatchStatus().toString());
+            // TODO Hack. Change this
+            holder.getTxtMatchStatus().setText((match.getMatchStatus() == MatchStatus.GAME_ABORTED ? "ABORT": match.getMatchStatus().toString()));
 
             if(match.getAmount() != null) {
                 holder.getTxtAmount().setText(String.format(Locale.ENGLISH,"%.2f", match.getAmount().getAmount() / 2));
@@ -70,6 +72,7 @@ public class MatchesAdapter extends RecyclerView.Adapter<MatchesAdapter.ViewHold
         }catch (Exception ex){
             ex.printStackTrace();
         }
+        
     }
 
     @Override

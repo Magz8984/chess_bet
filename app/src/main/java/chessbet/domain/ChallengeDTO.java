@@ -12,6 +12,13 @@ public class ChallengeDTO {
     private Challenge.Type type;
     private int minEloRating;
     private int maxEloRating;
+    private String userName;
+    private String photoUrl;
+    private String fcmToken;
+
+    public Amount getAmount() {
+        return amount;
+    }
 
     public String getOwner() {
         return owner;
@@ -74,6 +81,21 @@ public class ChallengeDTO {
         public Builder setAmount (float amount) {
             this.challengeDTO.amount.setAmount(amount);
             this.challengeDTO.amount.setCurrency("USD");
+            return this;
+        }
+
+        public Builder setUserName (String userName) {
+            this.challengeDTO.userName = userName;
+            return this;
+        }
+
+        public Builder setPhotoUrl (String photoUrl) {
+            this.challengeDTO.photoUrl = photoUrl;
+            return this;
+        }
+
+        public Builder setFcmToken (String fcmToken) {
+            this.challengeDTO.fcmToken = fcmToken;
             return this;
         }
 

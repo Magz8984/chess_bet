@@ -1,5 +1,9 @@
 package chessbet.domain;
 
+import androidx.annotation.NonNull;
+
+import java.util.Locale;
+
 public class Amount {
     private double amount;
     private String currency;
@@ -28,11 +32,9 @@ public class Amount {
         this.currency = currency;
     }
 
+    @NonNull
     @Override
     public String toString() {
-        return "Amount{" +
-                "amount='" + amount + '\'' +
-                ", currency='" + currency + '\'' +
-                '}';
+        return String.format(Locale.ENGLISH,"%s %.2f", currency, amount);
     }
 }

@@ -15,6 +15,15 @@ public class User {
     private long lastSeen;
     private String fcmToken = "";
     private boolean online;
+    private Type type;
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public Type getType() {
+        return type;
+    }
 
     public String getDate_created() {
         return date_created;
@@ -106,6 +115,11 @@ public class User {
 
     public String getFcmToken() {
         return fcmToken;
+    }
+
+    public enum Type{
+        CHESS_MVP,
+        CHESS_BET
     }
 }
 

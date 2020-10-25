@@ -14,6 +14,7 @@ public class Constants {
     public static String FORCE_EVALUATE_MATCH = "/forceEvaluateMatch";
     public static String SEND_FCM_MESSAGE_TO_USERS = "/sendFCMMessage";
     public static String GET_SET_CHALLENGE = "/challenge/randomChallenge";
+    public static String ACCEPT_BET_CHALLENGE = "/challange/acceptBetChallenge";
     public static String SEND_TARGETED_CHALLENGE = "/challenge/sendTargetedChallenge";
     public static String ACCEPT_TARGETED_CHALLENGE = "/challenge/acceptTargetChallenge";
     public static String TERMS_OF_SERVICE_URL = "https://chess-mvp.com/#/home/tos";
@@ -31,6 +32,8 @@ public class Constants {
     public static String CHALLENGE_ID = "challengeId";
     public static String IS_CHALLENGER = "isChallenger";
     public static String CHALLENGER = "Challenger";
+    public static final int TIME_NO_MOVE_END_ON_START = 60;
+    public static final int TIME_NO_MOVE_END_ON_START_CAUTION = 30;
     public static final int TIME_NO_MOVE_END_MATCH = 240;
     public static final int TIME_NO_MOVE_CAUTION = 230;
     public static int RESPONSE_OKAY_FLAG = 200;

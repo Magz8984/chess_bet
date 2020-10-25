@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:elevation="5dp"
+    app:cardElevation="10dp"
+    app:contentPadding="5dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5px">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_margin="5dp"
+            android:id="@+id/imgProfilePhoto"
+            android:layout_width="110dp"
+            android:layout_height="110dp"/>
+        <LinearLayout
+            android:padding="5dp"
+            android:orientation="vertical"
+            android:layout_toRightOf="@+id/imgProfilePhoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/imgProfilePhoto">
+            <TextView
+                android:fontFamily="@font/chakrapetchbold"
+                android:textSize="20sp"
+                android:text="@string/app_name"
+                android:id="@+id/txtUserName"
+                android:maxLength="25"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <LinearLayout
+                android:weightSum="2"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:textSize="15sp"
+                    android:textAlignment="center"
+                    android:fontFamily="@font/chakrapetchbold"
+                    android:layout_weight="1"
+                    android:id="@+id/txtAmount"
+                    android:text="@string/USD1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal">
+                </TextView>
+                <TextView
+                    android:textSize="15sp"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:gravity="center_horizontal"
+                    android:fontFamily="@font/cabinsketchregular"
+                    android:textColor="@color/bootstrap_green"
+                    android:id="@+id/txtStatus"
+                    android:text="Free"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content">
+                </TextView>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnAccept"
+                android:textSize="18sp"
+                android:fontFamily="@font/chakrapetchbold"
+                android:background="@drawable/rounded_selected_button"
+                android:text="Accept"
+                android:layout_gravity="end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

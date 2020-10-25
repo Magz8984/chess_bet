@@ -359,6 +359,8 @@ public class AccountAPI {
                 if(matchDetails.getMatch_result().getMatchId().equals(match.getMatchId())){
                     if (matchDetails.getMatch_result().getMatchStatus().equals(MatchStatus.DRAW)){
                         match.setMatchStatus(MatchStatus.DRAW);
+                    } else if (matchDetails.getMatch_result().getMatchStatus().equals(MatchStatus.GAME_ABORTED)) {
+                        match.setMatchStatus(MatchStatus.GAME_ABORTED);
                     } else if(matchDetails.getMatch_result().getLoss().equals(currentAccount.getOwner())){
                         match.setMatchStatus(MatchStatus.LOSS);
                     } else if(matchDetails.getMatch_result().getGain().equals(currentAccount.getOwner())) {

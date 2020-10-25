@@ -15,6 +15,11 @@ public class Challenge {
     private boolean isFriendly = false;
     private MatchType matchType;
     private String dateCreated;
+    private String currency;
+    private double amount;
+    private String userName;
+    private String photoUrl;
+    private String fcmToken;
     private String id;
 
     public void setMatchType(MatchType matchType) {
@@ -35,6 +40,10 @@ public class Challenge {
 
     public void setOwner(String owner) {
         this.owner = owner;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 
     public void setAccepted(boolean accepted) {
@@ -73,6 +82,14 @@ public class Challenge {
         return dateCreated;
     }
 
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
     public String getOwner() {
         return owner;
     }
@@ -93,6 +110,10 @@ public class Challenge {
         return duration;
     }
 
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
     public void setDuration(long duration) {
         this.duration = duration;
     }
@@ -103,6 +124,30 @@ public class Challenge {
 
     public boolean isFriendly() {
         return isFriendly;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public String getUserName() {
+        return userName;
     }
 
     public void setId(String id) {

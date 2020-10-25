@@ -145,7 +145,19 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
                 public void run() {
                     try {
                         noMoveSeconds++;
-                        if(noMoveSeconds == Constants.TIME_NO_MOVE_END_MATCH && isDisconnected){
+                        if (noMoveSeconds == Constants.TIME_NO_MOVE_END_ON_START_CAUTION && !hasOpponentMoved && hasMadeMove) {
+                            noMoveEndMatch.onNoMoveOpponentReacting();
+                        } else if (noMoveSeconds == Constants.TIME_NO_MOVE_END_ON_START_CAUTION && hasOpponentMoved && !hasMadeMove) {
+                            noMoveEndMatch.onNoMoveSelfReacting();
+                        } else if (noMoveSeconds == Constants.TIME_NO_MOVE_END_ON_START){
+                            if(!hasOpponentMoved) {
+                                matchableAccount.endMatch(pgn, GameHandler.GAME_ABORTED_FLAG ,MatchStatus.GAME_ABORTED, matchableAccount.getOwner(), matchableAccount.getOpponentId());
+                                noMoveEndMatch.onNoMoveEndMatch(MatchStatus.GAME_ABORTED);
+                            } else if (!hasMadeMove) {
+                                noMoveEndMatch.onNoMoveEndMatch(MatchStatus.GAME_ABORTED);
+                            }
+                        }
+                        else if(noMoveSeconds == Constants.TIME_NO_MOVE_END_MATCH && isDisconnected){
                             noMoveEndMatch.onDisconnected(MatchStatus.DISCONNECTED);
                         }
                         else if(noMoveSeconds == Constants.TIME_NO_MOVE_END_MATCH && !isMyPly){
@@ -153,7 +165,7 @@ public class GameHandler extends AsyncTask<Integer,Void,Void> {
                                 matchableAccount.endMatch(pgn, GameHandler.GAME_ABANDONED_FLAG,MatchStatus.ABANDONMENT, matchableAccount.getOwner(), matchableAccount.getOpponentId());
                                 noMoveEndMatch.onNoMoveEndMatch(MatchStatus.ABANDONMENT);
                             } else {
-                                matchableAccount.endMatch(pgn, GameHandler.GAME_ABORTED_FLAG ,MatchStatus.GAME_ABORTED, "", "");
+                                matchableAccount.endMatch(pgn, GameHandler.GAME_ABORTED_FLAG ,MatchStatus.GAME_ABORTED, matchableAccount.getOwner(), matchableAccount.getOpponentId());
                                 noMoveEndMatch.onNoMoveEndMatch(MatchStatus.GAME_ABORTED);
                             }
                         } else if (noMoveSeconds == Constants.TIME_NO_MOVE_CAUTION && !isMyPly){
