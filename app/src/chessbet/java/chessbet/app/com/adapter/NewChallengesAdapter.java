@@ -127,7 +127,7 @@ public class NewChallengesAdapter  extends FirestoreRecyclerAdapter<Challenge, N
 
     @Override
     public void onMatchError() {
-        Toasty.info(context, "Still setting up match").show();
+        Toasty.info(context, "Wait for match set up").show();
     }
 
     protected static class ViewHolder extends RecyclerView.ViewHolder {
